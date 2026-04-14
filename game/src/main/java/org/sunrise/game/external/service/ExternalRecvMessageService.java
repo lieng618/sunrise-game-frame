@@ -34,7 +34,7 @@ public class ExternalRecvMessageService extends BaseService {
         externalServer.start();
         Properties properties = ConfigReader.getProp();
         if (properties != null) {
-            externalServer.setExternalHost(properties.getProperty("report.address"));
+            externalServer.setExternalHost(properties.getProperty("external.address"));
         }
     }
 
