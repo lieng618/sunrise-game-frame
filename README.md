@@ -2,7 +2,7 @@
 
 ## 1. 项目简介
 
-`sunrise-game-frame` 是一个基于 Java 21 + Maven 的分布式游戏服务器框架示例工程，采用“中心服 + 对外服 + 游戏服 + 全局服 + HTTP 服务 + GM 后台 + 客户端/机器人”的多进程架构。框架不依赖任何第三方中间件，减少开发与部署的负担，只需具备 Java 环境即可运行。
+`sunrise-game-frame` 是一个基于 Java 21 + Maven 的分布式游戏服务器框架，采用“中心服 + 对外服 + 游戏服 + 全局服 + HTTP 服务 + GM 后台 + 客户端/机器人”的多进程架构。框架不依赖任何第三方中间件，减少开发与部署的负担，只需具备 Java 环境即可运行。
 
 项目主要特点：
 
@@ -34,10 +34,10 @@ sunrise-game-frame/
 ├─ admin-ui/                   # GM 后台前端页面
 ├─ start/                      # Windows / Linux 启动脚本
 ├─ tables/                     # Excel 配置表与 Luban 生成配置
-└─ docs/                       # 文档
+└─ docs/                       # 详细的架构文档
 ```
 
-### 2.2 Maven 模块
+### 2.2 Maven 模块 
 
 根 `pom.xml` 中定义了 5 个子模块：
 
@@ -51,7 +51,7 @@ sunrise-game-frame/
 
 ## 3. 框架架构图
 
-
+![sunrise-game-frame.png](https://files.seeusercontent.com/2026/04/14/5unS/sunrise-game-frame.png)
 
 ## 4. MVN 编译构建
 
@@ -67,6 +67,7 @@ sunrise-game-frame/
 由于这是聚合工程，直接在根目录执行 Maven 即可：
 
 ```bash
+mvn install
 mvn clean package
 ```
 
@@ -146,7 +147,19 @@ sh start/linux/create_sql_table.sh
 start/windows/server_run_all.bat
 ```
 
-启动顺序：
+### 6.3 Linux 一键启动
+
+```bash
+sh start/linux/server_run_all.sh
+```
+
+Linux 脚本使用 `pm2` 管理各个进程。需安装 PM2，并根据环境配置，开放端口。
+
+```
+npm install -g pm2
+```
+
+启动后会依次启动
 
 1. center
 2. external
@@ -154,20 +167,6 @@ start/windows/server_run_all.bat
 4. game
 5. http
 6. gmback
-
-### 6.3 Linux 一键启动
-
-```bash
-sh start/linux/server_run_all.sh
-```
-
-Linux 脚本基于 `pm2` 启动各个进程。
-
-需安装 PM2，并根据环境配置，开放端口。
-
-```
-npm install -g pm2
-```
 
 ### 6.4 GM后台登录
 
