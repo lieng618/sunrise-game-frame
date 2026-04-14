@@ -1,0 +1,34 @@
+<configuration>
+    <!-- 关闭 logback 启动时打印的无效日志 -->
+    <statusListener class="ch.qos.logback.core.status.NopStatusListener"/>
+    <!-- 彩色日志 -->
+    <property name="log.pattern"
+              value="%d{HH:mm:ss.SSS} %green([%thread]) %highlight(%-5level) %cyan(%logger{5}).%M\(%F:%L\) %m%n"/>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${log.pattern}</pattern>
+            <charset>utf8</charset>
+        </encoder>
+    </appender>
+    <property name="logFileName" value="log/server-${programName}.log"/>
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${logFileName}</file> <!-- 日志文件路径 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${logFileName}-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>20MB</maxFileSize> <!-- 限制单个日志文件大小为20MB -->
+            <maxHistory>7</maxHistory> <!-- 保留最近7天的日志文件 -->
+            <totalSizeCap>200MB</totalSizeCap> <!-- 日志文件总大小限制为200MB -->
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{50} [%C:%L] - %msg %n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="debug">
+        <appender-ref ref="FILE" />
+        <appender-ref ref="STDOUT" />
+    </root>
+    <logger name="io.netty" level="WARN" />
+    <logger name="com.zaxxer" level="WARN" />
+    <logger name="org.eclipse.jetty" level="WARN" />
+</configuration>

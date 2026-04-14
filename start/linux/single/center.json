@@ -1,0 +1,16 @@
+{
+  "name": "center",
+  "script": "java",
+  "args": [
+    "-Xms256m",
+    "-Xmx1024m",
+    "-jar",
+    "../../jar/sunrise-center.jar",
+    "../../../config/center-config.properties",
+    "1"
+  ],
+  "error_file": "../log/center-err.log",
+  "out_file": "../log/center.log",
+  "exec_interpreter": "",
+  "exec_mode": "fork"
+}

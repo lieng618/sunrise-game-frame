@@ -1,0 +1,1 @@
+start java -Xms256m -Xmx1024m -jar ../../jar/sunrise-external.jar ../../../config/external-config.properties 100

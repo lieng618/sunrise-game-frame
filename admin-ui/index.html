@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>游戏服务器管理</title>
+    <link rel="stylesheet" href="https://unpkg.com/element-plus/dist/index.css"/>
+    <link rel="stylesheet" href="css/common.css"/>
+    <link rel="stylesheet" href="css/index.css"/>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/element-plus"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@element-plus/icons-vue"></script>
+</head>
+<body>
+
+<div id="app">
+    <div v-if="!isLoggedIn" class="login-container min-h-screen flex items-center justify-center">
+        <el-card class="login-card w-96 rounded-xl">
+            <template #header>
+                <div class="text-center">Sunrise 后台登录</div>
+            </template>
+            <el-form label-position="top" class="px-2">
+                <el-form-item label="账号" class="mb-6">
+                    <el-input v-model="form.user" prefix-icon="User" placeholder="请输入账号" size="large"></el-input>
+                </el-form-item>
+                <el-form-item label="密码" class="mb-6">
+                    <el-input v-model="form.pass" type="password" prefix-icon="Lock" placeholder="请输入密码"
+                              @keyup.enter="handleLogin" size="large"></el-input>
+                </el-form-item>
+                <el-button type="primary" class="login-button w-full mt-4" @click="handleLogin" :loading="loading"
+                           size="large">
+                    登录
+                </el-button>
+            </el-form>
+        </el-card>
+    </div>
+
+    <el-container v-else class="h-screen overflow-hidden">
+        <el-aside width="220px" class="sidebar-wrapper">
+            <div class="logo-area">
+                <h1 class="text-lg font-bold text-blue-600 flex items-center gap-2">
+                    <el-icon>
+                        <Sunrise/>
+                    </el-icon>
+                    Sunrise Gm
+                </h1>
+            </div>
+
+            <el-menu :default-active="activeTab" class="flex-1" @select="handleSelect">
+                <el-menu-item index="monitor">
+                    <el-icon>
+                        <House/>
+                    </el-icon>
+                    <span>节点监控</span>
+                </el-menu-item>
+                <el-menu-item index="config_update">
+                    <el-icon>
+                        <Refresh/>
+                    </el-icon>
+                    <span>配置更新</span>
+                </el-menu-item>
+                <el-menu-item index="send_mail">
+                    <el-icon>
+                        <Message/>
+                    </el-icon>
+                    <span>发送邮件</span>
+                </el-menu-item>
+                <el-menu-item index="kick_human">
+                    <el-icon>
+                        <Delete/>
+                    </el-icon>
+                    <span>玩家下线</span>
+                </el-menu-item>
+                <el-menu-item index="ban_player">
+                    <el-icon>
+                        <Lock/>
+                    </el-icon>
+                    <span>玩家封禁</span>
+                </el-menu-item>
+                <el-menu-item index="mute_player">
+                    <el-icon>
+                        <Mute/>
+                    </el-icon>
+                    <span>玩家禁言</span>
+                </el-menu-item>
+                <el-menu-item index="operation_log">
+                    <el-icon>
+                        <Document/>
+                    </el-icon>
+                    <span>操作记录</span>
+                </el-menu-item>
+                <el-menu-item index="user_manager" v-if="isAdmin">
+                    <el-icon>
+                        <Edit/>
+                    </el-icon>
+                    <span>用户管理</span>
+                </el-menu-item>
+            </el-menu>
+
+            <div class="sidebar-footer">
+                sunrise@lieng
+            </div>
+        </el-aside>
+
+        <el-container class="flex flex-col h-full">
+            <el-header class="main-header flex items-center justify-between px-6" style="height: 60px;">
+                <div class="page-title">
+                    {{ pageTitle }}
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <el-dropdown>
+                        <span class="user-dropdown el-dropdown-link flex items-center gap-2 cursor-pointer text-gray-700">
+                            <span class="font-medium">{{ form.user || '管理员' }}</span>
+                        </span>
+                        <template #dropdown>
+                            <el-dropdown-menu>
+                                <el-dropdown-item @click="logout" divided>
+                                    <el-icon class="mr-2">
+                                        <Switch/>
+                                    </el-icon>
+                                    退出登录
+                                </el-dropdown-item>
+                            </el-dropdown-menu>
+                        </template>
+                    </el-dropdown>
+                </div>
+            </el-header>
+
+            <el-main style="padding: 0; overflow: hidden; position: relative;">
+                <iframe :src="currentSrc" ref="contentFrame"></iframe>
+            </el-main>
+        </el-container>
+    </el-container>
+</div>
+
+<script>
+    const {createApp, reactive, toRefs, onMounted, computed, ref} = Vue;
+
+    const app = createApp({
+        setup() {
+            const state = reactive({
+                isLoggedIn: false,
+                loading: false, // 登录按钮loading
+                form: {user: '', pass: ''},
+
+                activeTab: 'monitor', // 当前选中的菜单
+                // 定义菜单 index 到文件名的映射
+                menuMap: {
+                    'monitor': 'monitor.html',
+                    'config_update': 'config_update.html',
+                    'send_mail': 'send_mail.html',
+                    'kick_human': 'kick_human.html',
+                    'ban_player': 'ban_player.html',
+                    'mute_player': 'mute_player.html',
+                    'operation_log': 'operation_log.html',
+                    'user_manager': 'user_manager.html',
+                },
+                isAdmin: false // 是否为管理员
+            });
+
+            const pageTitle = computed(() => {
+                if (state.activeTab === 'monitor') return '节点监控';
+                if (state.activeTab === 'config_update') return '配置更新';
+                if (state.activeTab === 'send_mail') return '发送邮件';
+                if (state.activeTab === 'kick_human') return '玩家下线';
+                if (state.activeTab === 'ban_player') return '玩家封禁';
+                if (state.activeTab === 'mute_player') return '玩家禁言';
+                if (state.activeTab === 'operation_log') return '操作记录';
+                if (state.activeTab === 'user_manager') return '用户管理';
+                return '';
+            });
+
+            // 计算当前 iframe 地址
+            const currentSrc = computed(() => {
+                return state.menuMap[state.activeTab] || 'monitor.html';
+            });
+
+            // --- 登录逻辑 ---
+            const handleLogin = async () => {
+                if (!state.form.user || !state.form.pass) {
+                    ElementPlus.ElMessage.warning('请输入账号密码');
+                    return;
+                }
+                state.loading = true;
+                try {
+                    const res = await fetch('/api/login', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(state.form)
+                    });
+                    const data = await res.json();
+
+                    if (data.code === 200) {
+                        // 1. 存 Token (子页面 iframe 会自己去 localStorage 拿)
+                        localStorage.setItem('admin_token', data.token);
+                        // 2. 保存用户名到本地存储
+                        localStorage.setItem('admin_username', state.form.user);
+                        // 3. 切换状态
+                        state.isLoggedIn = true;
+                        // 4. 检查是否为 admin
+                        await checkAdmin();
+                        ElementPlus.ElMessage.success('登录成功');
+                    } else {
+                        ElementPlus.ElMessage.error(data.msg || '登录失败');
+                    }
+                } catch (e) {
+                    ElementPlus.ElMessage.error('网络连接错误');
+                } finally {
+                    state.loading = false;
+                }
+            };
+
+            // --- 登出逻辑 ---
+            const logout = () => {
+                state.isLoggedIn = false;
+                state.form.pass = ''; // 清空密码
+                state.form.user = ''; // 清空用户名
+                localStorage.removeItem('admin_token');
+                localStorage.removeItem('admin_username');
+                ElementPlus.ElMessage.success('已退出登录');
+            };
+
+            // --- 菜单切换 ---
+            const handleSelect = (index) => {
+                // 如果选择用户管理但当前用户不是 admin，则不允许切换
+                if (index === 'user_manager' && !state.isAdmin) {
+                    ElementPlus.ElMessage.warning('权限不足：只有管理员可以访问用户管理');
+                    return;
+                }
+                state.activeTab = index;
+            };
+
+            // 检查当前用户是否为 admin
+            const checkAdmin = async () => {
+                const token = localStorage.getItem('admin_token');
+                if (!token) {
+                    state.isAdmin = false;
+                    return;
+                }
+                try {
+                    // 尝试访问用户管理接口，只有返回 200 才认为是 admin
+                    const res = await fetch('/api/users', {
+                        headers: {'Authorization': token}
+                    });
+                    // 只有明确返回 200 时才认为是 admin
+                    if (res.status === 200) {
+                        const json = await res.json();
+                        state.isAdmin = json.code === 200;
+                    } else {
+                        state.isAdmin = false;
+                    }
+                } catch (e) {
+                    state.isAdmin = false;
+                }
+            };
+
+            // --- 初始化 ---
+            onMounted(async () => {
+                // 检查是否已有 Token，实现自动登录
+                if (localStorage.getItem('admin_token')) {
+                    state.isLoggedIn = true;
+                    // 恢复用户名
+                    const savedUsername = localStorage.getItem('admin_username');
+                    if (savedUsername) {
+                        state.form.user = savedUsername;
+                    }
+                    // 检查是否为 admin
+                    await checkAdmin();
+                    // 如果当前选中的是用户管理页面，但用户不是 admin，则切换到监控页面
+                    if (state.activeTab === 'user_manager' && !state.isAdmin) {
+                        state.activeTab = 'monitor';
+                    }
+                }
+            });
+
+            return {
+                ...toRefs(state),
+                handleLogin,
+                logout,
+                handleSelect,
+                pageTitle,
+                currentSrc,
+                checkAdmin
+            };
+        }
+    });
+
+    app.use(ElementPlus);
+    // 注册所有图标
+    for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
+        app.component(key, component)
+    }
+    app.mount('#app');
+</script>
+</body>
+</html>

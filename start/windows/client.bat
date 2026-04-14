@@ -1,0 +1,1 @@
+java -jar ../jar/sunrise-client.jar ../../config/client-config.properties

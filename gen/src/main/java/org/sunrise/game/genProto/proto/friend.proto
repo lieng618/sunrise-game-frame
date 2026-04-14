@@ -1,0 +1,83 @@
+syntax = "proto3";
+option java_outer_classname = "FriendProto";
+package org.sunrise.game.genProto.gen;
+
+enum FROM_CLIENT {
+  C2S_GetFriendList = 0;        // 获取好友列表（空消息）
+  C2S_SearchPlayer = 1;          // 搜索玩家
+  C2S_AddFriendRequest = 2;      // 发送好友申请
+  C2S_HandleFriendRequest = 3;   // 处理好友申请（同意/拒绝）
+  C2S_DeleteFriend = 4;          // 删除好友
+  C2S_GetFriendRequestList = 5;  // 获取好友申请列表（空消息）
+}
+
+enum FROM_SERVER {
+  S2C_GetFriendList = 0;         // 好友列表响应
+  S2C_SearchPlayer = 1;          // 搜索玩家响应
+  S2C_FriendUpdate = 2;          // 好友更新（添加/删除/状态变化）
+  S2C_FriendRequestUpdate = 3;   // 好友申请更新（新增申请/处理结果）
+  S2C_GetFriendRequestList = 4; // 好友申请列表响应
+}
+
+// 搜索玩家请求
+message MC2S_SearchPlayer {
+  string keyword = 1;  // 搜索关键词（玩家ID或名称）
+}
+
+// 发送好友申请请求
+message MC2S_AddFriendRequest {
+  string targetHumanId = 1;  // 目标玩家ID
+}
+
+// 处理好友申请请求
+message MC2S_HandleFriendRequest {
+  string applicantHumanId = 1;  // 申请人ID
+  int32 action = 2;            // 操作：1-同意，2-拒绝
+}
+
+// 删除好友请求
+message MC2S_DeleteFriend {
+  string friendHumanId = 1;  // 好友ID
+}
+
+// 好友信息
+message STFriendInfo {
+  string humanId = 1;      // 玩家ID
+  string name = 2;         // 玩家名称
+  int32 level = 3;         // 等级
+  int32 onlineStatus = 4;  // 在线状态：0-离线，1-在线
+}
+
+// 好友申请信息
+message STFriendRequestInfo {
+  string applicantHumanId = 1;  // 申请人ID
+  string applicantName = 2;      // 申请人名称
+  int32 applicantLevel = 3;      // 申请人等级
+  int64 requestTime = 4;         // 申请时间（时间戳）
+}
+
+// 搜索玩家响应
+message MS2C_SearchPlayer {
+  repeated STFriendInfo players = 1;  // 搜索结果列表
+}
+
+// 好友列表响应
+message MS2C_GetFriendList {
+  repeated STFriendInfo friends = 1;  // 好友列表
+}
+
+// 好友更新（用于添加/删除/状态变化）
+message MS2C_FriendUpdate {
+  STFriendInfo friend = 1;  // 好友信息
+  int32 updateType = 2;     // 更新类型：1-添加，2-删除，3-状态更新
+}
+
+// 好友申请列表响应
+message MS2C_GetFriendRequestList {
+  repeated STFriendRequestInfo requests = 1;  // 申请列表
+}
+
+// 好友申请更新
+message MS2C_FriendRequestUpdate {
+  STFriendRequestInfo request = 1;  // 申请信息
+}

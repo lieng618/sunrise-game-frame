@@ -1,0 +1,62 @@
+syntax = "proto3";
+option java_outer_classname = "MinerProto";
+package org.sunrise.game.genProto.gen;
+
+enum FROM_CLIENT
+{
+  C2S_SyncData = 0; //同步游戏数据到服务器
+  C2S_RankList = 1; //请求排行榜
+}
+
+enum FROM_SERVER
+{
+  S2C_SyncData = 0; //服务器下发游戏数据
+  S2C_RankList = 1; //请求排行榜
+}
+
+// 玩家属性数据
+message PlayerStats
+{
+  float rope_speed = 1;    //绳子速度
+  int32 hook_count = 2;    //钩子数量
+  float hook_power = 3;    //钩子力度
+}
+
+// 属性升级次数
+message UpgradeCounts
+{
+  int32 rope_speed = 1;    //绳子速度升级次数
+  int32 hook_count = 2;    //钩子数量升级次数
+  int32 hook_power = 3;    //钩子力度升级次数
+}
+
+// 客户端发送：同步游戏数据
+message MC2S_SyncData
+{
+  int32 level_index = 1;           //当前关卡进度
+  int32 upgrade_points = 2;         //升级点数
+  PlayerStats stats = 3;            //玩家属性
+  UpgradeCounts upgrade_counts = 4; //属性升级次数
+}
+
+// 服务器发送：游戏数据
+message MS2C_SyncData
+{
+  int32 level_index = 1;           //当前关卡进度
+  int32 upgrade_points = 2;         //升级点数
+  PlayerStats stats = 3;            //玩家属性
+  UpgradeCounts upgrade_counts = 4; //属性升级次数
+}
+
+message RankInfo
+{
+  string name = 1;  //角色名字
+  int32 level_index = 2; //当前关卡进度
+}
+
+// 服务器发送：排行榜
+message MS2C_RankList
+{
+  repeated RankInfo infos = 1;
+}
+

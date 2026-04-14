@@ -1,0 +1,158 @@
+[
+  {
+    "id": 10001,
+    "name": "达到1级",
+    "desc": "达到1级",
+    "type": 1,
+    "next_id": 0,
+    "params": [],
+    "goal": 1
+  },
+  {
+    "id": 10002,
+    "name": "达到2级",
+    "desc": "达到2级",
+    "type": 1,
+    "next_id": 0,
+    "params": [],
+    "goal": 2
+  },
+  {
+    "id": 10003,
+    "name": "达到3级",
+    "desc": "达到3级",
+    "type": 1,
+    "next_id": 0,
+    "params": [],
+    "goal": 3
+  },
+  {
+    "id": 10004,
+    "name": "达到4级",
+    "desc": "达到4级",
+    "type": 1,
+    "next_id": 0,
+    "params": [],
+    "goal": 4
+  },
+  {
+    "id": 10005,
+    "name": "达到5级",
+    "desc": "达到5级",
+    "type": 1,
+    "next_id": 0,
+    "params": [],
+    "goal": 5
+  },
+  {
+    "id": 10006,
+    "name": "达到6级",
+    "desc": "达到6级",
+    "type": 1,
+    "next_id": 0,
+    "params": [],
+    "goal": 6
+  },
+  {
+    "id": 10007,
+    "name": "达到7级",
+    "desc": "达到7级",
+    "type": 1,
+    "next_id": 0,
+    "params": [],
+    "goal": 7
+  },
+  {
+    "id": 10008,
+    "name": "达到8级",
+    "desc": "达到8级",
+    "type": 1,
+    "next_id": 0,
+    "params": [],
+    "goal": 8
+  },
+  {
+    "id": 10009,
+    "name": "达到9级",
+    "desc": "达到9级",
+    "type": 1,
+    "next_id": 0,
+    "params": [],
+    "goal": 9
+  },
+  {
+    "id": 10010,
+    "name": "达到10级",
+    "desc": "达到10级",
+    "type": 1,
+    "next_id": 0,
+    "params": [],
+    "goal": 10
+  },
+  {
+    "id": 10011,
+    "name": "击杀怪物",
+    "desc": "",
+    "type": 5,
+    "next_id": 10012,
+    "params": [
+      900001
+    ],
+    "goal": 10
+  },
+  {
+    "id": 10012,
+    "name": "击杀怪物",
+    "desc": "",
+    "type": 5,
+    "next_id": 10013,
+    "params": [
+      900002
+    ],
+    "goal": 10
+  },
+  {
+    "id": 10013,
+    "name": "击杀怪物",
+    "desc": "",
+    "type": 5,
+    "next_id": 0,
+    "params": [
+      900003
+    ],
+    "goal": 10
+  },
+  {
+    "id": 10014,
+    "name": "使用物品",
+    "desc": "",
+    "type": 3,
+    "next_id": 10015,
+    "params": [
+      10001
+    ],
+    "goal": 1
+  },
+  {
+    "id": 10015,
+    "name": "使用物品",
+    "desc": "",
+    "type": 3,
+    "next_id": 10016,
+    "params": [
+      10002
+    ],
+    "goal": 2
+  },
+  {
+    "id": 10016,
+    "name": "使用物品",
+    "desc": "",
+    "type": 3,
+    "next_id": 0,
+    "params": [
+      10003
+    ],
+    "goal": 3
+  }
+]

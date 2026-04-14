@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>配置更新</title>
+    <link rel="stylesheet" href="https://unpkg.com/element-plus/dist/index.css"/>
+    <link rel="stylesheet" href="css/common.css"/>
+    <link rel="stylesheet" href="css/pages.css"/>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/element-plus"></script>
+    <script src="https://unpkg.com/@element-plus/icons-vue"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="common.js"></script>
+</head>
+<body>
+<div id="app">
+    <el-card shadow="never" class="rounded-lg">
+        <el-table :data="filteredData" stripe style="width: 100%" v-loading="loading">
+            <el-table-column prop="type" label="节点类型" width="240">
+                <template #default="scope">
+                    <el-tag type="success" effect="dark">
+                        游戏服
+                    </el-tag>
+                </template>
+            </el-table-column>
+
+            <el-table-column prop="nodeId" label="Node ID" width="240" sortable></el-table-column>
+            <el-table-column prop="serverId" label="Server ID" width="180" sortable align="center"></el-table-column>
+
+            <el-table-column label="管理操作" width="240" align="center" fixed="right">
+                <template #default="scope">
+                    <el-button
+                            type="primary"
+                            size="small"
+                            :disabled="scope.row.status !== 1 || scope.row.stopped"
+                            :loading="scope.row.reloading"
+                            @click="reloadConfig(scope.row)">
+                        <el-icon v-if="!scope.row.reloading">
+                            <Refresh/>
+                        </el-icon>
+                        热更新
+                    </el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+    </el-card>
+</div>
+
+<script>
+    const {createApp, reactive, toRefs, onMounted, computed} = Vue;
+
+    const app = createApp({
+        setup() {
+            const state = reactive({
+                loading: false,
+                allNodes: []
+            });
+
+            // 获取数据
+            const fetchNodes = async () => {
+                state.loading = true;
+                try {
+                    const res = await fetch('/api/nodes', {
+                        headers: {'Authorization': localStorage.getItem('admin_token')}
+                    });
+
+                    if (res.status === 401) {
+                        handleLoginExpired();
+                        return;
+                    }
+
+                    const json = await res.json();
+                    if (json.code === 200) {
+                        // 初始化reloading属性
+                        state.allNodes = json.data.map(node => ({
+                            ...node,
+                            reloading: false
+                        }));
+                    }
+                } catch (e) {
+                    ElementPlus.ElMessage.error('加载失败');
+                } finally {
+                    state.loading = false;
+                }
+            };
+
+            const filteredData = computed(() => {
+                return state.allNodes;
+            });
+
+            // 热更新配置
+            const reloadConfig = async (node) => {
+                try {
+                    await ElementPlus.ElMessageBox.confirm(
+                        `确定要对节点 [${node.nodeId}] 进行配置热更新吗？\n热更新将重新加载配置表文件。`,
+                        '操作确认',
+                        {confirmButtonText: '确定', cancelButtonText: '取消', type: 'warning'}
+                    );
+
+                    // 设置loading状态
+                    node.reloading = true;
+
+                    const res = await fetch('/api/config/reload', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': localStorage.getItem('admin_token')
+                        },
+                        body: JSON.stringify({nodeId: node.nodeId})
+                    });
+
+                    if (res.status === 401) {
+                        handleLoginExpired();
+                        node.reloading = false;
+                        return;
+                    }
+
+                    const json = await res.json();
+                    if (json.code === 200) {
+                        ElementPlus.ElMessage.success('配置热更新指令已发送');
+                    } else {
+                        ElementPlus.ElMessage.error(json.msg || '操作失败');
+                    }
+                } catch (e) {
+                    if (e !== 'cancel') {
+                        console.error(e);
+                        ElementPlus.ElMessage.error('操作失败');
+                    }
+                } finally {
+                    node.reloading = false;
+                }
+            };
+
+            onMounted(() => {
+                fetchNodes();
+            });
+
+            return {...toRefs(state), filteredData, fetchNodes, reloadConfig};
+        }
+    });
+
+    app.use(ElementPlus);
+    for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
+        app.component(key, component)
+    }
+    app.mount('#app');
+</script>
+</body>
+</html>

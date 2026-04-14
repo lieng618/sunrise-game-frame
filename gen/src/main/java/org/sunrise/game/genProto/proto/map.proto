@@ -1,0 +1,67 @@
+syntax = "proto3";
+option java_outer_classname = "MapProto";
+package org.sunrise.game.genProto.gen;
+
+enum FROM_CLIENT {
+  C2S_Enter = 0; // 进入地图
+  C2S_Move = 1;  // 移动
+  C2S_Leave = 2; // 离开地图
+}
+
+enum FROM_SERVER {
+  S2C_Enter = 0; // 进入地图
+  S2C_Move = 1;  // 移动
+  S2C_Sync = 2;  // 同步所有人信息
+  S2C_Leave = 3; // 离开地图
+  S2C_LastMap = 4; // 上次所在地图
+}
+
+message STRoleInfo {
+  float mapPostX = 1;
+  float mapPostY = 2;
+  float mapPostZ = 3;
+  string human_id = 4;  // 角色id
+  string name = 5;      // 角色名字
+  float Orientation = 6;
+}
+
+message MC2S_Enter {
+  uint32 id = 1; // 地图id
+}
+
+message MC2S_Move {
+  float mapPostX = 1;
+  float mapPostY = 2;
+  float mapPostZ = 3;
+  float Orientation = 4;
+}
+
+message MC2S_Leave {
+  uint32 id = 1; // 地图id
+}
+
+// 新玩家进入地图，通知在地图中的玩家
+message MS2C_Enter {
+  STRoleInfo new_player = 1;  // 新进入的玩家信息
+}
+
+message MS2C_Move {
+  float mapPostX = 1;
+  float mapPostY = 2;
+  float mapPostZ = 3;
+  string human_id = 4;
+}
+
+// 进入地图后推送
+message MS2C_Sync {
+  repeated STRoleInfo roles = 1;
+}
+
+message MS2C_Leave {
+  string human_id = 1;  // 离开地图的玩家ID
+}
+
+// 上线后，同步离线时所在地图
+message MS2C_LastMap {
+  uint32 id = 1; // 地图id
+}

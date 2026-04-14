@@ -1,0 +1,1 @@
+start java -Xms256m -Xmx1024m -jar ../../jar/sunrise-http.jar ../../../config/http-config.properties 3

@@ -1,0 +1,34 @@
+syntax = "proto3";
+option java_outer_classname = "ChatProto";
+package org.sunrise.game.genProto.gen;
+
+enum FROM_CLIENT {
+  C2S_Chat = 0;
+  C2S_Horn = 1;
+  C2S_GetHistory = 2;  // 新增获取历史记录请求
+}
+
+enum FROM_SERVER {
+  S2C_Chat = 0;     // 实时聊天消息
+  S2C_Horn = 1;     // 大喇叭
+  S2C_History = 2;  // 新增历史记录响应
+}
+
+message MC2S_Chat {
+  int32 type = 1;  // 类型
+  string msg = 2;  // 消息内容
+}
+
+message MS2C_Chat {
+  string id = 1;     // 玩家id
+  string msg = 2;    // 消息内容
+  int64 time = 3;    // 新增时间戳（毫秒级）
+}
+
+message MC2S_GetHistory {
+  int32 count = 1;  // 请求的历史记录条数
+}
+
+message MS2C_History {
+  repeated MS2C_Chat history = 1;  // 历史记录列表
+}

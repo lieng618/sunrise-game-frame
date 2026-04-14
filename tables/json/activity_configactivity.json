@@ -1,0 +1,50 @@
+[
+  {
+    "id": 10001,
+    "type": 1,
+    "name": "活动1",
+    "desc": "",
+    "level_limit": 100,
+    "natural_time": 1,
+    "begin_time": "2026/3/11.00:00:00",
+    "end_time": "2026/4/11.00:00:00",
+    "human_create": 0,
+    "duration_time": 0
+  },
+  {
+    "id": 10002,
+    "type": 2,
+    "name": "活动2",
+    "desc": "",
+    "level_limit": 100,
+    "natural_time": 1,
+    "begin_time": "2026/3/11.00:00:00",
+    "end_time": "2026/4/11.00:00:00",
+    "human_create": 0,
+    "duration_time": 0
+  },
+  {
+    "id": 10003,
+    "type": 3,
+    "name": "活动3",
+    "desc": "",
+    "level_limit": 100,
+    "natural_time": 1,
+    "begin_time": "2026/3/11.00:00:00",
+    "end_time": "2026/4/11.00:00:00",
+    "human_create": 0,
+    "duration_time": 0
+  },
+  {
+    "id": 10004,
+    "type": 3,
+    "name": "活动4",
+    "desc": "",
+    "level_limit": 100,
+    "natural_time": 0,
+    "begin_time": "",
+    "end_time": "",
+    "human_create": 1,
+    "duration_time": 30
+  }
+]

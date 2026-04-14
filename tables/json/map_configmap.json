@@ -1,0 +1,102 @@
+[
+  {
+    "id": 10001,
+    "name": "地图1",
+    "desc": "",
+    "type": 1,
+    "Cli_id": 10001,
+    "enter_x": 10,
+    "enter_y": 0,
+    "enter_z": 10
+  },
+  {
+    "id": 10002,
+    "name": "地图2",
+    "desc": "",
+    "type": 2,
+    "Cli_id": 10002,
+    "enter_x": 11,
+    "enter_y": 0,
+    "enter_z": 11
+  },
+  {
+    "id": 10003,
+    "name": "地图3",
+    "desc": "",
+    "type": 3,
+    "Cli_id": 10003,
+    "enter_x": 12,
+    "enter_y": 0,
+    "enter_z": 12
+  },
+  {
+    "id": 10004,
+    "name": "地图4",
+    "desc": "",
+    "type": 4,
+    "Cli_id": 10004,
+    "enter_x": 13,
+    "enter_y": 0,
+    "enter_z": 13
+  },
+  {
+    "id": 10005,
+    "name": "地图5",
+    "desc": "",
+    "type": 5,
+    "Cli_id": 10005,
+    "enter_x": 14,
+    "enter_y": 0,
+    "enter_z": 14
+  },
+  {
+    "id": 10006,
+    "name": "地图6",
+    "desc": "",
+    "type": 6,
+    "Cli_id": 10006,
+    "enter_x": 15,
+    "enter_y": 0,
+    "enter_z": 15
+  },
+  {
+    "id": 10007,
+    "name": "地图7",
+    "desc": "",
+    "type": 7,
+    "Cli_id": 10007,
+    "enter_x": 16,
+    "enter_y": 0,
+    "enter_z": 16
+  },
+  {
+    "id": 10008,
+    "name": "地图8",
+    "desc": "",
+    "type": 8,
+    "Cli_id": 10008,
+    "enter_x": 17,
+    "enter_y": 0,
+    "enter_z": 17
+  },
+  {
+    "id": 10009,
+    "name": "地图9",
+    "desc": "",
+    "type": 9,
+    "Cli_id": 10009,
+    "enter_x": 18,
+    "enter_y": 0,
+    "enter_z": 18
+  },
+  {
+    "id": 10010,
+    "name": "地图10",
+    "desc": "",
+    "type": 10,
+    "Cli_id": 10010,
+    "enter_x": 19,
+    "enter_y": 0,
+    "enter_z": 19
+  }
+]

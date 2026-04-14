@@ -1,0 +1,42 @@
+syntax = "proto3";
+option java_outer_classname = "TaskProto";
+package org.sunrise.game.genProto.gen;
+
+enum FROM_CLIENT {
+  C2S_GetTaskList = 0;   // 获取任务列表（空消息）
+  C2S_AcceptTask = 1;    // 接受任务
+  C2S_SubmitTask = 2;    // 提交任务
+}
+
+enum FROM_SERVER {
+  S2C_GetTaskList = 0;   // 获取任务列表（对应C2S_GetTaskList）
+  S2C_TaskUpdate = 1;    // 任务更新（对应C2S_AcceptTask、C2S_SubmitTask，也用于服务器主动推送）
+}
+
+// 接受任务
+message MC2S_AcceptTask {
+  uint32 taskId = 1;     // 任务ID
+}
+
+// 提交任务
+message MC2S_SubmitTask {
+  uint32 taskId = 1;     // 任务ID
+}
+
+// 任务信息
+message STTaskInfo {
+  uint32 taskId = 1;     // 任务ID
+  uint32 progress = 2;   // 进度
+  uint32 status = 3;     // 状态：0-进行中，1-已完成，2-已提交
+}
+
+// 获取任务列表响应
+message MS2C_GetTaskList {
+  repeated STTaskInfo tasks = 1;  // 任务列表
+}
+
+// 任务更新（用于接受任务、提交任务响应，也用于服务器主动推送）
+message MS2C_TaskUpdate {
+  STTaskInfo task = 1;   // 更新的任务信息
+}
+

@@ -1,0 +1,10 @@
+
+protoc-28.2-win64
+
+https://github.com/protocolbuffers/protobuf/releases/tag/v28.2
+
+<dependency>
+    <groupId>org.projectlombok</groupId>
+    <artifactId>lombok</artifactId>
+    <version>1.18.34</version>
+</dependency>

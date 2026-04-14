@@ -1,0 +1,60 @@
+syntax = "proto3";
+option java_outer_classname = "ItemProto";
+package org.sunrise.game.genProto.gen;
+
+enum FROM_CLIENT {
+  C2S_GetItemList = 0;      // 获取背包列表
+  C2S_UseItem = 1;         // 使用物品
+  C2S_RemoveItem = 2;       // 删除物品（根据位置）
+  C2S_RemoveItemById = 3;   // 删除物品（根据物品ID）
+  C2S_SortItem = 4;         // 整理背包
+  C2S_SellItem = 5;         // 出售物品
+}
+
+enum FROM_SERVER {
+  S2C_ItemList = 0;         // 背包列表
+  S2C_ItemUpdate = 1;        // 物品更新（多个位置变化）
+}
+
+// 物品信息
+message STItemInfo {
+  uint32 itemId = 1;        // 物品配置ID
+  uint32 count = 2;         // 物品数量
+  uint32 index = 3;        // 背包位置索引
+}
+
+// 使用物品
+message MC2S_UseItem {
+  uint32 itemId = 1;       // 物品配置ID
+  uint32 count = 2;         // 使用数量
+}
+
+// 删除物品（根据位置）
+message MC2S_RemoveItem {
+  uint32 index = 1;        // 背包位置索引
+  uint32 count = 2;        // 删除数量
+}
+
+// 删除物品（根据物品ID）
+message MC2S_RemoveItemById {
+  uint32 itemId = 1;       // 物品配置ID
+  uint32 count = 2;        // 删除数量
+}
+
+// 出售物品
+message MC2S_SellItem {
+  uint32 itemId = 1;       // 物品配置ID
+  uint32 count = 2;        // 出售数量
+}
+
+// 背包列表
+message MS2C_ItemList {
+  repeated STItemInfo items = 1;  // 物品列表
+  uint32 capacity = 2;            // 背包容量
+}
+
+// 物品更新（多个位置变化）
+message MS2C_ItemUpdate {
+  repeated STItemInfo items = 1;  // 更新的物品信息列表
+}
+

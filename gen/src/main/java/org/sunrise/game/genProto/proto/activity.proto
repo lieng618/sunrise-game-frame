@@ -1,0 +1,59 @@
+syntax = "proto3";
+option java_outer_classname = "ActivityProto";
+package org.sunrise.game.genProto.gen;
+
+enum FROM_CLIENT {
+  C2S_GetActivityList = 0;  // 获取活动列表（空消息）
+  C2S_ActivityAction = 1;   // 活动操作
+}
+
+enum FROM_SERVER {
+  S2C_GetActivityList = 0;  // 获取活动列表
+  S2S_ActivityAction = 1;   // 活动操作
+  S2C_ActivityUpdate = 2;   // 活动更新（服务器主动推送）
+}
+
+// 活动状态信息
+message STActivityStatusInfo {
+  uint32 id = 1;          // 活动id
+  uint32 status = 2;      // 状态：0-未开启，1-进行中，2-已结束
+  int64 beginTime = 3;    // 开始时间戳
+  int64 endTime = 4;      // 结束时间戳
+}
+
+// 获取活动列表响应
+message MS2C_GetActivityList {
+  repeated STActivityStatusInfo activities = 1;
+}
+
+message MC2S_ActivityAction
+{
+  uint32 id = 1;  //活动id
+  uint32 action_id = 2;  //行为id
+  bytes data = 3;  //封包数据
+}
+
+message MS2C_ActivityAction
+{
+  uint32 id = 1;  //活动id
+  uint32 action_id = 2;  //行为id
+  bytes data = 3;  //封包数据
+}
+
+// 活动更新推送
+message MS2C_ActivityUpdate {
+  STActivityStatusInfo activity = 1;
+}
+
+// ----- 活动数据 -----
+
+// 签到活动
+message MS2C_CheckInInfo
+{
+  repeated uint32 ids = 1;  //已签到的天数列表
+}
+
+message MC2S_CheckInAction
+{
+  uint32 id = 1;  //天数id
+}

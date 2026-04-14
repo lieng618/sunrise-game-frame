@@ -1,0 +1,16 @@
+{
+  "name": "game",
+  "script": "java",
+  "args": [
+    "-Xms256m",
+    "-Xmx1024m",
+    "-jar",
+    "../../jar/sunrise-game.jar",
+    "../../../config/game-config.properties",
+    "1000"
+  ],
+  "error_file": "../log/game-err.log",
+  "out_file": "../log/game.log",
+  "exec_interpreter": "",
+  "exec_mode": "fork"
+}

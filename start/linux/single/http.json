@@ -1,0 +1,16 @@
+{
+  "name": "http",
+  "script": "java",
+  "args": [
+    "-Xms256m",
+    "-Xmx1024m",
+    "-jar",
+    "../../jar/sunrise-http.jar",
+    "../../../config/http-config.properties",
+    "3"
+  ],
+  "error_file": "../log/http-err.log",
+  "out_file": "../log/http.log",
+  "exec_interpreter": "",
+  "exec_mode": "fork"
+}

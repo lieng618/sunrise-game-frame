@@ -1,0 +1,16 @@
+{
+  "name": "global",
+  "script": "java",
+  "args": [
+    "-Xms256m",
+    "-Xmx1024m",
+    "-jar",
+    "../../jar/sunrise-global.jar",
+    "../../../config/global-config.properties",
+    "2000"
+  ],
+  "error_file": "../log/global-err.log",
+  "out_file": "../log/global.log",
+  "exec_interpreter": "",
+  "exec_mode": "fork"
+}

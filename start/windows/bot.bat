@@ -1,0 +1,1 @@
+java -jar ../jar/sunrise-bot.jar ../../config/client-config.properties

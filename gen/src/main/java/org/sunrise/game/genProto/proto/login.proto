@@ -1,0 +1,73 @@
+syntax = "proto3";
+option java_outer_classname = "LoginProto";
+package org.sunrise.game.genProto.gen;
+
+enum FROM_CLIENT
+{
+  C2S_Login = 0; //账号登陆
+  C2S_HumanList = 1; //角色列表
+  C2S_SelectHuman = 2; //选择角色
+  C2S_ClientPing = 3; //客户端ping
+}
+
+enum FROM_SERVER
+{
+  S2C_Login = 0; //账号登陆
+  S2C_HumanList = 1; //角色列表
+  S2C_SelectHuman = 2; //选择角色
+  S2C_ClientPing = 3; //客户端ping
+  S2C_ServerInfo = 4; //服务器信息
+  S2C_Kick = 5; //下线
+}
+
+message STHumanShowInfo
+{
+  uint32 pos = 1;  //角色位置
+  string name = 2;  //角色名字
+  string human_id = 3;  //角色id
+  uint32 level = 4;  //角色等级
+  uint32 server_id = 5;  //所属服务器
+}
+
+message MC2S_Login
+{
+  string uid = 1; //用户UID
+}
+
+message MC2S_SelectHuman
+{
+  uint32 pos = 1;  //角色位置
+  uint32 server_id = 2;  //所属服务器
+}
+
+message MC2S_ClientPing
+{
+  uint64 time = 1;  //ping的时间
+}
+
+message MS2C_Login
+{
+  uint64 account_id = 1; //账号ID
+}
+
+message MS2C_HumanList
+{
+  repeated STHumanShowInfo human_list = 1;    //角色列表
+}
+
+message MS2C_ClientPing
+{
+  uint64 time = 1;  //ping发来的时间
+}
+
+message MS2C_ServerInfo
+{
+  uint64 server_time = 1;    //服务器时间
+  int32 time_zone = 2;    //时区
+  uint64 server_open_time = 3;    //服务器开服时间
+}
+
+message MS2C_Kick
+{
+  string reason = 1;    //原因
+}

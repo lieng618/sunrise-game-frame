@@ -1,0 +1,63 @@
+syntax = "proto3";
+option java_outer_classname = "HumanProto";
+package org.sunrise.game.genProto.gen;
+
+enum FROM_CLIENT
+{
+  C2S_ChangeName = 0;  //修改名字
+  C2S_ChangeHeadIcon = 1;  //修改头像
+  C2S_ChangeSex = 2;  //修改性别
+}
+
+enum FROM_SERVER
+{
+  S2C_ChangeName = 0;  //修改名字
+  S2C_ChangeHeadIcon = 1;  //修改头像
+  S2C_ChangeSex = 2;  //修改性别
+  S2C_HumanInfo = 3; //上线发送玩家数据
+  S2C_SendInfoEnd = 4; //玩家数据全部发送完成
+}
+
+message MC2S_ChangeName
+{
+  string name = 1;  //新的名字
+}
+
+message MC2S_ChangeSex
+{
+  uint32 sex = 1;  //性别
+}
+
+message MC2S_ChangeHeadIcon
+{
+  uint32 head_icon_id = 1;  //头像id
+}
+
+message MS2C_ChangeName
+{
+  string name = 1;  //新的名字
+}
+
+message MS2C_ChangeSex
+{
+  uint32 sex = 1;  //性别
+}
+
+message MS2C_ChangeHeadIcon
+{
+  uint32 head_icon_id = 1;  //头像id
+}
+
+message MS2C_HumanInfo
+{
+  string uid = 1;  //uid
+  string name = 2;  //角色名字
+  string human_id = 3;  //角色id
+  uint32 level = 4;  //角色等级
+  uint32 server_id = 5;  //所属服务器
+  uint64 exp = 6;  //经验
+  uint64 account_id = 7;  //账号ID
+  string head_icon = 8;  //角色头像
+  uint64 fight_power = 9;  //战斗力
+  uint32 sex = 10;  //性别
+}

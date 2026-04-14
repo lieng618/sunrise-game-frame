@@ -1,0 +1,12 @@
+[
+  {
+    "ItemBoxCapacity": 200,
+    "ItemMaxStack": 999,
+    "TaskInitIds": [
+      10001,
+      10011,
+      10014
+    ],
+    "MapInitId": 10001
+  }
+]

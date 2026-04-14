@@ -1,0 +1,24 @@
+syntax = "proto3";
+option java_outer_classname = "TopicProto";
+package org.sunrise.game.genProto.gen;
+
+enum TOPIC
+{
+  TOPIC_TYPE_LOGIN = 0 ;
+  TOPIC_TYPE_HUMAN = 1 ;
+  TOPIC_TYPE_CHAT = 2 ;
+  TOPIC_TYPE_MAP = 3 ;
+  TOPIC_TYPE_MINER = 4 ;
+  TOPIC_TYPE_ITEM = 5 ;
+  TOPIC_TYPE_TASK = 6 ;
+  TOPIC_TYPE_FRIEND = 7 ;
+  TOPIC_TYPE_MAIL = 8 ;
+  TOPIC_TYPE_ACTIVITY = 9 ;
+}
+
+message MBasePacketData
+{
+  TOPIC packet_type = 1 ; //封包类型ID
+  uint32 packet_id = 2 ; //封包ID
+  bytes packet_data = 3 ; //封包内容
+}
