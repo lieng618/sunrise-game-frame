@@ -158,6 +158,9 @@ Linux 脚本使用 `pm2` 管理各个进程。需安装 PM2，并根据环境配
 ```
 npm install -g pm2
 ```
+### 6.4 docker启动
+
+详见文档：docs/docker启动流程.md
 
 启动后会依次启动
 
@@ -168,7 +171,7 @@ npm install -g pm2
 5. http
 6. gmback
 
-### 6.4 GM后台登录
+### 6.5 GM后台登录
 
 启动后访问：
 

@@ -1,0 +1,103 @@
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: "123456"
+      MYSQL_DATABASE: "sunrise"
+    ports:
+      - "13306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ../../gen/src/main/java/org/sunrise/game/genDb/sql:/docker-entrypoint-initdb.d
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  center:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    command: ["java", "-Xms256m", "-Xmx1024m", "-jar", "jar/sunrise-center.jar", "config/center-config.properties", "1"]
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - ./config/center-config.properties:/app/config/center-config.properties
+
+  external:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    command: ["java", "-Xms256m", "-Xmx1024m", "-jar", "jar/sunrise-external.jar", "config/external-config.properties", "100"]
+    depends_on:
+      mysql:
+        condition: service_healthy
+      center:
+        condition: service_started
+    ports:
+      - "10000:10000"
+      - "10001:10001"
+    volumes:
+      - ./config/external-config.properties:/app/config/external-config.properties
+
+  game:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    command: ["java", "-Xms256m", "-Xmx1024m", "-jar", "jar/sunrise-game.jar", "config/game-config.properties", "1000"]
+    depends_on:
+      mysql:
+        condition: service_healthy
+      center:
+        condition: service_started
+    volumes:
+      - ./config/game-config.properties:/app/config/game-config.properties
+
+  global:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    command: ["java", "-Xms256m", "-Xmx1024m", "-jar", "jar/sunrise-global.jar", "config/global-config.properties", "2000"]
+    depends_on:
+      mysql:
+        condition: service_healthy
+      center:
+        condition: service_started
+    volumes:
+      - ./config/global-config.properties:/app/config/global-config.properties
+
+  http:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    command: ["java", "-Xms256m", "-Xmx1024m", "-jar", "jar/sunrise-http.jar", "config/http-config.properties", "3"]
+    depends_on:
+      mysql:
+        condition: service_healthy
+      center:
+        condition: service_started
+    ports:
+      - "8090:8090"
+    volumes:
+      - ./config/http-config.properties:/app/config/http-config.properties
+
+  gmback:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    command: ["java", "-Xms256m", "-Xmx1024m", "-jar", "jar/sunrise-gmback.jar", "config/gmback-config.properties", "2"]
+    depends_on:
+      mysql:
+        condition: service_healthy
+      center:
+        condition: service_started
+    ports:
+      - "8010:8010"
+    volumes:
+      - ./config/gmback-config.properties:/app/config/gmback-config.properties
+
+volumes:
+  mysql_data:
