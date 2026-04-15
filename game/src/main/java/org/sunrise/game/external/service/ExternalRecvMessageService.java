@@ -47,6 +47,7 @@ public class ExternalRecvMessageService extends BaseService {
     @Override
     public void pulsePer5Sec() {
         super.pulsePer5Sec();
+        pulseRemoveClients();
         RpcFunction.newInstance().call(CallEnum.HttpRecvMessageService_recvMessage, "serverId", RpcNodeManager.getRpcServerId(), "host", externalServer.getExternalHost(), "port", externalServer.getExternalPort());
     }
 
@@ -63,6 +64,9 @@ public class ExternalRecvMessageService extends BaseService {
         }
     }
 
+    /**
+     * 心跳将客户端消息发送给游戏服
+     */
     private void pulseHandlerConnectionMsg() {
         for (ClientConnection connection : ExternalConnectionManger.getClientConnections()) {
             while (!connection.getMsgQueue().isEmpty()) {
@@ -71,7 +75,26 @@ public class ExternalRecvMessageService extends BaseService {
                     continue;
                 }
                 RpcFunction.newInstance(connection.getGameNodeId()).call(CallEnum.GameRecvMessageService_recvMessage, "id", connection.getId(), "data", data, "nodeId", connection.isFirstSend() ? "" : RpcNodeManager.getRpcServerNodeId());
-                connection.setFirstSend(true);
+                if (!connection.isFirstSend()) {
+                    connection.setFirstSend(true);
+                }
+            }
+        }
+    }
+
+    /**
+     * 心跳清理失效客户端
+     */
+    private void pulseRemoveClients() {
+        for (ClientConnection connection : ExternalConnectionManger.getClientConnections()) {
+            if (connection.getGameNodeId() == null || connection.getGameNodeId().isEmpty()) {
+                continue;
+            }
+            // 此客户断连接的游戏服已经断开连接 需要清理客户端
+            if (RpcNodeManager.getClientNodeIdByServerNodeId(connection.getGameNodeId()).isEmpty()) {
+                if (connection.getChannel() != null && connection.getChannel().isActive()) {
+                    connection.getChannel().close();
+                }
             }
         }
     }

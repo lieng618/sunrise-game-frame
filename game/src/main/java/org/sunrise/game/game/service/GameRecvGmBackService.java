@@ -11,6 +11,7 @@ import org.sunrise.game.rpc.annotation.RpcService;
 import org.sunrise.game.rpc.function.RpcFunction;
 import org.sunrise.game.rpc.node.RpcNodeManager;
 import org.sunrise.game.rpc.service.BaseService;
+import org.sunrise.game.utils.Utils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -100,9 +101,10 @@ public class GameRecvGmBackService extends BaseService {
         Map<String, Object> dataMap = new HashMap<>();
         dataMap.put("nodeId", RpcNodeManager.getRpcServerNodeId());
         dataMap.put("serverId", RpcNodeManager.getRpcServerId());
-        dataMap.put("ip", RpcNodeManager.getRpcNode().getIp());
+        dataMap.put("ip", Utils.getLocalIpAddress());
         dataMap.put("port", RpcNodeManager.getRpcNode().getPort());
         dataMap.put("online", HumanObjectManger.getOnlineCount());
+        dataMap.put("humanIds", JSON.toJSONString(HumanObjectManger.getOnlineHumanIds()));
         RpcFunction.newInstance().call(CallEnum.GmBackRecvMessageService_recvMessage, "operation", "reportGameData", "data", JSON.toJSONString(dataMap));
     }
 }

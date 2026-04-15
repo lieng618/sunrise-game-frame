@@ -2,6 +2,7 @@ package org.sunrise.game.game.human;
 
 import org.sunrise.game.db.entity.EntityHumanList;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -55,6 +56,10 @@ public class HumanObjectManger {
 
     public static int getOnlineCount() {
         return onlineCount.get();
+    }
+
+    public static List<String> getOnlineHumanIds() {
+        return new ArrayList<>(humanObjects.keySet());
     }
 
     public static ConnectObject getConnectObject(long id) {

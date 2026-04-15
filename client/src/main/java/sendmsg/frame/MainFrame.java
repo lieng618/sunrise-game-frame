@@ -140,19 +140,14 @@ public class MainFrame extends JFrame {
     }
 
     private void removeTab() {
-        if (tabbedPane.getTabCount() <= 1) {
-            JOptionPane.showMessageDialog(this, 
-                    "至少需要保留一个窗口", 
-                    "提示", 
-                    JOptionPane.INFORMATION_MESSAGE);
-            return;
-        }
-        
         int selectedIndex = tabbedPane.getSelectedIndex();
         Component selectedComponent = tabbedPane.getComponentAt(selectedIndex);
         if (selectedComponent instanceof SendMsgFrame) {
             ((SendMsgFrame) selectedComponent).close();
             tabbedPane.removeTabAt(selectedIndex);
+        }
+        if (tabbedPane.getTabCount() <= 0) {
+            addTab();
         }
     }
 

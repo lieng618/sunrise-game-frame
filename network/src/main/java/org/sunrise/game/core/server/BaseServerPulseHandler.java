@@ -19,7 +19,7 @@ public class BaseServerPulseHandler extends SimpleChannelInboundHandler<SocketMe
     protected void channelRead0(ChannelHandlerContext ctx, SocketMessage socketMessage) throws Exception {
         if (socketMessage.getMessageType() == MessageType.idle) {
             var message = MessageUtils.fromMessage(socketMessage.getData(), BaseMessage.class);
-            LogCore.BaseServer.debug("recv ping, cur NodeId = { {} }, from NodeId = { {} }, delay = {} ms", nodeId, message.getNodeId(), System.currentTimeMillis() - (long)message.getMsg());
+            LogCore.BasePulse.debug("recv ping, cur NodeId = { {} }, from NodeId = { {} }, delay = {} ms", nodeId, message.getNodeId(), System.currentTimeMillis() - (long)message.getMsg());
             return;
         }
         ctx.fireChannelRead(socketMessage);

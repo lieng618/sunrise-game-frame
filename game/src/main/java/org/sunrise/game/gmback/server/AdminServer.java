@@ -1,15 +1,12 @@
 package org.sunrise.game.gmback.server;
 
 import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
-import ch.qos.logback.classic.LoggerContext;
 import com.alibaba.fastjson2.JSON;
 import io.javalin.Javalin;
 import io.javalin.http.HttpStatus;
 import io.javalin.http.staticfiles.Location;
 import io.javalin.json.JsonMapper;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.LoggerFactory;
 import org.sunrise.game.config.ConfigReader;
 import org.sunrise.game.gmback.server.controller.AuthController;
 import org.sunrise.game.gmback.server.controller.BanHumanController;
@@ -17,11 +14,11 @@ import org.sunrise.game.gmback.server.controller.ControllerManager;
 import org.sunrise.game.gmback.server.controller.GmController;
 import org.sunrise.game.gmback.server.controller.MuteHumanController;
 import org.sunrise.game.gmback.server.controller.NodeController;
+import org.sunrise.game.gmback.server.controller.OnlinePlayerController;
 import org.sunrise.game.gmback.server.controller.OperationLogController;
 import org.sunrise.game.gmback.server.controller.UserController;
 import org.sunrise.game.jwt.JwtUtil;
 import org.sunrise.game.log.LogCore;
-
 
 import java.io.File;
 import java.lang.reflect.Type;
@@ -51,10 +48,7 @@ public class AdminServer {
         JwtUtil.init(jwtExpiration);
 
         // 将 io.javalin 包下的日志级别设置为 WARN
-        LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
-        Logger rootLogger = loggerContext.getLogger("io.javalin");
-        rootLogger.setLevel(Level.WARN);
-
+        LogCore.setLogLevel("io.javalin", Level.WARN);
         Javalin app = Javalin.create(config -> {
             // 配置静态资源 (前端页面)
             if (uiDir.exists()) {
@@ -98,7 +92,6 @@ public class AdminServer {
 
         app.post("/api/login", ControllerManager.getController(AuthController.class)::login);
         app.get("/api/nodes", ControllerManager.getController(NodeController.class)::list);
-        app.post("/api/nodes/toggle", ControllerManager.getController(NodeController.class)::toggle);
         app.post("/api/config/reload", ControllerManager.getController(NodeController.class)::reloadConfig);
         app.post("/api/gm/send-mail", ControllerManager.getController(GmController.class)::sendMail);
         app.post("/api/gm/kick", ControllerManager.getController(GmController.class)::kick);
@@ -120,6 +113,7 @@ public class AdminServer {
         app.post("/api/mute", ControllerManager.getController(MuteHumanController.class)::mute);
         app.post("/api/unmute", ControllerManager.getController(MuteHumanController.class)::unmute);
 
+        app.get("/api/online-players", ControllerManager.getController(OnlinePlayerController.class)::list);
         // --- 启动服务 ---
         try {
             app.start(port);

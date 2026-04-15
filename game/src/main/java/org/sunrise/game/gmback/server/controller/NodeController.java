@@ -48,20 +48,6 @@ public class NodeController extends BaseController {
         success(ctx, voList);
     }
 
-    public void toggle(Context ctx) {
-        String nodeId = getBodyParam(ctx, "nodeId", String.class);
-        Boolean stop = getBodyParam(ctx, "stop", Boolean.class);
-
-//        if (nodeId != null && stop != null) {
-//            NodeManager.updateNodeStatus(nodeId, stop);
-//            success(ctx);
-//
-//            ControllerManager.getController(OperationLogController.class).recordLog(ctx, OperationLogController.OperationType.TOGGLE_NODE, (stop ? "停止节点" : "启动节点") + "(节点ID:" + nodeId + ")");
-//        } else {
-//            fail(ctx, 400, "Missing params");
-//        }
-    }
-
     public void reloadConfig(Context ctx) {
         String nodeId = getBodyParam(ctx, "nodeId", String.class);
         if (nodeId == null || nodeId.isEmpty()) {

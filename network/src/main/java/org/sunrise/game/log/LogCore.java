@@ -1,5 +1,7 @@
 package org.sunrise.game.log;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.LoggerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -8,6 +10,7 @@ public class LogCore {
 
     public static final Logger BaseClient = LoggerFactory.getLogger("BaseClient");
     public static final Logger BaseServer = LoggerFactory.getLogger("BaseServer");
+    public static final Logger BasePulse = LoggerFactory.getLogger("BasePulse");
 
     public static final Logger RpcClient = LoggerFactory.getLogger("RpcClient");
     public static final Logger RpcServer = LoggerFactory.getLogger("RpcServer");
@@ -21,4 +24,10 @@ public class LogCore {
 
     public static final Logger Bot = LoggerFactory.getLogger("Bot");
     public static final Logger Client = LoggerFactory.getLogger("Client");
+
+    public static void setLogLevel(String loggerKey, Level level) {
+        LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+        ch.qos.logback.classic.Logger rootLogger = loggerContext.getLogger(loggerKey);
+        rootLogger.setLevel(level);
+    }
 }

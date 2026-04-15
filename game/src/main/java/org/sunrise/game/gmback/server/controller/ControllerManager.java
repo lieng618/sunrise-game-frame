@@ -28,6 +28,7 @@ public class ControllerManager {
         controllers.put(UserController.class.getSimpleName(), new UserController());
         controllers.put(BanHumanController.class.getSimpleName(), new BanHumanController());
         controllers.put(MuteHumanController.class.getSimpleName(), new MuteHumanController());
+        controllers.put(OnlinePlayerController.class.getSimpleName(), new OnlinePlayerController());
         load();
         waitInitEnd();
         startSaveDbPulse();

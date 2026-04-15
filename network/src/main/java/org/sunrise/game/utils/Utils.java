@@ -1,9 +1,6 @@
 package org.sunrise.game.utils;
 
 import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
-import ch.qos.logback.classic.LoggerContext;
-import org.slf4j.LoggerFactory;
 import org.sunrise.game.log.LogCore;
 import org.sunrise.game.thread.DispatchThread;
 
@@ -132,25 +129,22 @@ public class Utils {
     }
 
     public static void setLogLevel(String logLevel) {
-        LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
-        Logger rootLogger = loggerContext.getLogger("root");
-
         switch (logLevel.toUpperCase()) {
             case "TRACE":
-                rootLogger.setLevel(Level.TRACE);
+                LogCore.setLogLevel("root", Level.TRACE);
                 break;
             case "DEBUG":
-                rootLogger.setLevel(Level.DEBUG);
+                LogCore.setLogLevel("root", Level.DEBUG);
                 break;
             case "WARN":
-                rootLogger.setLevel(Level.WARN);
+                LogCore.setLogLevel("root", Level.WARN);
                 break;
             case "ERROR":
-                rootLogger.setLevel(Level.ERROR);
+                LogCore.setLogLevel("root", Level.ERROR);
                 break;
             case "INFO":
             default:
-                rootLogger.setLevel(Level.INFO);
+                LogCore.setLogLevel("root", Level.INFO);
                 break;
         }
     }

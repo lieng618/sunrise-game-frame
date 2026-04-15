@@ -24,7 +24,7 @@ public class BaseClientPulseHandler extends ChannelInboundHandlerAdapter {
             BaseMessage pulseMsg = new BaseMessage(nodeId);
             pulseMsg.setMsg(System.currentTimeMillis());
             ctx.writeAndFlush(new SocketMessage(MessageType.idle, MessageUtils.toBytes(pulseMsg)));
-            LogCore.BaseClient.debug("send ping, cur NodeId = { {} }", nodeId);
+            LogCore.BasePulse.debug("send ping, cur NodeId = { {} }", nodeId);
         } else {
             super.userEventTriggered(ctx, evt);
         }

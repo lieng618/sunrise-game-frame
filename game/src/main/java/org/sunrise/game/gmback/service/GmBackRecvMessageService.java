@@ -7,11 +7,13 @@ import org.sunrise.game.gmback.server.controller.BanHumanController;
 import org.sunrise.game.gmback.server.controller.ControllerManager;
 import org.sunrise.game.gmback.server.controller.MuteHumanController;
 import org.sunrise.game.gmback.server.controller.NodeController;
+import org.sunrise.game.gmback.server.controller.OnlinePlayerController;
 import org.sunrise.game.log.LogCore;
 import org.sunrise.game.rpc.annotation.RpcMethod;
 import org.sunrise.game.rpc.annotation.RpcService;
 import org.sunrise.game.rpc.service.BaseService;
 
+import java.util.List;
 import java.util.Map;
 
 @RpcService
@@ -51,7 +53,7 @@ public class GmBackRecvMessageService extends BaseService {
     }
 
     /**
-     * 处理game发来的数据
+     * 处理game发来的节点数据
      */
     private void handleGameData(Map<String, Object> data) {
         String nodeId = (String) data.get("nodeId");
@@ -59,7 +61,11 @@ public class GmBackRecvMessageService extends BaseService {
         String ip = (String) data.get("ip");
         int port = (int) data.get("port");
         int online = (int) data.get("online");
+        List<String> humanIds = JSON.parseObject((String) data.get("humanIds"), new TypeReference<List<String>>() {});
         ControllerManager.getController(NodeController.class).updateGameData(nodeId, serverId, ip, port, online);
+        if (humanIds != null) {
+            ControllerManager.getController(OnlinePlayerController.class).updateHumanData(serverId, humanIds);
+        }
     }
 
     @Override

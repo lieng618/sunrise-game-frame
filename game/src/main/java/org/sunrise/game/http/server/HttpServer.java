@@ -1,13 +1,11 @@
 package org.sunrise.game.http.server;
 
 import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
-import ch.qos.logback.classic.LoggerContext;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import io.javalin.Javalin;
 import lombok.Data;
-import org.slf4j.LoggerFactory;
+import org.sunrise.game.log.LogCore;
 
 import java.util.Map;
 import java.util.Random;
@@ -99,9 +97,7 @@ public class HttpServer {
 
     public void start() {
         // 将 io.javalin 包下的日志级别设置为 WARN
-        LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
-        Logger rootLogger = loggerContext.getLogger("io.javalin");
-        rootLogger.setLevel(Level.WARN);
+        LogCore.setLogLevel("io.javalin", Level.WARN);
         try {
             app.start(port);
         } catch (Exception e) {

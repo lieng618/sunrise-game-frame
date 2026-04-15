@@ -1,5 +1,6 @@
 package org.sunrise.game.rpc.node;
 
+import ch.qos.logback.classic.Level;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
 import io.netty.bootstrap.Bootstrap;
@@ -73,6 +74,7 @@ public class RpcNode {
         rpcServer.setServerHandler(r -> new RpcServerHandler(rpcServer.getNodeId()));
         BaseServerManager.register(rpcServer);
         IdGenerator.init(serverId);
+        LogCore.setLogLevel("BasePulse", Level.INFO);
     }
 
     public String getNodeId() {
