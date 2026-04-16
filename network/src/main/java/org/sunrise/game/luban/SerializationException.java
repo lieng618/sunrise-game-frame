@@ -1,4 +1,4 @@
-package org.sunrise.game.game.config.luban;
+package org.sunrise.game.luban;
 
 public class SerializationException extends RuntimeException {
     public SerializationException() {

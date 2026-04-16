@@ -1,4 +1,4 @@
-package org.sunrise.game.game.config.luban;
+package org.sunrise.game.luban;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;

@@ -9,28 +9,29 @@
 
 package org.sunrise.game.game.config.map;
 
+import org.sunrise.game.luban.*;
 import com.google.gson.JsonElement;
 
 
 public final class ConfigMap {
-    private final java.util.HashMap<Integer, TbMap> _dataMap;
-    private final java.util.ArrayList<TbMap> _dataList;
+    private final java.util.HashMap<Integer, org.sunrise.game.game.config.map.TbMap> _dataMap;
+    private final java.util.ArrayList<org.sunrise.game.game.config.map.TbMap> _dataList;
     
     public ConfigMap(JsonElement _buf) {
-        _dataMap = new java.util.HashMap<Integer, TbMap>();
-        _dataList = new java.util.ArrayList<TbMap>();
+        _dataMap = new java.util.HashMap<Integer, org.sunrise.game.game.config.map.TbMap>();
+        _dataList = new java.util.ArrayList<org.sunrise.game.game.config.map.TbMap>();
         
-        for (JsonElement _e_ : _buf.getAsJsonArray()) {
-            TbMap _v;
-            _v = TbMap.deserialize(_e_.getAsJsonObject());
+        for (com.google.gson.JsonElement _e_ : _buf.getAsJsonArray()) {
+            org.sunrise.game.game.config.map.TbMap _v;
+            _v = org.sunrise.game.game.config.map.TbMap.deserialize(_e_.getAsJsonObject());
             _dataList.add(_v);
             _dataMap.put(_v.id, _v);
         }
     }
 
-    public java.util.HashMap<Integer, TbMap> getDataMap() { return _dataMap; }
-    public java.util.ArrayList<TbMap> getDataList() { return _dataList; }
+    public java.util.HashMap<Integer, org.sunrise.game.game.config.map.TbMap> getDataMap() { return _dataMap; }
+    public java.util.ArrayList<org.sunrise.game.game.config.map.TbMap> getDataList() { return _dataList; }
 
-    public TbMap get(int key) { return _dataMap.get(key); }
+    public org.sunrise.game.game.config.map.TbMap get(int key) { return _dataMap.get(key); }
 
 }

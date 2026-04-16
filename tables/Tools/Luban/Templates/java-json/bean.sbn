@@ -2,7 +2,7 @@
 package {{__namespace_with_top_module}};
 {{~end~}}
 
-import org.sunrise.game.common.luban.*;
+import org.sunrise.game.luban.*;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 

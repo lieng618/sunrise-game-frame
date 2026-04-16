@@ -9,6 +9,7 @@
 
 package org.sunrise.game.game.config;
 
+import org.sunrise.game.luban.*;
 import com.google.gson.JsonElement;
 
 public final class Tables

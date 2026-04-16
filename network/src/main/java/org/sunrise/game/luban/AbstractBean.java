@@ -1,4 +1,4 @@
-package org.sunrise.game.game.config.luban;
+package org.sunrise.game.luban;
 
 public abstract class AbstractBean {
     public abstract int getTypeId();

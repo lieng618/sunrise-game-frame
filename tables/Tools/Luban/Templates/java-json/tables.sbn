@@ -2,7 +2,7 @@
 package {{__namespace}};
 {{~end~}}
 
-import org.sunrise.game.common.luban.*;
+import org.sunrise.game.luban.*;
 import com.google.gson.JsonElement;
 {{~
 func get_table_inner_name

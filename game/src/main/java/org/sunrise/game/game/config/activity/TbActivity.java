@@ -9,8 +9,9 @@
 
 package org.sunrise.game.game.config.activity;
 
+import org.sunrise.game.luban.*;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import org.sunrise.game.game.config.luban.AbstractBean;
 
 
 public final class TbActivity extends AbstractBean {
@@ -28,7 +29,7 @@ public final class TbActivity extends AbstractBean {
     }
 
     public static TbActivity deserialize(JsonObject _buf) {
-            return new TbActivity(_buf);
+            return new org.sunrise.game.game.config.activity.TbActivity(_buf);
     }
 
     /**

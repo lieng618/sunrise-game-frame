@@ -12,7 +12,7 @@ dotnet %LUBAN_DLL% ^
 
 @echo off
 set sourceDir=.\src
-set targetDir=..\game\src\org\sunrise\game\game\config\
+set targetDir=..\game\src\main\java\org\sunrise\game\game\config\
 
 echo Clearing target directory: %targetDir%
 if exist "%targetDir%" (

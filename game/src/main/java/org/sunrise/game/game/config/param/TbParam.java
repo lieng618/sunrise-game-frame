@@ -9,9 +9,9 @@
 
 package org.sunrise.game.game.config.param;
 
+import org.sunrise.game.luban.*;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import org.sunrise.game.game.config.luban.AbstractBean;
 
 
 public final class TbParam extends AbstractBean {
@@ -23,7 +23,7 @@ public final class TbParam extends AbstractBean {
     }
 
     public static TbParam deserialize(JsonObject _buf) {
-            return new TbParam(_buf);
+            return new org.sunrise.game.game.config.param.TbParam(_buf);
     }
 
     /**

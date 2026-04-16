@@ -9,19 +9,19 @@
 
 package org.sunrise.game.game.config.param;
 
+import org.sunrise.game.luban.*;
 import com.google.gson.JsonElement;
-import org.sunrise.game.game.config.luban.SerializationException;
 
 
 public final class ConfigParam {
-    private final TbParam _data;
+    private final org.sunrise.game.game.config.param.TbParam _data;
 
-    public final TbParam data() { return _data; }
+    public final org.sunrise.game.game.config.param.TbParam data() { return _data; }
 
     public ConfigParam(JsonElement _buf) {
         int n = _buf.getAsJsonArray().size();
         if (n != 1) throw new SerializationException("table mode=one, but size != 1");
-        _data = TbParam.deserialize(_buf.getAsJsonArray().get(0).getAsJsonObject().getAsJsonObject());
+        _data = org.sunrise.game.game.config.param.TbParam.deserialize(_buf.getAsJsonArray().get(0).getAsJsonObject().getAsJsonObject());
     }
 
 

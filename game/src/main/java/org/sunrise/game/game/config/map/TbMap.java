@@ -9,8 +9,9 @@
 
 package org.sunrise.game.game.config.map;
 
+import org.sunrise.game.luban.*;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import org.sunrise.game.game.config.luban.AbstractBean;
 
 
 public final class TbMap extends AbstractBean {
@@ -26,7 +27,7 @@ public final class TbMap extends AbstractBean {
     }
 
     public static TbMap deserialize(JsonObject _buf) {
-            return new TbMap(_buf);
+            return new org.sunrise.game.game.config.map.TbMap(_buf);
     }
 
     /**
