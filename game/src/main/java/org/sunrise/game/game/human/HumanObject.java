@@ -115,6 +115,18 @@ public class HumanObject {
         return roleData;
     }
 
+    public void pulse() {
+        for (Map.Entry<String, BaseModule> entry : modules.entrySet()) {
+            entry.getValue().pulse();
+        }
+    }
+
+    public void pulsePerSec() {
+        for (Map.Entry<String, BaseModule> entry : modules.entrySet()) {
+            entry.getValue().pulsePerSec();
+        }
+    }
+
     public void sendMsg(int packetType, int packetId) {
         connectObject.sendMsg(packetType, packetId);
     }

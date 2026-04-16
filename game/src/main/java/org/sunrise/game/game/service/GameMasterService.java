@@ -32,6 +32,8 @@ public class GameMasterService extends BaseService {
         pulseHandlerHumanMsg();
         // 处理玩家的异步回调
         pulseHandlerHumanAsyncEvent();
+        // 系统心跳
+        GameSystem.pulse();
     }
 
     @Override
@@ -42,8 +44,8 @@ public class GameMasterService extends BaseService {
         pulseHandlerDeleteHuman();
         // 玩家数据定时存库
         pulseHandlerHumanDbSave();
-        // 系统心跳
-        GameSystem.pulse();
+        // 系统心跳 每秒
+        GameSystem.pulsePerSec();
     }
 
     /**

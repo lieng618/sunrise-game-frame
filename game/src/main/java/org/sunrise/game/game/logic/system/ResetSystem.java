@@ -34,7 +34,7 @@ public class ResetSystem extends BaseSystem {
     }
 
     @Override
-    public void pulse() {
+    public void pulsePerSec() {
         pulseHandlerDailyRefresh();
         pulseHandlerWeekRefresh();
     }

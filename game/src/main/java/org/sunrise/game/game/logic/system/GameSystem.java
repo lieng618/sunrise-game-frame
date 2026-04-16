@@ -4,6 +4,8 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
 import org.sunrise.game.db.entity.EntityServerData;
 import org.sunrise.game.game.db.DbManager;
+import org.sunrise.game.game.human.HumanObject;
+import org.sunrise.game.game.human.HumanObjectManger;
 import org.sunrise.game.game.logic.ToolsUtils;
 import org.sunrise.game.log.LogCore;
 import org.sunrise.game.rpc.node.RpcNodeManager;
@@ -116,19 +118,41 @@ public class GameSystem {
      * GameSystem 主心跳
      */
     public static void pulse() {
+        // 系统的心跳
+        for (Map.Entry<String, BaseSystem> entry : systems.entrySet()) {
+            if (entry.getValue().isInitEnd()) {
+                entry.getValue().pulse();
+            }
+        }
+
+        // 玩家模块心跳
+        for (HumanObject humanObject : HumanObjectManger.getHumanObjects()) {
+            humanObject.pulse();
+        }
+    }
+
+    /**
+     * GameSystem 主心跳 每秒
+     */
+    public static void pulsePerSec() {
         long cur = System.currentTimeMillis();
-        
+
         // 每分钟保存一次数据库
         if (lastSaveDbTime + ToolsUtils.MINUTE_MILLS <= cur) {
             lastSaveDbTime = cur;
             save();
         }
-        
-        // 每秒调用一次系统的 pulse
+
+        // 每秒调用一次系统的心跳
         for (Map.Entry<String, BaseSystem> entry : systems.entrySet()) {
             if (entry.getValue().isInitEnd()) {
-                entry.getValue().pulse();
+                entry.getValue().pulsePerSec();
             }
+        }
+
+        // 每秒调用一次玩家模块心跳
+        for (HumanObject humanObject : HumanObjectManger.getHumanObjects()) {
+            humanObject.pulsePerSec();
         }
     }
 

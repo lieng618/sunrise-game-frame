@@ -56,6 +56,12 @@ public class ActivityModule extends BaseModule {
         sendActivityList();
     }
 
+    @Override
+    public void pulsePerSec() {
+        super.pulsePerSec();
+        pulseChangeActivityStatus();
+    }
+
     /**
      * 进行初始化
      */

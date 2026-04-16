@@ -54,6 +54,20 @@ public class BaseModule {
     }
 
     /**
+     * 模块心跳
+     */
+    public void pulse() {
+
+    }
+
+    /**
+     * 模块心跳 每秒
+     */
+    public void pulsePerSec() {
+
+    }
+
+    /**
      * 每日刷新
      */
     public void dailyReset() {
