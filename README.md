@@ -6,15 +6,24 @@
 
 项目主要特点：
 
-- 基于 `Netty` 实现 TCP / WebSocket 通讯。
-- 基于 `Protocol Buffers` 组织客户端协议。
-- 基于自研 RPC 框架实现服务间通信与广播。
-- 基于 `Javalin` 实现 HTTP 地址分发服务与 GM 后台。
-- 基于 `MySQL + HikariCP` 实现数据持久化。
-- 游戏服采用“玩家对象 + 模块化存档 + 注解路由”的业务组织方式。
-- 实现了两个客户端：
-  - `sunrise-client`：协议发送工具
-  - `sunrise-bot`：机器人压测工具
+- 采用分布式多节点架构，中心服管理节点，所有业务节点支持动态扩容。
+- 基于自研 RPC 框架搭建多个服务模块，结构清晰，易于扩展。
+- 采用单线程无锁异步化设计，避免了多线程并发问题。
+- 无任何中间件依赖，业务代码编写规范，业务模块化设计。
+- 实现了协议发送工具与机器人压测工具，开发测试更便捷。
+
+主要使用技术栈:
+
+- netty（开源网络框架）
+- protobuf（消息序列化）
+- msgpack（消息序列化）
+- fastjson（json序列化）
+- mysql（数据库）
+- HikariCP（数据库连接池）
+- slf4j（日志输出）
+- yitter（分布式雪花算法）
+- javalin（轻量级web框架）
+- luban（游戏配置工作流）
 
 ---
 
@@ -32,7 +41,7 @@ sunrise-game-frame/
 ├─ game/                       # 游戏主逻辑、多服务实现
 ├─ client/                     # 客户端工具、机器人
 ├─ admin-ui/                   # GM 后台前端页面
-├─ start/                      # Windows / Linux 启动脚本
+├─ start/                      # Windows / Linux / Docker 启动脚本
 ├─ tables/                     # Excel 配置表与 Luban 生成配置
 └─ docs/                       # 详细的架构文档
 ```
@@ -53,16 +62,17 @@ sunrise-game-frame/
 
 ![sunrise-game-frame.png](https://files.seeusercontent.com/2026/04/14/5unS/sunrise-game-frame.png)
 
-## 4. MVN 编译构建
+---
+
+## 4. 服务器启动
 
 ### 4.1 环境要求
 
 - JDK 21
-- Maven 3.8+
-- MySQL 8.x
-- Windows 或 Linux
+- Maven
+- MySQL
 
-### 4.2 编译说明
+### 4.2 代码编译
 
 由于这是聚合工程，直接在根目录执行 Maven 即可：
 
@@ -82,9 +92,34 @@ mvn clean package
 - `start/jar/sunrise-client.jar`
 - `start/jar/sunrise-bot.jar`
 
----
+### 4.3 配置文件
 
-## 5. 数据库初始化
+所有服务都从 `config/` 目录读取配置：
+
+- `center-config.properties`
+- `external-config.properties`
+- `game-config.properties`
+- `global-config.properties`
+- `http-config.properties`
+- `gmback-config.properties`
+
+其中典型项有：
+
+- `jdbc.*` (mysql连接信息)
+- `master.id/master.address/master.port` （中央服id、ip、端口）
+- `report.address` （每个节点向中心服上报ip，使得所有节点互连）
+- `external.address` （对外服向http服务上报ip，客户端通过http请求获取对外服地址进行连接）
+- `http.address`/`http.port`（测试客户端，连接的http服务的ip、端口）
+- `admin.port`（gm后台服务监听的端口）
+- `admin.user/admin.password`（gm后台登录用户名、密码）
+- `admin.uipath`（gm后台静态资源路径）
+- `config.path`（游戏服配置表数据路径）
+
+根据自己的环境，修改为正确配置。
+
+### 4.4 数据库初始化
+
+sql脚本内部会创建数据表，执行脚本前，需修改脚本内的mysql地址、账号、密码。
 
 Windows：
 
@@ -98,80 +133,39 @@ Linux：
 sh start/linux/create_sql_table.sh
 ```
 
-初始化 SQL 主要创建以下表：
+初始化 SQL 会创建以下表：
 
-- `external_system`
-- `rpc_server_system`
-- `account`
-- `human_list`
-- `human_info`
-- `server_data`
+- `external_system`（对外服地址管理）
+- `rpc_server_system`（rpc节点地址管理）
+- `account`（玩家账号表）
+- `human_list`（玩家角色列表）
+- `human_info`（玩家信息存档表）
+- `server_data`（服务信息存档表）
 
-说明：
-
-- `human_info.role_data`：玩家模块化 JSON 存档
-- `server_data`：服务级持久化，如全局聊天、好友、邮件等
-- 执行脚本前，需修改脚本内的mysql地址、账号、密码
-
----
-
-## 6. 服务器启动
-
-### 6.1 配置文件
-
-所有服务都从 `config/` 目录读取配置：
-
-- `center-config.properties`
-- `external-config.properties`
-- `game-config.properties`
-- `global-config.properties`
-- `http-config.properties`
-- `gmback-config.properties`
-
-其中典型项有：
-
-- MySQL 连接信息
-- `master.id/master.address/master.port`
-- `report.address`
-- `http.port`
-- `admin.port`
-- `admin.user/admin.password`
-- `admin.uipath`
-- `config.path`
-
-根据自己的环境，修改为正确配置
-
-### 6.2 Windows 一键启动
+### 4.5 Windows 一键启动
 
 ```bat
 start/windows/server_run_all.bat
 ```
 
-### 6.3 Linux 一键启动
+### 4.6 Linux 一键启动
+
+```bash
+npm install -g pm2
+```
 
 ```bash
 sh start/linux/server_run_all.sh
 ```
 
-Linux 脚本使用 `pm2` 管理各个进程。需安装 PM2，并根据环境配置，开放端口。
+### 4.7 Docker启动
 
+```bash
+cd start/docker
+docker compose up -d --build
 ```
-npm install -g pm2
-```
-### 6.4 docker启动
 
-详见文档：docs/docker启动流程.md
-
-启动后会依次启动
-
-1. center
-2. external
-3. global
-4. game
-5. http
-6. gmback
-
-### 6.5 GM后台登录
+### 4.8 GM后台登录
 
 启动后访问：
 
@@ -197,9 +191,9 @@ http://127.0.0.1:8010/
 
 ---
 
-## 7. 客户端启动
+## 5. 客户端启动
 
-### 7.1 发送消息工具
+### 5.1 发送消息工具
 
 Windows：
 
@@ -211,13 +205,7 @@ start/windows/client.bat
 
 - `sendmsg.main.ClientStartUp`
 
-作用：
-
-- 初始化 HTTP 地址获取器
-- 注册协议解析器与处理器
-- 打开消息发送工具
-
-### 7.2 机器人客户端
+### 5.2 机器人客户端
 
 Windows：
 
@@ -229,14 +217,7 @@ start/windows/bot.bat
 
 - `bot.main.BotStartUp`
 
-作用：
-
-- 批量创建客户端
-- 自动登录
-- 定时发送 Ping
-- 用于压测与稳定性测试
-
-### 7.3 客户端配置
+### 5.3 客户端配置
 
 客户端统一读：
 
@@ -257,7 +238,7 @@ client.socket=tcp
 
 ---
 
-## 8. 已有业务模块一览
+## 6. 已有业务模块一览
 
 目前协议与业务已覆盖：
 
@@ -270,12 +251,13 @@ client.socket=tcp
 - 好友
 - 邮件
 - 活动
+- 属性
 
 适合作为新增业务模块的参考模板。
 
 ---
 
-## 9. 联系我
+## 7. 联系我
 
 qq：1906438581
 

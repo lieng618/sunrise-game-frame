@@ -12,5 +12,6 @@
   "error_file": "../log/global-err.log",
   "out_file": "../log/global.log",
   "exec_interpreter": "",
-  "exec_mode": "fork"
+  "exec_mode": "fork",
+  "restart": "none"
 }

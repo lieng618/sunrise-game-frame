@@ -1,0 +1,25 @@
+syntax = "proto3";
+option java_outer_classname = "AttributeProto";
+package org.sunrise.game.genProto.gen;
+
+enum FROM_CLIENT {
+  C2S_GetAttributeList = 0;  // 获取属性列表
+}
+
+enum FROM_SERVER {
+  S2C_AttributeList = 0;     // 属性列表
+  S2C_AttributeUpdate = 1;   // 属性更新
+}
+
+message STAttributeInfo {
+  uint32 attribute_type = 1;  // 属性类型
+  uint64 final_value = 2;     // 最终值（放大1000倍存储）
+}
+
+message MS2C_AttributeList {
+  repeated STAttributeInfo attributes = 1;  // 属性列表
+}
+
+message MS2C_AttributeUpdate {
+  repeated STAttributeInfo attributes = 1;  // 更新的属性列表
+}

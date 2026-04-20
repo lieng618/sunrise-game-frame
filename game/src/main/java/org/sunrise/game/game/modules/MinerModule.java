@@ -3,6 +3,8 @@ package org.sunrise.game.game.modules;
 import com.alibaba.fastjson2.TypeReference;
 import lombok.Getter;
 import lombok.Setter;
+import org.sunrise.game.game.config.Enum.AttributeType;
+import org.sunrise.game.game.logic.attribute.AttributeProvider;
 import org.sunrise.game.genProto.gen.MinerProto;
 import org.sunrise.game.genProto.gen.TopicProto;
 
@@ -17,6 +19,8 @@ public class MinerModule extends BaseModule {
     private int level3;    //钩子力度升级次数
     private int levelIndex; //当前关卡
     private int upgradePoints; //当前拥有点数
+    private AttributeProvider attributeProvider = new AttributeProvider(); // 属性
+
     public MinerModule(String humanId) {
         super(humanId);
     }
@@ -31,6 +35,7 @@ public class MinerModule extends BaseModule {
         level3 = 0;
         levelIndex = 0;
         upgradePoints = 0;
+        resetAttribute();
     }
 
     @Override
@@ -50,6 +55,22 @@ public class MinerModule extends BaseModule {
         level1 = data.getUpgradeCounts().getRopeSpeed();
         level2 = data.getUpgradeCounts().getHookCount();
         level3 = data.getUpgradeCounts().getHookPower();
+
+        resetAttribute();
+        getHuman().getModule(AttributeModule.class).markDirty();
+    }
+
+    // 假设此模块有属性
+    // 重新计算此模块的属性
+    public void resetAttribute() {
+        attributeProvider.reset();
+        attributeProvider.addValue(AttributeType.MAX_HP, levelIndex);
+        attributeProvider.addValue(AttributeType.MAX_MP, upgradePoints);
+    }
+
+    @Override
+    public AttributeProvider getAttribute() {
+        return attributeProvider;
     }
 
     @Override
@@ -62,6 +83,7 @@ public class MinerModule extends BaseModule {
         getDbData("level3", new TypeReference<Integer>() {}, value -> level3 = value);
         getDbData("levelIndex", new TypeReference<Integer>() {}, value -> levelIndex = value);
         getDbData("upgradePoints", new TypeReference<Integer>() {}, value -> upgradePoints = value);
+        resetAttribute();
     }
 
     @Override

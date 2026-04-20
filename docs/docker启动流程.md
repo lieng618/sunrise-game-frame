@@ -55,13 +55,24 @@ start/docker/
 根目录保留：
 
 ```
-Dockerfile                    # 构建镜像（多阶段：Maven 编译 → JRE 运行）
+Dockerfile                    # 构建镜像（纯运行时镜像，直接拷贝已有 JAR）
 .dockerignore                 # 排除不必要的文件，加速构建
 ```
 
 ---
 
 ## 三、部署步骤
+
+### 0. 编译项目（必须先执行）
+
+在 IDE 中或通过命令行执行 Maven 编译：
+
+```bash
+# 在项目根目录执行
+mvn clean package -DskipTests
+```
+
+编译完成后，所有 JAR 文件会输出到 `start/jar/` 目录。
 
 ### 1. 修改 external.address
 
@@ -115,7 +126,7 @@ docker compose logs -f            # 查看所有日志
 |------|------|
 | 日常启停 | `docker compose stop` / `docker compose start` |
 | 修改了配置文件 | `docker compose up -d` |
-| 修改了代码 | `docker compose up -d --build` |
+| 修改了代码 | `mvn clean package -DskipTests` → `docker compose up -d --build` |
 | MySQL 端口冲突 | 修改 docker-compose.yml 中 MySQL 的宿主机端口 |
 
 ### 查看状态

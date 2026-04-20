@@ -12,5 +12,6 @@
   "error_file": "../log/external-err.log",
   "out_file": "../log/external.log",
   "exec_interpreter": "",
-  "exec_mode": "fork"
+  "exec_mode": "fork",
+  "restart": "none"
 }

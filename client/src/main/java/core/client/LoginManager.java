@@ -2,15 +2,16 @@ package core.client;
 
 import com.alibaba.fastjson2.JSON;
 import com.google.protobuf.ByteString;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 import org.sunrise.game.config.ConfigReader;
 import org.sunrise.game.genProto.gen.LoginProto;
 import org.sunrise.game.genProto.gen.TopicProto;
 import org.sunrise.game.log.LogCore;
 
-import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -20,18 +21,16 @@ import java.util.function.Consumer;
  */
 public class LoginManager {
 
-    private static String httpUrl = "127.0.0.1:8080";
-    private static OkHttpClient httpClient;
+    private static String httpUrl = "127.0.0.1:8090";
+    private static final HttpClient httpClient = HttpClient.newBuilder()
+            .connectTimeout(Duration.ofSeconds(10))
+            .build();
 
     /**
      * 初始化登录管理器
      */
     public static void initialize(String httpUrl) {
         LoginManager.httpUrl = httpUrl;
-        LoginManager.httpClient = new OkHttpClient.Builder()
-                .connectTimeout(10, TimeUnit.SECONDS)
-                .readTimeout(10, TimeUnit.SECONDS)
-                .build();
     }
 
 
@@ -135,17 +134,20 @@ public class LoginManager {
      * 执行HTTP请求
      */
     private static String httpRequest(String url) {
-        Request request = new Request.Builder()
-                .url(url)
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .timeout(Duration.ofSeconds(10))
+                .GET()
                 .build();
         
-        try (Response response = httpClient.newCall(request).execute()) {
-            if (!response.isSuccessful() || response.body() == null) {
-                LogCore.Client.error("HTTP request failed: url={}, code={}", url, response.code());
+        try {
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() != 200) {
+                LogCore.Client.error("HTTP request failed: url={}, code={}", url, response.statusCode());
                 return null;
             }
-            return response.body().string();
-        } catch (IOException e) {
+            return response.body();
+        } catch (Exception e) {
             LogCore.Client.error("HTTP request exception: url={}", url, e);
             return null;
         }

@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.sunrise.game.game.human.HumanObject;
 import org.sunrise.game.game.human.HumanObjectManger;
+import org.sunrise.game.game.logic.attribute.AttributeProvider;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -79,6 +80,13 @@ public class BaseModule {
      */
     public void weekReset() {
 
+    }
+
+    /**
+     * 当前模块的属性值
+     */
+    public AttributeProvider getAttribute() {
+        return null;
     }
 
     public HumanObject getHuman() {

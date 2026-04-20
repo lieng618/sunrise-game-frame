@@ -57,8 +57,8 @@ public class GameRecvGmBackService extends BaseService {
     }
 
     @Override
-    public void pulsePer5Sec() {
-        super.pulsePer5Sec();
+    public void pulsePerMin() {
+        super.pulsePerMin();
         pulseReportGameData();
     }
 

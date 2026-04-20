@@ -64,7 +64,7 @@ public class ProtocolRouter {
         Method handler = handlerMethods.get(key);
         if (handler == null) {
             String topicName = getTopicName(topic.getNumber());
-            LogCore.Client.debug("No handler found for topic={}({}), packetId={}, ignoring", topicName, topic.getNumber(), packetId);
+//            LogCore.Client.debug("No handler found for topic={}({}), packetId={}, ignoring", topicName, topic.getNumber(), packetId);
             return;
         }
 

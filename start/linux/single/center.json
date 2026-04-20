@@ -12,5 +12,6 @@
   "error_file": "../log/center-err.log",
   "out_file": "../log/center.log",
   "exec_interpreter": "",
-  "exec_mode": "fork"
+  "exec_mode": "fork",
+  "restart": "none"
 }

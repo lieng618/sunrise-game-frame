@@ -5,6 +5,7 @@ import com.alibaba.fastjson2.TypeReference;
 import com.google.protobuf.Message;
 import lombok.Data;
 import org.sunrise.game.game.modules.ActivityModule;
+import org.sunrise.game.game.modules.AttributeModule;
 import org.sunrise.game.game.modules.BaseModule;
 import org.sunrise.game.game.modules.DataModule;
 import org.sunrise.game.game.modules.FriendModule;
@@ -51,6 +52,7 @@ public class HumanObject {
         modules.put(FriendModule.class.getSimpleName(), new FriendModule(humanId));
         modules.put(MailModule.class.getSimpleName(), new MailModule(humanId));
         modules.put(ActivityModule.class.getSimpleName(), new ActivityModule(humanId));
+        modules.put(AttributeModule.class.getSimpleName(), new AttributeModule(humanId));
     }
 
     @SuppressWarnings("unchecked")

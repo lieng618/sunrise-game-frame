@@ -12,5 +12,6 @@
   "error_file": "../log/http-err.log",
   "out_file": "../log/http.log",
   "exec_interpreter": "",
-  "exec_mode": "fork"
+  "exec_mode": "fork",
+  "restart": "none"
 }

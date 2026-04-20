@@ -56,7 +56,7 @@ public class HttpRecvMessageService extends BaseService {
             tcp.put(remoteData.getServerId(), remoteData.getIp() + ":" + remoteData.getPort());
 
             ConcurrentHashMap<Integer, String> websocket = httpServer.getExternalAddress().computeIfAbsent("websocket", k -> new ConcurrentHashMap<>());
-            websocket.put(remoteData.getServerId(), remoteData.getIp() + ":" + remoteData.getPort());
+            websocket.put(remoteData.getServerId(), remoteData.getIp() + ":" + remoteData.getPort() + 1);
         }
     }
 }
