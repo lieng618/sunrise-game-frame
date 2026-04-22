@@ -1,7 +1,5 @@
 package org.sunrise.game.genRpc;
 
-import org.sunrise.game.rpc.annotation.RpcMethod;
-import org.sunrise.game.rpc.annotation.RpcService;
 import org.sunrise.game.utils.Utils;
 
 import java.io.BufferedWriter;
@@ -46,25 +44,20 @@ public class GenRpcStartUp {
             writer.write("public class CallEnum {\n");
 
             for (Class<?> clazz : classes) {
-//                if (clazz.isAnnotationPresent(RpcService.class)) {
-                    for (Method method : clazz.getDeclaredMethods()) {
-//                        if (method.isAnnotationPresent(RpcMethod.class)) {
-                            String enumName = clazz.getSimpleName() + "_" + method.getName();
+                for (Method method : clazz.getDeclaredMethods()) {
+                    String enumName = clazz.getSimpleName() + "_" + method.getName();
 
-                            // 检查是否已经存在相同的enumName
-                            if (!enumNamesSet.add(enumName)) {
-                                throw new RuntimeException("生成的enumName重复: " + enumName + "，请检查代码。");
-                            }
-
-                            writer.write("    public static final int " + enumName + " = " + counter.getAndIncrement() + ";\n");
-//                        }
+                    // 检查是否已经存在相同的enumName
+                    if (!enumNamesSet.add(enumName)) {
+                        throw new RuntimeException("生成的enumName重复: " + enumName + "，请检查代码。");
                     }
-//                }
+
+                    writer.write("    public static final int " + enumName + " = " + counter.getAndIncrement() + ";\n");
+                }
             }
 
             writer.write("}\n");
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException ignored) {
         }
     }
 }

@@ -13,8 +13,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class HumanObjectManger {
     // humanId-玩家对象
     private static final Map<String, HumanObject> humanObjects = new HashMap<>();
-    // connectId-所属对外服节点
-    public static final Map<Long, String> connectObjectExternalNode = new HashMap<>();
     // connectId-连接对象
     private static final Map<Long, ConnectObject> connectObjects = new HashMap<>();
     // connectId-humanId

@@ -178,13 +178,7 @@ public class FriendService extends BaseService {
             Map.Entry<String, List<FriendRequestData>> entry = iterator.next();
             List<FriendRequestData> requests = entry.getValue();
 
-            Iterator<FriendRequestData> reqIterator = requests.iterator();
-            while (reqIterator.hasNext()) {
-                FriendRequestData req = reqIterator.next();
-                if (currentTime - req.getRequestTime() > REQUEST_EXPIRE_TIME) {
-                    reqIterator.remove();
-                }
-            }
+            requests.removeIf(req -> currentTime - req.getRequestTime() > REQUEST_EXPIRE_TIME);
 
             if (requests.isEmpty()) {
                 iterator.remove();

@@ -40,34 +40,30 @@ public class ChatService extends BaseService {
     }
 
     @RpcMethod
-    public void chat(String humanId, int type, String message) {
-        if (type == ChatType.GLOBAL) {
-            long time = System.currentTimeMillis();
-            messages.add(new ChatData(humanId, time, message));
+    public void chat(String humanId, String message) {
+        long time = System.currentTimeMillis();
+        messages.add(new ChatData(humanId, time, message));
 
-            if (messages.size() > MAX_MESSAGES) {
-                messages.removeFirst();
-            }
-
-            RpcFunction.newInstance(RpcFunction.RpcCallType.SendAll)
-                    .call(CallEnum.ChatRpcListenService_onChat, "humanId", humanId, "type", type, "message", message, "time", time);
+        if (messages.size() > MAX_MESSAGES) {
+            messages.removeFirst();
         }
+
+        RpcFunction.newInstance(RpcFunction.RpcCallType.SendAll)
+                .call(CallEnum.ChatRpcListenService_onChat, "humanId", humanId, "message", message, "time", time);
     }
 
     @RpcMethod
-    public void history(String humanId, int type) {
-        if (type == ChatType.GLOBAL) {
-            ChatProto.MS2C_History.Builder historyBuilder = ChatProto.MS2C_History.newBuilder();
-            for (ChatData message : messages) {
-                ChatProto.MS2C_Chat.Builder chatBuilder = ChatProto.MS2C_Chat.newBuilder();
-                chatBuilder.setId(message.getHumanId());
-                chatBuilder.setMsg(message.getMessage());
-                chatBuilder.setTime(message.getSendTime());
-                historyBuilder.addHistory(chatBuilder);
-            }
-
-            byte[] data = historyBuilder.build().toByteArray();
-            returns("humanId", humanId, "type", type, "info", data);
+    public void history(String humanId) {
+        ChatProto.MS2C_History.Builder historyBuilder = ChatProto.MS2C_History.newBuilder();
+        for (ChatData message : messages) {
+            ChatProto.MS2C_Chat.Builder chatBuilder = ChatProto.MS2C_Chat.newBuilder();
+            chatBuilder.setId(message.getHumanId());
+            chatBuilder.setMsg(message.getMessage());
+            chatBuilder.setTime(message.getSendTime());
+            historyBuilder.addHistory(chatBuilder);
         }
+
+        byte[] data = historyBuilder.build().toByteArray();
+        returns("humanId", humanId, "info", data);
     }
 }

@@ -1,5 +1,6 @@
 package core.client;
 
+import core.message.MessageHandler;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -8,14 +9,9 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.channel.epoll.EpollEventLoopGroup;
-import io.netty.channel.epoll.EpollSocketChannel;
-import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.socket.nio.NioSocketChannel;
 import lombok.Getter;
 import lombok.Setter;
-import core.message.MessageHandler;
 import org.sunrise.game.core.coder.SocketMessageDecoder;
 import org.sunrise.game.core.coder.SocketMessageEncoder;
 import org.sunrise.game.core.message.MessageType;
@@ -30,11 +26,11 @@ import java.nio.charset.StandardCharsets;
 public class TcpClient extends SocketClient {
 
     public void connect(String host, int port) {
-        EventLoopGroup group = Utils.isLinux() ? new EpollEventLoopGroup(1) : new NioEventLoopGroup(1);
+        EventLoopGroup group = Utils.createEventLoopGroup(1);
         try {
             Bootstrap b = new Bootstrap();
             b.group(group)
-                    .channel(Utils.isLinux() ? EpollSocketChannel.class : NioSocketChannel.class)
+                    .channel(Utils.getServerChannelClass())
                     .option(ChannelOption.TCP_NODELAY, true)
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override

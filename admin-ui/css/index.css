@@ -4,7 +4,7 @@
 
 /* 登录页面样式 */
 .login-container {
-    background: linear-gradient(135deg, #e0f2fe 0%, #f3e8ff 50%, #fce7f3 100%);
+    background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 50%, #bfdbfe 100%);
     background-size: 400% 400%;
     animation: gradientShift 15s ease infinite;
     position: relative;
@@ -24,9 +24,9 @@
 }
 
 @keyframes gradientShift {
-    0% { background-position: 0% 50%; }
+    0% { background-position: 0 50%; }
     50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+    100% { background-position: 0 50%; }
 }
 
 .login-card {
@@ -49,7 +49,7 @@
 }
 
 .login-card .el-card__header {
-    background: linear-gradient(135deg, #93c5fd 0%, #c4b5fd 100%);
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
     color: white;
     border-radius: 12px 12px 0 0;
     padding: 20px;
@@ -64,23 +64,23 @@
 }
 
 .login-card .el-input__wrapper:hover {
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
 .login-card .el-input.is-focus .el-input__wrapper {
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
 }
 
 .login-button {
-    background: linear-gradient(135deg, #93c5fd 0%, #c4b5fd 100%);
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
     border: none;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(147, 197, 253, 0.4);
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
 }
 
 .login-button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(147, 197, 253, 0.5);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
 }
 
 .login-button:active {
@@ -170,13 +170,13 @@
 
 /* 顶部栏样式 */
 .main-header {
-    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-    border-bottom: 1px solid #e5e7eb;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
+    border-bottom: 1px solid #dbeafe;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
 }
 
 .main-header .page-title {
-    color: #1f2937;
+    color: #1e40af;
     font-weight: 600;
     font-size: 20px;
     letter-spacing: 0.5px;
@@ -190,7 +190,7 @@
 }
 
 .user-dropdown:hover {
-    color: #667eea;
+    color: #3b82f6;
 }
 
 .user-dropdown:focus {

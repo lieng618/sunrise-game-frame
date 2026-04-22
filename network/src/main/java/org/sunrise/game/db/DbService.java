@@ -177,9 +177,7 @@ public class DbService {
 
     // 异步：执行更新
     public void executeAsync(String sql, Object... params) {
-        CompletableFuture.runAsync(() -> {
-            execute(sql, params);
-        }, dbExecutor);
+        CompletableFuture.runAsync(() -> execute(sql, params), dbExecutor);
     }
 
     // 同步：执行更新并返回生成的主键

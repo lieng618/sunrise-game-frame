@@ -35,11 +35,11 @@ import java.nio.charset.StandardCharsets;
 @Setter
 public class WsClient extends SocketClient {
     public void connect(String host, int port) {
-        EventLoopGroup group = Utils.isLinux() ? new EpollEventLoopGroup(1) : new NioEventLoopGroup(1);
+        EventLoopGroup group = Utils.createEventLoopGroup(1);
         try {
             Bootstrap bootstrap = new Bootstrap();
             bootstrap.group(group)
-                    .channel(Utils.isLinux() ? EpollSocketChannel.class : NioSocketChannel.class)
+                    .channel(Utils.getServerChannelClass())
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel ch) {

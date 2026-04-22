@@ -7,7 +7,6 @@ import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -23,9 +22,6 @@ public class BanHumanController extends BaseController {
         private Long banTime;         // 封禁时间
         private Long banExpireTime;   // 封禁到期时间戳(毫秒)，0表示永久封禁
         private String reason;        // 封禁原因
-
-        public BanRecord() {
-        }
 
         public BanRecord(String humanId, String reason, Long banExpireTime) {
             this.humanId = humanId;
@@ -152,13 +148,7 @@ public class BanHumanController extends BaseController {
 
 
     public ConcurrentHashMap<String, BanRecord> getBanRecords() {
-        Iterator<Map.Entry<String, BanRecord>> iterator = banRecords.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Map.Entry<String, BanRecord> entry = iterator.next();
-            if (entry.getValue().getBanExpireTime() > 0 && System.currentTimeMillis() > entry.getValue().getBanExpireTime()) {
-                iterator.remove();
-            }
-        }
+        banRecords.entrySet().removeIf(entry -> entry.getValue().getBanExpireTime() > 0 && System.currentTimeMillis() > entry.getValue().getBanExpireTime());
         return banRecords;
     }
 

@@ -26,7 +26,7 @@ iframe {
    页面背景 - 子页面通用
    ============================================ */
 .page-background {
-    background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%);
+    background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 100%);
     min-height: 100vh;
     padding: 20px;
 }
@@ -36,13 +36,14 @@ iframe {
    ============================================ */
 .el-card {
     border-radius: 12px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-    border: 1px solid #e5e7eb;
+    box-shadow: 0 2px 12px rgba(102, 126, 234, 0.1);
+    border: 1px solid #dbeafe;
+    background: rgba(255, 255, 255, 0.8);
 }
 
 .el-card__header {
-    background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
-    border-bottom: 1px solid #e5e7eb;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    border-bottom: 1px solid #dbeafe;
     padding: 16px 20px;
 }
 
@@ -55,18 +56,18 @@ iframe {
 }
 
 .el-table th {
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-    color: #1f2937;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    color: #1e40af;
     font-weight: 600;
-    border-bottom: 2px solid #e5e7eb;
+    border-bottom: 2px solid #dbeafe;
 }
 
 .el-table tr:hover {
-    background-color: #f8fafc;
+    background-color: #f0f9ff;
 }
 
 .el-table--striped .el-table__body tr.el-table__row--striped td {
-    background-color: #fafbfc;
+    background-color: #f8fafc;
 }
 
 .el-tag {
@@ -90,14 +91,14 @@ iframe {
 }
 
 .el-button--primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
     border: none;
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
 }
 
 .el-button--primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
 }
 
 .el-button--primary:active {
@@ -119,11 +120,11 @@ iframe {
 }
 
 .el-input__wrapper:hover {
-    box-shadow: 0 2px 6px rgba(102, 126, 234, 0.2);
+    box-shadow: 0 2px 6px rgba(59, 130, 246, 0.2);
 }
 
 .el-input.is-focus .el-input__wrapper {
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
 /* ============================================
@@ -204,6 +205,6 @@ iframe {
 }
 
 .el-pagination .el-pager li.is-active {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
     color: white;
 }

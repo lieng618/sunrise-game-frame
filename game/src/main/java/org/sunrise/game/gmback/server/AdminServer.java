@@ -47,8 +47,6 @@ public class AdminServer {
         long jwtExpiration = Long.parseLong(properties.getProperty("admin.jwt.expiration", "3600000")); // 默认1小时
         JwtUtil.init(jwtExpiration);
 
-        // 将 io.javalin 包下的日志级别设置为 WARN
-        LogCore.setLogLevel("io.javalin", Level.WARN);
         Javalin app = Javalin.create(config -> {
             // 配置静态资源 (前端页面)
             if (uiDir.exists()) {
@@ -114,7 +112,8 @@ public class AdminServer {
         app.post("/api/unmute", ControllerManager.getController(MuteHumanController.class)::unmute);
 
         app.get("/api/online-players", ControllerManager.getController(OnlinePlayerController.class)::list);
-        // --- 启动服务 ---
+        // 将 io.javalin 包下的日志级别设置为 WARN
+        LogCore.setLogLevel("io.javalin", Level.WARN);
         try {
             app.start(port);
             LogCore.GmBackServer.info("AdminServer started on : {}", app.jettyServer().server().getURI());

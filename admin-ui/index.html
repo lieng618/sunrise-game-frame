@@ -10,12 +10,14 @@
     <script src="https://unpkg.com/element-plus"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@element-plus/icons-vue"></script>
+    <script src="js/particles-bg.js"></script>
 </head>
 <body>
 
 <div id="app">
     <div v-if="!isLoggedIn" class="login-container min-h-screen flex items-center justify-center">
-        <el-card class="login-card w-96 rounded-xl">
+        <particles-bg class="absolute inset-0" :quantity="80" :ease="80" color="#667eea" :staticity="30"></particles-bg>
+        <el-card class="login-card w-96 rounded-xl relative z-10">
             <template #header>
                 <div class="text-center">Sunrise 后台登录</div>
             </template>
@@ -134,7 +136,8 @@
             </el-header>
 
             <el-main style="padding: 0; overflow: hidden; position: relative;">
-                <iframe :src="currentSrc" ref="contentFrame"></iframe>
+                <particles-bg class="absolute inset-0" :quantity="100" :ease="60" color="#667eea" :staticity="50" :particleSpeed="0.3" :lineDistance="100"></particles-bg>
+                <iframe :src="currentSrc" ref="contentFrame" class="relative z-10"></iframe>
             </el-main>
         </el-container>
     </el-container>
@@ -295,6 +298,7 @@
     });
 
     app.use(ElementPlus);
+    app.component('ParticlesBg', ParticlesBg);
     // 注册所有图标
     for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
         app.component(key, component)

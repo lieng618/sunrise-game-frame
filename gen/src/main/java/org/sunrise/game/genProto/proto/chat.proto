@@ -15,8 +15,7 @@ enum FROM_SERVER {
 }
 
 message MC2S_Chat {
-  int32 type = 1;  // 类型
-  string msg = 2;  // 消息内容
+  string msg = 1;  // 消息内容
 }
 
 message MS2C_Chat {

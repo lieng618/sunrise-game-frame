@@ -1,6 +1,21 @@
 package org.sunrise.game.utils;
 
 import ch.qos.logback.classic.Level;
+import io.netty.channel.Channel;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.MultiThreadIoEventLoopGroup;
+import io.netty.channel.ServerChannel;
+import io.netty.channel.epoll.Epoll;
+import io.netty.channel.epoll.EpollIoHandler;
+import io.netty.channel.epoll.EpollServerSocketChannel;
+import io.netty.channel.epoll.EpollSocketChannel;
+import io.netty.channel.kqueue.KQueue;
+import io.netty.channel.kqueue.KQueueIoHandler;
+import io.netty.channel.kqueue.KQueueServerSocketChannel;
+import io.netty.channel.kqueue.KQueueSocketChannel;
+import io.netty.channel.nio.NioIoHandler;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.channel.socket.nio.NioSocketChannel;
 import org.sunrise.game.log.LogCore;
 import org.sunrise.game.thread.DispatchThread;
 
@@ -49,12 +64,49 @@ public class Utils {
         Runtime.getRuntime().addShutdownHook(new Thread(task, "ServerShutdown"));
     }
 
-    public static boolean isWin() {
-        return System.getProperty("os.name").startsWith("Windows");
+    /**
+     * 根据当前系统环境创建最优的 EventLoopGroup
+     * @param nThreads 线程数 (传入 0 则使用 Netty 默认值：CPU 核心数 * 2)
+     */
+    public static EventLoopGroup createEventLoopGroup(int nThreads) {
+        if (Epoll.isAvailable()) {
+            // 注入 Epoll 的 IoHandler
+            return new MultiThreadIoEventLoopGroup(nThreads, EpollIoHandler.newFactory());
+
+        } else if (KQueue.isAvailable()) {
+            // 注入 KQueue 的 IoHandler
+            return new MultiThreadIoEventLoopGroup(nThreads, KQueueIoHandler.newFactory());
+
+        } else {
+            // 注入默认 NIO 的 IoHandler
+            return new MultiThreadIoEventLoopGroup(nThreads, NioIoHandler.newFactory());
+        }
     }
 
-    public static boolean isLinux() {
-        return "Linux".equals(System.getProperty("os.name"));
+    /**
+     * 获取与当前系统环境匹配的 ServerSocketChannel 类
+     */
+    public static Class<? extends ServerChannel> getServerChannelClass() {
+        if (Epoll.isAvailable()) {
+            return EpollServerSocketChannel.class;
+        } else if (KQueue.isAvailable()) {
+            return KQueueServerSocketChannel.class;
+        } else {
+            return NioServerSocketChannel.class;
+        }
+    }
+
+    /**
+     * 获取与当前系统环境匹配的 SocketChannel 类 (客户端使用)
+     */
+    public static Class<? extends Channel> getClientChannelClass() {
+        if (Epoll.isAvailable()) {
+            return EpollSocketChannel.class;
+        } else if (KQueue.isAvailable()) {
+            return KQueueSocketChannel.class;
+        } else {
+            return NioSocketChannel.class;
+        }
     }
 
     public static List<Class<?>> findClasses(String packageName) throws ClassNotFoundException, IOException, URISyntaxException {

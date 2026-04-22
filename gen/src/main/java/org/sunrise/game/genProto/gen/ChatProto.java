@@ -315,20 +315,10 @@ public final class ChatProto {
 
     /**
      * <pre>
-     * 类型
-     * </pre>
-     *
-     * <code>int32 type = 1;</code>
-     * @return The type.
-     */
-    int getType();
-
-    /**
-     * <pre>
      * 消息内容
      * </pre>
      *
-     * <code>string msg = 2;</code>
+     * <code>string msg = 1;</code>
      * @return The msg.
      */
     java.lang.String getMsg();
@@ -337,7 +327,7 @@ public final class ChatProto {
      * 消息内容
      * </pre>
      *
-     * <code>string msg = 2;</code>
+     * <code>string msg = 1;</code>
      * @return The bytes for msg.
      */
     com.google.protobuf.ByteString
@@ -381,22 +371,7 @@ public final class ChatProto {
               org.sunrise.game.genProto.gen.ChatProto.MC2S_Chat.class, org.sunrise.game.genProto.gen.ChatProto.MC2S_Chat.Builder.class);
     }
 
-    public static final int TYPE_FIELD_NUMBER = 1;
-    private int type_ = 0;
-    /**
-     * <pre>
-     * 类型
-     * </pre>
-     *
-     * <code>int32 type = 1;</code>
-     * @return The type.
-     */
-    @java.lang.Override
-    public int getType() {
-      return type_;
-    }
-
-    public static final int MSG_FIELD_NUMBER = 2;
+    public static final int MSG_FIELD_NUMBER = 1;
     @SuppressWarnings("serial")
     private volatile java.lang.Object msg_ = "";
     /**
@@ -404,7 +379,7 @@ public final class ChatProto {
      * 消息内容
      * </pre>
      *
-     * <code>string msg = 2;</code>
+     * <code>string msg = 1;</code>
      * @return The msg.
      */
     @java.lang.Override
@@ -425,7 +400,7 @@ public final class ChatProto {
      * 消息内容
      * </pre>
      *
-     * <code>string msg = 2;</code>
+     * <code>string msg = 1;</code>
      * @return The bytes for msg.
      */
     @java.lang.Override
@@ -457,11 +432,8 @@ public final class ChatProto {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (type_ != 0) {
-        output.writeInt32(1, type_);
-      }
       if (!com.google.protobuf.GeneratedMessage.isStringEmpty(msg_)) {
-        com.google.protobuf.GeneratedMessage.writeString(output, 2, msg_);
+        com.google.protobuf.GeneratedMessage.writeString(output, 1, msg_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -472,12 +444,8 @@ public final class ChatProto {
       if (size != -1) return size;
 
       size = 0;
-      if (type_ != 0) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(1, type_);
-      }
       if (!com.google.protobuf.GeneratedMessage.isStringEmpty(msg_)) {
-        size += com.google.protobuf.GeneratedMessage.computeStringSize(2, msg_);
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(1, msg_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
@@ -494,8 +462,6 @@ public final class ChatProto {
       }
       org.sunrise.game.genProto.gen.ChatProto.MC2S_Chat other = (org.sunrise.game.genProto.gen.ChatProto.MC2S_Chat) obj;
 
-      if (getType()
-          != other.getType()) return false;
       if (!getMsg()
           .equals(other.getMsg())) return false;
       if (!getUnknownFields().equals(other.getUnknownFields())) return false;
@@ -509,8 +475,6 @@ public final class ChatProto {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
-      hash = (37 * hash) + TYPE_FIELD_NUMBER;
-      hash = (53 * hash) + getType();
       hash = (37 * hash) + MSG_FIELD_NUMBER;
       hash = (53 * hash) + getMsg().hashCode();
       hash = (29 * hash) + getUnknownFields().hashCode();
@@ -644,7 +608,6 @@ public final class ChatProto {
       public Builder clear() {
         super.clear();
         bitField0_ = 0;
-        type_ = 0;
         msg_ = "";
         return this;
       }
@@ -680,9 +643,6 @@ public final class ChatProto {
       private void buildPartial0(org.sunrise.game.genProto.gen.ChatProto.MC2S_Chat result) {
         int from_bitField0_ = bitField0_;
         if (((from_bitField0_ & 0x00000001) != 0)) {
-          result.type_ = type_;
-        }
-        if (((from_bitField0_ & 0x00000002) != 0)) {
           result.msg_ = msg_;
         }
       }
@@ -699,12 +659,9 @@ public final class ChatProto {
 
       public Builder mergeFrom(org.sunrise.game.genProto.gen.ChatProto.MC2S_Chat other) {
         if (other == org.sunrise.game.genProto.gen.ChatProto.MC2S_Chat.getDefaultInstance()) return this;
-        if (other.getType() != 0) {
-          setType(other.getType());
-        }
         if (!other.getMsg().isEmpty()) {
           msg_ = other.msg_;
-          bitField0_ |= 0x00000002;
+          bitField0_ |= 0x00000001;
           onChanged();
         }
         this.mergeUnknownFields(other.getUnknownFields());
@@ -733,16 +690,11 @@ public final class ChatProto {
               case 0:
                 done = true;
                 break;
-              case 8: {
-                type_ = input.readInt32();
+              case 10: {
+                msg_ = input.readStringRequireUtf8();
                 bitField0_ |= 0x00000001;
                 break;
-              } // case 8
-              case 18: {
-                msg_ = input.readStringRequireUtf8();
-                bitField0_ |= 0x00000002;
-                break;
-              } // case 18
+              } // case 10
               default: {
                 if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                   done = true; // was an endgroup tag
@@ -760,57 +712,13 @@ public final class ChatProto {
       }
       private int bitField0_;
 
-      private int type_ ;
-      /**
-       * <pre>
-       * 类型
-       * </pre>
-       *
-       * <code>int32 type = 1;</code>
-       * @return The type.
-       */
-      @java.lang.Override
-      public int getType() {
-        return type_;
-      }
-      /**
-       * <pre>
-       * 类型
-       * </pre>
-       *
-       * <code>int32 type = 1;</code>
-       * @param value The type to set.
-       * @return This builder for chaining.
-       */
-      public Builder setType(int value) {
-
-        type_ = value;
-        bitField0_ |= 0x00000001;
-        onChanged();
-        return this;
-      }
-      /**
-       * <pre>
-       * 类型
-       * </pre>
-       *
-       * <code>int32 type = 1;</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearType() {
-        bitField0_ = (bitField0_ & ~0x00000001);
-        type_ = 0;
-        onChanged();
-        return this;
-      }
-
       private java.lang.Object msg_ = "";
       /**
        * <pre>
        * 消息内容
        * </pre>
        *
-       * <code>string msg = 2;</code>
+       * <code>string msg = 1;</code>
        * @return The msg.
        */
       public java.lang.String getMsg() {
@@ -830,7 +738,7 @@ public final class ChatProto {
        * 消息内容
        * </pre>
        *
-       * <code>string msg = 2;</code>
+       * <code>string msg = 1;</code>
        * @return The bytes for msg.
        */
       public com.google.protobuf.ByteString
@@ -851,7 +759,7 @@ public final class ChatProto {
        * 消息内容
        * </pre>
        *
-       * <code>string msg = 2;</code>
+       * <code>string msg = 1;</code>
        * @param value The msg to set.
        * @return This builder for chaining.
        */
@@ -859,7 +767,7 @@ public final class ChatProto {
           java.lang.String value) {
         if (value == null) { throw new NullPointerException(); }
         msg_ = value;
-        bitField0_ |= 0x00000002;
+        bitField0_ |= 0x00000001;
         onChanged();
         return this;
       }
@@ -868,12 +776,12 @@ public final class ChatProto {
        * 消息内容
        * </pre>
        *
-       * <code>string msg = 2;</code>
+       * <code>string msg = 1;</code>
        * @return This builder for chaining.
        */
       public Builder clearMsg() {
         msg_ = getDefaultInstance().getMsg();
-        bitField0_ = (bitField0_ & ~0x00000002);
+        bitField0_ = (bitField0_ & ~0x00000001);
         onChanged();
         return this;
       }
@@ -882,7 +790,7 @@ public final class ChatProto {
        * 消息内容
        * </pre>
        *
-       * <code>string msg = 2;</code>
+       * <code>string msg = 1;</code>
        * @param value The bytes for msg to set.
        * @return This builder for chaining.
        */
@@ -891,7 +799,7 @@ public final class ChatProto {
         if (value == null) { throw new NullPointerException(); }
         checkByteStringIsUtf8(value);
         msg_ = value;
-        bitField0_ |= 0x00000002;
+        bitField0_ |= 0x00000001;
         onChanged();
         return this;
       }
@@ -3106,15 +3014,15 @@ public final class ChatProto {
   static {
     java.lang.String[] descriptorData = {
       "\n\nchat.proto\022\035org.sunrise.game.genProto." +
-      "gen\"&\n\tMC2S_Chat\022\014\n\004type\030\001 \001(\005\022\013\n\003msg\030\002 " +
-      "\001(\t\"2\n\tMS2C_Chat\022\n\n\002id\030\001 \001(\t\022\013\n\003msg\030\002 \001(" +
-      "\t\022\014\n\004time\030\003 \001(\003\" \n\017MC2S_GetHistory\022\r\n\005co" +
-      "unt\030\001 \001(\005\"I\n\014MS2C_History\0229\n\007history\030\001 \003" +
-      "(\0132(.org.sunrise.game.genProto.gen.MS2C_" +
-      "Chat*=\n\013FROM_CLIENT\022\014\n\010C2S_Chat\020\000\022\014\n\010C2S" +
-      "_Horn\020\001\022\022\n\016C2S_GetHistory\020\002*:\n\013FROM_SERV" +
-      "ER\022\014\n\010S2C_Chat\020\000\022\014\n\010S2C_Horn\020\001\022\017\n\013S2C_Hi" +
-      "story\020\002B\013B\tChatProtob\006proto3"
+      "gen\"\030\n\tMC2S_Chat\022\013\n\003msg\030\001 \001(\t\"2\n\tMS2C_Ch" +
+      "at\022\n\n\002id\030\001 \001(\t\022\013\n\003msg\030\002 \001(\t\022\014\n\004time\030\003 \001(" +
+      "\003\" \n\017MC2S_GetHistory\022\r\n\005count\030\001 \001(\005\"I\n\014M" +
+      "S2C_History\0229\n\007history\030\001 \003(\0132(.org.sunri" +
+      "se.game.genProto.gen.MS2C_Chat*=\n\013FROM_C" +
+      "LIENT\022\014\n\010C2S_Chat\020\000\022\014\n\010C2S_Horn\020\001\022\022\n\016C2S" +
+      "_GetHistory\020\002*:\n\013FROM_SERVER\022\014\n\010S2C_Chat" +
+      "\020\000\022\014\n\010S2C_Horn\020\001\022\017\n\013S2C_History\020\002B\013B\tCha" +
+      "tProtob\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -3125,7 +3033,7 @@ public final class ChatProto {
     internal_static_org_sunrise_game_genProto_gen_MC2S_Chat_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_org_sunrise_game_genProto_gen_MC2S_Chat_descriptor,
-        new java.lang.String[] { "Type", "Msg", });
+        new java.lang.String[] { "Msg", });
     internal_static_org_sunrise_game_genProto_gen_MS2C_Chat_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_org_sunrise_game_genProto_gen_MS2C_Chat_fieldAccessorTable = new

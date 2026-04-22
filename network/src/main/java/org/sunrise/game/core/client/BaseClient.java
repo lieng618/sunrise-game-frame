@@ -1,21 +1,23 @@
 package org.sunrise.game.core.client;
 
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.*;
-import io.netty.channel.epoll.EpollEventLoopGroup;
-import io.netty.channel.epoll.EpollSocketChannel;
-import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.ChannelPipeline;
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.timeout.IdleStateHandler;
 import lombok.Data;
 import org.sunrise.game.core.coder.SocketMessageDecoder;
 import org.sunrise.game.core.coder.SocketMessageEncoder;
-import org.sunrise.game.log.LogCore;
 import org.sunrise.game.core.message.BaseMessage;
 import org.sunrise.game.core.message.BaseMessageManager;
 import org.sunrise.game.core.message.ClientMessageManager;
 import org.sunrise.game.core.server.Function;
+import org.sunrise.game.log.LogCore;
 import org.sunrise.game.utils.Utils;
 
 import java.util.concurrent.TimeUnit;
@@ -39,7 +41,7 @@ public class BaseClient {
         this.messageManager = new ClientMessageManager(nodeId);
         this.clientHandler = r -> new BaseClientHandler(nodeId);
         this.pulseHandler = r -> new BaseClientPulseHandler(nodeId);
-        this.group = Utils.isLinux() ? new EpollEventLoopGroup(1) : new NioEventLoopGroup(1);
+        this.group = Utils.createEventLoopGroup(1);
         this.b = new Bootstrap();
         this.b.group(this.group);
         init();
@@ -51,7 +53,7 @@ public class BaseClient {
         this.messageManager = new ClientMessageManager(nodeId);
         this.clientHandler = r -> new BaseClientHandler(nodeId);
         this.pulseHandler = r -> new BaseClientPulseHandler(nodeId);
-        this.group = Utils.isLinux() ? new EpollEventLoopGroup(1) : new NioEventLoopGroup(1);
+        this.group = Utils.createEventLoopGroup(1);
         this.b = new Bootstrap();
         this.b.group(this.group);
         init();
@@ -67,7 +69,7 @@ public class BaseClient {
         this.clientHandler = r -> new BaseClientHandler(nodeId);
         this.pulseHandler = r -> new BaseClientPulseHandler(nodeId);
         if (group == null) {
-            group = Utils.isLinux() ? new EpollEventLoopGroup(1) : new NioEventLoopGroup(1);
+            group = Utils.createEventLoopGroup(1);
         }
         this.group = group;
         if (b == null) {
@@ -80,7 +82,7 @@ public class BaseClient {
     }
 
     public void init() {
-        b.channel(Utils.isLinux() ? EpollSocketChannel.class : NioSocketChannel.class)
+        b.channel(Utils.getClientChannelClass())
                 .option(ChannelOption.TCP_NODELAY, true)
                 .option(ChannelOption.SO_KEEPALIVE, true)
                 .handler(new ChannelInitializer<SocketChannel>() {

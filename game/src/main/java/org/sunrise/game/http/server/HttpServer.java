@@ -100,7 +100,9 @@ public class HttpServer {
         LogCore.setLogLevel("io.javalin", Level.WARN);
         try {
             app.start(port);
+            LogCore.HttpServer.info("HttpServer started on : {}", app.jettyServer().server().getURI());
         } catch (Exception e) {
+            LogCore.HttpServer.error("HttpServer start failed", e);
         }
     }
 }

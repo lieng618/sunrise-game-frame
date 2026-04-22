@@ -2,8 +2,6 @@ package org.sunrise.game.gmback.server.controller;
 
 import io.javalin.http.Context;
 import lombok.Data;
-import org.sunrise.game.rpc.center.NodeData;
-import org.sunrise.game.rpc.center.NodeManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,7 +18,7 @@ public class NodeController extends BaseController {
         private int serverId;
         private String nodeId;
     }
-    private ConcurrentHashMap<String, GameRemoteData> games = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, GameRemoteData> games = new ConcurrentHashMap<>();
     public void updateGameData(String nodeId, int serverId, String ip, int port, int online) {
         GameRemoteData gameRemoteData = games.computeIfAbsent(nodeId, k -> new GameRemoteData());
         gameRemoteData.nodeId = nodeId;

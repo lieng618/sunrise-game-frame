@@ -152,13 +152,7 @@ public class MuteHumanController extends BaseController {
 
 
     public ConcurrentHashMap<String, MuteRecord> getMuteRecords() {
-        Iterator<Map.Entry<String, MuteRecord>> iterator = muteRecords.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Map.Entry<String, MuteRecord> entry = iterator.next();
-            if (entry.getValue().getMuteExpireTime() > 0 && System.currentTimeMillis() > entry.getValue().getMuteExpireTime()) {
-                iterator.remove();
-            }
-        }
+        muteRecords.entrySet().removeIf(entry -> entry.getValue().getMuteExpireTime() > 0 && System.currentTimeMillis() > entry.getValue().getMuteExpireTime());
         return muteRecords;
     }
 

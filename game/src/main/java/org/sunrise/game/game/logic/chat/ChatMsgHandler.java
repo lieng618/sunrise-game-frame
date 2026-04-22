@@ -17,11 +17,7 @@ public class ChatMsgHandler {
         if (HumanObjectManger.muteHumanQueue.contains(humanObject.getHumanId())) {
             return;
         }
-        if (data.getType() == 1) {
-            RpcFunction.newInstance().call(CallEnum.ChatService_chat, "humanId", humanObject.getHumanId(), "type", data.getType(), "message", data.getMsg());
-        } else if (data.getType() == 2) {
-
-        }
+        RpcFunction.newInstance().call(CallEnum.ChatService_chat, "humanId", humanObject.getHumanId(), "message", data.getMsg());
     }
 
     @MsgHandlerMethod(packetId = ChatProto.FROM_CLIENT.C2S_Horn_VALUE)

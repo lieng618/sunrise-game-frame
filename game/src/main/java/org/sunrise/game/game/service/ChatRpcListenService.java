@@ -15,7 +15,7 @@ public class ChatRpcListenService extends BaseService {
     }
 
     @RpcMethod
-    public void onChat(String humanId, int type, String message, long time) {
+    public void onChat(String humanId, String message, long time) {
         for (HumanObject humanObject : HumanObjectManger.getHumanObjects()) {
             humanObject.sendMsg(TopicProto.TOPIC.TOPIC_TYPE_CHAT_VALUE, ChatProto.FROM_SERVER.S2C_Chat_VALUE, ChatProto.MS2C_Chat.newBuilder().setId(humanId).setMsg(message).setTime(time));
         }

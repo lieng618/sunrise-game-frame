@@ -2,21 +2,23 @@ package org.sunrise.game.core.server;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
-import io.netty.channel.*;
-import io.netty.channel.epoll.EpollEventLoopGroup;
-import io.netty.channel.epoll.EpollServerSocketChannel;
-import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.WriteBufferWaterMark;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import lombok.Data;
 import org.sunrise.game.core.coder.SocketMessageDecoder;
 import org.sunrise.game.core.coder.SocketMessageEncoder;
-import org.sunrise.game.log.LogCore;
 import org.sunrise.game.core.message.BaseMessage;
 import org.sunrise.game.core.message.BaseMessageManager;
 import org.sunrise.game.core.message.ServerMessageManager;
+import org.sunrise.game.log.LogCore;
 import org.sunrise.game.utils.Utils;
 
 @Data
@@ -48,11 +50,11 @@ public class BaseServer {
         if (ip == null || port == 0) {
             return;
         }
-        EventLoopGroup bossGroup = Utils.isLinux() ? new EpollEventLoopGroup(1) : new NioEventLoopGroup(1);
-        EventLoopGroup workerGroup = Utils.isLinux() ? new EpollEventLoopGroup() : new NioEventLoopGroup();
+        EventLoopGroup bossGroup = Utils.createEventLoopGroup(1);
+        EventLoopGroup workerGroup = Utils.createEventLoopGroup(0);
         ServerBootstrap b = new ServerBootstrap();
         b.group(bossGroup, workerGroup)
-                .channel(Utils.isLinux() ? EpollServerSocketChannel.class : NioServerSocketChannel.class)
+                .channel(Utils.getServerChannelClass())
                 .option(ChannelOption.SO_BACKLOG, 10240) //内核为这个套接字排队的最大连接数
                 .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT) //使用内存池
                 .childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT) //使用内存池

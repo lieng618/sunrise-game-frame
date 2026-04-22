@@ -7,11 +7,7 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.WriteBufferWaterMark;
-import io.netty.channel.epoll.EpollEventLoopGroup;
-import io.netty.channel.epoll.EpollServerSocketChannel;
-import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
@@ -77,17 +73,15 @@ public class ExternalServer {
             LogCore.ExternalServer.error("Server StartUp Failed, name = { ExternalServer }, serverId = {}, reason = {}", serverId, e.getLocalizedMessage());
             System.exit(-1);
         }
-        Utils.setShutdownHook(() -> {
-            dbService.execute("update `external_system` set `status` = ? where `id` = ?", 0, serverId);
-        });
+        Utils.setShutdownHook(() -> dbService.execute("update `external_system` set `status` = ? where `id` = ?", 0, serverId));
     }
 
     private void startTcpListen(String ip, int port) {
-        EventLoopGroup bossGroup = Utils.isLinux() ? new EpollEventLoopGroup(1) : new NioEventLoopGroup(1);
-        EventLoopGroup workerGroup = Utils.isLinux() ? new EpollEventLoopGroup() : new NioEventLoopGroup();
+        EventLoopGroup bossGroup = Utils.createEventLoopGroup(1);
+        EventLoopGroup workerGroup = Utils.createEventLoopGroup(0);
         ServerBootstrap b = new ServerBootstrap();
         b.group(bossGroup, workerGroup)
-                .channel(Utils.isLinux() ? EpollServerSocketChannel.class : NioServerSocketChannel.class)
+                .channel(Utils.getServerChannelClass())
                 .option(ChannelOption.SO_BACKLOG, 10240) //内核为这个套接字排队的最大连接数
                 .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT) //使用内存池
                 .childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT) //使用内存池
@@ -121,18 +115,18 @@ public class ExternalServer {
         if (ip == null || port == 0) {
             return;
         }
-        EventLoopGroup bossGroup = Utils.isLinux() ? new EpollEventLoopGroup(1) : new NioEventLoopGroup(1);
-        EventLoopGroup workerGroup = Utils.isLinux() ? new EpollEventLoopGroup() : new NioEventLoopGroup();
+        EventLoopGroup bossGroup = Utils.createEventLoopGroup(1);
+        EventLoopGroup workerGroup = Utils.createEventLoopGroup(0);
         ServerBootstrap b = new ServerBootstrap();
         b.group(bossGroup, workerGroup)
-                .channel(Utils.isLinux() ? EpollServerSocketChannel.class : NioServerSocketChannel.class)
+                .channel(Utils.getServerChannelClass())
                 .handler(new LoggingHandler(LogLevel.INFO))
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     public void initChannel(SocketChannel ch) {
                         ch.pipeline().addLast(new HttpServerCodec()); // HTTP 协议解析，用于握手阶段
                         ch.pipeline().addLast(new HttpObjectAggregator(65536)); // HTTP 协议解析，用于握手阶段
-                        ch.pipeline().addLast(new WebSocketServerCompressionHandler()); // WebSocket 数据压缩扩展
+                        ch.pipeline().addLast(new WebSocketServerCompressionHandler(8 * 1024 * 1024)); // WebSocket 数据压缩扩展
                         ch.pipeline().addLast(new WebSocketMessageCodec());
                         ch.pipeline().addLast(new WebSocketServerProtocolHandler("/", null, true, 128 * 1024 * 1024)); // WebSocket 握手、控制帧处理
                         ch.pipeline().addLast(new ExternalServerHandler());
