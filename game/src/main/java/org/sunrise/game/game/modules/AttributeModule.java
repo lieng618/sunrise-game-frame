@@ -2,6 +2,7 @@ package org.sunrise.game.game.modules;
 
 import com.alibaba.fastjson2.TypeReference;
 import lombok.Getter;
+import org.sunrise.game.game.annotation.HumanModule;
 import org.sunrise.game.game.config.Enum.AttributeType;
 import org.sunrise.game.game.logic.attribute.AttributeContainer;
 import org.sunrise.game.game.logic.attribute.AttributeProvider;
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@HumanModule
 @Getter
 public class AttributeModule extends BaseModule {
     private static final int SCALE = 1000;

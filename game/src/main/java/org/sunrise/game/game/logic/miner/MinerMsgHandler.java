@@ -3,7 +3,7 @@ package org.sunrise.game.game.logic.miner;
 import org.sunrise.game.game.annotation.MsgHandlerClass;
 import org.sunrise.game.game.annotation.MsgHandlerMethod;
 import org.sunrise.game.game.human.HumanObject;
-import org.sunrise.game.game.logic.system.GameSystem;
+import org.sunrise.game.game.logic.system.GameSystemUtils;
 import org.sunrise.game.game.logic.system.MinerSystem;
 import org.sunrise.game.game.modules.MinerModule;
 import org.sunrise.game.genProto.gen.MinerProto;
@@ -19,7 +19,7 @@ public class MinerMsgHandler {
         MinerModule module = humanObject.getModule(MinerModule.class);
         if (module == null) return;
         module.syncData(data);
-        GameSystem.getSystem(MinerSystem.class).update(humanObject);
+        GameSystemUtils.getSystem(MinerSystem.class).update(humanObject);
     }
 
     @MsgHandlerMethod(packetId = MinerProto.FROM_CLIENT.C2S_RankList_VALUE)
@@ -27,7 +27,7 @@ public class MinerMsgHandler {
         MinerModule module = humanObject.getModule(MinerModule.class);
         if (module == null) return;
 
-        MinerSystem minerSystem = GameSystem.getSystem(MinerSystem.class);
+        MinerSystem minerSystem = GameSystemUtils.getSystem(MinerSystem.class);
         HashMap<String, Integer> info = minerSystem.getRanks(); // 获取分数 Map
         List<String> sortedNames = minerSystem.getSortRanks(); // 获取有序名字 List
 

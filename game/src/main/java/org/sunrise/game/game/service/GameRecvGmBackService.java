@@ -19,7 +19,7 @@ import java.util.Map;
 
 /**
  * 处理从gm后台收到的gm消息
- * 心跳每五秒向gm后台上报自身数据，主要用于后台页面中的展示
+ * 心跳每分钟向gm后台上报自身数据，主要用于后台页面中的展示
  */
 @RpcService
 public class GameRecvGmBackService extends BaseService {

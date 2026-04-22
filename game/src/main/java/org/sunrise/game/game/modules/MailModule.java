@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
 import lombok.Getter;
 import lombok.Setter;
+import org.sunrise.game.game.annotation.HumanModule;
 import org.sunrise.game.game.logic.mail.MailData;
 import org.sunrise.game.genProto.gen.MailProto;
 import org.sunrise.game.genProto.gen.TopicProto;
@@ -16,6 +17,7 @@ import java.util.List;
 /**
  * 邮件模块
  */
+@HumanModule
 @Getter
 @Setter
 public class MailModule extends BaseModule {

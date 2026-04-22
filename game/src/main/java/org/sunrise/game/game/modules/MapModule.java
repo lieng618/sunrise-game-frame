@@ -3,14 +3,16 @@ package org.sunrise.game.game.modules;
 import com.alibaba.fastjson2.TypeReference;
 import lombok.Getter;
 import lombok.Setter;
+import org.sunrise.game.game.annotation.HumanModule;
 import org.sunrise.game.game.config.Tables;
 import org.sunrise.game.game.config.map.TbMap;
 import org.sunrise.game.game.logic.map.GameMap;
-import org.sunrise.game.game.logic.system.GameSystem;
+import org.sunrise.game.game.logic.system.GameSystemUtils;
 import org.sunrise.game.game.logic.system.MapSystem;
 import org.sunrise.game.genProto.gen.MapProto;
 import org.sunrise.game.genProto.gen.TopicProto;
 
+@HumanModule
 @Getter
 @Setter
 public class MapModule extends BaseModule {
@@ -72,7 +74,7 @@ public class MapModule extends BaseModule {
         if (mapId == 0) {
             return;
         }
-        MapSystem mapSystem = GameSystem.getSystem(MapSystem.class);
+        MapSystem mapSystem = GameSystemUtils.getSystem(MapSystem.class);
         GameMap gameMap = mapSystem.getMap(mapId);
         if (gameMap == null) {
             return;

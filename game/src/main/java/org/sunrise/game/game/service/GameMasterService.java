@@ -7,7 +7,7 @@ import org.sunrise.game.game.human.HumanObject;
 import org.sunrise.game.game.human.HumanObjectManger;
 import org.sunrise.game.game.logic.LogicUtils;
 import org.sunrise.game.game.logic.ToolsUtils;
-import org.sunrise.game.game.logic.system.GameSystem;
+import org.sunrise.game.game.logic.system.GameSystemUtils;
 import org.sunrise.game.game.modules.MapModule;
 import org.sunrise.game.genProto.gen.TopicProto;
 import org.sunrise.game.log.LogCore;
@@ -33,7 +33,7 @@ public class GameMasterService extends BaseService {
         // 处理玩家的异步回调
         pulseHandlerHumanAsyncEvent();
         // 系统心跳
-        GameSystem.pulse();
+        GameSystemUtils.pulse();
     }
 
     @Override
@@ -45,7 +45,7 @@ public class GameMasterService extends BaseService {
         // 玩家数据定时存库
         pulseHandlerHumanDbSave();
         // 系统心跳 每秒
-        GameSystem.pulsePerSec();
+        GameSystemUtils.pulsePerSec();
     }
 
     /**

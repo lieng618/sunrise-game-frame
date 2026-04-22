@@ -3,12 +3,14 @@ package org.sunrise.game.game.modules;
 import com.alibaba.fastjson2.TypeReference;
 import lombok.Getter;
 import lombok.Setter;
+import org.sunrise.game.game.annotation.HumanModule;
 import org.sunrise.game.game.logic.ToolsUtils;
 import org.sunrise.game.genProto.gen.HumanProto;
 import org.sunrise.game.genProto.gen.TopicProto;
 import org.sunrise.game.genRpc.gen.CallEnum;
 import org.sunrise.game.rpc.function.RpcFunction;
 
+@HumanModule
 @Getter
 public class DataModule extends BaseModule {
     private String name;  //角色名字

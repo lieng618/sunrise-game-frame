@@ -1,5 +1,6 @@
 package org.sunrise.game.game.logic.system;
 
+import org.sunrise.game.game.annotation.GameSystem;
 import org.sunrise.game.game.config.Tables;
 import org.sunrise.game.game.config.map.TbMap;
 import org.sunrise.game.game.logic.map.GameMap;
@@ -11,6 +12,7 @@ import java.util.Map;
  * 地图系统
  * 统一管理所有地图实例
  */
+@GameSystem
 public class MapSystem extends BaseSystem {
     private final Map<Integer, GameMap> maps = new HashMap<>();
 

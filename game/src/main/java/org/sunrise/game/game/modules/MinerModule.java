@@ -3,11 +3,13 @@ package org.sunrise.game.game.modules;
 import com.alibaba.fastjson2.TypeReference;
 import lombok.Getter;
 import lombok.Setter;
+import org.sunrise.game.game.annotation.HumanModule;
 import org.sunrise.game.game.config.Enum.AttributeType;
 import org.sunrise.game.game.logic.attribute.AttributeProvider;
 import org.sunrise.game.genProto.gen.MinerProto;
 import org.sunrise.game.genProto.gen.TopicProto;
 
+@HumanModule
 @Getter
 @Setter
 public class MinerModule extends BaseModule {

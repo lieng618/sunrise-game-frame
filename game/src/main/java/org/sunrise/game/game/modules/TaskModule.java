@@ -3,6 +3,7 @@ package org.sunrise.game.game.modules;
 import com.alibaba.fastjson2.TypeReference;
 import lombok.Getter;
 import lombok.Setter;
+import org.sunrise.game.game.annotation.HumanModule;
 import org.sunrise.game.game.config.Enum.TaskStatus;
 import org.sunrise.game.game.config.Tables;
 import org.sunrise.game.game.config.task.TbTask;
@@ -13,6 +14,7 @@ import org.sunrise.game.genProto.gen.TopicProto;
 import java.util.HashMap;
 import java.util.Map;
 
+@HumanModule
 @Getter
 @Setter
 public class TaskModule extends BaseModule {
@@ -136,4 +138,3 @@ public class TaskModule extends BaseModule {
     }
 
 }
-

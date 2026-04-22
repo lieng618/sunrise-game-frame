@@ -25,11 +25,9 @@ public class BaseService {
 
     public BaseService(String nodeId) {
         this.nodeId = nodeId;
-        ServiceManager.registerService(this);
     }
 
     public void init() {
-        LogCore.RpcUtils.debug("Service init start, name = { {} }", this.getClass().getName());
     }
 
     /**

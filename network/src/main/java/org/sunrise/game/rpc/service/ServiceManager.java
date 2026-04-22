@@ -52,7 +52,7 @@ public class ServiceManager {
             }
 
             if (allInitEnd) {
-                LogCore.RpcUtils.debug("Load All Service end, took {} ms", System.currentTimeMillis() - initStartTime);
+                LogCore.RpcUtils.info("Load All Service end, took {} ms", System.currentTimeMillis() - initStartTime);
                 break;
             }
 

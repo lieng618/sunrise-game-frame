@@ -15,7 +15,7 @@ public class IdGenerator {
             options.SeqBitLength = 10; // 限制每毫秒生成的ID个数。若生成速度超过5万个/秒，建议加大 SeqBitLength 到 10。
             options.BaseTime = 1727712000000L; // 基础时间，设定为2024-10-01 00:00:00
             YitIdHelper.setIdGenerator(options);
-            LogCore.ServerStartUp.info("IdGenerator init, WorkerId = { {} }", WorkerId);
+            LogCore.RpcUtils.info("IdGenerator init, WorkerId = { {} }", WorkerId);
         }
     }
 
@@ -23,7 +23,7 @@ public class IdGenerator {
         try {
             return YitIdHelper.nextId();
         } catch (IdGeneratorException e) {
-            LogCore.ServerStartUp.error("IdGenerator, failed");
+            LogCore.RpcUtils.error("IdGenerator, failed");
         }
         return 0L;
     }

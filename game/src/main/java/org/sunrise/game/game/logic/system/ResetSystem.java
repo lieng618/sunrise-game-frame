@@ -1,6 +1,7 @@
 package org.sunrise.game.game.logic.system;
 
 import com.alibaba.fastjson2.TypeReference;
+import org.sunrise.game.game.annotation.GameSystem;
 import org.sunrise.game.game.human.HumanObject;
 import org.sunrise.game.game.human.HumanObjectManger;
 import org.sunrise.game.game.logic.ToolsUtils;
@@ -9,6 +10,7 @@ import org.sunrise.game.game.modules.DataModule;
 
 import java.util.Map;
 
+@GameSystem
 public class ResetSystem extends BaseSystem {
     private long nextDailyRefreshTime;
     private long nextWeekRefreshTime;

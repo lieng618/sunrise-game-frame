@@ -3,6 +3,7 @@ package org.sunrise.game.game.modules;
 import com.alibaba.fastjson2.TypeReference;
 import lombok.Getter;
 import lombok.Setter;
+import org.sunrise.game.game.annotation.HumanModule;
 import org.sunrise.game.game.config.Enum.ActivityStatus;
 import org.sunrise.game.game.config.Tables;
 import org.sunrise.game.game.config.activity.TbActivity;
@@ -10,13 +11,14 @@ import org.sunrise.game.game.logic.ToolsUtils;
 import org.sunrise.game.game.logic.activity.logic.ActivityDbData;
 import org.sunrise.game.game.logic.activity.logic.BaseActivityLogic;
 import org.sunrise.game.game.logic.system.ActivitySystem;
-import org.sunrise.game.game.logic.system.GameSystem;
+import org.sunrise.game.game.logic.system.GameSystemUtils;
 import org.sunrise.game.genProto.gen.ActivityProto;
 import org.sunrise.game.genProto.gen.TopicProto;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@HumanModule
 @Getter
 @Setter
 public class ActivityModule extends BaseModule {
@@ -67,7 +69,7 @@ public class ActivityModule extends BaseModule {
      */
     public void initActivityList() {
         if (Tables.ConfigActivity == null) return;
-        ActivitySystem activitySystem = GameSystem.getSystem(ActivitySystem.class);
+        ActivitySystem activitySystem = GameSystemUtils.getSystem(ActivitySystem.class);
         if (activitySystem == null) return;
         for (TbActivity cfg : Tables.ConfigActivity.getDataList()) {
             if (cfg == null) continue;
@@ -170,4 +172,3 @@ public class ActivityModule extends BaseModule {
         activityLogic.onAction(data.getActionId(), data.getData());
     }
 }
-

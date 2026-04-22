@@ -3,6 +3,7 @@ package org.sunrise.game.game.modules;
 import com.alibaba.fastjson2.TypeReference;
 import lombok.Getter;
 import lombok.Setter;
+import org.sunrise.game.game.annotation.HumanModule;
 import org.sunrise.game.game.config.Enum.TaskType;
 import org.sunrise.game.game.config.Tables;
 import org.sunrise.game.game.config.item.TbItem;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+@HumanModule
 @Getter
 @Setter
 public class ItemModule extends BaseModule {

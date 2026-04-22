@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
 import lombok.Getter;
 import lombok.Setter;
+import org.sunrise.game.game.annotation.HumanModule;
 import org.sunrise.game.game.human.HumanObjectManger;
 import org.sunrise.game.game.logic.friend.FriendRequestData;
 import org.sunrise.game.game.logic.playerinfo.PlayerInfo;
@@ -20,6 +21,7 @@ import java.util.Map;
 /**
  * 好友模块
  */
+@HumanModule
 @Getter
 @Setter
 public class FriendModule extends BaseModule {

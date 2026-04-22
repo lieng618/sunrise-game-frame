@@ -3,7 +3,7 @@ package org.sunrise.game.game.logic.map;
 import org.sunrise.game.game.annotation.MsgHandlerClass;
 import org.sunrise.game.game.annotation.MsgHandlerMethod;
 import org.sunrise.game.game.human.HumanObject;
-import org.sunrise.game.game.logic.system.GameSystem;
+import org.sunrise.game.game.logic.system.GameSystemUtils;
 import org.sunrise.game.game.logic.system.MapSystem;
 import org.sunrise.game.game.modules.MapModule;
 import org.sunrise.game.genProto.gen.MapProto;
@@ -17,7 +17,7 @@ public class MapMsgHandler {
     @MsgHandlerMethod(packetId = MapProto.FROM_CLIENT.C2S_Enter_VALUE)
     public static void enter(HumanObject humanObject, MapProto.MC2S_Enter data) {
         int mapId = data.getId();
-        MapSystem mapSystem = GameSystem.getSystem(MapSystem.class);
+        MapSystem mapSystem = GameSystemUtils.getSystem(MapSystem.class);
         GameMap gameMap = mapSystem.getMap(mapId);
         if (gameMap == null) {
             return;
@@ -36,7 +36,7 @@ public class MapMsgHandler {
         if (module.getMapId() == 0) {
             return;
         }
-        MapSystem mapSystem = GameSystem.getSystem(MapSystem.class);
+        MapSystem mapSystem = GameSystemUtils.getSystem(MapSystem.class);
         GameMap gameMap = mapSystem.getMap(module.getMapId());
         if (gameMap == null) {
             return;
@@ -62,7 +62,7 @@ public class MapMsgHandler {
             return;
         }
         int mapId = data.getId();
-        MapSystem mapSystem = GameSystem.getSystem(MapSystem.class);
+        MapSystem mapSystem = GameSystemUtils.getSystem(MapSystem.class);
         GameMap gameMap = mapSystem.getMap(mapId);
         if (gameMap == null) {
             return;

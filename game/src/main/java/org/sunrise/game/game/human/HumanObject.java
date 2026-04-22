@@ -4,21 +4,15 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
 import com.google.protobuf.Message;
 import lombok.Data;
-import org.sunrise.game.game.modules.ActivityModule;
-import org.sunrise.game.game.modules.AttributeModule;
 import org.sunrise.game.game.modules.BaseModule;
 import org.sunrise.game.game.modules.DataModule;
-import org.sunrise.game.game.modules.FriendModule;
-import org.sunrise.game.game.modules.ItemModule;
-import org.sunrise.game.game.modules.MailModule;
-import org.sunrise.game.game.modules.MapModule;
-import org.sunrise.game.game.modules.MinerModule;
-import org.sunrise.game.game.modules.TaskModule;
+import org.sunrise.game.game.modules.ModuleUtils;
 import org.sunrise.game.genProto.gen.HumanProto;
 import org.sunrise.game.genProto.gen.TopicProto;
 
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 @Data
@@ -44,15 +38,10 @@ public class HumanObject {
     }
 
     private void createModules() {
-        modules.put(ItemModule.class.getSimpleName(), new ItemModule(humanId));
-        modules.put(DataModule.class.getSimpleName(), new DataModule(humanId));
-        modules.put(MapModule.class.getSimpleName(), new MapModule(humanId));
-        modules.put(MinerModule.class.getSimpleName(), new MinerModule(humanId));
-        modules.put(TaskModule.class.getSimpleName(), new TaskModule(humanId));
-        modules.put(FriendModule.class.getSimpleName(), new FriendModule(humanId));
-        modules.put(MailModule.class.getSimpleName(), new MailModule(humanId));
-        modules.put(ActivityModule.class.getSimpleName(), new ActivityModule(humanId));
-        modules.put(AttributeModule.class.getSimpleName(), new AttributeModule(humanId));
+        List<BaseModule> moduleList = ModuleUtils.createModules(humanId);
+        for (BaseModule module : moduleList) {
+            modules.put(module.getClass().getSimpleName(), module);
+        }
     }
 
     @SuppressWarnings("unchecked")

@@ -41,7 +41,7 @@ public class RpcNode {
     private final int serverId;
     private String ip = null; //绑定ip
     private int port; //绑定端口
-    private DbService dbService;
+    private DbService dbService = new DbService();
 
     private EventLoopGroup group = null;
     private Bootstrap b = null;
@@ -91,11 +91,9 @@ public class RpcNode {
     }
 
     /**
-     * 传入dbService，进行启动
      * 通过数据表rpc_server_system，保证当前服务的唯一性
      */
-    public void start(DbService dbService) {
-        this.dbService = dbService;
+    public void start() {
         int maxPort = 0;
         List<EntityRpcServerSystem> rpcServerSystems = new ArrayList<>();
         try {

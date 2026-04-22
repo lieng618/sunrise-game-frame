@@ -29,7 +29,7 @@ public class ExternalServerStartUp {
         // 添加当前模块要注册的rpc
         CallUtils.init(rpcNode.getNodeId(), Collections.singletonList("org.sunrise.game.external.service"), CallEnum.class);
         // 启动
-        rpcNode.start(new DbService());
+        rpcNode.start();
 
         // 内存检测
         Utils.startMemoryCheck();

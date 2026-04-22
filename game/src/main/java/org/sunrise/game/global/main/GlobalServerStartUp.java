@@ -30,7 +30,7 @@ public class GlobalServerStartUp {
         // 添加当前模块要注册的rpc
         CallUtils.init(rpcNode.getNodeId(), Collections.singletonList("org.sunrise.game.global.service"), CallEnum.class);
         // 启动
-        rpcNode.start(new DbService());
+        rpcNode.start();
 
         // 内存检测
         Utils.startMemoryCheck();

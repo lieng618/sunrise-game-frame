@@ -2,6 +2,7 @@ package org.sunrise.game.game.logic.system;
 
 import com.alibaba.fastjson2.TypeReference;
 import lombok.Getter;
+import org.sunrise.game.game.annotation.GameSystem;
 import org.sunrise.game.game.human.HumanObject;
 import org.sunrise.game.game.modules.DataModule;
 import org.sunrise.game.game.modules.MinerModule;
@@ -10,10 +11,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+@GameSystem
+@Getter
 public class MinerSystem extends BaseSystem {
-    @Getter
     private HashMap<String, Integer> ranks = new HashMap<>();
-    @Getter
     private List<String> sortRanks = new ArrayList<>();
     @Override
     public void load() {

@@ -3,6 +3,7 @@ package org.sunrise.game.rpc.function;
 
 import org.sunrise.game.core.server.BaseServerManager;
 import org.sunrise.game.log.LogCore;
+import org.sunrise.game.rpc.annotation.RpcMethod;
 import org.sunrise.game.rpc.annotation.RpcService;
 import org.sunrise.game.rpc.service.BaseService;
 import org.sunrise.game.rpc.service.ServiceManager;
@@ -43,16 +44,32 @@ public class CallUtils {
                     if (!clazz.isAnnotationPresent(RpcService.class)) {
                         continue;
                     }
+                    if (!BaseService.class.isAssignableFrom(clazz) || clazz == BaseService.class) {
+                        continue;
+                    }
+                    long classStartTime = System.currentTimeMillis();
+                    @SuppressWarnings("unchecked")
+                    Class<? extends BaseService> serviceClass = (Class<? extends BaseService>) clazz;
+
                     String className = clazz.getSimpleName();
                     Method[] methods = clazz.getDeclaredMethods();
+                    int classMethodCount = 0; // 记录类方法数
                     if (methods != null) {
                         for (Method method : methods) {
-                            methodsCache.put(className + "_" + method.getName(), method);
+                            if (method.isAnnotationPresent(RpcMethod.class)) {
+                                methodsCache.put(className + "_" + method.getName(), method);
+
+                                // 类方法数加1
+                                classMethodCount++;
+                            }
                         }
                     }
                     try {
                         // 实例化类
-                        clazz.getConstructor(String.class).newInstance(nodeId);
+                        ServiceManager.registerService(serviceClass.getConstructor(String.class).newInstance(nodeId));
+
+                        long classEndTime = System.currentTimeMillis();
+                        LogCore.RpcUtils.info("Load class end, name = { {} }, loaded {} methods, took {} ms", clazz.getName(), classMethodCount, classEndTime - classStartTime);
                     } catch (Exception e) {
                         LogCore.RpcUtils.warn("Failed to instantiate class: {} with nodeId: {}, error: {}", className, nodeId, e.getMessage());
                     }
@@ -82,7 +99,7 @@ public class CallUtils {
             }
         }
 
-        LogCore.RpcUtils.debug("CallUtils init end, took {} ms", System.currentTimeMillis() - startTime);
+        LogCore.RpcUtils.info("CallUtils init end, took {} ms", System.currentTimeMillis() - startTime);
         initCurRegisterCallIds();
         // 初始化所有服务
         ServiceManager.initAll();

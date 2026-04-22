@@ -3,6 +3,7 @@ package org.sunrise.game.game.logic.system;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
 import org.sunrise.game.db.entity.EntityServerData;
+import org.sunrise.game.game.annotation.GameSystem;
 import org.sunrise.game.game.db.DbManager;
 import org.sunrise.game.game.human.HumanObject;
 import org.sunrise.game.game.human.HumanObjectManger;
@@ -12,18 +13,38 @@ import org.sunrise.game.rpc.node.RpcNodeManager;
 import org.sunrise.game.utils.Utils;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-public class GameSystem {
-    private static long initStartTime;
+public class GameSystemUtils {
+    private static long loadStartTime;
     private static long lastSaveDbTime = System.currentTimeMillis(); //上次保存数据的时间
     private static final Map<String, BaseSystem> systems = new HashMap<>();
 
-    private static void createSystems() {
-        systems.put(ResetSystem.class.getSimpleName(), new ResetSystem());
-        systems.put(MinerSystem.class.getSimpleName(), new MinerSystem());
-        systems.put(MapSystem.class.getSimpleName(), new MapSystem());
-        systems.put(ActivitySystem.class.getSimpleName(), new ActivitySystem());
+    private static void createSystems(List<String> classPaths) {
+        long startTime = System.currentTimeMillis();
+        for (String classPath : classPaths) {
+            try {
+                List<Class<?>> classes = Utils.findClasses(classPath);
+                for (Class<?> clazz : classes) {
+                    if (!clazz.isAnnotationPresent(GameSystem.class)) {
+                        continue;
+                    }
+                    if (!BaseSystem.class.isAssignableFrom(clazz) || clazz == BaseSystem.class) {
+                        continue;
+                    }
+                    long classStartTime = System.currentTimeMillis();
+                    @SuppressWarnings("unchecked")
+                    Class<? extends BaseSystem> systemClass = (Class<? extends BaseSystem>) clazz;
+                    systems.put(systemClass.getSimpleName(), systemClass.getConstructor().newInstance());
+                    long classEndTime = System.currentTimeMillis();
+                    LogCore.GameServer.info("Load class end, name = { {} }, took {} ms", clazz.getName(), classEndTime - classStartTime);
+                }
+            } catch (Exception e) {
+                LogCore.GameServer.error("GameSystemUtils init failed, error: {}", e.getMessage(), e);
+            }
+        }
+        LogCore.GameServer.info("GameSystemUtils init end, loaded {} systems, took {} ms", systems.size(), System.currentTimeMillis() - startTime);
     }
 
     @SuppressWarnings("unchecked")
@@ -34,15 +55,15 @@ public class GameSystem {
     /**
      * GameSystem 初始化
      */
-    public static void init() {
-        initStartTime = System.currentTimeMillis();
-        createSystems();
+    public static void init(List<String> classPaths) {
+        createSystems(classPaths);
         for (Map.Entry<String, BaseSystem> entry : systems.entrySet()) {
             entry.getValue().init();
         }
+        loadStartTime = System.currentTimeMillis();
         load();
         waitInitEnd();
-        Utils.setShutdownHook(GameSystem::saveSync);
+        Utils.setShutdownHook(GameSystemUtils::saveSync);
     }
 
     /**
@@ -57,12 +78,12 @@ public class GameSystem {
                     break;
                 }
             }
-            
+
             if (allInitEnd) {
-                LogCore.GameServer.info("Load All Systems end, took {} ms", System.currentTimeMillis() - initStartTime);
+                LogCore.GameServer.info("Load All Systems end, took {} ms", System.currentTimeMillis() - loadStartTime);
                 break;
             }
-            
+
             try {
                 Thread.sleep(30);
             } catch (InterruptedException e) {
@@ -80,7 +101,8 @@ public class GameSystem {
             DbManager.getDbService().queryGetOneByParamsAsync((result -> {
                 if (result != null) {
                     EntityServerData serverData = new EntityServerData(result);
-                    entry.getValue().setDataMap(JSON.parseObject(serverData.getData(), new TypeReference<Map<String, String>>() {}.getType()));
+                    entry.getValue().setDataMap(JSON.parseObject(serverData.getData(), new TypeReference<Map<String, String>>() {
+                    }.getType()));
                     entry.getValue().load();
                 } else {
                     DbManager.getDbService().executeAsync("insert into `server_data` (server_id,name,data) values (?,?,?)", RpcNodeManager.getRpcServerId(), entry.getKey(), JSON.toJSONBytes(entry.getValue().getDataMap()));
