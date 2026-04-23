@@ -159,10 +159,17 @@ start/windows/single/runallone.bat
 
 ### 4.6 Linux 一键启动
 
+安装pm2
 ```bash
 npm install -g pm2
 ```
 
+服务多进程部署启动
+```bash
+sh start/linux/server_run_allone.sh
+```
+
+服务单进程部署启动
 ```bash
 sh start/linux/server_run_all.sh
 ```

@@ -1,0 +1,17 @@
+{
+  "name": "runallone",
+  "script": "java",
+  "args": [
+    "-Xms256m",
+    "-Xmx1024m",
+    "-jar",
+    "../../jar/sunrise-runallone.jar",
+    "../../../config/runallone-config.properties",
+    "100"
+  ],
+  "error_file": "../log/runallone-err.log",
+  "out_file": "../log/runallone.log",
+  "exec_interpreter": "",
+  "exec_mode": "fork",
+  "restart": "none"
+}

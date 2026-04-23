@@ -28,21 +28,6 @@
             <artifactId>gen</artifactId>
             <version>1.0</version>
         </dependency>
-        <dependency>
-            <groupId>com.github.l42111996</groupId>
-            <artifactId>kcp-base</artifactId>
-            <version>1.6</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>io.netty</groupId>
-                    <artifactId>netty-all</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-simple</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
     </dependencies>
 
     <build>
