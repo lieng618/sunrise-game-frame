@@ -2,6 +2,7 @@ package org.sunrise.game.rpc.node;
 
 import lombok.Getter;
 import org.sunrise.game.core.client.BaseClient;
+import org.sunrise.game.log.LogCore;
 
 import java.util.Map;
 import java.util.Objects;
@@ -25,6 +26,9 @@ public class RpcNodeManager {
                     return entry.getKey();
                 }
             }
+            LogCore.RpcUtils.warn("RpcNode getServerIdByClientNodeId fail, use NodeId = { {} }, cur have Others ServerId = {{}}", curNodeId, rpcNode.getConnectToOthers().keySet());
+        } else {
+            LogCore.RpcUtils.warn("RpcNode getServerIdByClientNodeId fail, rpcNode is null, use NodeId = { {} }", curNodeId);
         }
         return 0;
     }
@@ -39,8 +43,31 @@ public class RpcNodeManager {
                     return entry.getValue().getServerNodeId();
                 }
             }
+            LogCore.RpcUtils.warn("RpcNode getServerNodeIdByClientNodeId fail, use NodeId = { {} }, cur have Others ServerId = {{}}", curNodeId, rpcNode.getConnectToOthers().keySet());
+        } else {
+            LogCore.RpcUtils.warn("RpcNode getServerNodeIdByClientNodeId fail, rpcNode is null, use NodeId = { {} }", curNodeId);
         }
         return "";
+    }
+
+    /**
+     * 判断服务器节点是否有效
+     */
+    public static boolean IsServerNodeActive(String serverNodeId) {
+        if (serverNodeId == null || serverNodeId.isEmpty()) {
+            return false;
+        }
+        if (rpcNode != null) {
+            if (rpcNode.getNodeId().equals(serverNodeId)) {
+                return true;
+            }
+            for (Map.Entry<Integer, BaseClient> entry : rpcNode.getConnectToOthers().entrySet()) {
+                if (Objects.equals(entry.getValue().getServerNodeId(), serverNodeId)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -53,6 +80,9 @@ public class RpcNodeManager {
                     return entry.getValue().getNodeId();
                 }
             }
+            LogCore.RpcUtils.warn("RpcNode getClientNodeIdByServerNodeId fail, use NodeId = { {} }, cur have Others ServerId = {{}}", serverNodeId, rpcNode.getConnectToOthers().keySet());
+        } else {
+            LogCore.RpcUtils.warn("RpcNode getClientNodeIdByServerNodeId fail, rpcNode is null, use NodeId = { {} }", serverNodeId);
         }
         return "";
     }
@@ -63,6 +93,8 @@ public class RpcNodeManager {
     public static int getRpcServerId() {
         if (rpcNode != null) {
             return rpcNode.getServerId();
+        } else {
+            LogCore.RpcUtils.warn("RpcNode getRpcServerId fail, rpcNode is null");
         }
         return 0;
     }
@@ -73,6 +105,8 @@ public class RpcNodeManager {
     public static String getRpcServerNodeId() {
         if (rpcNode != null) {
             return rpcNode.getRpcServer().getNodeId();
+        } else {
+            LogCore.RpcUtils.warn("RpcNode getRpcServerNodeId fail, rpcNode is null");
         }
         return "";
     }

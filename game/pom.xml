@@ -28,6 +28,21 @@
             <artifactId>gen</artifactId>
             <version>1.0</version>
         </dependency>
+        <dependency>
+            <groupId>com.github.l42111996</groupId>
+            <artifactId>kcp-base</artifactId>
+            <version>1.6</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.netty</groupId>
+                    <artifactId>netty-all</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-simple</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
     </dependencies>
 
     <build>
@@ -197,6 +212,38 @@
                                 <manifest>
                                     <!-- 指定主类 -->
                                     <mainClass>org.sunrise.game.http.main.HttpServerStartUp</mainClass>
+                                </manifest>
+                            </archive>
+                            <descriptorRefs>
+                                <!-- 指定打包成jar包 -->
+                                <descriptorRef>jar-with-dependencies</descriptorRef>
+                            </descriptorRefs>
+                            <appendAssemblyId>false</appendAssemblyId>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- RunAllOneServer -->
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.6.0</version>
+                <executions>
+                    <execution>
+                        <id>make-assembly-http</id>
+                        <!-- 绑定到打包生命周期阶段上 -->
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>sunrise-runallone</finalName>
+                            <outputDirectory>${project.basedir}/../start/jar</outputDirectory>
+                            <!-- 指定打包方式为jar -->
+                            <archive>
+                                <manifest>
+                                    <!-- 指定主类 -->
+                                    <mainClass>org.sunrise.game.runone.main.RunAllOneServerStartUp</mainClass>
                                 </manifest>
                             </archive>
                             <descriptorRefs>

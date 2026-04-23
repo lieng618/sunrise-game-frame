@@ -1,6 +1,7 @@
 package org.sunrise.game.external.server;
 
 import io.netty.channel.Channel;
+import kcp.Ukcp;
 import org.sunrise.game.rpc.node.RpcNodeManager;
 import org.sunrise.game.utils.Utils;
 
@@ -14,6 +15,14 @@ public class ExternalConnectionManger {
 
     public static ClientConnection createClientConnect(Channel channel) {
         var connection = new ClientConnection(channel);
+        connection.setId((long) RpcNodeManager.getRpcServerId() * Utils.ID_BASE_NUM + connectionIdAuto.incrementAndGet());
+        clients.put(connection.getId(), connection);
+
+        return connection;
+    }
+
+    public static ClientConnection createClientConnect(Ukcp ukcp) {
+        var connection = new ClientConnection(ukcp);
         connection.setId((long) RpcNodeManager.getRpcServerId() * Utils.ID_BASE_NUM + connectionIdAuto.incrementAndGet());
         clients.put(connection.getId(), connection);
 

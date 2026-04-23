@@ -26,6 +26,7 @@ public class HttpServer {
     // 对外服类型-<对外服id-地址>
     // "tcp" - <1001, 127.0.0.1:10000>
     // "websocket" - <1001, 127.0.0.1:10001>
+    // "kcp" - <1001, 127.0.0.1:10002>
     private final ConcurrentHashMap<String, ConcurrentHashMap<Integer, String>> externalAddress = new ConcurrentHashMap<>();
 
     public HttpServer(int port) {

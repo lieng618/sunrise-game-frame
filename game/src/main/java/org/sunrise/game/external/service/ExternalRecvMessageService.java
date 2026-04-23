@@ -1,8 +1,6 @@
 package org.sunrise.game.external.service;
 
 import org.sunrise.game.config.ConfigReader;
-import org.sunrise.game.core.message.MessageType;
-import org.sunrise.game.core.message.SocketMessage;
 import org.sunrise.game.external.server.ClientConnection;
 import org.sunrise.game.external.server.ExternalConnectionManger;
 import org.sunrise.game.external.server.ExternalServer;
@@ -59,7 +57,7 @@ public class ExternalRecvMessageService extends BaseService {
                 if (gameNodeId != null && !gameNodeId.isEmpty()) {
                     connection.setGameNodeId(gameNodeId);
                 }
-                connection.getChannel().writeAndFlush(new SocketMessage(MessageType.biz, data));
+                connection.sendMessage(data);
             }
         }
     }
@@ -91,9 +89,9 @@ public class ExternalRecvMessageService extends BaseService {
                 continue;
             }
             // 此客户断连接的游戏服已经断开连接 需要清理客户端
-            if (RpcNodeManager.getClientNodeIdByServerNodeId(connection.getGameNodeId()).isEmpty()) {
-                if (connection.getChannel() != null && connection.getChannel().isActive()) {
-                    connection.getChannel().close();
+            if (!RpcNodeManager.IsServerNodeActive(connection.getGameNodeId())) {
+                if (connection.isActive()) {
+                    connection.close();
                 }
             }
         }

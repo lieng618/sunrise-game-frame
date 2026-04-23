@@ -14,7 +14,8 @@
 
 主要使用技术栈:
 
-- netty（开源网络框架）
+- netty（高性能网络框架）
+- java-Kcp（kcp传输协议）
 - protobuf（消息序列化）
 - msgpack（消息序列化）
 - fastjson（json序列化）
@@ -91,6 +92,7 @@ mvn clean package
 - `start/jar/sunrise-gmback.jar`
 - `start/jar/sunrise-client.jar`
 - `start/jar/sunrise-bot.jar`
+- `start/jar/sunrise-runallone.jar`
 
 ### 4.3 配置文件
 
@@ -102,6 +104,7 @@ mvn clean package
 - `global-config.properties`
 - `http-config.properties`
 - `gmback-config.properties`
+- `runallone-config.properties`
 
 其中典型项有：
 
@@ -144,8 +147,14 @@ sh start/linux/create_sql_table.sh
 
 ### 4.5 Windows 一键启动
 
+服务多进程部署启动
 ```bat
 start/windows/server_run_all.bat
+```
+
+服务单进程部署启动
+```bat
+start/windows/single/runallone.bat
 ```
 
 ### 4.6 Linux 一键启动

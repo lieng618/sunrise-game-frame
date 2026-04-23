@@ -24,14 +24,12 @@ public class ExternalServerHandler extends SimpleChannelInboundHandler<SocketMes
             verify(ctx.channel(), data);
             return;
         }
-        // 来自client的消息，发给game
         if (!clientConnection.dataCheck(data)) {
             return;
         }
         clientConnection.getMsgQueue().add(data);
     }
 
-    // 首次收到消息
     private void verify(Channel channel, byte[] data) {
         isAuthMessage = false;
         String message = new String(data, StandardCharsets.UTF_8);
@@ -39,8 +37,8 @@ public class ExternalServerHandler extends SimpleChannelInboundHandler<SocketMes
             clientConnection = ExternalConnectionManger.createClientConnect(channel);
             LogCore.ExternalServer.info("recv connection from client : connectionId = {}, remoteAddress = {}", clientConnection.getId(), channel.remoteAddress());
         } else {
-            channel.close();
             LogCore.ExternalServer.error("recv connection from client : check fail,  close, remoteAddress = {}", channel.remoteAddress());
+            channel.close();
         }
     }
 
@@ -48,8 +46,7 @@ public class ExternalServerHandler extends SimpleChannelInboundHandler<SocketMes
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         if (clientConnection != null) {
             ExternalConnectionManger.removeClientConnect(clientConnection.getId());
-            Channel channel = clientConnection.getChannel();
-            LogCore.ExternalServer.info("client disconnected, id = {}, remoteAddress = {}", clientConnection.getId(), channel != null ? channel.remoteAddress() : "unknown");
+            LogCore.ExternalServer.info("client disconnected, id = {}, remoteAddress = {}", clientConnection.getId(), clientConnection.getRemoteAddress());
             clientConnection = null;
         }
         super.channelInactive(ctx);

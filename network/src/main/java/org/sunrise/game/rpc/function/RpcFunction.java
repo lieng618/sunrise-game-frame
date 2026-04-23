@@ -5,6 +5,7 @@ import org.sunrise.game.core.server.BaseServerManager;
 import org.sunrise.game.core.server.ConnectionManger;
 import org.sunrise.game.log.LogCore;
 import org.sunrise.game.rpc.node.RpcNodeManager;
+import org.sunrise.game.utils.IdGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +57,8 @@ public class RpcFunction {
      * 创建调用器，指定节点
      */
     public static RpcFunction newInstance(String designatedNodeId) {
-        if (getCurNodeByServerNode(designatedNodeId).isEmpty()) {
+        // 指定的服务节点无效，则创建默认调用器，随机寻找一个节点发送
+        if (!RpcNodeManager.IsServerNodeActive(designatedNodeId)) {
             LogCore.RpcClient.warn("rpc newInstance SendDesignated, designatedNodeId is empty, create default");
             return new RpcFunction();
         }
@@ -81,43 +83,35 @@ public class RpcFunction {
         // 发给所有注册此方法的远端
         // 每个call使用同一个消息id，回调函数只调用一次
         if (callType == RpcCallType.SendAll) {
-            long msgId = 0L;
-            for (int i = 0; i < callNode.size(); i++) {
-                Call call;
-                if (i == 0) {
-                    call = new Call(getCurNodeByServerNode(callNode.getFirst()), id);
+            long msgId = IdGenerator.getId();
+            for (String s : callNode) {
+                if (nodeId.equals(s)) {
+                    Call call = new Call(nodeId, id, msgId);
                     call.setType(CallType.Call.ordinal());
                     call.setData(params);
                     calls.add(call);
-                    msgId = call.getMessageId();
-                } else {
-                    call = new Call(getCurNodeByServerNode(callNode.get(i)), id, msgId);
-                    call.setType(CallType.Call.ordinal());
-                    call.setData(params);
-                    calls.add(call);
-                }
-                if (callNode.get(i).equals(nodeId)) {
-                    //当前节点有这个方法，放入自身消息队列
-                    call.setNodeId(nodeId);
                     BaseServerManager.recvFromClient(nodeId, call);
+                    LogCore.RpcClient.debug("rpc call, callId = {}, messageId = { {} }, params = {}", call.getRpcId(), call.getMessageId(), params);
                 } else {
+                    Call call = new Call(getCurNodeByServerNode(s), id, msgId);
+                    call.setType(CallType.Call.ordinal());
+                    call.setData(params);
+                    calls.add(call);
                     BaseClientManager.sendToServer(call);
+                    LogCore.RpcClient.debug("rpc call, callId = {}, messageId = { {} }, params = {}", call.getRpcId(), call.getMessageId(), params);
                 }
-                LogCore.RpcClient.debug("rpc call, callId = {}, messageId = { {} }, params = {}", call.getRpcId(), call.getMessageId(), params);
             }
         } else if (callType == RpcCallType.SendRandom) {
-            if (nodeId != null) {
-                for (String s : callNode) {
-                    //当前节点有这个方法，放入自身消息队列
-                    if (nodeId.equals(s)) {
-                        Call call = new Call(nodeId, id);
-                        call.setType(CallType.Call.ordinal());
-                        call.setData(params);
-                        calls.add(call);
-                        BaseServerManager.recvFromClient(nodeId, call);
-                        LogCore.RpcClient.debug("rpc call, callId = {}, messageId = { {} }, params = {}", call.getRpcId(), call.getMessageId(), params);
-                        return true;
-                    }
+            for (String s : callNode) {
+                //当前节点有这个方法，放入自身消息队列
+                if (nodeId.equals(s)) {
+                    Call call = new Call(nodeId, id);
+                    call.setType(CallType.Call.ordinal());
+                    call.setData(params);
+                    calls.add(call);
+                    BaseServerManager.recvFromClient(nodeId, call);
+                    LogCore.RpcClient.debug("rpc call, callId = {}, messageId = { {} }, params = {}", call.getRpcId(), call.getMessageId(), params);
+                    return true;
                 }
             }
 
@@ -131,20 +125,26 @@ public class RpcFunction {
             BaseClientManager.sendToServer(call);
             LogCore.RpcClient.debug("rpc call, callId = {}, messageId = { {} }, params = {}", call.getRpcId(), call.getMessageId(), params);
         } else if (callType == RpcCallType.SendDesignated) {
-            if (designatedServerNodeId == null || designatedServerNodeId.isEmpty() || getCurNodeByServerNode(designatedServerNodeId).isEmpty()) {
+            if (!RpcNodeManager.IsServerNodeActive(designatedServerNodeId)) {
                 LogCore.RpcClient.warn("rpc newInstance SendDesignated, designatedNodeId is empty, skip");
                 return false;
             }
-            Call call = new Call(getCurNodeByServerNode(designatedServerNodeId), id);
-            call.setType(CallType.Call.ordinal());
-            call.setData(params);
-            calls.add(call);
             if (nodeId.equals(designatedServerNodeId)) {
+                //当前节点有这个方法，放入自身消息队列
+                Call call = new Call(nodeId, id);
+                call.setType(CallType.Call.ordinal());
+                call.setData(params);
+                calls.add(call);
                 BaseServerManager.recvFromClient(nodeId, call);
+                LogCore.RpcClient.debug("rpc call, callId = {}, messageId = { {} }, params = {}", call.getRpcId(), call.getMessageId(), params);
             } else {
+                Call call = new Call(getCurNodeByServerNode(designatedServerNodeId), id);
+                call.setType(CallType.Call.ordinal());
+                call.setData(params);
+                calls.add(call);
                 BaseClientManager.sendToServer(call);
+                LogCore.RpcClient.debug("rpc call, callId = {}, messageId = { {} }, params = {}", call.getRpcId(), call.getMessageId(), params);
             }
-            LogCore.RpcClient.debug("rpc call, callId = {}, messageId = { {} }, params = {}", call.getRpcId(), call.getMessageId(), params);
         }
         return true;
     }

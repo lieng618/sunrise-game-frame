@@ -39,7 +39,7 @@ public class WsClient extends SocketClient {
         try {
             Bootstrap bootstrap = new Bootstrap();
             bootstrap.group(group)
-                    .channel(Utils.getServerChannelClass())
+                    .channel(Utils.getClientChannelClass())
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel ch) {

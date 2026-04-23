@@ -57,7 +57,7 @@ iframe {
 
 .el-table th {
     background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-    color: #1e40af;
+    color: #3e496e;
     font-weight: 600;
     border-bottom: 2px solid #dbeafe;
 }
@@ -91,7 +91,7 @@ iframe {
 }
 
 .el-button--primary {
-    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    background: linear-gradient(135deg, #5c7398 0%, #4c5f94 100%);
     border: none;
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
 }
@@ -205,6 +205,6 @@ iframe {
 }
 
 .el-pagination .el-pager li.is-active {
-    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    background: linear-gradient(135deg, #4d6080 0%, #495e9a 100%);
     color: white;
 }

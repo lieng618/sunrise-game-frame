@@ -10,16 +10,14 @@
     <script src="https://unpkg.com/element-plus"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@element-plus/icons-vue"></script>
-    <script src="js/particles-bg.js"></script>
 </head>
 <body>
 
 <div id="app">
     <div v-if="!isLoggedIn" class="login-container min-h-screen flex items-center justify-center">
-        <particles-bg class="absolute inset-0" :quantity="80" :ease="80" color="#667eea" :staticity="30"></particles-bg>
         <el-card class="login-card w-96 rounded-xl relative z-10">
             <template #header>
-                <div class="text-center">Sunrise 后台登录</div>
+                <div class="text-center">Sunrise Game Frame</div>
             </template>
             <el-form label-position="top" class="px-2">
                 <el-form-item label="账号" class="mb-6">
@@ -41,10 +39,7 @@
         <el-aside width="220px" class="sidebar-wrapper">
             <div class="logo-area">
                 <h1 class="text-lg font-bold text-blue-600 flex items-center gap-2">
-                    <el-icon>
-                        <Sunrise/>
-                    </el-icon>
-                    Sunrise Gm
+                    Sunrise Game Frame
                 </h1>
             </div>
 
@@ -104,9 +99,14 @@
                     <span>用户管理</span>
                 </el-menu-item>
             </el-menu>
-
             <div class="sidebar-footer">
-                sunrise@lieng
+                <a
+                        href="https://gitee.com/lieng618/sunrise-game-frame"
+                        target="_blank"
+                        class="text-gray-500 hover:text-blue-600 transition-colors no-underline"
+                >
+                    sunrise-game-frame@lieng
+                </a>
             </div>
         </el-aside>
 
@@ -136,8 +136,7 @@
             </el-header>
 
             <el-main style="padding: 0; overflow: hidden; position: relative;">
-                <particles-bg class="absolute inset-0" :quantity="100" :ease="60" color="#667eea" :staticity="50" :particleSpeed="0.3" :lineDistance="100"></particles-bg>
-                <iframe :src="currentSrc" ref="contentFrame" class="relative z-10"></iframe>
+                <iframe :src="currentSrc" ref="contentFrame"></iframe>
             </el-main>
         </el-container>
     </el-container>
@@ -298,7 +297,6 @@
     });
 
     app.use(ElementPlus);
-    app.component('ParticlesBg', ParticlesBg);
     // 注册所有图标
     for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
         app.component(key, component)

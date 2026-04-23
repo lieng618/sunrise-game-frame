@@ -30,6 +30,11 @@ public class GameServerStartUp {
         // 设置日志等级
         Utils.setLogLevel(properties.getProperty("log.level"));
 
+        // 创建rpc节点
+        var rpcNode = RpcNodeManager.createRpcNode(Integer.parseInt(args[1]));
+        // rpc初始化
+        CallUtils.init(rpcNode.getNodeId(), Collections.singletonList("org.sunrise.game.game.service"), CallEnum.class);
+
         // 加载配置文件
         ConfigUtils.load();
         // 协议解析初始化
@@ -41,10 +46,6 @@ public class GameServerStartUp {
         // 系统模块初始化
         GameSystemUtils.init(Collections.singletonList("org.sunrise.game.game.logic.system"));
 
-        // 创建rpc节点
-        var rpcNode = RpcNodeManager.createRpcNode(Integer.parseInt(args[1]));
-        // rpc初始化
-        CallUtils.init(rpcNode.getNodeId(), Collections.singletonList("org.sunrise.game.game.service"), CallEnum.class);
         rpcNode.start();
 
         // 内存检测

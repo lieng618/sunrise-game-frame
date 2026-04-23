@@ -30,7 +30,7 @@ public class TcpClient extends SocketClient {
         try {
             Bootstrap b = new Bootstrap();
             b.group(group)
-                    .channel(Utils.getServerChannelClass())
+                    .channel(Utils.getClientChannelClass())
                     .option(ChannelOption.TCP_NODELAY, true)
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override

@@ -187,6 +187,9 @@ public class RpcNode {
             return;
         }
         int id = Integer.parseInt(properties.getProperty("master.id"));
+        if (id <= 0) {
+            return;
+        }
         String masterIp = properties.getProperty("master.address");
         int masterPort = Integer.parseInt(properties.getProperty("master.port"));
         String reportIp = properties.getProperty("report.address");

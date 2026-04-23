@@ -49,7 +49,7 @@
 }
 
 .login-card .el-card__header {
-    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    background: linear-gradient(135deg, #3d4e69 0%, #182648 100%);
     color: white;
     border-radius: 12px 12px 0 0;
     padding: 20px;
@@ -72,7 +72,7 @@
 }
 
 .login-button {
-    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    background: linear-gradient(135deg, #60728f 0%, #30498d 100%);
     border: none;
     transition: all 0.3s ease;
     box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
@@ -89,7 +89,7 @@
 
 /* 侧边栏样式 */
 .sidebar-wrapper {
-    background: linear-gradient(180deg, #1f2937 0%, #111827 100%);
+    background: linear-gradient(180deg, #374151 0%, #1f2937 100%);
     border-right: none;
     display: flex;
     flex-direction: column;
@@ -102,7 +102,7 @@
     align-items: center;
     justify-content: center;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(0, 0, 0, 0.2);
+    background: transparent;
 }
 
 .logo-area h1 {
@@ -147,7 +147,7 @@
 .el-menu-item.is-active {
     background: linear-gradient(90deg, rgba(96, 165, 250, 0.3) 0%, rgba(102, 126, 234, 0.3) 100%);
     color: white;
-    border-left: 3px solid #60a5fa;
+    border-left: 3px solid #3c597e;
 }
 
 .el-menu-item .el-icon {
@@ -176,7 +176,7 @@
 }
 
 .main-header .page-title {
-    color: #1e40af;
+    color: #4a5781;
     font-weight: 600;
     font-size: 20px;
     letter-spacing: 0.5px;
@@ -190,7 +190,7 @@
 }
 
 .user-dropdown:hover {
-    color: #3b82f6;
+    color: #3d5379;
 }
 
 .user-dropdown:focus {

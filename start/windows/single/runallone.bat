@@ -1,0 +1,1 @@
+start java -Xms256m -Xmx1024m -jar ../../jar/sunrise-runallone.jar ../../../config/runallone-config.properties 100

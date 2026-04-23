@@ -68,6 +68,8 @@ public class BaseServerManager {
         BaseServer baseServer = baseServers.get(message.getNodeId());
         if (baseServer != null) {
             baseServer.getMessageManager().sendMsg(message);
+        } else {
+            LogCore.BaseServer.warn("BaseServer sendToClient fail, use NodeId = { {} }, message = {{}}", message.getNodeId(), message);
         }
     }
 
@@ -85,6 +87,8 @@ public class BaseServerManager {
                     nodeConnect.getChannel().writeAndFlush(new SocketMessage(MessageType.biz, MessageUtils.toBytes(message)));
                 }
             }
+        } else {
+            LogCore.BaseServer.warn("BaseServer sendToClient fail, use NodeId = { {} }, message = {{}}", message.getNodeId(), message);
         }
     }
 
@@ -95,6 +99,8 @@ public class BaseServerManager {
         BaseServer baseServer = baseServers.get(nodeId);
         if (baseServer != null) {
             baseServer.getMessageManager().recvMsg(data);
+        } else {
+            LogCore.BaseServer.warn("BaseServer recvFromClient fail, use NodeId = { {} }, message = {{}}", nodeId, data);
         }
     }
 }
