@@ -1,9 +1,6 @@
 package sendmsg.frame;
 
-import core.client.SocketClient;
-import core.client.SocketClientManager;
-import core.client.TcpClient;
-import core.client.WsClient;
+import core.client.*;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.Message;
 import core.message.MessageUtil;
@@ -11,7 +8,6 @@ import sendmsg.frame.components.ModernButton;
 import sendmsg.frame.components.ModernPanel;
 import sendmsg.frame.components.ModernTextField;
 import lombok.Setter;
-import core.client.LoginManager;
 import sendmsg.frame.components.StatusLabel;
 import sendmsg.frame.theme.ThemeManager;
 import org.slf4j.LoggerFactory;
@@ -233,10 +229,10 @@ public class SendMsgFrame extends JPanel {
         CompletableFuture.runAsync(() -> {
             try {
                 String socketType = ConfigReader.getProp().getProperty("client.socket", "tcp");
-                if ("websocket".equals(socketType)) {
-                    client = new WsClient();
-                } else {
-                    client = new TcpClient();
+                switch (socketType) {
+                    case "websocket" -> client = new WsClient();
+                    case "kcp" -> client = new KcpClientImpl();
+                    default -> client = new TcpClient();
                 }
                 client.setUid(uid);
                 SocketClientManager.addClient(client);

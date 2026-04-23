@@ -1,9 +1,11 @@
 package bot.main;
 
 import bot.frame.BotFrame;
+import ch.qos.logback.classic.Level;
 import core.client.BotManager;
 import core.client.LoginManager;
 import org.sunrise.game.config.ConfigReader;
+import org.sunrise.game.log.LogCore;
 
 import java.util.Properties;
 
@@ -19,7 +21,7 @@ public class BotStartUp {
             return;
         }
         String httpUrl = properties.getProperty("http.address") + ":" + properties.getProperty("http.port");
-
+        LogCore.setLogLevel("kcp", Level.WARN);
         LoginManager.initialize(httpUrl);
         BotManager.initialize();
         BotFrame.start();

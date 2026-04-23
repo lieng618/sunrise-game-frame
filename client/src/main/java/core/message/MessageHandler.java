@@ -1,8 +1,8 @@
 package core.message;
 
+import com.google.protobuf.ByteString;
 import core.client.SocketClient;
 import core.client.SocketClientManager;
-import com.google.protobuf.ByteString;
 import core.message.annotation.Handler;
 import org.sunrise.game.genProto.gen.LoginProto;
 import org.sunrise.game.genProto.gen.TopicProto;
@@ -10,13 +10,18 @@ import org.sunrise.game.log.LogCore;
 
 public class MessageHandler {
 
-    public static void handler(String uid, byte[] bytes) throws Exception {
+    public static void handler(String uid, byte[] bytes) {
         SocketClient client = SocketClientManager.getClient(uid);
         if (client == null) {
             return;
         }
-        TopicProto.MBasePacketData packet = TopicProto.MBasePacketData.parseFrom(bytes);
-        ProtocolRouter.route(client, packet);
+        TopicProto.MBasePacketData packet;
+        try {
+            packet = TopicProto.MBasePacketData.parseFrom(bytes);
+            ProtocolRouter.route(client, packet);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Handler(packetType = TopicProto.TOPIC.TOPIC_TYPE_LOGIN_VALUE, packetId = LoginProto.FROM_SERVER.S2C_Login_VALUE)

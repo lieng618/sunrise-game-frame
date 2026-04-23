@@ -166,10 +166,10 @@ public class BotManager {
         SocketClient client = null;
         try {
             String socketType = ConfigReader.getProp().getProperty("client.socket", "tcp");
-            if ("websocket".equals(socketType)) {
-                client = new WsClient();
-            } else {
-                client = new TcpClient();
+            switch (socketType) {
+                case "websocket" -> client = new WsClient();
+                case "kcp" -> client = new KcpClientImpl();
+                default -> client = new TcpClient();
             }
             client.setUid(uid);
 
@@ -222,8 +222,8 @@ public class BotManager {
         BotInfo bot = bots.remove(uid);
         if (bot != null) {
             SocketClient client = bot.getClient();
-            if (client != null && client.getChannel() != null && client.getChannel().isActive()) {
-                client.getChannel().close();
+            if (client != null && client.isActive()) {
+                client.close();
             }
             SocketClientManager.removeClient(uid);
             log("已移除机器人: " + uid);
@@ -236,8 +236,8 @@ public class BotManager {
 
         for (BotInfo bot : bots.values()) {
             SocketClient client = bot.getClient();
-            if (client != null && client.getChannel() != null && client.getChannel().isActive()) {
-                client.getChannel().close();
+            if (client != null && client.isActive()) {
+                client.close();
             }
             SocketClientManager.removeClient(bot.getUid());
         }

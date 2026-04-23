@@ -1,5 +1,6 @@
 package org.sunrise.game.external.server;
 
+import ch.qos.logback.classic.Level;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelFuture;
@@ -147,6 +148,7 @@ public class ExternalServer {
     }
 
     public void startKcpListen(String ip, int port) {
+        LogCore.setLogLevel("kcp", Level.WARN);
         ChannelConfig channelConfig = new ChannelConfig();
         channelConfig.nodelay(true, 10, 2, true);
         channelConfig.setSndwnd(256);
