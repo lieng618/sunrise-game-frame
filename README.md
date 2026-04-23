@@ -166,12 +166,12 @@ npm install -g pm2
 
 服务多进程部署启动
 ```bash
-sh start/linux/server_run_allone.sh
+sh start/linux/server_run_all.sh
 ```
 
 服务单进程部署启动
 ```bash
-sh start/linux/server_run_all.sh
+sh start/linux/server_run_allone.sh
 ```
 
 ### 4.7 Docker启动
