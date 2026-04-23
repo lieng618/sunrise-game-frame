@@ -65,6 +65,13 @@ public class LoginManager {
                 }
 
                 // 设置连接ID并连接
+                if ("kcp".equals(ConfigReader.getProp().getProperty("client.socket", "tcp"))) {
+                    int conv = getKcpConv();
+                    address.conv = conv;
+                    if (client instanceof KcpClientImpl kcpClient) {
+                        kcpClient.setConv(conv);
+                    }
+                }
                 client.connect(address.host, address.port);
 
                 // 等待连接成功（带超时）
@@ -131,6 +138,23 @@ public class LoginManager {
     }
 
     /**
+     * 从服务端获取唯一的kcp conv id
+     */
+    private static int getKcpConv() {
+        String url = "http://" + httpUrl + "/kcp_conv";
+        String response = httpRequest(url);
+        if (response == null || response.isEmpty()) {
+            return 0;
+        }
+        try {
+            return JSON.parseObject(response).getIntValue("conv");
+        } catch (Exception e) {
+            LogCore.Client.error("Failed to parse kcp_conv response: {}", response, e);
+            return 0;
+        }
+    }
+
+    /**
      * 执行HTTP请求
      */
     private static String httpRequest(String url) {
@@ -178,10 +202,12 @@ public class LoginManager {
     private static class ServerAddress {
         final String host;
         final int port;
-        
+        int conv;
+
         ServerAddress(String host, int port) {
             this.host = host;
             this.port = port;
+            this.conv = 0;
         }
     }
 }

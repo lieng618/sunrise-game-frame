@@ -14,14 +14,12 @@ import org.sunrise.game.utils.Utils;
 
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Getter
 @Setter
 public class KcpClientImpl extends SocketClient {
 
-    private static final AtomicInteger convCounter = new AtomicInteger(1);
-
+    private int conv;
     private KcpClient kcpClient;
 
     public void connect(String host, int port) {
@@ -33,7 +31,7 @@ public class KcpClientImpl extends SocketClient {
         channelConfig.setTimeoutMillis(30000);
         channelConfig.setUseConvChannel(true);
         channelConfig.setCrc32Check(true);
-        channelConfig.setConv(convCounter.getAndIncrement());
+        channelConfig.setConv(conv);
 
         kcpClient = new KcpClient();
         kcpClient.init(channelConfig);
@@ -41,7 +39,7 @@ public class KcpClientImpl extends SocketClient {
         KcpListener listener = new KcpListener() {
             @Override
             public void onConnected(Ukcp ukcp) {
-                LogCore.Client.info("Kcp connected to {}:{}", host, port);
+                LogCore.Client.info("Kcp connected to {}:{}, conv={}", host, port, conv);
             }
 
             @Override
@@ -71,11 +69,6 @@ public class KcpClientImpl extends SocketClient {
                     return;
                 }
 
-//                if (!connectSuccess) {
-//                    verify(ukcp, data);
-//                    return;
-//                }
-
                 MessageHandler.handler(uid, data);
             }
 
@@ -86,7 +79,7 @@ public class KcpClientImpl extends SocketClient {
 
             @Override
             public void handleClose(Ukcp ukcp) {
-                LogCore.Client.info("Kcp connection closed");
+                LogCore.Client.info("Kcp connection closed, conv={}", conv);
                 connectSuccess = false;
             }
         };
@@ -102,21 +95,10 @@ public class KcpClientImpl extends SocketClient {
             ukcp.write(buf);
             buf.release();
 
-            LogCore.Client.info("Kcp connecting to {}:{}", host, port);
+            LogCore.Client.info("Kcp connecting to {}:{}, conv={}", host, port, conv);
         } catch (Exception e) {
-            LogCore.Client.error("Kcp connect failed: {}:{}", host, port, e);
+            LogCore.Client.error("Kcp connect failed: {}:{}, conv={}", host, port, conv, e);
             connectSuccess = false;
-        }
-    }
-
-    private void verify(Ukcp ukcp, byte[] data) {
-        String message = new String(data, StandardCharsets.UTF_8);
-        if (message.startsWith(Utils.CLIENT_CONNECT_RESPONSE)) {
-            connectSuccess = true;
-            LogCore.Client.info("Kcp client verified, uid={}", uid);
-        } else {
-            LogCore.Client.error("Kcp client verify failed, closing");
-            ukcp.close();
         }
     }
 

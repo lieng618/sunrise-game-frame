@@ -10,6 +10,7 @@ import org.sunrise.game.log.LogCore;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * http服务 管理所有对外服地址
@@ -21,6 +22,7 @@ public class HttpServer {
     private final int port;
     private Javalin app;
     private final Random random = new Random();
+    private final AtomicInteger convAllocator = new AtomicInteger(1);
     // uid-对外服id
     private final ConcurrentHashMap<String, Integer> uidExternals = new ConcurrentHashMap<>();
     // 对外服类型-<对外服id-地址>
@@ -78,6 +80,13 @@ public class HttpServer {
                     ++i;
                 }
             }
+            ctx.result(jsonResponse.toJSONString());
+        });
+        // 接口：/kcp_conv
+        // 功能：分配唯一的kcp conv id
+        app.get("/kcp_conv", ctx -> {
+            JSONObject jsonResponse = new JSONObject();
+            jsonResponse.put("conv", convAllocator.getAndIncrement());
             ctx.result(jsonResponse.toJSONString());
         });
         // 接口：/external_address_list
