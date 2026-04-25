@@ -52,6 +52,7 @@ public class TcpClient extends SocketClient {
                                 @Override
                                 public void channelInactive(ChannelHandlerContext ctx) throws Exception {
                                     super.channelInactive(ctx);
+                                    connectSuccess = false;
                                 }
 
                                 @Override

@@ -8,6 +8,7 @@ import org.sunrise.game.gmback.server.controller.ControllerManager;
 import org.sunrise.game.gmback.server.controller.MuteHumanController;
 import org.sunrise.game.gmback.server.controller.NodeController;
 import org.sunrise.game.gmback.server.controller.OnlinePlayerController;
+import org.sunrise.game.gmback.server.controller.WhitelistController;
 import org.sunrise.game.log.LogCore;
 import org.sunrise.game.rpc.annotation.RpcMethod;
 import org.sunrise.game.rpc.annotation.RpcService;
@@ -75,5 +76,7 @@ public class GmBackRecvMessageService extends BaseService {
         // 定时下发封禁与禁言名单
         ControllerManager.getController(BanHumanController.class).broadcastBanListToGame();
         ControllerManager.getController(MuteHumanController.class).broadcastMuteListToGame();
+        // 定时同步白名单到HttpServer
+        ControllerManager.getController(WhitelistController.class).syncWhitelistToHttp();
     }
 }

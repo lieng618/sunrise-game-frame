@@ -30,6 +30,7 @@ public class ControllerManager {
         controllers.put(MuteHumanController.class.getSimpleName(), new MuteHumanController());
         controllers.put(OnlinePlayerController.class.getSimpleName(), new OnlinePlayerController());
         controllers.put(ServerStatusController.class.getSimpleName(), new ServerStatusController());
+        controllers.put(WhitelistController.class.getSimpleName(), new WhitelistController());
         load();
         waitInitEnd();
         startSaveDbPulse();

@@ -7,6 +7,8 @@ import io.javalin.Javalin;
 import lombok.Data;
 import org.sunrise.game.log.LogCore;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
@@ -24,6 +26,7 @@ public class HttpServer {
     private final Random random = new Random();
     private final AtomicInteger convAllocator = new AtomicInteger(1);
     private volatile boolean serverOpen = true;
+    private volatile List<String> whitelist = new ArrayList<>();
     // uid-对外服id
     private final ConcurrentHashMap<String, Integer> uidExternals = new ConcurrentHashMap<>();
     // 对外服类型-<对外服id-地址>
@@ -37,26 +40,29 @@ public class HttpServer {
         app = Javalin.create();
         // 接口：/server_status
         // 功能：返回服务器开关状态，客户端通过此接口判断是否可以连接
+        // 白名单用户始终返回开启
         app.get("/server_status", ctx -> {
             JSONObject jsonResponse = new JSONObject();
-            jsonResponse.put("open", serverOpen);
+            String uid = ctx.queryParam("uid");
+            if (uid != null && whitelist.contains(uid)) {
+                jsonResponse.put("open", true);
+            } else {
+                jsonResponse.put("open", serverOpen);
+            }
             ctx.result(jsonResponse.toJSONString());
         });
         // 接口：/external_address
         // 功能：分配网关节点并返回 ip:port
         app.get("/external_address", ctx -> {
             JSONObject jsonResponse = new JSONObject();
-            if (!serverOpen) {
+            String uid = ctx.queryParam("uid");
+            if (!serverOpen && (uid == null || !whitelist.contains(uid))) {
                 jsonResponse.put("error", "server_closed");
                 ctx.result(jsonResponse.toJSONString());
                 return;
             }
             String type = ctx.queryParam("type");
             if (type == null) {
-                return;
-            }
-            String uid = ctx.queryParam("uid");
-            if (uid == null) {
                 return;
             }
             ConcurrentHashMap<Integer, String> address = externalAddress.get(type);

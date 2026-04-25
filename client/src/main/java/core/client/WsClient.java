@@ -101,6 +101,7 @@ public class WsClient extends SocketClient {
                                 @Override
                                 public void channelInactive(ChannelHandlerContext ctx) {
                                     LogCore.Client.warn("WebSocket connection closed");
+                                    connectSuccess = false;
                                     group.shutdownGracefully();
                                 }
 

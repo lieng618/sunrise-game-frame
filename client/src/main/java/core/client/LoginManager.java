@@ -57,7 +57,7 @@ public class LoginManager {
             try {
                 statusCallback.accept("正在检查服务器状态...");
 
-                if (!checkServerStatus()) {
+                if (!checkServerStatus(uid)) {
                     statusCallback.accept("服务器维护中，暂时无法连接");
                     return false;
                 }
@@ -113,8 +113,8 @@ public class LoginManager {
     /**
      * 检查服务器是否开放
      */
-    private static boolean checkServerStatus() {
-        String url = "http://" + httpUrl + "/server_status";
+    private static boolean checkServerStatus(String uid) {
+        String url = "http://" + httpUrl + "/server_status?uid=" + uid;
         String response = httpRequest(url);
         if (response == null || response.isEmpty()) {
             LogCore.Client.error("Failed to check server status");

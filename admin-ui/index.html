@@ -92,6 +92,12 @@
                     </el-icon>
                     <span>玩家禁言</span>
                 </el-menu-item>
+                <el-menu-item index="whitelist">
+                    <el-icon>
+                        <Key/>
+                    </el-icon>
+                    <span>白名单</span>
+                </el-menu-item>
                 <el-menu-item index="operation_log">
                     <el-icon>
                         <Document/>
@@ -169,6 +175,7 @@
                     'kick_human': 'kick_human.html',
                     'ban_player': 'ban_player.html',
                     'mute_player': 'mute_player.html',
+                    'whitelist': 'whitelist.html',
                     'operation_log': 'operation_log.html',
                     'user_manager': 'user_manager.html',
                 },
@@ -184,6 +191,7 @@
                 if (state.activeTab === 'kick_human') return '玩家下线';
                 if (state.activeTab === 'ban_player') return '玩家封禁';
                 if (state.activeTab === 'mute_player') return '玩家禁言';
+                if (state.activeTab === 'whitelist') return '白名单';
                 if (state.activeTab === 'operation_log') return '操作记录';
                 if (state.activeTab === 'user_manager') return '用户管理';
                 return '';

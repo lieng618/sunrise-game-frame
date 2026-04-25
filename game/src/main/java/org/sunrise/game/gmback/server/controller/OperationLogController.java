@@ -32,6 +32,7 @@ public class OperationLogController extends BaseController {
         MUTE_PLAYER("禁言玩家"),
         UNMUTE_PLAYER("解除禁言"),
         SERVER_STATUS("服务器状态切换"),
+        WHITELIST("白名单管理"),
         OTHER("其他操作");
 
         OperationType(String description) {

@@ -18,6 +18,7 @@ import org.sunrise.game.gmback.server.controller.OnlinePlayerController;
 import org.sunrise.game.gmback.server.controller.OperationLogController;
 import org.sunrise.game.gmback.server.controller.ServerStatusController;
 import org.sunrise.game.gmback.server.controller.UserController;
+import org.sunrise.game.gmback.server.controller.WhitelistController;
 import org.sunrise.game.jwt.JwtUtil;
 import org.sunrise.game.log.LogCore;
 
@@ -117,6 +118,11 @@ public class AdminServer {
         // 服务器状态路由
         app.get("/api/server-status", ControllerManager.getController(ServerStatusController.class)::getStatus);
         app.post("/api/server-status", ControllerManager.getController(ServerStatusController.class)::setStatus);
+
+        // 白名单路由
+        app.get("/api/whitelist", ControllerManager.getController(WhitelistController.class)::list);
+        app.post("/api/whitelist", ControllerManager.getController(WhitelistController.class)::add);
+        app.post("/api/whitelist/remove", ControllerManager.getController(WhitelistController.class)::remove);
         // 将 io.javalin 包下的日志级别设置为 WARN
         LogCore.setLogLevel("io.javalin", Level.WARN);
         try {
