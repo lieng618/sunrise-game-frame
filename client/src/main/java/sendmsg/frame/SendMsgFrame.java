@@ -329,7 +329,7 @@ public class SendMsgFrame extends JPanel {
 
     public void close() {
         if (client != null) {
-            client.getChannel().close();
+            client.close();
             SocketClientManager.removeClient(client.getUid());
         }
     }

@@ -23,6 +23,7 @@ public class HttpServer {
     private Javalin app;
     private final Random random = new Random();
     private final AtomicInteger convAllocator = new AtomicInteger(1);
+    private volatile boolean serverOpen = true;
     // uid-对外服id
     private final ConcurrentHashMap<String, Integer> uidExternals = new ConcurrentHashMap<>();
     // 对外服类型-<对外服id-地址>
@@ -34,10 +35,22 @@ public class HttpServer {
     public HttpServer(int port) {
         this.port = port;
         app = Javalin.create();
+        // 接口：/server_status
+        // 功能：返回服务器开关状态，客户端通过此接口判断是否可以连接
+        app.get("/server_status", ctx -> {
+            JSONObject jsonResponse = new JSONObject();
+            jsonResponse.put("open", serverOpen);
+            ctx.result(jsonResponse.toJSONString());
+        });
         // 接口：/external_address
         // 功能：分配网关节点并返回 ip:port
         app.get("/external_address", ctx -> {
             JSONObject jsonResponse = new JSONObject();
+            if (!serverOpen) {
+                jsonResponse.put("error", "server_closed");
+                ctx.result(jsonResponse.toJSONString());
+                return;
+            }
             String type = ctx.queryParam("type");
             if (type == null) {
                 return;

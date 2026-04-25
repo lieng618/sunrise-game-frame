@@ -55,6 +55,13 @@ public class LoginManager {
                                                          Consumer<String> statusCallback) {
         return CompletableFuture.supplyAsync(() -> {
             try {
+                statusCallback.accept("正在检查服务器状态...");
+
+                if (!checkServerStatus()) {
+                    statusCallback.accept("服务器维护中，暂时无法连接");
+                    return false;
+                }
+
                 statusCallback.accept("正在获取服务器信息...");
 
                 // 获取对外服务器地址
@@ -102,6 +109,24 @@ public class LoginManager {
         });
     }
 
+
+    /**
+     * 检查服务器是否开放
+     */
+    private static boolean checkServerStatus() {
+        String url = "http://" + httpUrl + "/server_status";
+        String response = httpRequest(url);
+        if (response == null || response.isEmpty()) {
+            LogCore.Client.error("Failed to check server status");
+            return false;
+        }
+        try {
+            return JSON.parseObject(response).getBooleanValue("open");
+        } catch (Exception e) {
+            LogCore.Client.error("Failed to parse server_status response: {}", response, e);
+            return false;
+        }
+    }
 
     /**
      * 异步获取对外服务器地址

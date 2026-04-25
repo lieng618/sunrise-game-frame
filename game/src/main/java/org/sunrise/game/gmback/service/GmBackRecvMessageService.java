@@ -39,8 +39,8 @@ public class GmBackRecvMessageService extends BaseService {
             });
             if (operation != null) {
                 switch (operation) {
-                    case "reportGameData":
-                        handleGameData(dataMap);
+                    case "reportNodeData":
+                        handleNodeData(dataMap);
                         break;
                     default:
                         LogCore.GmBackServer.warn("Unknown GM operation: {}", operation);
@@ -53,16 +53,17 @@ public class GmBackRecvMessageService extends BaseService {
     }
 
     /**
-     * 处理game发来的节点数据
+     * 处理其他节点发来的节点数据
      */
-    private void handleGameData(Map<String, Object> data) {
+    private void handleNodeData(Map<String, Object> data) {
         String nodeId = (String) data.get("nodeId");
         int serverId = (int) data.get("serverId");
         String ip = (String) data.get("ip");
         int port = (int) data.get("port");
         int online = (int) data.get("online");
+        String type = (String) data.get("type");
         List<String> humanIds = JSON.parseObject((String) data.get("humanIds"), new TypeReference<List<String>>() {});
-        ControllerManager.getController(NodeController.class).updateGameData(nodeId, serverId, ip, port, online);
+        ControllerManager.getController(NodeController.class).updateNodeData(nodeId, serverId, ip, port, online, type);
         if (humanIds != null) {
             ControllerManager.getController(OnlinePlayerController.class).updateHumanData(serverId, humanIds);
         }

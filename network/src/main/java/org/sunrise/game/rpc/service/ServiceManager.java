@@ -14,9 +14,9 @@ import java.util.Map;
 
 public class ServiceManager {
     private static long initStartTime;
-    private static long lastPulsePerMinTime = System.currentTimeMillis(); //上次系统每分钟心跳的时间
-    private static long lastPulsePerSecTime = System.currentTimeMillis(); //上次系统每秒心跳的时间
-    private static long lastPulsePer5SecTime = System.currentTimeMillis(); //上次系统每5秒心跳的时间
+    private static long lastPulsePerMinTime = 0L; //上次系统每分钟心跳的时间
+    private static long lastPulsePerSecTime = 0L; //上次系统每秒心跳的时间
+    private static long lastPulsePer5SecTime = 0L; //上次系统每5秒心跳的时间
     public static final DbService dbService = new DbService();
     private static final Map<String, BaseService> services = new HashMap<>();
 

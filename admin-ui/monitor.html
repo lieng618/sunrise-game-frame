@@ -33,7 +33,7 @@
             <el-table-column prop="type" label="节点类型" width="240">
                 <template #default="scope">
                     <el-tag :type="'success'" effect="dark">
-                        {{ '游戏服' }}
+                        {{ scope.row.type }}
                     </el-tag>
                 </template>
             </el-table-column>

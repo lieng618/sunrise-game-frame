@@ -36,7 +36,7 @@ public class HttpRecvMessageService extends BaseService {
     }
 
     @RpcMethod
-    public void recvMessage(int serverId, String host, int port) {
+    public void updateExternalRemoteData(int serverId, String host, int port) {
         ExternalRemoteData externalRemoteData = remoteStatus.get(serverId);
         if (externalRemoteData == null) {
             externalRemoteData = new ExternalRemoteData();
@@ -46,6 +46,11 @@ public class HttpRecvMessageService extends BaseService {
         externalRemoteData.ip = host;
         externalRemoteData.port = port;
         externalRemoteData.time = System.currentTimeMillis();
+    }
+
+    @RpcMethod
+    public void setExternalServerStatus(boolean open) {
+        httpServer.setServerOpen(open);
     }
 
     @Override

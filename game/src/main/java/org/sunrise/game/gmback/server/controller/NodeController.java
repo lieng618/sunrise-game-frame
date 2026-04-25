@@ -11,32 +11,36 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class NodeController extends BaseController {
     @Data
-    private class GameRemoteData {
+    private class NodeRemoteData {
         private int online;
         private String ip;
         private int port;
         private int serverId;
         private String nodeId;
+        private String type;
     }
-    private final ConcurrentHashMap<String, GameRemoteData> games = new ConcurrentHashMap<>();
-    public void updateGameData(String nodeId, int serverId, String ip, int port, int online) {
-        GameRemoteData gameRemoteData = games.computeIfAbsent(nodeId, k -> new GameRemoteData());
-        gameRemoteData.nodeId = nodeId;
-        gameRemoteData.serverId = serverId;
-        gameRemoteData.ip = ip;
-        gameRemoteData.port = port;
-        gameRemoteData.online = online;
+
+    private final ConcurrentHashMap<String, NodeRemoteData> nodes = new ConcurrentHashMap<>();
+    public void updateNodeData(String nodeId, int serverId, String ip, int port, int online, String type) {
+        NodeRemoteData nodeRemoteData = nodes.computeIfAbsent(type + nodeId, k -> new NodeRemoteData());
+        nodeRemoteData.nodeId = nodeId;
+        nodeRemoteData.serverId = serverId;
+        nodeRemoteData.type = type;
+        nodeRemoteData.ip = ip;
+        nodeRemoteData.port = port;
+        nodeRemoteData.online = online;
     }
 
     public void list(Context ctx) {
         // 构建返回消息
-        List<GameRemoteData> nodes = new ArrayList<>(games.values());
+        List<NodeRemoteData> nodes = new ArrayList<>(this.nodes.values());
 
         List<Map<String, Object>> voList = new ArrayList<>();
-        for (GameRemoteData node : nodes) {
+        for (NodeRemoteData node : nodes) {
             Map<String, Object> map = new HashMap<>();
             map.put("nodeId", node.getNodeId());
             map.put("ip", node.getIp());
+            map.put("type", node.getType());
             map.put("port", node.getPort());
             map.put("serverId", node.getServerId());
             map.put("status", 1);

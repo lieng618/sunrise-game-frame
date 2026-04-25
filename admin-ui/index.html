@@ -50,6 +50,12 @@
                     </el-icon>
                     <span>节点监控</span>
                 </el-menu-item>
+                <el-menu-item index="server_status">
+                    <el-icon>
+                        <Open/>
+                    </el-icon>
+                    <span>服务器关闭</span>
+                </el-menu-item>
                 <el-menu-item index="online_player">
                     <el-icon>
                         <User/>
@@ -156,6 +162,7 @@
                 // 定义菜单 index 到文件名的映射
                 menuMap: {
                     'monitor': 'monitor.html',
+                    'server_status': 'server_status.html',
                     'online_player': 'online_player.html',
                     'config_update': 'config_update.html',
                     'send_mail': 'send_mail.html',
@@ -170,6 +177,7 @@
 
             const pageTitle = computed(() => {
                 if (state.activeTab === 'monitor') return '节点监控';
+                if (state.activeTab === 'server_status') return '服务器关闭';
                 if (state.activeTab === 'online_player') return '在线玩家';
                 if (state.activeTab === 'config_update') return '配置更新';
                 if (state.activeTab === 'send_mail') return '发送邮件';

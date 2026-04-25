@@ -1,5 +1,6 @@
 package org.sunrise.game.external.service;
 
+import com.alibaba.fastjson2.JSON;
 import org.sunrise.game.config.ConfigReader;
 import org.sunrise.game.external.server.ClientConnection;
 import org.sunrise.game.external.server.ExternalConnectionManger;
@@ -10,7 +11,10 @@ import org.sunrise.game.rpc.annotation.RpcService;
 import org.sunrise.game.rpc.function.RpcFunction;
 import org.sunrise.game.rpc.node.RpcNodeManager;
 import org.sunrise.game.rpc.service.BaseService;
+import org.sunrise.game.utils.Utils;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -46,7 +50,13 @@ public class ExternalRecvMessageService extends BaseService {
     public void pulsePer5Sec() {
         super.pulsePer5Sec();
         pulseRemoveClients();
-        RpcFunction.newInstance().call(CallEnum.HttpRecvMessageService_recvMessage, "serverId", RpcNodeManager.getRpcServerId(), "host", externalServer.getExternalHost(), "port", externalServer.getExternalPort());
+        RpcFunction.newInstance().call(CallEnum.HttpRecvMessageService_updateExternalRemoteData, "serverId", RpcNodeManager.getRpcServerId(), "host", externalServer.getExternalHost(), "port", externalServer.getExternalPort());
+    }
+
+    @Override
+    public void pulsePerMin() {
+        super.pulsePerMin();
+        pulseReportExternalData();
     }
 
     @RpcMethod
@@ -95,5 +105,19 @@ public class ExternalRecvMessageService extends BaseService {
                 }
             }
         }
+    }
+
+    /**
+     * 定时上报external自身数据
+     */
+    private void pulseReportExternalData() {
+        Map<String, Object> dataMap = new HashMap<>();
+        dataMap.put("nodeId", RpcNodeManager.getRpcServerNodeId());
+        dataMap.put("serverId", RpcNodeManager.getRpcServerId());
+        dataMap.put("ip", Utils.getLocalIpAddress());
+        dataMap.put("port", externalServer.getExternalPort());
+        dataMap.put("online", ExternalConnectionManger.getOnlineCount());
+        dataMap.put("type", "ExternalServer");
+        RpcFunction.newInstance().call(CallEnum.GmBackRecvMessageService_recvMessage, "operation", "reportNodeData", "data", JSON.toJSONString(dataMap));
     }
 }

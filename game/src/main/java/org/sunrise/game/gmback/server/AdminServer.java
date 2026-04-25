@@ -16,6 +16,7 @@ import org.sunrise.game.gmback.server.controller.MuteHumanController;
 import org.sunrise.game.gmback.server.controller.NodeController;
 import org.sunrise.game.gmback.server.controller.OnlinePlayerController;
 import org.sunrise.game.gmback.server.controller.OperationLogController;
+import org.sunrise.game.gmback.server.controller.ServerStatusController;
 import org.sunrise.game.gmback.server.controller.UserController;
 import org.sunrise.game.jwt.JwtUtil;
 import org.sunrise.game.log.LogCore;
@@ -112,6 +113,10 @@ public class AdminServer {
         app.post("/api/unmute", ControllerManager.getController(MuteHumanController.class)::unmute);
 
         app.get("/api/online-players", ControllerManager.getController(OnlinePlayerController.class)::list);
+
+        // 服务器状态路由
+        app.get("/api/server-status", ControllerManager.getController(ServerStatusController.class)::getStatus);
+        app.post("/api/server-status", ControllerManager.getController(ServerStatusController.class)::setStatus);
         // 将 io.javalin 包下的日志级别设置为 WARN
         LogCore.setLogLevel("io.javalin", Level.WARN);
         try {

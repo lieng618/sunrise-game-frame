@@ -48,8 +48,9 @@ public class MessageHandler {
     @Handler(packetType = TopicProto.TOPIC.TOPIC_TYPE_LOGIN_VALUE, packetId = LoginProto.FROM_SERVER.S2C_Kick_VALUE)
     public static void LOGIN_S2C_Kick(SocketClient client) {
         LogCore.Client.warn("Received kick message, closing connection for uid: {}", client.getUid());
-        if (client.getChannel() != null && client.getChannel().isActive()) {
-            client.getChannel().close();
+        if (client.isActive()) {
+            client.close();
+            SocketClientManager.removeClient(client.getUid());
         }
     }
 }

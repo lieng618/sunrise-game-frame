@@ -1,5 +1,6 @@
 package org.sunrise.game.genRpc.service;
 
 public interface HttpRecvMessageService {
-    void recvMessage();
+    void updateExternalRemoteData();
+    void setExternalServerStatus();
 }

@@ -105,6 +105,7 @@ public class GameRecvGmBackService extends BaseService {
         dataMap.put("port", RpcNodeManager.getRpcNode().getPort());
         dataMap.put("online", HumanObjectManger.getOnlineCount());
         dataMap.put("humanIds", JSON.toJSONString(HumanObjectManger.getOnlineHumanIds()));
-        RpcFunction.newInstance().call(CallEnum.GmBackRecvMessageService_recvMessage, "operation", "reportGameData", "data", JSON.toJSONString(dataMap));
+        dataMap.put("type", "GameServer");
+        RpcFunction.newInstance().call(CallEnum.GmBackRecvMessageService_recvMessage, "operation", "reportNodeData", "data", JSON.toJSONString(dataMap));
     }
 }

@@ -30,6 +30,7 @@
                         <el-option label="用户管理" value="USER_MANAGER"></el-option>
                         <el-option label="封禁玩家" value="BAN_PLAYER"></el-option>
                         <el-option label="解封玩家" value="UNBAN_PLAYER"></el-option>
+                        <el-option label="服务器关闭" value="SERVER_STATUS"></el-option>
                         <el-option label="其他操作" value="OTHER"></el-option>
                     </el-select>
                 </div>
@@ -181,6 +182,7 @@
                     'USER_MANAGER': '用户管理',
                     'BAN_PLAYER': '封禁玩家',
                     'UNBAN_PLAYER': '解封玩家',
+                    'SERVER_STATUS': '服务器关闭',
                     'OTHER': '其他操作'
                 };
                 return typeMap[type] || type || '未知';
