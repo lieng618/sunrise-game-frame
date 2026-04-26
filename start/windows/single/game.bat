@@ -1,1 +1,1 @@
-start java -Xms256m -Xmx1024m -jar ../../jar/sunrise-game.jar ../../../config/game-config.properties 1000
+start java -Xms256m -Xmx1024m -jar ../../jar/sunrise-game.jar ../../../config/game-config.properties 200

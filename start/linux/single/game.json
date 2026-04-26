@@ -7,7 +7,7 @@
     "-jar",
     "../../jar/sunrise-game.jar",
     "../../../config/game-config.properties",
-    "1000"
+    "200"
   ],
   "error_file": "../log/game-err.log",
   "out_file": "../log/game.log",

@@ -14,7 +14,7 @@ public class GlobalServerStartUp {
     public static void main(String[] args) {
         // args[0]:config path args[1]:global_id
         if (args.length == 0) {
-            args = new String[] { "./config/global-config.properties", "2000" };
+            args = new String[] { "./config/global-config.properties", "4000" };
         }
         System.setProperty("programName", "GlobalServer-" + args[1]);
         ConfigReader.loadConfig(args[0]);

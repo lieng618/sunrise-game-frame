@@ -1,3 +1,4 @@
+registerPage('home', '项目概览', 'Sunrise Game Frame 分布式游戏服务器框架介绍', () => `
 <div class="hero">
     <h1>Sunrise Game Frame</h1>
     <p class="subtitle">基于 Java 21 + Maven 的分布式游戏服务器框架，采用"中心服 + 对外服 + 游戏服 + 全局服 + HTTP 服务 + GM 后台"的多进程架构，也支持单进程部署，框架不依赖任何第三方中间件，安装Java + MySQL 环境即可运行</p>
@@ -102,3 +103,38 @@
 <tr><td>client</td><td>client</td><td>客户端工具（消息发送器、压测机器人）</td><td>org.sunrise.game.client</td></tr>
 </tbody>
 </table>
+
+<h2>快速导航</h2>
+<div class="card-grid">
+    <a href="#/quick-start" class="card">
+        <div class="card-icon">⚡</div>
+        <div class="card-title">快速开始</div>
+        <div class="card-desc">环境搭建、编译、配置、启动服务的完整流程</div>
+    </a>
+    <a href="#/architecture" class="card">
+        <div class="card-icon">🏛️</div>
+        <div class="card-title">架构总览</div>
+        <div class="card-desc">多进程架构、服务职责、核心数据流、单线程设计</div>
+    </a>
+    <a href="#/rpc" class="card">
+        <div class="card-icon">🔗</div>
+        <div class="card-title">RPC 框架</div>
+        <div class="card-desc">节点发现、方法注册、三种调用模式、回调与超时</div>
+    </a>
+    <a href="#/development" class="card">
+        <div class="card-icon">🛠️</div>
+        <div class="card-title">开发指南</div>
+        <div class="card-desc">新增业务模块的完整开发流程与常见坑</div>
+    </a>
+    <a href="#/protocol" class="card">
+        <div class="card-icon">📋</div>
+        <div class="card-title">协议规范</div>
+        <div class="card-desc">Protobuf 协议定义、命名规则、各模块协议一览</div>
+    </a>
+    <a href="#/deployment" class="card">
+        <div class="card-icon">🚀</div>
+        <div class="card-title">部署指南</div>
+        <div class="card-desc">本地部署、Docker 部署、Linux 部署</div>
+    </a>
+</div>
+`);

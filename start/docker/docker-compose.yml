@@ -40,6 +40,7 @@ services:
     ports:
       - "10000:10000"
       - "10001:10001"
+      - "10002:10002"
     volumes:
       - ./config/external-config.properties:/app/config/external-config.properties
 
@@ -47,7 +48,7 @@ services:
     build:
       context: ../..
       dockerfile: Dockerfile
-    command: ["java", "-Xms256m", "-Xmx1024m", "-jar", "jar/sunrise-game.jar", "config/game-config.properties", "1000"]
+    command: ["java", "-Xms256m", "-Xmx1024m", "-jar", "jar/sunrise-game.jar", "config/game-config.properties", "200"]
     depends_on:
       mysql:
         condition: service_healthy
@@ -60,7 +61,7 @@ services:
     build:
       context: ../..
       dockerfile: Dockerfile
-    command: ["java", "-Xms256m", "-Xmx1024m", "-jar", "jar/sunrise-global.jar", "config/global-config.properties", "2000"]
+    command: ["java", "-Xms256m", "-Xmx1024m", "-jar", "jar/sunrise-global.jar", "config/global-config.properties", "4000"]
     depends_on:
       mysql:
         condition: service_healthy

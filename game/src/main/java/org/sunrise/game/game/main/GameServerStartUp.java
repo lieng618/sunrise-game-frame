@@ -19,7 +19,7 @@ public class GameServerStartUp {
     public static void main(String[] args) {
         // args[0]:config path args[1]:gameId
         if (args.length == 0) {
-            args = new String[]{ "./config/game-config.properties", "1000"};
+            args = new String[]{ "./config/game-config.properties", "200"};
         }
         System.setProperty("programName", "GameServer-" + args[1]);
         ConfigReader.loadConfig(args[0]);

@@ -36,19 +36,6 @@ public class Call extends BaseMessage {
         data = params;
     }
 
-    public Object getData(String name) {
-        if (data != null) {
-            for (int i = 0; i < data.length; i += 2) {
-                if (data[i] instanceof String key) {
-                    if (key.equals(name)) {
-                        return data[i + 1];
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
     public Object getData(int index) {
         return data[index * 2 + 1];
     }
