@@ -129,6 +129,8 @@ public class CallUtils {
      */
     public static void handler(Call call) {
         try {
+            LogCore.RpcServer.debug("recv call, callId = {}, messageId = { {} }, cur NodeId = { {} }, from NodeId = { {} }, data = { {} }", call.getRpcId(), call.getMessageId(), curNodeId, call.getNodeId(), call.getData());
+
             // 将call请求压栈
             CallContext.push(call);
 
@@ -171,7 +173,7 @@ public class CallUtils {
 
     public static void returns(Call from, String nodeId, int result, Object ... params) {
         Call rep = new Call(nodeId);
-        rep.setType(CallType.Call.ordinal());
+        rep.setType(CallType.CallResult.ordinal());
         rep.setToNodeId(from.getNodeId());
         rep.setRpcId(from.getRpcId());
         rep.setMessageId(from.getMessageId());

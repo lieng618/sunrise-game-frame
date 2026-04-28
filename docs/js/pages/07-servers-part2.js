@@ -49,7 +49,7 @@ registerPage('game-server', '游戏服', '玩家对象、模块系统、消息�
 </table>
 
 <h3>ConnectObject</h3>
-<p>连接对象，封装 connectId、uid、accountId、externalNodeId。通过 RPC 调用 ExternalRecvMessageService_recvMessage 发送消息给客户端。</p>
+<p>连接对象，封装 connectId、uid、accountId、externalNodeId。通过 RPC 调用 ExternalRecvGameMessageService_recvMessage 发送消息给客户端。</p>
 <pre><code class="language-java">public class ConnectObject {
     private String connectId;
     private String externalId;
@@ -60,7 +60,7 @@ registerPage('game-server', '游戏服', '玩家对象、模块系统、消息�
 
     public void sendMsg(int packetType, int packetId, ByteString data) {
         RpcFunction.newInstance(externalNodeId).call(
-            CallEnum.ExternalRecvMessageService_recvMessage,
+            CallEnum.ExternalRecvGameMessageService_recvMessage,
             "connectionId", connectId,
             "data", bytes,
             "gameNodeId", gameNodeId  // 首次发送带 gameNodeId
@@ -154,14 +154,10 @@ public class ItemMsgHandler {
     <li>客户端发送 <code>C2S_HumanList</code></li>
     <li>Game 查询 human_list 表，返回 <code>S2C_HumanList</code>（角色列表）</li>
     <li>客户端发送 <code>C2S_SelectHuman(pos, serverId)</code></li>
-    <li>Game 创建/加载 HumanObject：
-        <ul>
-            <li>新角色：创建 HumanObject → moduleInit() → insertDB → sendHumanData()</li>
-            <li>老角色：查询 human_info 表 → load(roleData) → sendHumanData()</li>
-        </ul>
-    </li>
+    <li>新角色：插入 human_list 表 (uid, human_id, server_id, pos) → 创建 HumanObject → moduleInit() 新角色首次初始化 → S2C_SelectHuman() → sendHumanData() -> 插入 human_info 表 (human_id, role_data)</li>
+    <li>老角色：匹配 human_list 表找到 human_id  → 检测 human_id 是否被封禁 → 重连 / 加载 human_info 表 → 创建 HumanObject → load(roleData) 加载所有模块数据 → sendHumanData()</li>
     <li>sendHumanData() 发送：S2C_HumanInfo + 各模块 sendToClient() + S2C_SendInfoEnd</li>
-    <li>登录完成，客户端定时发送 <code>C2S_ClientPing</code>（60秒超时判定）</li>
+    <li>登录完成，需客户端定时发送 <code>C2S_ClientPing</code>（60秒超时判定玩家掉线，进行数据清理）</li>
 </ol>
 
 <h2>GameMasterService 心跳</h2>
@@ -173,7 +169,15 @@ public class ItemMsgHandler {
 </tbody>
 </table>
 
-<h2>GameRecvGmBackService GM 指令处理</h2>
+<h2>GameRecvGmBackMessageService 心跳</h2>
+<table>
+<thead><tr><th>频率</th><th>行为</th></tr></thead>
+<tbody>
+<tr><td>pulsePerMin()</td><td>向GM后台节点定时上报game自身数据，用于后台页面展示</td></tr>
+</tbody>
+</table>
+
+<h2>GameRecvGmBackMessageService GM 指令处理</h2>
 <table>
 <thead><tr><th>指令</th><th>说明</th></tr></thead>
 <tbody>
@@ -198,22 +202,22 @@ registerPage('global-server', '全局服', '聊天、好友、邮件、玩家信
 
 <h2>已有服务</h2>
 <div class="card-grid">
-    <div class="card"><div class="card-icon">💬</div><div class="card-title">ChatService</div><div class="card-desc">聊天历史与广播。维护最多50条聊天记录，game 调用后返回已编码的 protobuf 二进制，game 直接转发给客户端</div></div>
-    <div class="card"><div class="card-icon">👥</div><div class="card-title">FriendService</div><div class="card-desc">好友关系与申请。处理好友申请、获取列表、发送申请、删除好友。7天过期清理申请</div></div>
-    <div class="card"><div class="card-icon">📬</div><div class="card-title">MailService</div><div class="card-desc">邮件与附件。支持单发、群发、全服发、领取附件、读取、删除。未领取附件不可删除</div></div>
-    <div class="card"><div class="card-icon">👤</div><div class="card-title">PlayerInfoService</div><div class="card-desc">玩家简要信息。获取/更新/批量获取玩家信息（名字/等级/头像/战斗力/性别）</div></div>
+    <div class="card"><div class="card-icon">💬</div><div class="card-title">GlobalChatService</div><div class="card-desc">聊天历史与广播。维护最多50条聊天记录，game 调用后返回已编码的 protobuf 二进制，game 直接转发给客户端</div></div>
+    <div class="card"><div class="card-icon">👥</div><div class="card-title">GlobalFriendService</div><div class="card-desc">好友关系与申请。处理好友申请、获取列表、发送申请、删除好友。7天过期清理申请</div></div>
+    <div class="card"><div class="card-icon">📬</div><div class="card-title">GlobalMailService</div><div class="card-desc">邮件与附件。支持单发、群发、全服发、领取附件、读取、删除。未领取附件不可删除</div></div>
+    <div class="card"><div class="card-icon">👤</div><div class="card-title">GlobalPlayerInfoService</div><div class="card-desc">玩家简要信息。获取/更新/批量获取玩家信息（名字/等级/头像/战斗力/性别）</div></div>
 </div>
 
-<h2>ChatService 详解</h2>
+<h2>GlobalChatService 详解</h2>
 <table>
 <thead><tr><th>CallEnum</th><th>方法签名</th><th>说明</th></tr></thead>
 <tbody>
-<tr><td>ChatService_chat</td><td>chat(humanId, message)</td><td>发送聊天消息，添加到历史（最多50条），SendAll 广播 ChatRpcListenService_onChat</td></tr>
-<tr><td>ChatService_history</td><td>history(humanId)</td><td>获取聊天历史，返回已编码的 protobuf 二进制（game 直接转发给客户端）</td></tr>
+<tr><td>GlobalChatService_chat</td><td>chat(humanId, message)</td><td>发送聊天消息，添加到历史（最多50条），SendAll 广播 GameRpcListenService_sendToAllHuman</td></tr>
+<tr><td>GlobalChatService_history</td><td>history(humanId)</td><td>获取聊天历史，返回已编码的 protobuf 二进制（game 直接转发给客户端）</td></tr>
 </tbody>
 </table>
 <pre><code class="language-java">@RpcService
-public class ChatService extends BaseService {
+public class GlobalChatService extends BaseService {
     private List&lt;ChatRecord&gt; chatHistory = new ArrayList&lt;&gt;();
     private static final int MAX_HISTORY = 50;
 
@@ -225,10 +229,9 @@ public class ChatService extends BaseService {
             chatHistory.remove(0);
         }
         // 广播给所有 Game 节点
-        RpcFunction.newInstance(RpcFunction.SendAll).call(
-            CallEnum.ChatRpcListenService_onChat,
-            "humanId", humanId, "message", message, "time", record.getTime());
-        returns("success", true);
+        RpcFunction.newInstance(RpcFunction.RpcCallType.SendAll)
+                .call(CallEnum.GameRpcListenService_sendToAllHuman, "packetType", TopicProto.TOPIC.TOPIC_TYPE_CHAT_VALUE, "packetId", ChatProto.FROM_SERVER.S2C_Chat_VALUE,
+                        "time", ChatProto.MS2C_Chat.newBuilder().setId(humanId).setMsg(message).setTime(time).build().toByteArray());
     }
 
     @RpcMethod
@@ -239,46 +242,48 @@ public class ChatService extends BaseService {
     }
 }</code></pre>
 
-<h2>FriendService 详解</h2>
+<h2>GlobalFriendService 详解</h2>
 <table>
 <thead><tr><th>CallEnum</th><th>说明</th><th>校验逻辑</th></tr></thead>
 <tbody>
-<tr><td>FriendService_sendFriendRequest</td><td>发送好友申请</td><td>检查：不能加自己、不能重复申请、已是好友、申请列表上限</td></tr>
-<tr><td>FriendService_handleFriendRequest</td><td>处理好友申请（同意/拒绝）</td><td>同意后双向广播 FriendRpcListenService_onFriendAdded</td></tr>
-<tr><td>FriendService_deleteFriend</td><td>删除好友</td><td>双向广播 FriendRpcListenService_onFriendDeleted</td></tr>
-<tr><td>FriendService_getFriends</td><td>获取好友列表</td><td>返回好友 humanId 列表</td></tr>
-<tr><td>FriendService_getFriendRequests</td><td>获取好友申请列表</td><td>返回待处理的申请</td></tr>
+<tr><td>GlobalFriendService_sendFriendRequest</td><td>发送好友申请</td><td>检查：不能加自己、不能重复申请、已是好友、申请列表上限</td></tr>
+<tr><td>GlobalFriendService_handleFriendRequest</td><td>处理好友申请（同意/拒绝）</td><td>同意后双向广播 FriendRpcListenService_onFriendAdded</td></tr>
+<tr><td>GlobalFriendService_deleteFriend</td><td>删除好友</td><td>双向广播 FriendRpcListenService_onFriendDeleted</td></tr>
+<tr><td>GlobalFriendService_getFriends</td><td>获取好友列表</td><td>返回好友 humanId 列表</td></tr>
+<tr><td>GlobalFriendService_getFriendRequests</td><td>获取好友申请列表</td><td>返回待处理的申请</td></tr>
 </tbody>
 </table>
 <p>pulse() 中自动清理超过 7 天的好友申请（cleanExpiredRequests）。</p>
 
-<h2>MailService 详解</h2>
+<h2>GlobalMailService 详解</h2>
 <table>
 <thead><tr><th>CallEnum</th><th>说明</th><th>特殊说明</th></tr></thead>
 <tbody>
-<tr><td>MailService_sendMail</td><td>发送单人邮件</td><td>构建 proto 二进制，SendAll 广播 MailRpcListenService_onNewMail</td></tr>
-<tr><td>MailService_sendGroupMail</td><td>群发邮件</td><td>遍历 humanIds 逐个创建</td></tr>
-<tr><td>MailService_sendAllMail</td><td>全服发送邮件</td><td>先调 PlayerInfoService_getAllPlayerIds 获取所有玩家 ID</td></tr>
-<tr><td>MailService_getMailList</td><td>获取邮件列表</td><td>返回 proto 二进制</td></tr>
-<tr><td>MailService_readMail</td><td>标记已读</td><td>-</td></tr>
-<tr><td>MailService_claimAttachment</td><td>领取附件</td><td>返回附件 JSON，标记已领取</td></tr>
-<tr><td>MailService_deleteMail</td><td>删除邮件</td><td>未领取附件不可删除</td></tr>
+<tr><td>GlobalMailService_sendMail</td><td>发送单人邮件</td><td>构建 proto 二进制，SendAll 广播 MailRpcListenService_onNewMail</td></tr>
+<tr><td>GlobalMailService_sendGroupMail</td><td>群发邮件</td><td>遍历 humanIds 逐个创建</td></tr>
+<tr><td>GlobalMailService_sendAllMail</td><td>全服发送邮件</td><td>先调 GlobalPlayerInfoService_getAllPlayerIds 获取所有玩家 ID</td></tr>
+<tr><td>GlobalMailService_getMailList</td><td>获取邮件列表</td><td>返回 proto 二进制</td></tr>
+<tr><td>GlobalMailService_readMail</td><td>标记已读</td><td>-</td></tr>
+<tr><td>GlobalMailService_claimAttachment</td><td>领取附件</td><td>返回附件 JSON，标记已领取</td></tr>
+<tr><td>GlobalMailService_deleteMail</td><td>删除邮件</td><td>未领取附件不可删除</td></tr>
 </tbody>
 </table>
 
-<h2>PlayerInfoService 详解</h2>
+<h2>GlobalPlayerInfoService 详解</h2>
 <table>
 <thead><tr><th>CallEnum</th><th>说明</th></tr></thead>
 <tbody>
-<tr><td>PlayerInfoService_getPlayerInfo</td><td>获取单个玩家信息（名字/等级/头像/战斗力/性别）</td></tr>
-<tr><td>PlayerInfoService_updatePlayerInfo</td><td>更新玩家信息（Game 服登录/变化时调用）</td></tr>
-<tr><td>PlayerInfoService_getPlayerInfos</td><td>批量获取玩家信息（好友列表场景）</td></tr>
-<tr><td>PlayerInfoService_getAllHumanIds</td><td>获取所有角色 ID（全服邮件场景）</td></tr>
+<tr><td>GlobalPlayerInfoService_getPlayerInfo</td><td>获取单个玩家信息（名字/等级/头像/战斗力/性别）</td></tr>
+<tr><td>GlobalPlayerInfoService_updatePlayerInfo</td><td>更新玩家信息（Game 服登录/变化时调用）</td></tr>
+<tr><td>GlobalPlayerInfoService_getPlayerInfos</td><td>批量获取玩家信息（好友列表场景）</td></tr>
+<tr><td>GlobalPlayerInfoService_getAllHumanIds</td><td>获取所有角色 ID（全服邮件场景）</td></tr>
 </tbody>
 </table>
 
 <h2>跨服通知机制</h2>
 <p>Global 服处理完后，需要通知玩家所在的 Game 节点，使用 <code>SendAll</code> 广播给所有 Game 节点：</p>
+<p><code>CallEnum.GameRpcListenService_sendToAllHuman</code> 广播给所有游戏服所有玩家</p>
+<p><code>CallEnum.GameRpcListenService_sendToHuman</code> 广播给所有游戏服，每个游戏服各自判断是否持有目标玩家，进行发送</p>
 <div class="flow-diagram">
     <div class="flow-row">
         <span class="flow-node flow-node-secondary">Game A</span>
@@ -327,6 +332,12 @@ registerPage('http-server', 'HTTP 服务', '对外服地址分配、心跳上报
 2. 如果有且该 external 仍然可用 → 返回旧地址
 3. 如果旧地址不可用 → 从地址池随机分配一个新的
 4. 如果没有旧地址 → 随机分配</code></pre>
+
+<h3>为什么需要分配 KCP convid（会话 ID）</h3>
+<p>KCP 是一个纯应用层实现的可靠传输协议，基于 UDP 协议运行。而 UDP 本身是无连接、无状态的，
+KCP 要在 UDP 之上实现类似 TCP 的可靠传输（确认、重传、流量控制、拥塞控制），就必须自己模拟 "连接" 的概念，
+而 convid 就是 KCP 用来唯一标识一个 "连接" 的核心机制。
+所以我们通过http服务管理连接id，目前仅仅用了AtomicInteger 自增简单实现分配，可根据需求进行修改。</p>
 
 <h2>核心类</h2>
 <table>

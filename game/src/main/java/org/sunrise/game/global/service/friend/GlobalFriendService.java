@@ -17,21 +17,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * 跨服好友系统
- */
 @RpcService
-public class FriendService extends BaseService {
-    // 好友关系：humanId -> Set<friendHumanId>
+public class GlobalFriendService extends BaseService {
     private Map<String, Set<String>> friends = new HashMap<>();
-
-    // 好友申请：targetHumanId -> List<FriendRequestData>
     private Map<String, List<FriendRequestData>> friendRequests = new HashMap<>();
 
     private static final long REQUEST_EXPIRE_TIME = 7 * 24 * 60 * 60 * 1000L;
     private static final int MAX_FRIENDS = 100;
 
-    public FriendService(String nodeId) {
+    public GlobalFriendService(String nodeId) {
         super(nodeId);
     }
 
@@ -59,44 +53,34 @@ public class FriendService extends BaseService {
 
     @Override
     public void pulse() {
-        // 清理过期申请
         cleanExpiredRequests();
     }
 
-    /**
-     * 发送好友申请
-     */
     @RpcMethod
     public void sendFriendRequest(String applicantHumanId, String targetHumanId) {
-        // 检查是否是自己
         if (targetHumanId.equals(applicantHumanId)) {
             returns("applicantHumanId", applicantHumanId, "targetHumanId", targetHumanId, "result", 1);
             return;
         }
 
-        // 检查是否已经是好友
         if (isFriend(applicantHumanId, targetHumanId)) {
             returns("applicantHumanId", applicantHumanId, "targetHumanId", targetHumanId, "result", 2);
             return;
         }
 
-        // 检查是否已发送申请
         if (hasSentRequest(applicantHumanId, targetHumanId)) {
             returns("applicantHumanId", applicantHumanId, "targetHumanId", targetHumanId, "result", 3);
             return;
         }
 
-        // 检查好友上限
         Set<String> friendIds = friends.getOrDefault(applicantHumanId, new HashSet<>());
         if (friendIds.size() >= MAX_FRIENDS) {
             returns("applicantHumanId", applicantHumanId, "targetHumanId", targetHumanId, "result", 4);
             return;
         }
 
-        // 添加申请
         addFriendRequest(applicantHumanId, targetHumanId, System.currentTimeMillis());
 
-        // 通知目标玩家
         RpcFunction.newInstance(RpcFunction.RpcCallType.SendAll)
                 .call(CallEnum.FriendRpcListenService_onNewFriendRequest,
                         "targetHumanId", targetHumanId);
@@ -104,15 +88,11 @@ public class FriendService extends BaseService {
         returns("applicantHumanId", applicantHumanId, "targetHumanId", targetHumanId, "result", 0);
     }
 
-    /**
-     * 处理好友申请
-     */
     @RpcMethod
     public void handleFriendRequest(String targetHumanId, String applicantHumanId, int action) {
         FriendRequestData request = handleFriendRequestInternal(targetHumanId, applicantHumanId, action);
 
         if (request != null && action == 1) {
-            // 同意后，通知双方
             RpcFunction.newInstance(RpcFunction.RpcCallType.SendAll)
                     .call(CallEnum.FriendRpcListenService_onFriendAdded,
                             "humanId1", targetHumanId,
@@ -127,14 +107,10 @@ public class FriendService extends BaseService {
         returns("targetHumanId", targetHumanId, "applicantHumanId", applicantHumanId, "action", action, "success", request != null);
     }
 
-    /**
-     * 删除好友
-     */
     @RpcMethod
     public void deleteFriend(String humanId1, String humanId2) {
         removeFriend(humanId1, humanId2);
 
-        // 通知双方
         RpcFunction.newInstance(RpcFunction.RpcCallType.SendAll)
                 .call(CallEnum.FriendRpcListenService_onFriendDeleted,
                         "humanId1", humanId1,
@@ -148,18 +124,12 @@ public class FriendService extends BaseService {
         returns("humanId1", humanId1, "humanId2", humanId2, "success", true);
     }
 
-    /**
-     * 获取好友列表
-     */
     @RpcMethod
     public void getFriends(String humanId) {
         Set<String> friendIds = friends.getOrDefault(humanId, new HashSet<>());
         returns("humanId", humanId, "friends", new ArrayList<>(friendIds));
     }
 
-    /**
-     * 获取好友申请列表
-     */
     @RpcMethod
     public void getFriendRequests(String targetHumanId) {
         List<FriendRequestData> requests =
@@ -167,9 +137,6 @@ public class FriendService extends BaseService {
         returns("targetHumanId", targetHumanId, "requestsJson", JSON.toJSONString(requests));
     }
 
-    /**
-     * 清理过期申请
-     */
     public void cleanExpiredRequests() {
         long currentTime = System.currentTimeMillis();
         Iterator<Map.Entry<String, List<FriendRequestData>>> iterator = friendRequests.entrySet().iterator();
@@ -186,7 +153,6 @@ public class FriendService extends BaseService {
         }
     }
 
-    // 内部方法
     private void addFriend(String humanId1, String humanId2) {
         friends.computeIfAbsent(humanId1, k -> new HashSet<>()).add(humanId2);
         friends.computeIfAbsent(humanId2, k -> new HashSet<>()).add(humanId1);

@@ -11,9 +11,9 @@ import org.sunrise.game.rpc.annotation.RpcService;
 import org.sunrise.game.rpc.service.BaseService;
 
 @RpcService
-public class GameRecvMessageService extends BaseService {
+public class GameRecvExternalMessageService extends BaseService {
 
-    public GameRecvMessageService(String nodeId) {
+    public GameRecvExternalMessageService(String nodeId) {
         super(nodeId);
     }
 

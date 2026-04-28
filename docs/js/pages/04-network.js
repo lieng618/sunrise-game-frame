@@ -84,7 +84,7 @@ data: MessagePack 序列化的 BaseMessage / Protobuf 序列化的 MBasePacketDa
 <tbody>
 <tr><td>recvMsgQueue</td><td>接收消息队列，网络线程写入，主线程消费</td></tr>
 <tr><td>sendMsgQueue</td><td>发送消息队列，主线程写入，网络线程消费</td></tr>
-<tr><td>DispatchThread</td><td>调度线程，5ms 间隔循环执行心跳</td></tr>
+<tr><td>DispatchThread</td><td>调度线程，5ms 间隔循环执行心跳，单线程处理业务</td></tr>
 <tr><td>pulseHandlerOne()</td><td>子类实现，处理收到的消息</td></tr>
 <tr><td>pulseSenderOne()</td><td>子类实现，发送待发消息</td></tr>
 </tbody>

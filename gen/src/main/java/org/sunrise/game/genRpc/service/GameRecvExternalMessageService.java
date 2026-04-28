@@ -1,5 +1,5 @@
 package org.sunrise.game.genRpc.service;
 
-public interface ExternalRecvMessageService {
+public interface GameRecvExternalMessageService {
     void recvMessage();
 }

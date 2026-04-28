@@ -52,14 +52,16 @@ public class NodeController extends BaseController {
 
     public void reloadConfig(Context ctx) {
         String nodeId = getBodyParam(ctx, "nodeId", String.class);
+        String logNodeId = nodeId;
         if (nodeId == null || nodeId.isEmpty()) {
-            fail(ctx, 400, "Missing nodeId");
-            return;
+            logNodeId = "所有游戏服节点";
+            sendMessageToAllGame("reloadConfig", null);
+        } else {
+            sendMessageToDesignatedGame("reloadConfig", null, nodeId);
         }
 
-        sendMessageToAllGame("reloadConfig", null);
         success(ctx, null, "Reload config message sent");
 
-        ControllerManager.getController(OperationLogController.class).recordLog(ctx, OperationLogController.OperationType.RELOAD_CONFIG, "热更配置(节点ID:" + nodeId + ")");
+        ControllerManager.getController(OperationLogController.class).recordLog(ctx, OperationLogController.OperationType.RELOAD_CONFIG, "热更配置(节点ID:" + logNodeId + ")");
     }
 }

@@ -22,10 +22,10 @@ import java.util.Properties;
  * 每五秒在心跳中向http服务上报自身数据，把地址提供给客户端进行连接
  */
 @RpcService
-public class ExternalRecvMessageService extends BaseService {
+public class ExternalRecvGameMessageService extends BaseService {
     private ExternalServer externalServer;
 
-    public ExternalRecvMessageService(String nodeId) {
+    public ExternalRecvGameMessageService(String nodeId) {
         super(nodeId);
     }
 
@@ -82,7 +82,7 @@ public class ExternalRecvMessageService extends BaseService {
                 if (data == null) {
                     continue;
                 }
-                RpcFunction.newInstance(connection.getGameNodeId()).call(CallEnum.GameRecvMessageService_recvMessage, "id", connection.getId(), "data", data, "nodeId", connection.isFirstSend() ? "" : RpcNodeManager.getRpcServerNodeId());
+                RpcFunction.newInstance(connection.getGameNodeId()).call(CallEnum.GameRecvExternalMessageService_recvMessage, "id", connection.getId(), "data", data, "nodeId", connection.isFirstSend() ? "" : RpcNodeManager.getRpcServerNodeId());
                 if (!connection.isFirstSend()) {
                     connection.setFirstSend(true);
                 }

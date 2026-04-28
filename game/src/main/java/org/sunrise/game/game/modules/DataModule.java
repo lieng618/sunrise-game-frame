@@ -116,7 +116,7 @@ public class DataModule extends BaseModule {
      */
     private void syncToPlayerInfoSystem() {
         RpcFunction.newInstance()
-                .call(CallEnum.PlayerInfoService_updatePlayerInfo,
+                .call(CallEnum.GlobalPlayerInfoService_updatePlayerInfo,
                         "humanId", getHumanId(),
                         "name", name,
                         "level", level,

@@ -103,6 +103,7 @@ public class HttpServer {
         });
         // 接口：/kcp_conv
         // 功能：分配唯一的kcp conv id
+        // 注意：重启后此id会重新开始计数
         app.get("/kcp_conv", ctx -> {
             JSONObject jsonResponse = new JSONObject();
             jsonResponse.put("conv", convAllocator.getAndIncrement());

@@ -23,7 +23,6 @@ public class LoginMsgHandler {
     public static void handlerLogin(long connectId, int packetId, Object data, String externalNodeId) {
         ConnectObject connectObject = HumanObjectManger.getConnectObject(connectId);
         switch (packetId) {
-            // todo 验证token
             case LoginProto.FROM_CLIENT.C2S_Login_VALUE: {
                 if (connectObject != null) {
                     return;

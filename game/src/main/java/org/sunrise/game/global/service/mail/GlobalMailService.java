@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
 import org.sunrise.game.game.logic.mail.MailData;
 import org.sunrise.game.genProto.gen.MailProto;
+import org.sunrise.game.genProto.gen.TopicProto;
 import org.sunrise.game.genRpc.gen.CallEnum;
 import org.sunrise.game.rpc.annotation.RpcMethod;
 import org.sunrise.game.rpc.annotation.RpcService;
@@ -17,15 +18,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * 跨服邮件系统
- */
 @RpcService
-public class MailService extends BaseService {
-    // 所有玩家的邮件：humanId -> List<MailData>
+public class GlobalMailService extends BaseService {
     private Map<String, List<MailData>> playerMails = new HashMap<>();
 
-    public MailService(String nodeId) {
+    public GlobalMailService(String nodeId) {
         super(nodeId);
     }
 
@@ -41,13 +38,9 @@ public class MailService extends BaseService {
 
     @Override
     public void save() {
-        // 保存所有邮件
         putDbData("playerMails", playerMails);
     }
 
-    /**
-     * 获取玩家的下一个邮件ID
-     */
     private long getNextMailId(String humanId) {
         List<MailData> mails = playerMails.computeIfAbsent(humanId, k -> new ArrayList<>());
         if (mails.isEmpty()) {
@@ -62,9 +55,6 @@ public class MailService extends BaseService {
         return maxId + 1;
     }
 
-    /**
-     * 给玩家发送邮件
-     */
     @RpcMethod
     public void sendMail(String humanId, int templateId, String attachmentsJson, String senderName) {
         long mailId = getNextMailId(humanId);
@@ -83,15 +73,13 @@ public class MailService extends BaseService {
             mail.setSenderName(senderName);
         }
 
-        // 添加到邮件列表
         List<MailData> mails = playerMails.computeIfAbsent(humanId, k -> new ArrayList<>());
         mails.add(mail);
 
-        // 构建proto消息并广播到所有游戏服
         MailProto.STMailInfo.Builder mailInfoBuilder = MailProto.STMailInfo.newBuilder()
                 .setMailId(mailId)
                 .setTemplateId(templateId)
-                .setStatus(0) // 未读
+                .setStatus(0)
                 .setCreateTime(createTime);
 
         if (senderName != null && !senderName.isEmpty()) {
@@ -112,16 +100,11 @@ public class MailService extends BaseService {
 
         byte[] protoData = newMailBuilder.build().toByteArray();
 
-        // 广播proto消息到所有游戏服
         RpcFunction.newInstance(RpcFunction.RpcCallType.SendAll)
-                .call(CallEnum.MailRpcListenService_onNewMail,
-                        "humanId", humanId,
-                        "protoData", protoData);
+                .call(CallEnum.GameRpcListenService_sendToHuman,
+                        "humanId", humanId, "packetType", TopicProto.TOPIC.TOPIC_TYPE_MAIL_VALUE, "packetId", MailProto.FROM_SERVER.S2C_NewMail_VALUE, "protoData", protoData);
     }
 
-    /**
-     * 给多个玩家发送邮件
-     */
     @RpcMethod
     public void sendMailToMultiple(List<String> humanIds, int templateId, String attachmentsJson, String senderName) {
         for (String humanId : humanIds) {
@@ -129,13 +112,10 @@ public class MailService extends BaseService {
         }
     }
 
-    /**
-     * 给全服发送邮件
-     */
     @RpcMethod
     public void sendMailToAll(int templateId, String attachmentsJson, String senderName) {
         RpcFunction rpcFunction = RpcFunction.newInstance();
-        rpcFunction.call(CallEnum.PlayerInfoService_getAllPlayerIds);
+        rpcFunction.call(CallEnum.GlobalPlayerInfoService_getAllPlayerIds);
         rpcFunction.listenResult(rpcResult -> {
             if (rpcResult.getResult() != ErrorType.SUCCESS) {
                 return;
@@ -148,14 +128,10 @@ public class MailService extends BaseService {
         });
     }
 
-    /**
-     * 获取玩家邮件列表
-     */
     @RpcMethod
     public void getPlayerMails(String humanId) {
         List<MailData> mails = playerMails.computeIfAbsent(humanId, k -> new ArrayList<>());
 
-        // 构建proto消息
         MailProto.MS2C_GetMailList.Builder builder = MailProto.MS2C_GetMailList.newBuilder();
         for (MailData mail : mails) {
             MailProto.STMailInfo.Builder mailInfoBuilder = MailProto.STMailInfo.newBuilder()
@@ -184,9 +160,6 @@ public class MailService extends BaseService {
         returns("humanId", humanId, "protoData", protoData);
     }
 
-    /**
-     * 读取邮件（标记为已读）
-     */
     @RpcMethod
     public void readMail(String humanId, long mailId) {
         List<MailData> mails = playerMails.computeIfAbsent(humanId, k -> new ArrayList<>());
@@ -199,14 +172,10 @@ public class MailService extends BaseService {
         }
     }
 
-    /**
-     * 领取邮件附件
-     */
     @RpcMethod
     public void receiveMailAttachment(String humanId, long mailId) {
         MailData mail = getPlayerMail(humanId, mailId);
         if (mail != null && mail.getStatus() != 2 && mail.getAttachments() != null && !mail.getAttachments().isEmpty()) {
-            // 标记为已领取，实际物品添加在游戏服处理
             mail.setStatus(2);
             String attachmentsJson = JSON.toJSONString(mail.getAttachments());
             returns("humanId", humanId, "mailId", mailId, "success", true, "attachmentsJson", attachmentsJson);
@@ -215,9 +184,6 @@ public class MailService extends BaseService {
         }
     }
 
-    /**
-     * 删除邮件
-     */
     @RpcMethod
     public void deleteMail(String humanId, long mailId) {
         List<MailData> mails = playerMails.computeIfAbsent(humanId, k -> new ArrayList<>());

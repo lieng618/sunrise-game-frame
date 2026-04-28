@@ -2,6 +2,7 @@ package org.sunrise.game.global.service.chat;
 
 import com.alibaba.fastjson2.TypeReference;
 import org.sunrise.game.genProto.gen.ChatProto;
+import org.sunrise.game.genProto.gen.TopicProto;
 import org.sunrise.game.genRpc.gen.CallEnum;
 import org.sunrise.game.rpc.annotation.RpcMethod;
 import org.sunrise.game.rpc.annotation.RpcService;
@@ -11,16 +12,12 @@ import org.sunrise.game.rpc.service.BaseService;
 import java.util.LinkedList;
 import java.util.List;
 
-/**
- * 跨服聊天系统
- */
 @RpcService
-public class ChatService extends BaseService {
-    // 定义最大聊天记录数量
+public class GlobalChatService extends BaseService {
     private static final int MAX_MESSAGES = 50;
     private List<ChatData> messages = new LinkedList<>();
 
-    public ChatService(String nodeId) {
+    public GlobalChatService(String nodeId) {
         super(nodeId);
     }
 
@@ -49,7 +46,8 @@ public class ChatService extends BaseService {
         }
 
         RpcFunction.newInstance(RpcFunction.RpcCallType.SendAll)
-                .call(CallEnum.ChatRpcListenService_onChat, "humanId", humanId, "message", message, "time", time);
+                .call(CallEnum.GameRpcListenService_sendToAllHuman, "packetType", TopicProto.TOPIC.TOPIC_TYPE_CHAT_VALUE, "packetId", ChatProto.FROM_SERVER.S2C_Chat_VALUE,
+                        "time", ChatProto.MS2C_Chat.newBuilder().setId(humanId).setMsg(message).setTime(time).build().toByteArray());
     }
 
     @RpcMethod

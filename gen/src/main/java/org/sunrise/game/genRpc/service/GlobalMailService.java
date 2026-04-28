@@ -1,6 +1,6 @@
 package org.sunrise.game.genRpc.service;
 
-public interface MailService {
+public interface GlobalMailService {
     void sendMail();
     void sendMailToMultiple();
     void sendMailToAll();

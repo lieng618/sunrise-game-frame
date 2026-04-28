@@ -212,7 +212,7 @@ public class RpcFunction {
             list.add(call.getNodeId());
             RpcFunction.callIdNodes.put(callId, list);
         }
-        LogCore.RpcClient.info("rpc update, from NodeId = { {} }, rpcId = {}, data = {{}}", call.getNodeId(), call.getRpcId(), call.getMsg());
+        LogCore.RpcServer.info("rpc update, from NodeId = { {} }, rpcId = {}, data = {{}}", call.getNodeId(), call.getRpcId(), call.getMsg());
 
     }
 

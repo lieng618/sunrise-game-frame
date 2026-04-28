@@ -84,13 +84,13 @@ public void start() {
 <p>每个 RPC 方法对应一个 int 编号，定义在 <code>CallEnum.java</code> 中，在gen模块下genRpc包下新增服务接口，运行<code>GenRpcStartUp</code>自动生成</p>
 <pre><code class="language-java">public class CallEnum {
     public static final int ChatRpcListenService_onChat = 1;
-    public static final int ChatService_chat = 2;
-    public static final int ChatService_history = 3;
-    public static final int ExternalRecvMessageService_recvMessage = 4;
+    public static final int GlobalChatService_chat = 2;
+    public static final int GlobalChatService_history = 3;
+    public static final int ExternalRecvGameMessageService_recvMessage = 4;
     public static final int FriendRpcListenService_onNewFriendRequest = 5;
     public static final int FriendRpcListenService_onFriendAdded = 6;
     public static final int FriendRpcListenService_onFriendDeleted = 7;
-    public static final int FriendService_handleFriendRequest = 8;
+    public static final int GlobalFriendService_handleFriendRequest = 8;
     // ... 共 30 个方法
 }</code></pre>
 
@@ -109,12 +109,12 @@ public void start() {
 <h3>SendRandom（随机调用）</h3>
 <p>默认模式。如果当前节点自己注册了此方法，优先本地处理（不经过网络）；否则从远端节点随机选一个。</p>
 <pre><code class="language-java">// 示例：发送聊天消息（随机选一个 Global 节点处理）
-RpcFunction.newInstance().call(CallEnum.ChatService_chat,
+RpcFunction.newInstance().call(CallEnum.GlobalChatService_chat,
     "humanId", humanId,
     "message", message);</code></pre>
 
 <h3>SendAll（广播调用）</h3>
-<p>给所有注册了该 callId 的节点都发一份。所有 Call 共用同一个 messageId，回调也只注册一次。</p>
+<p>给所有注册了该方法的节点都发一份。</p>
 <pre><code class="language-java">// 示例：通知所有 Game 节点有新好友申请
 RpcFunction.newInstance(RpcFunction.SendAll).call(
     CallEnum.FriendRpcListenService_onNewFriendRequest,
@@ -124,7 +124,7 @@ RpcFunction.newInstance(RpcFunction.SendAll).call(
 <p>按指定 serverNodeId 发给某一个目标节点。如果目标节点无效，退化为 SendRandom。External ↔ Game 之间的消息转发大量使用此模式。</p>
 <pre><code class="language-java">// 示例：Game 向指定 External 节点发送消息
 RpcFunction.newInstance(externalNodeId).call(
-    CallEnum.ExternalRecvMessageService_recvMessage,
+    CallEnum.ExternalRecvGameMessageService_recvMessage,
     "connectionId", connectionId,
     "data", data,
     "gameNodeId", gameNodeId);  // 首次发送带 gameNodeId</code></pre>
@@ -134,7 +134,7 @@ RpcFunction.newInstance(externalNodeId).call(
 
 <p>以邮件系统举例，发送邮件时调用写法是：</p>
 <pre><code class="language-java">RpcFunction.newInstance().call(
-    CallEnum.MailService_sendMail,
+    CallEnum.GlobalMailService_sendMail,
     "humanId", humanId,
     "templateId", templateId,
     "attachmentsJson", attachmentsJson,
@@ -158,7 +158,7 @@ private static Object[] parseCallArgs(Call call, Method method) {
 <p>通过<code>call.getData(i)</code>，根据位置取出数据，作为参数传递给服务方法，进行处理。可以看到发起调用时传递的参数名称无实际意义，只需要顺序一致即可。</p>
 
 <pre><code class="language-java">@RpcService
-public class MailService extends BaseService {
+public class GlobalMailService extends BaseService {
     @RpcMethod
     public void sendMail(String humanId, int templateId, String attachmentsJson, String senderName) {}    
 }
@@ -176,20 +176,21 @@ public class MailService extends BaseService {
         returns("humanId", humanId, "info", data);
     }</code></pre>
 <h3>调用方注册回调</h3>
-<p>可以看到<code>rpcFunction.listenResult(Callback<RpcResult> callback, Object... contexts)</code>第一个参数为回调函数，第二个参数为上下文（非必须），作为演示把"humanId"作为上下文进行传递。
+<p>可以看到<code>rpcFunction.listenResult(Callback<RpcResult> callback, Object... contexts)</code>第一个参数为回调函数，第二个参数为上下文（非必须，但处理玩家数据时一定要把玩家id做为上下文传递，
+回调里通过上下文获取玩家id，再根据id获取humanObject， 避免Lambda 持有 this引用，导致内存泄露问题）。
 那么在回调执行时，可以通过<code>rpcResult.getContext("humanId")</code>取出传递的数据。通过<code>rpcResult.getResult()</code>判断本次回调的错误码，通过<code>rpcResult.getData()</code>获取远端返回的数据。
 注意调用<code>rpcResult.getData()</code>方法传递的参数名一定要和远端返回时所用的参数名保持一致。</p>
 <pre><code class="language-java">@MsgHandlerMethod(packetId = ChatProto.FROM_CLIENT.C2S_GetHistory_VALUE)
     public static void history(HumanObject humanObject) {
         RpcFunction rpcFunction = RpcFunction.newInstance();
-        rpcFunction.call(CallEnum.ChatService_history, "humanId", humanObject.getHumanId(), "type", 1);
+        rpcFunction.call(CallEnum.GlobalChatService_history, "humanId", humanObject.getHumanId());
         rpcFunction.listenResult(rpcResult -> {
             String humanId = (String) rpcResult.getContext("humanId");
             HumanObject humanObj = HumanObjectManger.getHumanObject(humanId);
             if (humanObj == null) return;
             if (rpcResult.getResult() != ErrorType.SUCCESS) return;
             byte[] protoData = (byte[]) rpcResult.getData("info");
-            humanObject.sendMsg(TopicProto.TOPIC.TOPIC_TYPE_CHAT_VALUE, ChatProto.FROM_SERVER.S2C_History_VALUE, protoData);
+            humanObj.sendMsg(TopicProto.TOPIC.TOPIC_TYPE_CHAT_VALUE, ChatProto.FROM_SERVER.S2C_History_VALUE, protoData);
         }, "humanId", humanObject.getHumanId());
     }</code></pre>
 
@@ -197,7 +198,7 @@ public class MailService extends BaseService {
 <ul>
     <li>默认超时：<strong>10 秒</strong>（RpcManager.registerCallback 设置）</li>
     <li>自定义超时：<code>rpcFunction.setTimeOut(millis)</code></li>
-    <li>超时检测：<code>RpcClientMessageManager.pulseListenRpcTimeout()</code> 持续扫描 checkTimeout Map</li>
+    <li>超时检测：<code>RpcServerMessageManager.pulseListenRpcTimeout()</code> 持续扫描 checkTimeout Map</li>
     <li>超时后：移除回调，构造 <code>RPC_TIMEOUT</code> 错误码，触发回调</li>
 </ul>
 
@@ -263,10 +264,44 @@ Call currentCall = CallContext.getLastCall();  // 取栈顶</code></pre>
 </tbody>
 </table>
 
+<h2>消息管理器</h2>
+一个RPC节点包含两个消息管理器：<code>RpcServerMessageManager</code>和<code>RpcClientMessageManager</code>，消息管理器继承于基类<code>BaseMessageManager</code><a href="#/network"> (详见网络层)</a>
+<h3>RPC服务器节点消息管理器</h3>
+<p>职责是：执行当前节点所有服务的心跳、心跳检测rpc调用超时、处理远端节点发来的rpc调用、处理发起rpc调用后的回调、更新本地保存的其他节点拥有的rpc方法列表。所有业务都在同一消息管理器中单线程处理。</p>
+<pre><code class="language-java">public class RpcServerMessageManager extends ServerMessageManager {
+    @Override
+    public void pulse() {
+        pulseHandler();
+        pulseSender();
+        pulseListenRpcTimeout();
+        ServiceManager.pulse();
+    }
+    @Override
+    protected void pulseHandlerOne(Object data) {
+        ...
+        if (message.getType() == CallType.Call.ordinal()) {
+            CallUtils.handler(message);
+        } else if (message.getType() == CallType.CallResult.ordinal()) {
+            RpcManager.callResult(message);
+        } else if (message.getType() == CallType.Update.ordinal()) {
+            RpcFunction.onUpdate(message);
+        }
+    }
+}</code></pre>
+
+<h3>RPC客户端节点消息管理器</h3>
+<p>职责是：发起rpc调用后，都会通过此管理器最终发给远端节点。不论RPC节点连接了多少个远端节点，当前节点的所有客户端都使用同一个消息管理器，单线程处理call调用的发送。</p>
+<pre><code class="language-java">public class RpcClientMessageManager extends ClientMessageManager {
+    @Override
+    public void pulse() {
+        pulseSender();
+    }
+}</code></pre>
+
 <h2>BaseService 数据操作</h2>
 <pre><code class="language-java">@RpcService
-public class ChatService extends BaseService {
-    public ChatService(String nodeId) { super(nodeId); }
+public class GlobalChatService extends BaseService {
+    public GlobalChatService(String nodeId) { super(nodeId); }
 
     @RpcMethod
     public void chat(String humanId, String message) {

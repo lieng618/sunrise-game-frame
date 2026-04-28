@@ -61,7 +61,7 @@ public class GameMap {
         attachments.add(new MailData.MailAttachment(mapId, 10)); // 物品ID 1001，数量10
         attachments.add(new MailData.MailAttachment(1009, 100)); // 物品ID 1001，数量10
         RpcFunction rpcFunction = RpcFunction.newInstance();
-        rpcFunction.call(CallEnum.MailService_sendMail, "humanId", humanObject.getHumanId(), "templateId", 1, "attachmentsJson", JSON.toJSONString(attachments), "senderName", "test");
+        rpcFunction.call(CallEnum.GlobalMailService_sendMail, "humanId", humanObject.getHumanId(), "templateId", 1, "attachmentsJson", JSON.toJSONString(attachments), "senderName", "test");
     }
 
     // 玩家离开地图

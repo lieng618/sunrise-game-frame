@@ -43,17 +43,17 @@ gen.bat</code></pre>
 <h3>生成的 CallEnum 示例</h3>
 <pre><code class="language-java">public class CallEnum {
     public static final int ChatRpcListenService_onChat = 1;
-    public static final int ChatService_chat = 2;
-    public static final int ChatService_history = 3;
-    public static final int ExternalRecvMessageService_recvMessage = 4;
+    public static final int GlobalChatService_chat = 2;
+    public static final int GlobalChatService_history = 3;
+    public static final int ExternalRecvGameMessageService_recvMessage = 4;
     public static final int FriendRpcListenService_onNewFriendRequest = 5;
     public static final int FriendRpcListenService_onFriendAdded = 6;
     public static final int FriendRpcListenService_onFriendDeleted = 7;
-    public static final int FriendService_handleFriendRequest = 8;
-    public static final int FriendService_getFriends = 9;
-    public static final int FriendService_sendFriendRequest = 10;
-    public static final int FriendService_deleteFriend = 11;
-    public static final int FriendService_getFriendRequests = 12;
+    public static final int GlobalFriendService_handleFriendRequest = 8;
+    public static final int GlobalFriendService_getFriends = 9;
+    public static final int GlobalFriendService_sendFriendRequest = 10;
+    public static final int GlobalFriendService_deleteFriend = 11;
+    public static final int GlobalFriendService_getFriendRequests = 12;
     public static final int GameRecvGmBackService_recvMessage = 13;
     public static final int GameRecvMessageService_recvMessage = 14;
     public static final int GmBackRecvMessageService_recvMessage = 15;
@@ -61,17 +61,17 @@ gen.bat</code></pre>
     public static final int HttpRecvMessageService_setExternalServerStatus = 17;
     public static final int HttpRecvMessageService_setWhitelist = 18;
     public static final int MailRpcListenService_onNewMail = 19;
-    public static final int MailService_claimAttachment = 20;
-    public static final int MailService_sendMail = 21;
-    public static final int MailService_readMail = 22;
-    public static final int MailService_deleteMail = 23;
-    public static final int MailService_sendGroupMail = 24;
-    public static final int MailService_sendAllMail = 25;
-    public static final int MailService_getMailList = 26;
-    public static final int PlayerInfoService_getPlayerInfo = 27;
-    public static final int PlayerInfoService_updatePlayerInfo = 28;
-    public static final int PlayerInfoService_getPlayerInfos = 29;
-    public static final int PlayerInfoService_getAllHumanIds = 30;
+    public static final int GlobalMailService_claimAttachment = 20;
+    public static final int GlobalMailService_sendMail = 21;
+    public static final int GlobalMailService_readMail = 22;
+    public static final int GlobalMailService_deleteMail = 23;
+    public static final int GlobalMailService_sendGroupMail = 24;
+    public static final int GlobalMailService_sendAllMail = 25;
+    public static final int GlobalMailService_getMailList = 26;
+    public static final int GlobalPlayerInfoService_getPlayerInfo = 27;
+    public static final int GlobalPlayerInfoService_updatePlayerInfo = 28;
+    public static final int GlobalPlayerInfoService_getPlayerInfos = 29;
+    public static final int GlobalPlayerInfoService_getAllHumanIds = 30;
 }</code></pre>
 
 <h2>数据库实体生成</h2>

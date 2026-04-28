@@ -24,6 +24,15 @@
     <div class="feature-item"><span class="feature-icon">🔃</span><span class="feature-text">业务代码编写规范，业务模块化设计，开发便捷</span></div>
 </div>
 
+<h2>项目文档</h2>
+
+<a href="https://sunrise-game-frame.pages.dev">https://sunrise-game-frame.pages.dev</a>
+
+<h2>架构图</h2>
+<div class="arch-diagram">
+    <img src="https://files.seeusercontent.com/2026/04/27/Im3e/sunrise-game-frame.png" alt="架构图" style="max-width:100%;border-radius:8px;" />
+</div>
+
 <h2>项目结构</h2>
 <pre><code class="language-bash">sunrise-game-frame/
 ├─ pom.xml                     # Maven 聚合工程（父 POM）
@@ -92,6 +101,7 @@
 </tbody>
 </table>
 
+<h2>模块介绍</h2>
 <table>
 <thead><tr><th>模块</th><th>artifactId</th><th>职责</th><th>关键包</th></tr></thead>
 <tbody>

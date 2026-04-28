@@ -172,6 +172,8 @@ public class RpcNode {
         if (fromOtherMessageManager == null) {
             // 与rpc通信的客户端共用一个消息管理器
             fromOtherMessageManager = new RpcClientMessageManager("");
+            // rpc客户端接收队列，设置为rpc服务器的接收队列，所有从远端rpc服务器发给rpc客户端的数据，也都会由当前节点的rpc服务器处理
+            fromOtherMessageManager.setRecvMsgQueue(rpcServer.getMessageManager().getRecvMsgQueue());
         }
         connectToOther.setMessageManager(fromOtherMessageManager);
         connectToOther.setClientHandler(r -> new ToOtherRpcNodeHandler(connectToOther.getNodeId()));

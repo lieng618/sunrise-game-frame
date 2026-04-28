@@ -24,7 +24,7 @@ public class GmController extends BaseController {
 
         if ("-1".equals(humanId.trim())) {
             RpcFunction.newInstance().call(
-                    CallEnum.MailService_sendMailToAll,
+                    CallEnum.GlobalMailService_sendMailToAll,
                     "templateId", templateId,
                     "attachmentsJson", attachmentsStr,
                     "senderName", "运营邮件");
@@ -32,7 +32,7 @@ public class GmController extends BaseController {
 
         } else {
             RpcFunction.newInstance().call(
-                    CallEnum.MailService_sendMail,
+                    CallEnum.GlobalMailService_sendMail,
                     "humanId", humanId.trim(),
                     "templateId", templateId,
                     "attachmentsJson", attachmentsStr,

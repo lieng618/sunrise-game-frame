@@ -15,11 +15,23 @@
 <body>
 <div id="app">
     <el-card shadow="never" class="rounded-lg">
+        <div class="flex justify-between items-center mb-4">
+            <el-button
+                    type="primary"
+                    :loading="allReloading"
+                    :disabled="filteredData.length === 0"
+                    @click="reloadAllConfig">
+                <el-icon v-if="!allReloading">
+                    <Refresh/>
+                </el-icon>
+                全部热更新
+            </el-button>
+        </div>
         <el-table :data="filteredData" stripe style="width: 100%" v-loading="loading">
             <el-table-column prop="type" label="节点类型" width="240">
                 <template #default="scope">
                     <el-tag type="success" effect="dark">
-                        游戏服
+                        {{ scope.row.type }}
                     </el-tag>
                 </template>
             </el-table-column>
@@ -53,6 +65,7 @@
         setup() {
             const state = reactive({
                 loading: false,
+                allReloading: false,
                 allNodes: []
             });
 
@@ -85,8 +98,49 @@
             };
 
             const filteredData = computed(() => {
-                return state.allNodes;
+                return state.allNodes.filter(node => node.type === 'GameServer');
             });
+
+            // 全部热更新配置
+            const reloadAllConfig = async () => {
+                try {
+                    await ElementPlus.ElMessageBox.confirm(
+                        `确定要对所有 GameServer 节点进行配置热更新吗？\n共 ${filteredData.value.length} 个节点。`,
+                        '操作确认',
+                        {confirmButtonText: '确定', cancelButtonText: '取消', type: 'warning'}
+                    );
+
+                    state.allReloading = true;
+
+                    const res = await fetch('/api/config/reload', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': localStorage.getItem('admin_token')
+                        },
+                        body: JSON.stringify({})
+                    });
+
+                    if (res.status === 401) {
+                        handleLoginExpired();
+                        return;
+                    }
+
+                    const json = await res.json();
+                    if (json.code === 200) {
+                        ElementPlus.ElMessage.success('全部热更新指令已发送');
+                    } else {
+                        ElementPlus.ElMessage.error(json.msg || '操作失败');
+                    }
+                } catch (e) {
+                    if (e !== 'cancel') {
+                        console.error(e);
+                        ElementPlus.ElMessage.error('操作失败');
+                    }
+                } finally {
+                    state.allReloading = false;
+                }
+            };
 
             // 热更新配置
             const reloadConfig = async (node) => {
@@ -135,7 +189,7 @@
                 fetchNodes();
             });
 
-            return {...toRefs(state), filteredData, fetchNodes, reloadConfig};
+            return {...toRefs(state), filteredData, fetchNodes, reloadConfig, reloadAllConfig};
         }
     });
 

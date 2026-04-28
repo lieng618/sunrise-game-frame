@@ -4,7 +4,7 @@ registerPage('architecture', '架构总览', '多进程架构、服务职责、�
 
 <h2>架构图</h2>
 <div class="arch-diagram">
-    <img src="https://files.seeusercontent.com/2026/04/14/5unS/sunrise-game-frame.png" alt="架构图" style="max-width:100%;border-radius:8px;" />
+    <img src="https://files.seeusercontent.com/2026/04/27/Im3e/sunrise-game-frame.png" alt="架构图" style="max-width:100%;border-radius:8px;" />
 </div>
 
 <h2>各服务职责</h2>
@@ -27,7 +27,7 @@ registerPage('architecture', '架构总览', '多进程架构、服务职责、�
     <div class="card">
         <div class="card-icon">🌍</div>
         <div class="card-title">GlobalServer</div>
-        <div class="card-desc">全局跨服服务。所有需要跨服共享的数据和逻辑都放在这里，目前实现了：聊天服务（ChatService）、好友服务（FriendService）、邮件服务（MailService）、玩家简要信息查询（PlayerInfoService）</div>
+        <div class="card-desc">全局跨服服务。所有需要跨服共享的数据和逻辑都放在这里，目前实现了：聊天服务（GlobalChatService）、好友服务（GlobalFriendService）、邮件服务（GlobalMailService）、玩家简要信息查询（GlobalPlayerInfoService）</div>
     </div>
     <div class="card">
         <div class="card-icon">🔗</div>
@@ -46,15 +46,22 @@ registerPage('architecture', '架构总览', '多进程架构、服务职责、�
 <div class="flow-diagram">
     <div class="flow-row">
         <span class="flow-node flow-node-primary">Client</span>
+        <span class="flow-arrow">→ Http请求对外服状态与地址 →</span>
+        <span class="flow-node flow-node-warning">HttpServer</span>
+    </div>
+    <div class="flow-row">
+        <span class="flow-node flow-node-primary">Client</span>
         <span class="flow-arrow">→ TCP/WS/KCP →</span>
         <span class="flow-node flow-node-success">ExternalServer</span>
         <span class="flow-arrow">→ 首次带 externalNodeId →</span>
         <span class="flow-node flow-node-secondary">GameServer</span>
-        <span class="flow-arrow">→ 解析 MBasePacketData →</span>
-        <span class="flow-node flow-node-secondary">MsgHandler</span>
+        <span class="flow-arrow">→ 解析 Protobuf →</span>
+        <span class="flow-node flow-node-secondary">GameMasterService</span>
+        <span class="flow-arrow">→ 消息处理 →</span>
+        <span class="flow-node flow-node-secondary"> LogicUtils.handler()</span>
     </div>
 </div>
-<p>消息经过 External 转发时，External 会在首次转发时带上自己的 <code>externalNodeId</code>，Game 收到后绑定该连接，后续回包直接定向发送到该 External 节点。</p>
+<p>消息经过 External 转发时，External 会在首次转发时带上自己的 <code>externalNodeId</code>，Game 收到externalNodeId，则记录此玩家当前在这个对外服，后续回包直接通过rpc调用定向发送到该 External 节点。</p>
 
 <h3>服务器消息下行（Game → Client）</h3>
 <div class="flow-diagram">
@@ -68,7 +75,7 @@ registerPage('architecture', '架构总览', '多进程架构、服务职责、�
         <span class="flow-node flow-node-primary">Client</span>
     </div>
 </div>
-<p>Game 服通过 <code>ConnectObject.sendMsg()</code> 发送消息，内部调用 <code>RpcFunction.newInstance(externalNodeId).call(CallEnum.ExternalRecvMessageService_recvMessage, ...)</code>，首次发送还会带上 <code>gameNodeId</code> 完成双向绑定。</p>
+<p>Game 服通过 <code>ConnectObject.sendMsg()</code> 发送消息，内部调用 <code>RpcFunction.newInstance(externalNodeId).call(CallEnum.ExternalRecvGameMessageService_recvMessage, ...)</code>，则会将此玩家的消息，发给他所在的对外服节点，首次发送还会带上游戏服自己的节点ID <code>gameNodeId</code> ，对外服就知道此玩家在哪个游戏服了，完成双向绑定。</p>
 
 <h3>跨服调用流程（Game → Global → Game）</h3>
 <div class="flow-diagram">
@@ -82,11 +89,28 @@ registerPage('architecture', '架构总览', '多进程架构、服务职责、�
         <span class="flow-node flow-node-warning">GlobalServer</span>
         <span class="flow-arrow">→ RpcFunction.call(SendAll) →</span>
         <span class="flow-node flow-node-secondary">Game A/B/C</span>
-        <span class="flow-arrow">→ 各自判断是否持有目标玩家 →</span>
+        <span class="flow-arrow">→ 群发给所有玩家 → ConnectObject.sendMsg() → </span>
         <span class="flow-node flow-node-primary">Client</span>
     </div>
 </div>
-<p>典型场景：玩家发聊天 → Game 调用 <code>ChatService_chat</code>(SendRandom) → Global 处理后广播 <code>ChatRpcListenService_onChat</code>(SendAll) → 所有 Game 节点各自推送给本服的在线玩家。</p>
+<p>典型场景：玩家发聊天 → Game 调用 <code>GlobalChatService_chat</code>(SendRandom) → Global 处理后广播 <code>GameRpcListenService_sendToAllHuman</code>(SendAll) → 所有 Game 节点各自推送给本服的在线玩家。</p>
+
+<div class="flow-diagram">
+    <div class="flow-row">
+        <span class="flow-node flow-node-secondary">Game A</span>
+        <span class="flow-arrow">→ RpcFunction.call(SendRandom)、listenResult() →</span>
+        <span class="flow-node flow-node-warning">GlobalServer</span>
+        <span class="flow-arrow">→ 处理业务 →</span>
+    </div>
+    <div class="flow-row">
+        <span class="flow-node flow-node-warning">GlobalServer</span>
+        <span class="flow-arrow">→ returns("param1", ..., "param2", ...); →</span>
+        <span class="flow-node flow-node-secondary">Game A</span>
+        <span class="flow-arrow">→ 执行RPC回调 → ConnectObject.sendMsg() → </span>
+        <span class="flow-node flow-node-primary">Client</span>
+    </div>
+</div>
+<p>典型场景：玩家获取聊天记录 → Game 调用 <code>GlobalChatService_history</code>(SendRandom) → Global 处理后组织数据返回 <code>returns("humanId", humanId, "info", data)</code>返回给调用此方法的 Game 节点，Game 节点收到后发给客户端。</p>
 
 <h3>GM 指令广播流程</h3>
 <div class="flow-diagram">
@@ -98,7 +122,7 @@ registerPage('architecture', '架构总览', '多进程架构、服务职责、�
         <span class="flow-node flow-node-secondary">Game A/B/C</span>
     </div>
 </div>
-<p>GM 后台通过 <code>GameRecvGmBackService_recvMessage</code> 广播指令（reloadConfig/kickHuman/banHumanList/muteHumanList），每个 Game 节点根据本地在线玩家情况执行对应动作。</p>
+<p>GM 后台通过 <code>GameRecvGmBackMessageService_recvMessage</code> 广播指令（reloadConfig/kickHuman/banHumanList/muteHumanList），每个 Game 节点根据本地在线玩家情况执行对应动作。</p>
 
 <h2>单线程无锁设计</h2>
 <p>本项目采用 <strong>单线程 DispatchThread + 消息队列</strong> 模型：</p>

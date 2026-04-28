@@ -17,7 +17,7 @@ public class ChatMsgHandler {
         if (HumanObjectManger.muteHumanQueue.contains(humanObject.getHumanId())) {
             return;
         }
-        RpcFunction.newInstance().call(CallEnum.ChatService_chat, "humanId", humanObject.getHumanId(), "message", data.getMsg());
+        RpcFunction.newInstance().call(CallEnum.GlobalChatService_chat, "humanId", humanObject.getHumanId(), "message", data.getMsg());
     }
 
     @MsgHandlerMethod(packetId = ChatProto.FROM_CLIENT.C2S_Horn_VALUE)
@@ -28,14 +28,14 @@ public class ChatMsgHandler {
     @MsgHandlerMethod(packetId = ChatProto.FROM_CLIENT.C2S_GetHistory_VALUE)
     public static void history(HumanObject humanObject) {
         RpcFunction rpcFunction = RpcFunction.newInstance();
-        rpcFunction.call(CallEnum.ChatService_history, "humanId", humanObject.getHumanId(), "type", 1);
+        rpcFunction.call(CallEnum.GlobalChatService_history, "humanId", humanObject.getHumanId());
         rpcFunction.listenResult(rpcResult -> {
             String humanId = (String) rpcResult.getContext("humanId");
             HumanObject humanObj = HumanObjectManger.getHumanObject(humanId);
             if (humanObj == null) return;
             if (rpcResult.getResult() != ErrorType.SUCCESS) return;
             byte[] protoData = (byte[]) rpcResult.getData("info");
-            humanObject.sendMsg(TopicProto.TOPIC.TOPIC_TYPE_CHAT_VALUE, ChatProto.FROM_SERVER.S2C_History_VALUE, protoData);
+            humanObj.sendMsg(TopicProto.TOPIC.TOPIC_TYPE_CHAT_VALUE, ChatProto.FROM_SERVER.S2C_History_VALUE, protoData);
         }, "humanId", humanObject.getHumanId());
     }
 }

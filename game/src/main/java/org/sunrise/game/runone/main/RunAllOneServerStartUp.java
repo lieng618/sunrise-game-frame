@@ -16,7 +16,7 @@ import java.util.Properties;
 
 public class RunAllOneServerStartUp {
     public static void main(String[] args) {
-        // args[0]:config path args[1]:external_id
+        // args[0]:config path args[1]:server_id
         if (args.length == 0) {
             args = new String[]{"./config/runallone-config.properties", "100"};
         }

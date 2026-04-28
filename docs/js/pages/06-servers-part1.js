@@ -137,11 +137,11 @@ registerPage('external-server', '对外服', 'TCP/WS/KCP 网关、客户端连�
 <tr><td>KcpServerHandler</td><td>KCP 入站处理器</td></tr>
 <tr><td>ExternalConnectionManger</td><td>客户端连接管理器，维护 clients Map(connectionId → ClientConnection)</td></tr>
 <tr><td>ClientConnection</td><td>客户端连接对象，支持 Channel(TCP/WS) 和 Ukcp(KCP)，含消息频率限制</td></tr>
-<tr><td>ExternalRecvMessageService</td><td>@RpcService，核心服务：消息转发、地址上报</td></tr>
+<tr><td>ExternalRecvGameMessageService</td><td>@RpcService，核心服务：消息转发、地址上报</td></tr>
 </tbody>
 </table>
 
-<h2>ExternalRecvMessageService 心跳</h2>
+<h2>ExternalRecvGameMessageService 心跳</h2>
 <table>
 <thead><tr><th>频率</th><th>行为</th></tr></thead>
 <tbody>

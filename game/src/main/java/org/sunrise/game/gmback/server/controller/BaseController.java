@@ -75,6 +75,10 @@ public abstract class BaseController {
     }
 
     protected void sendMessageToAllGame(String operation, Map<String, Object> extraData) {
-        RpcFunction.newInstance(RpcFunction.RpcCallType.SendAll).call(CallEnum.GameRecvGmBackService_recvMessage, "operation", operation, "data", JSON.toJSONString(extraData));
+        RpcFunction.newInstance(RpcFunction.RpcCallType.SendAll).call(CallEnum.GameRecvGmBackMessageService_recvMessage, "operation", operation, "data", JSON.toJSONString(extraData));
+    }
+
+    protected void sendMessageToDesignatedGame(String operation, Map<String, Object> extraData, String gameServerNodeId) {
+        RpcFunction.newInstance(gameServerNodeId).call(CallEnum.GameRecvGmBackMessageService_recvMessage, "operation", operation, "data", JSON.toJSONString(extraData));
     }
 }

@@ -22,8 +22,8 @@ import java.util.Map;
  * 心跳每分钟向gm后台上报自身数据，主要用于后台页面中的展示
  */
 @RpcService
-public class GameRecvGmBackService extends BaseService {
-    public GameRecvGmBackService(String nodeId) {
+public class GameRecvGmBackMessageService extends BaseService {
+    public GameRecvGmBackMessageService(String nodeId) {
         super(nodeId);
     }
 

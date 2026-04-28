@@ -16,7 +16,7 @@ public class RpcManager {
     public static void callResult(Call call) {
         CallResult callResult = callResults.remove(call.getMessageId());
         if (callResult != null) {
-            LogCore.RpcClient.debug("rpc result, callId = {}, messageId = { {} }, result = {}, data = {}", call.getRpcId(), call.getMessageId(), call.getResult(), call.getData());
+            LogCore.RpcServer.debug("rpc result, callId = {}, messageId = { {} }, result = {}, data = {}", call.getRpcId(), call.getMessageId(), call.getResult(), call.getData());
 
             checkTimeout.remove(call.getMessageId());
             callResult.getRpcResult().setData(call.getData());

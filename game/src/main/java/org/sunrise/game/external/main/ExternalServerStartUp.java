@@ -26,7 +26,7 @@ public class ExternalServerStartUp {
         // 创建rpc节点
         var rpcNode = RpcNodeManager.createRpcNode(Integer.parseInt(args[1]));
         // 添加当前模块要注册的rpc
-        CallUtils.init(rpcNode.getNodeId(), Collections.singletonList("org.sunrise.game"), CallEnum.class);
+        CallUtils.init(rpcNode.getNodeId(), Collections.singletonList("org.sunrise.game.external.service"), CallEnum.class);
         // 启动
         rpcNode.start();
 
