@@ -233,6 +233,86 @@ public static void onHumanList(SocketClient client, LoginProto.MS2C_HumanList da
 }</code></pre>
 `);
 
+registerPage('client-example', '客户端示例', '用于连接服务器的一些客户端简单示例', () => `
+<h1>客户端示例</h1>
+<p class="page-desc">用于连接服务器的一些客户端简单示例</p>
+
+<h2>通信示例</h2>
+<p>sunrise-goldminer：</p>
+<a href="https://gitee.com/lieng618/sunrise-goldminer" target="_blank">网页版通信客户端</a>
+
+<p>sunrise-goldminer-wx：</p>
+<a href="https://gitee.com/lieng618/sunrise-goldminer-wx" target="_blank">微信小游戏版通信客户端</a>
+
+<p>sunrise-client-unity：</p>
+<a href="https://gitee.com/lieng618/sunrise-client-unity" target="_blank">unity版通信客户端</a>
+
+<h2>WebSocket通信流程</h2>
+
+<p>从http服务器获取external_address，测试版本可以直接连接ip+port，但正式版本需要使用域名和ssl证书，所以连接的最终地址里，把ip替换为域名，拼接上/ws/port，后端由nginx解析转发给对应的端口。</p>
+
+<pre><code>// 请求 external_address
+// 对应 url: https://url/external_address?type=websocket&uid=xxx
+const addressUrl = \`https://\${networkConfig.serverdomain}/external_address?type=websocket&uid=xxx\`;
+const addressData = await requestAsync(addressUrl);
+// 返回的 JSON 结构中有 address 字段，格式如 "192.168.1.5:10001"
+// {"address":"49.232.236.230:10000"}
+const rawAddress = addressData.address;
+const parts = rawAddress.split(':');
+const targetPort = parts[1]; // 拿到对外服端口
+// 正式上线需要域名，所以获取的ip+端口是没法用的
+// 所以ip使用域名，拼接上/ws/port，后端会由nginx解析转发到对应的端口
+const wsUrl = \`wss://\${networkConfig.serverdomain}/ws/\${targetPort}\`;
+</code></pre>
+
+<h2>nginx配置</h2>
+<p>本地测试一般会直连对外服的ip+端口，正式上线需要域名，所以部署一层nginx，即可支持wss协议。ip使用域名，拼接上/ws/port，会转发给本机的指定端口。以下示例假设当前服务器域名为www.goldminer.cloud。</p>
+
+<pre><code>server {
+    listen 443 ssl;
+    server_name goldminer.cloud www.goldminer.cloud;
+
+    ssl_certificate     /etc/nginx/cert/www.goldminer.cloud_bundle.crt;
+    ssl_certificate_key /etc/nginx/cert/www.goldminer.cloud_key;
+
+    ssl_protocols       TLSv1 TLSv1.1 TLSv1.2 TLSv1.3;
+    ssl_ciphers         ECDHE-RSA-AES128-GCM-SHA256:ECDHE:ECDH:AES:HIGH:!NULL:!aNULL:!MD5:!ADH:!RC4;
+    ssl_session_timeout 20m;
+    ssl_verify_client off;
+    
+
+    # 动态匹配 /ws/端口号
+    # 客户端连接地址示例: wss://www.goldminer.cloud/ws/10001
+    location ~ ^/ws/(?<forward_port>\\d+)$ {
+        rewrite ^/ws/\\d+ / break;
+        # 将路径中的端口号变量，拼接到 proxy_pass 中
+        proxy_pass http://127.0.0.1:\$forward_port;
+
+        # WebSocket 标准头
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection "upgrade";
+
+        # 传递真实 IP
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header Host \$host;
+    }
+
+    # 将 /external_address 转发到 Java 的 HTTP Server (8090)
+    location ~ ^/external_address {
+        proxy_pass http://127.0.0.1:8090; # 转发给你的 HttpServer.java
+
+        # 传递真实IP等头信息
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+    }
+}
+</code></pre>
+`);
+
 registerPage('api-reference', 'API 参考', 'RPC 服务 API、HTTP 接口、注解参考', () => `
 <h1>API 参考</h1>
 <p class="page-desc">RPC 服务 API 和 HTTP 接口的完整参考</p>
