@@ -215,7 +215,7 @@
                 <version>3.6.0</version>
                 <executions>
                     <execution>
-                        <id>make-assembly-http</id>
+                        <id>make-assembly-runallone</id>
                         <!-- 绑定到打包生命周期阶段上 -->
                         <phase>package</phase>
                         <goals>
