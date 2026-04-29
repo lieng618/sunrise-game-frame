@@ -101,3 +101,8 @@ body {
     background: linear-gradient(135deg, #10b981 0%, #059669 100%);
     color: white;
 }
+
+.operation-type.ANNOUNCEMENT {
+    background: linear-gradient(135deg, #5bb6c2 0%, #051d96 100%);
+    color: white;
+}

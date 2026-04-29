@@ -239,38 +239,39 @@ registerPage('api-reference', 'API 参考', 'RPC 服务 API、HTTP 接口、注�
 
 <h2>RPC 服务完整列表</h2>
 <table>
-<thead><tr><th>ID</th><th>CallEnum</th><th>所在进程</th><th>说明</th></tr></thead>
+<thead><tr><th>CallEnum</th><th>所在进程</th><th>说明</th></tr></thead>
 <tbody>
-<tr><td>1</td><td>ExternalRecvGameMessageService_recvMessage</td><td>External</td><td>接收 Game 服消息转发给客户端</td></tr>
-<tr><td>2</td><td>FriendRpcListenService_onFriendDeleted</td><td>Game</td><td>好友删除通知（双向）</td></tr>
-<tr><td>3</td><td>FriendRpcListenService_onNewFriendRequest</td><td>Game</td><td>新好友申请通知</td></tr>
-<tr><td>4</td><td>FriendRpcListenService_onFriendAdded</td><td>Game</td><td>好友添加通知（双向）</td></tr>
-<tr><td>5</td><td>GameRecvExternalMessageService_recvMessage</td><td>Game</td><td>接收客户端消息（External 转发）</td></tr>
-<tr><td>6</td><td>GameRecvGmBackMessageService_recvMessage</td><td>Game</td><td>接收 GM 命令</td></tr>
-<tr><td>7</td><td>GameRpcListenService_sendToHuman</td><td>Game</td><td>发送消息给指定玩家（广播到所有Game服，各自判断是否持有目标玩家）</td></tr>
-<tr><td>8</td><td>GameRpcListenService_sendToAllHuman</td><td>Game</td><td>广播消息给所有玩家</td></tr>
-<tr><td>9</td><td>GlobalChatService_chat</td><td>Global</td><td>发送聊天消息（最多50条历史）</td></tr>
-<tr><td>10</td><td>GlobalChatService_history</td><td>Global</td><td>获取聊天历史（返回 proto 二进制）</td></tr>
-<tr><td>11</td><td>GlobalFriendService_getFriends</td><td>Global</td><td>获取好友列表</td></tr>
-<tr><td>12</td><td>GlobalFriendService_handleFriendRequest</td><td>Global</td><td>处理好友申请（同意/拒绝）</td></tr>
-<tr><td>13</td><td>GlobalFriendService_deleteFriend</td><td>Global</td><td>删除好友</td></tr>
-<tr><td>14</td><td>GlobalFriendService_getFriendRequests</td><td>Global</td><td>获取好友申请列表</td></tr>
-<tr><td>15</td><td>GlobalFriendService_sendFriendRequest</td><td>Global</td><td>发送好友申请</td></tr>
-<tr><td>16</td><td>GlobalMailService_deleteMail</td><td>Global</td><td>删除邮件</td></tr>
-<tr><td>17</td><td>GlobalMailService_sendMail</td><td>Global</td><td>发送单人邮件</td></tr>
-<tr><td>18</td><td>GlobalMailService_readMail</td><td>Global</td><td>读取邮件</td></tr>
-<tr><td>19</td><td>GlobalMailService_receiveMailAttachment</td><td>Global</td><td>领取邮件附件</td></tr>
-<tr><td>20</td><td>GlobalMailService_getPlayerMails</td><td>Global</td><td>获取邮件列表</td></tr>
-<tr><td>21</td><td>GlobalMailService_sendMailToAll</td><td>Global</td><td>全服发送邮件</td></tr>
-<tr><td>22</td><td>GlobalMailService_sendMailToMultiple</td><td>Global</td><td>群发邮件</td></tr>
-<tr><td>23</td><td>GlobalPlayerInfoService_updatePlayerInfo</td><td>Global</td><td>更新玩家信息</td></tr>
-<tr><td>24</td><td>GlobalPlayerInfoService_getPlayerInfos</td><td>Global</td><td>批量获取玩家信息</td></tr>
-<tr><td>25</td><td>GlobalPlayerInfoService_getPlayerInfo</td><td>Global</td><td>获取单个玩家信息</td></tr>
-<tr><td>26</td><td>GlobalPlayerInfoService_getAllPlayerIds</td><td>Global</td><td>获取所有角色 ID</td></tr>
-<tr><td>27</td><td>GmBackRecvMessageService_recvMessage</td><td>GmBack</td><td>GM 后台消息接收</td></tr>
-<tr><td>28</td><td>HttpRecvMessageService_updateExternalRemoteData</td><td>Http</td><td>更新对外服地址数据</td></tr>
-<tr><td>29</td><td>HttpRecvMessageService_setExternalServerStatus</td><td>Http</td><td>设置服务器开关</td></tr>
-<tr><td>30</td><td>HttpRecvMessageService_setWhitelist</td><td>Http</td><td>设置白名单</td></tr>
+<tr><td>ExternalRecvGameMessageService_recvMessage</td><td>External</td><td>接收 Game 服消息转发给客户端</td></tr>
+<tr><td>FriendRpcListenService_onFriendDeleted</td><td>Game</td><td>好友删除通知（双向）</td></tr>
+<tr><td>FriendRpcListenService_onNewFriendRequest</td><td>Game</td><td>新好友申请通知</td></tr>
+<tr><td>FriendRpcListenService_onFriendAdded</td><td>Game</td><td>好友添加通知（双向）</td></tr>
+<tr><td>GameRecvExternalMessageService_recvMessage</td><td>Game</td><td>接收客户端消息（External 转发）</td></tr>
+<tr><td>GameRecvGmBackMessageService_recvMessage</td><td>Game</td><td>接收 GM 命令</td></tr>
+<tr><td>GameRpcListenService_sendToHuman</td><td>Game</td><td>发送消息给指定玩家（广播到所有Game服，各自判断是否持有目标玩家）</td></tr>
+<tr><td>GameRpcListenService_sendToAllHuman</td><td>Game</td><td>广播消息给所有玩家</td></tr>
+<tr><td>GlobalChatService_chat</td><td>Global</td><td>发送聊天消息（最多50条历史）</td></tr>
+<tr><td>GlobalChatService_history</td><td>Global</td><td>获取聊天历史（返回 proto 二进制）</td></tr>
+<tr><td>GlobalFriendService_getFriends</td><td>Global</td><td>获取好友列表</td></tr>
+<tr><td>GlobalFriendService_handleFriendRequest</td><td>Global</td><td>处理好友申请（同意/拒绝）</td></tr>
+<tr><td>GlobalFriendService_deleteFriend</td><td>Global</td><td>删除好友</td></tr>
+<tr><td>GlobalFriendService_getFriendRequests</td><td>Global</td><td>获取好友申请列表</td></tr>
+<tr><td>GlobalFriendService_sendFriendRequest</td><td>Global</td><td>发送好友申请</td></tr>
+<tr><td>GlobalMailService_deleteMail</td><td>Global</td><td>删除邮件</td></tr>
+<tr><td>GlobalMailService_sendMail</td><td>Global</td><td>发送单人邮件</td></tr>
+<tr><td>GlobalMailService_readMail</td><td>Global</td><td>读取邮件</td></tr>
+<tr><td>GlobalMailService_receiveMailAttachment</td><td>Global</td><td>领取邮件附件</td></tr>
+<tr><td>GlobalMailService_getPlayerMails</td><td>Global</td><td>获取邮件列表</td></tr>
+<tr><td>GlobalMailService_sendMailToAll</td><td>Global</td><td>全服发送邮件</td></tr>
+<tr><td>GlobalMailService_sendMailToMultiple</td><td>Global</td><td>群发邮件</td></tr>
+<tr><td>GlobalPlayerInfoService_updatePlayerInfo</td><td>Global</td><td>更新玩家信息</td></tr>
+<tr><td>GlobalPlayerInfoService_getPlayerInfos</td><td>Global</td><td>批量获取玩家信息</td></tr>
+<tr><td>GlobalPlayerInfoService_getPlayerInfo</td><td>Global</td><td>获取单个玩家信息</td></tr>
+<tr><td>GlobalPlayerInfoService_getAllPlayerIds</td><td>Global</td><td>获取所有角色 ID</td></tr>
+<tr><td>GmBackRecvMessageService_recvMessage</td><td>GmBack</td><td>GM 后台消息接收</td></tr>
+<tr><td>HttpRecvMessageService_updateExternalRemoteData</td><td>Http</td><td>更新对外服地址数据</td></tr>
+<tr><td>HttpRecvMessageService_setExternalServerStatus</td><td>Http</td><td>设置服务器开关</td></tr>
+<tr><td>HttpRecvMessageService_setWhitelist</td><td>Http</td><td>设置白名单</td></tr>
+<tr><td>HttpRecvMessageService_setAnnouncements</td><td>Http</td><td>设置当前生效公告列表</td></tr>
 </tbody>
 </table>
 
@@ -283,6 +284,7 @@ registerPage('api-reference', 'API 参考', 'RPC 服务 API、HTTP 接口、注�
 <tr><td>/external_address</td><td>GET</td><td>type, uid</td><td>{address}</td><td>分配对外服地址</td></tr>
 <tr><td>/external_address_list</td><td>GET</td><td>-</td><td>{addresses}</td><td>所有对外服地址</td></tr>
 <tr><td>/kcp_conv</td><td>GET</td><td>-</td><td>{conv}</td><td>分配 KCP conv ID</td></tr>
+<tr><td>/announcements</td><td>GET</td><td>-</td><td>[{id,title,content,startTime,endTime}]</td><td>获取当前生效公告列表</td></tr>
 </tbody>
 </table>
 
@@ -304,6 +306,9 @@ registerPage('api-reference', 'API 参考', 'RPC 服务 API、HTTP 接口、注�
 <tr><td>/api/online-players</td><td>GET</td><td>在线玩家</td></tr>
 <tr><td>/api/server-status</td><td>GET/POST</td><td>服务器开关</td></tr>
 <tr><td>/api/whitelist</td><td>GET/POST</td><td>白名单管理</td></tr>
+<tr><td>/api/announcements</td><td>GET/POST</td><td>公告列表/发布公告</td></tr>
+<tr><td>/api/announcements/update</td><td>POST</td><td>修改公告</td></tr>
+<tr><td>/api/announcements/remove</td><td>POST</td><td>删除公告</td></tr>
 <tr><td>/api/users</td><td>GET</td><td>用户管理</td></tr>
 <tr><td>/api/logs</td><td>GET</td><td>操作日志</td></tr>
 </tbody>

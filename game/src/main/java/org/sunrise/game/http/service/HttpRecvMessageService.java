@@ -62,6 +62,12 @@ public class HttpRecvMessageService extends BaseService {
         httpServer.setWhitelist(uidList);
     }
 
+    @RpcMethod
+    public void setAnnouncements(String announcements) {
+        List<Map<String, Object>> announcementList = JSON.parseObject(announcements, new TypeReference<List<Map<String, Object>>>() {});
+        httpServer.setAnnouncements(announcementList);
+    }
+
     @Override
     public void pulsePer5Sec() {
         super.pulsePer5Sec();

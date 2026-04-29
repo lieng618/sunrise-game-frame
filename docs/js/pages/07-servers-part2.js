@@ -322,6 +322,7 @@ registerPage('http-server', 'HTTP 服务', '对外服地址分配、心跳上报
 <tr><td>/external_address</td><td>GET</td><td>type, uid</td><td>{"address":"127.0.0.1:10000"}</td><td>分配对外服地址</td></tr>
 <tr><td>/external_address_list</td><td>GET</td><td>-</td><td>{"addresses":[...]}</td><td>获取所有对外服地址</td></tr>
 <tr><td>/kcp_conv</td><td>GET</td><td>-</td><td>{"conv":12345}</td><td>分配 KCP conv ID</td></tr>
+<tr><td>/announcements</td><td>GET</td><td>-</td><td>[{id,title,content,startTime,endTime}]</td><td>获取当前生效的公告列表，客户端通过curl请求</td></tr>
 </tbody>
 </table>
 
@@ -355,6 +356,7 @@ KCP 要在 UDP 之上实现类似 TCP 的可靠传输（确认、重传、流量
 <tr><td>HttpRecvMessageService_updateExternalRemoteData</td><td>更新对外服地址数据（External 上报）</td></tr>
 <tr><td>HttpRecvMessageService_setExternalServerStatus</td><td>设置服务器开关状态（GM 后台调用）</td></tr>
 <tr><td>HttpRecvMessageService_setWhitelist</td><td>设置白名单（GM 后台调用）</td></tr>
+<tr><td>HttpRecvMessageService_setAnnouncements</td><td>设置当前生效公告列表（GM 后台调用）</td></tr>
 </tbody>
 </table>
 
@@ -379,6 +381,7 @@ registerPage('gmback-server', 'GM 后台', '登录认证、节点监控、配置
     <li>发送邮件（单人/群发/全服）</li>
     <li>踢人下线（广播 kickHuman）</li>
     <li>封禁/禁言名单广播（banHumanList/muteHumanList）</li>
+    <li>全服公告管理（发布/编辑/删除，定时同步到HttpServer）</li>
     <li>用户与操作日志管理</li>
 </ul>
 
@@ -400,6 +403,9 @@ registerPage('gmback-server', 'GM 后台', '登录认证、节点监控、配置
 <tr><td>/api/online-players</td><td>GET</td><td>在线玩家列表</td><td>需要</td></tr>
 <tr><td>/api/server-status</td><td>GET/POST</td><td>服务器开关</td><td>需要</td></tr>
 <tr><td>/api/whitelist</td><td>GET/POST</td><td>白名单管理</td><td>需要</td></tr>
+<tr><td>/api/announcements</td><td>GET/POST</td><td>公告列表/发布公告</td><td>需要</td></tr>
+<tr><td>/api/announcements/update</td><td>POST</td><td>修改公告</td><td>需要</td></tr>
+<tr><td>/api/announcements/remove</td><td>POST</td><td>删除公告</td><td>需要</td></tr>
 <tr><td>/api/users</td><td>GET</td><td>用户管理</td><td>需要</td></tr>
 <tr><td>/api/logs</td><td>GET</td><td>操作日志</td><td>需要</td></tr>
 </tbody>
@@ -434,6 +440,7 @@ registerPage('gmback-server', 'GM 后台', '登录认证、节点监控、配置
 <tr><td>ban_player.html</td><td>封禁管理</td></tr>
 <tr><td>mute_player.html</td><td>禁言管理</td></tr>
 <tr><td>whitelist.html</td><td>白名单管理</td></tr>
+<tr><td>announcement.html</td><td>全服公告管理</td></tr>
 <tr><td>operation_log.html</td><td>操作日志</td></tr>
 <tr><td>user_manager.html</td><td>用户管理</td></tr>
 </tbody>

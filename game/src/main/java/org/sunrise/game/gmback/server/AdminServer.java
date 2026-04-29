@@ -9,6 +9,7 @@ import io.javalin.json.JsonMapper;
 import org.jetbrains.annotations.NotNull;
 import org.sunrise.game.config.ConfigReader;
 import org.sunrise.game.gmback.server.controller.AuthController;
+import org.sunrise.game.gmback.server.controller.AnnouncementController;
 import org.sunrise.game.gmback.server.controller.BanHumanController;
 import org.sunrise.game.gmback.server.controller.ControllerManager;
 import org.sunrise.game.gmback.server.controller.GmController;
@@ -123,6 +124,12 @@ public class AdminServer {
         app.get("/api/whitelist", ControllerManager.getController(WhitelistController.class)::list);
         app.post("/api/whitelist", ControllerManager.getController(WhitelistController.class)::add);
         app.post("/api/whitelist/remove", ControllerManager.getController(WhitelistController.class)::remove);
+
+        // 公告路由
+        app.get("/api/announcements", ControllerManager.getController(AnnouncementController.class)::list);
+        app.post("/api/announcements", ControllerManager.getController(AnnouncementController.class)::add);
+        app.post("/api/announcements/update", ControllerManager.getController(AnnouncementController.class)::update);
+        app.post("/api/announcements/remove", ControllerManager.getController(AnnouncementController.class)::remove);
         // 将 io.javalin 包下的日志级别设置为 WARN
         LogCore.setLogLevel("io.javalin", Level.WARN);
         try {

@@ -27,6 +27,7 @@ public class HttpServer {
     private final AtomicInteger convAllocator = new AtomicInteger(1);
     private volatile boolean serverOpen = true;
     private volatile List<String> whitelist = new ArrayList<>();
+    private volatile List<Map<String, Object>> announcements = new ArrayList<>();
     // uid-对外服id
     private final ConcurrentHashMap<String, Integer> uidExternals = new ConcurrentHashMap<>();
     // 对外服类型-<对外服id-地址>
@@ -122,6 +123,22 @@ public class HttpServer {
                 }
             }
             ctx.result(finalAddress.toJSONString());
+        });
+        // 接口：/announcements
+        // 功能：返回当前生效的公告列表，客户端通过curl请求获取
+        app.get("/announcements", ctx -> {
+            JSONArray result = new JSONArray();
+            for (Map<String, Object> announcement : announcements) {
+                JSONObject item = new JSONObject();
+                item.put("id", announcement.get("id"));
+                item.put("title", announcement.get("title"));
+                item.put("content", announcement.get("content"));
+                item.put("startTime", announcement.get("startTime"));
+                item.put("endTime", announcement.get("endTime"));
+                result.add(item);
+            }
+            ctx.contentType("application/json;charset=utf-8");
+            ctx.result(result.toJSONString());
         });
     }
 

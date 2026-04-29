@@ -3,6 +3,7 @@ package org.sunrise.game.gmback.service;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
 import org.sunrise.game.gmback.server.AdminServer;
+import org.sunrise.game.gmback.server.controller.AnnouncementController;
 import org.sunrise.game.gmback.server.controller.BanHumanController;
 import org.sunrise.game.gmback.server.controller.ControllerManager;
 import org.sunrise.game.gmback.server.controller.MuteHumanController;
@@ -78,5 +79,7 @@ public class GmBackRecvMessageService extends BaseService {
         ControllerManager.getController(MuteHumanController.class).broadcastMuteListToGame();
         // 定时同步白名单到HttpServer
         ControllerManager.getController(WhitelistController.class).syncWhitelistToHttp();
+        // 定时同步公告到HttpServer
+        ControllerManager.getController(AnnouncementController.class).syncAnnouncementsToHttp();
     }
 }

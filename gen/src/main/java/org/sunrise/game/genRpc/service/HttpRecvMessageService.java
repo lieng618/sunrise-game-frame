@@ -4,4 +4,5 @@ public interface HttpRecvMessageService {
     void updateExternalRemoteData();
     void setExternalServerStatus();
     void setWhitelist();
+    void setAnnouncements();
 }

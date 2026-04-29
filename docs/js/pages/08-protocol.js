@@ -12,12 +12,68 @@ registerPage('protocol', '协议规范', 'Protobuf 协议定义、命名规则�
 
 <h2>网络包结构</h2>
 <p>TCP/WebSocket 层传输的 SocketMessage：</p>
-<pre><code class="language-text">┌──────────────┬──────────────┬─────────────────────────────────┐
-│ messageType  │ dataLength   │           data                  │
-│  (4 bytes)   │  (4 bytes)   │        (N bytes)                │
-│ 0=心跳       │              │ MBasePacketData 的 Protobuf     │
-│ 1=业务消息   │              │ 序列化二进制                     │
-└──────────────┴──────────────┴─────────────────────────────────┘</code></pre>
+<pre><code class="language-java">public class SocketMessage {
+    int messageType;
+    byte[] data;
+}
+
+public class MessageType {
+    /** 请求命令类型:心跳 */
+    public static int idle = 0;
+    /** 请求命令类型:业务 */
+    public static int biz = 1;
+}
+
+public class SocketMessageEncoder extends MessageToByteEncoder<SocketMessage> {
+    @Override
+    protected void encode(ChannelHandlerContext ctx, SocketMessage msg, ByteBuf out) throws Exception {
+        out.writeInt(msg.getMessageType());
+        out.writeInt(msg.getData().length);
+        out.writeBytes(msg.getData());
+    }
+}
+</code></pre>
+<p>四个字节写入消息类型，心跳类型主要用于节点间的底层心跳通信，客户端与对外服的通信、所有节点间的rpc调用都为业务类型。
+四个字节写入data的长度，之后在写入真正的业务数据。</p>
+
+<pre><code class="language-java">public class ConnectObject {
+    public void sendMsg(int packetType, int packetId) {
+        var sendBuilder = TopicProto.MBasePacketData.newBuilder().setPacketType(TopicProto.TOPIC.forNumber(packetType)).setPacketId(packetId);
+        RpcFunction.newInstance(externalNodeId).call(CallEnum.ExternalRecvGameMessageService_recvMessage, "id", connectId, "data", sendBuilder.build().toByteArray());
+    }
+}
+</code></pre>
+<p>在ConnectObject中，调用sendMsg() 发送protobuf消息，游戏服通过rpc调用，把protobuf数据作为参数传递给对外服。</p>
+
+<pre><code class="language-java">@RpcService
+public class ExternalRecvGameMessageService extends BaseService {
+    @RpcMethod
+    public void recvMessage(long connectionId, byte[] data) {
+        if (connectionId > 0) {
+            var connection = ExternalConnectionManger.getClientConnect(connectionId);
+            if (connection != null) {
+                connection.sendMessage(data);
+            }
+        }
+    }
+}
+public class ClientConnection {
+    public void sendMessage(byte[] data) {
+        if (channel != null && channel.isActive()) {
+            channel.writeAndFlush(new SocketMessage(MessageType.biz, data));
+        } else if (ukcp != null && ukcp.isActive()) {
+            ByteBuf buf = Unpooled.buffer(4 + 4 + data.length);
+            buf.writeInt(MessageType.biz);
+            buf.writeInt(data.length);
+            buf.writeBytes(data);
+            ukcp.write(buf);
+            buf.release();
+        }
+    }
+}
+</code></pre>
+<p>在对外服ExternalRecvGameMessageService中，recvMessage()接收到数据。对外服接收到rpc后，把protobuf数据，通过ClientConnection.sendMessage()发给客户端可以看到，最终的protobuf数据在对外服传递给客户端时，放入了SocketMessage中。
+</p>
 
 <h2>TOPIC 模块枚举</h2>
 <table>

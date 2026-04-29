@@ -98,6 +98,12 @@
                     </el-icon>
                     <span>白名单</span>
                 </el-menu-item>
+                <el-menu-item index="announcement">
+                    <el-icon>
+                        <Bell/>
+                    </el-icon>
+                    <span>全服公告</span>
+                </el-menu-item>
                 <el-menu-item index="operation_log">
                     <el-icon>
                         <Document/>
@@ -176,6 +182,7 @@
                     'ban_player': 'ban_player.html',
                     'mute_player': 'mute_player.html',
                     'whitelist': 'whitelist.html',
+                    'announcement': 'announcement.html',
                     'operation_log': 'operation_log.html',
                     'user_manager': 'user_manager.html',
                 },
@@ -192,6 +199,7 @@
                 if (state.activeTab === 'ban_player') return '玩家封禁';
                 if (state.activeTab === 'mute_player') return '玩家禁言';
                 if (state.activeTab === 'whitelist') return '白名单';
+                if (state.activeTab === 'announcement') return '全服公告';
                 if (state.activeTab === 'operation_log') return '操作记录';
                 if (state.activeTab === 'user_manager') return '用户管理';
                 return '';

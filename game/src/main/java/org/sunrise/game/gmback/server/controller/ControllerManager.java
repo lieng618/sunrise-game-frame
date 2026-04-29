@@ -31,6 +31,7 @@ public class ControllerManager {
         controllers.put(OnlinePlayerController.class.getSimpleName(), new OnlinePlayerController());
         controllers.put(ServerStatusController.class.getSimpleName(), new ServerStatusController());
         controllers.put(WhitelistController.class.getSimpleName(), new WhitelistController());
+        controllers.put(AnnouncementController.class.getSimpleName(), new AnnouncementController());
         load();
         waitInitEnd();
         startSaveDbPulse();
