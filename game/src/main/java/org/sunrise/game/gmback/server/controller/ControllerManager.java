@@ -61,12 +61,7 @@ public class ControllerManager {
                 break;
             }
 
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                break;
-            }
+            Utils.sleep(30);
         }
     }
 

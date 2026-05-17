@@ -53,7 +53,7 @@ public class RpcNodeManager {
     /**
      * 判断服务器节点是否有效
      */
-    public static boolean IsServerNodeActive(String serverNodeId) {
+    public static boolean isServerNodeActive(String serverNodeId) {
         if (serverNodeId == null || serverNodeId.isEmpty()) {
             return false;
         }

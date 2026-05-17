@@ -8,6 +8,7 @@ import org.sunrise.game.config.ConfigReader;
 import org.sunrise.game.genProto.gen.LoginProto;
 import org.sunrise.game.genProto.gen.TopicProto;
 import org.sunrise.game.log.LogCore;
+import org.sunrise.game.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -147,12 +148,7 @@ public class BotManager {
             }, loginExecutor);
             futures.add(future);
 
-            try {
-                Thread.sleep(50);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                break;
-            }
+            Utils.sleep(30);
         }
 
         CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
@@ -258,7 +254,7 @@ public class BotManager {
                         try {
                             client.sendMsg(topicType, packetId, data);
                             if (i < times - 1 && interval > 0) {
-                                Thread.sleep(interval);
+                                Utils.sleep(interval);
                             }
                         } catch (Exception e) {
                             LogCore.Bot.error("Send message failed for bot: {}", bot.getUid(), e);

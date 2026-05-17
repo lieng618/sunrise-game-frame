@@ -28,7 +28,7 @@ public class BaseClient {
     private String nodeId = this.getClass().getSimpleName() + "@" + System.currentTimeMillis();
     private Channel serverChannel;
     private String serverNodeId;
-    private Boolean connectStatus = false;
+    private volatile Boolean connectStatus = false;
     private BaseMessageManager messageManager;
     private Function<ChannelHandler, String> clientHandler;
     private Function<ChannelHandler, String> pulseHandler;
@@ -120,13 +120,13 @@ public class BaseClient {
         });
     }
 
-    public void connectBlock(String ip, int port) throws InterruptedException {
+    public void connectBlock(String ip, int port) {
         connect(ip, port);
         while (true) {
             if (connectStatus) {
                 return;
             }
-            Thread.sleep(100);
+            Utils.sleep(30);
         }
     }
 

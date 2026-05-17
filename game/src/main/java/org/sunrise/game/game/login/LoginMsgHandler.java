@@ -89,7 +89,7 @@ public class LoginMsgHandler {
                     return;
                 }
                 // 假设开放0 1 2三个位置
-                if (msg.getPos() < 0 || msg.getPos() > 3) {
+                if (msg.getPos() < 0 || msg.getPos() > 2) {
                     return;
                 }
                 var humanLists = HumanObjectManger.uidPlays.get(connectObject.getUid());

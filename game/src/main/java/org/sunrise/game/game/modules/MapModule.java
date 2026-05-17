@@ -42,10 +42,10 @@ public class MapModule extends BaseModule {
     @Override
     public void load() {
         getDbData("id", new TypeReference<Integer>() {}, value -> lastMapId = value);
-        getDbData("mapPostX", new TypeReference<Integer>() {}, value -> mapPostX = value);
-        getDbData("mapPostY", new TypeReference<Integer>() {}, value -> mapPostY = value);
-        getDbData("mapPostZ", new TypeReference<Integer>() {}, value -> mapPostZ = value);
-        getDbData("Orientation", new TypeReference<Integer>() {}, value -> Orientation = value);
+        getDbData("mapPostX", new TypeReference<Float>() {}, value -> mapPostX = value);
+        getDbData("mapPostY", new TypeReference<Float>() {}, value -> mapPostY = value);
+        getDbData("mapPostZ", new TypeReference<Float>() {}, value -> mapPostZ = value);
+        getDbData("Orientation", new TypeReference<Float>() {}, value -> Orientation = value);
     }
 
     @Override

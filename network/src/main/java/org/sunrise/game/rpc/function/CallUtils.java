@@ -156,10 +156,11 @@ public class CallUtils {
             }
 
         } catch (Exception e) {
+            returns(curNodeId, ErrorType.RPC_CALL_CATCH);
             LogCore.RpcServer.error("recv call, handler error = {},  rpcId = {}, data = { {} }", e.getLocalizedMessage(), call.getRpcId(), call.getData());
         } finally {
             // 请求处理完，出栈
-            CallContext.pull();
+            CallContext.pop();
         }
     }
 

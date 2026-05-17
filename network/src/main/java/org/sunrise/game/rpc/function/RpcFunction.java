@@ -58,7 +58,7 @@ public class RpcFunction {
      */
     public static RpcFunction newInstance(String designatedNodeId) {
         // 指定的服务节点无效，则创建默认调用器，随机寻找一个节点发送
-        if (!RpcNodeManager.IsServerNodeActive(designatedNodeId)) {
+        if (!RpcNodeManager.isServerNodeActive(designatedNodeId)) {
             LogCore.RpcClient.warn("rpc newInstance SendDesignated, designatedNodeId is empty, create default");
             return new RpcFunction();
         }
@@ -125,7 +125,7 @@ public class RpcFunction {
             BaseClientManager.sendToServer(call);
             LogCore.RpcClient.debug("rpc call, callId = {}, messageId = { {} }, params = {}", call.getRpcId(), call.getMessageId(), params);
         } else if (callType == RpcCallType.SendDesignated) {
-            if (!RpcNodeManager.IsServerNodeActive(designatedServerNodeId)) {
+            if (!RpcNodeManager.isServerNodeActive(designatedServerNodeId)) {
                 LogCore.RpcClient.warn("rpc newInstance SendDesignated, designatedNodeId is empty, skip");
                 return false;
             }

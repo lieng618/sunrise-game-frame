@@ -6,6 +6,7 @@ import org.sunrise.game.config.ConfigReader;
 import org.sunrise.game.genProto.gen.LoginProto;
 import org.sunrise.game.genProto.gen.TopicProto;
 import org.sunrise.game.log.LogCore;
+import org.sunrise.game.utils.Utils;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -211,12 +212,7 @@ public class LoginManager {
             if (client.isConnectSuccess()) {
                 return true;
             }
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                return false;
-            }
+            Utils.sleep(100);
         }
         return false;
     }

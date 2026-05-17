@@ -84,12 +84,7 @@ public class GameSystemUtils {
                 break;
             }
 
-            try {
-                Thread.sleep(30);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                break;
-            }
+            Utils.sleep(30);
         }
     }
 

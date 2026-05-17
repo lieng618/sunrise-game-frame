@@ -14,6 +14,9 @@ public class CenterServerMessageManager extends ServerMessageManager {
     @Override
     protected void pulseHandlerOne(Object data) {
         var message = MessageUtils.fromMessage((byte[]) data, BaseMessage.class);
+        if (message == null) {
+            return;
+        }
         LogCore.BaseServer.debug("recv msg, cur NodeId = { {} }, from NodeId = { {} }, messageId = { {} }, data = { {} }", getNodeId(), message.getNodeId(), message.getMessageId(), message.getMsg());
         NodeManager.updateNode(message);
     }

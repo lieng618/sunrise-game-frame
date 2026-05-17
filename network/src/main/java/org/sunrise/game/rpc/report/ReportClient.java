@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.sunrise.game.core.client.BaseClient;
 import org.sunrise.game.core.client.BaseClientManager;
+import org.sunrise.game.utils.Utils;
 
 @Getter
 @Setter
@@ -21,11 +22,7 @@ public class ReportClient {
             @Override
             public void onFail() {
                 super.onFail();
-                try {
-                    Thread.sleep(5000);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
+                Utils.sleep(5000);
                 connectMaster(masterIp, masterPort);
             }
         };
@@ -43,11 +40,7 @@ public class ReportClient {
             @Override
             public void onFail() {
                 super.onFail();
-                try {
-                    Thread.sleep(5000);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
+                Utils.sleep(5000);
                 connectMaster(masterIp, masterPort);
             }
         };

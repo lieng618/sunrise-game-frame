@@ -75,7 +75,7 @@ public class ResetSystem extends BaseSystem {
             return;
         }
         for (HumanObject humanObject : HumanObjectManger.getHumanObjects()) {
-            if (humanObject.getModule(DataModule.class).getLastDailyRefreshTime() < cur) {
+            if (humanObject.getModule(DataModule.class).getLastWeekRefreshTime() < cur) {
                 for (Map.Entry<String, BaseModule> entry : humanObject.getModules().entrySet()) {
                     entry.getValue().weekReset();
                 }

@@ -6,6 +6,7 @@ import org.sunrise.game.core.client.BaseClientManager;
 import org.sunrise.game.core.message.BaseMessage;
 import org.sunrise.game.core.server.BaseServerManager;
 import org.sunrise.game.log.LogCore;
+import org.sunrise.game.rpc.report.ReportClient;
 import org.sunrise.game.rpc.report.ReportClientManager;
 import org.sunrise.game.utils.IdGenerator;
 
@@ -91,7 +92,11 @@ public class NodeManager {
     }
 
     public static void reportFull(String clientNode) {
-        String serverNodeId = ReportClientManager.getReportClient(clientNode).getConnectToCenter().getServerNodeId();
+        ReportClient reportClient = ReportClientManager.getReportClient(clientNode);
+        if (reportClient == null) {
+            return;
+        }
+        String serverNodeId = reportClient.getConnectToCenter().getServerNodeId();
         if (serverNodeId == null) {
             return;
         }
@@ -100,9 +105,9 @@ public class NodeManager {
         message.setNodeId(clientNode);
 
         Map<String, Object> data = new HashMap<>();
-        data.put("ip", ReportClientManager.getReportClient(clientNode).getClientIp());
-        data.put("port", ReportClientManager.getReportClient(clientNode).getClientPort());
-        data.put("id", ReportClientManager.getReportClient(clientNode).getServerId());
+        data.put("ip", reportClient.getClientIp());
+        data.put("port", reportClient.getClientPort());
+        data.put("id", reportClient.getServerId());
         message.setMsg(JSON.toJSONString(data));
         LogCore.ReportClient.info("report, cur NodeId = { {} }, serverNodeId = { {} }, data = { {} }", clientNode, serverNodeId, message);
         BaseClientManager.sendToServer(message);

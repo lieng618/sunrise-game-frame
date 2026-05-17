@@ -9,7 +9,7 @@ public class CallContext {
         callStack.addLast(call);
     }
 
-    public static void pull() {
+    public static void pop() {
         callStack.removeLast();
     }
 

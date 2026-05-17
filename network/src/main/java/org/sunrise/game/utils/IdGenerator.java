@@ -8,14 +8,14 @@ import org.sunrise.game.log.LogCore;
 public class IdGenerator {
     private static IdGeneratorOptions options;
 
-    public static void init(int WorkerId) {
+    public static void init(int workerId) {
         if (options == null) {
-            options = new IdGeneratorOptions((short) WorkerId); // 节点id 限制为1-4096
+            options = new IdGeneratorOptions((short) workerId); // 节点id 限制为1-4096
             options.WorkerIdBitLength = 12; // 2^12-1，即最多支持4096个节点。
             options.SeqBitLength = 10; // 限制每毫秒生成的ID个数。若生成速度超过5万个/秒，建议加大 SeqBitLength 到 10。
             options.BaseTime = 1727712000000L; // 基础时间，设定为2024-10-01 00:00:00
             YitIdHelper.setIdGenerator(options);
-            LogCore.RpcUtils.info("IdGenerator init, WorkerId = { {} }", WorkerId);
+            LogCore.RpcUtils.info("IdGenerator init, WorkerId = { {} }", workerId);
         }
     }
 

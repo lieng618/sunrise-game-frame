@@ -1,16 +1,17 @@
 package org.sunrise.game.core.client;
 
-import org.sunrise.game.log.LogCore;
 import org.sunrise.game.core.message.BaseMessage;
 import org.sunrise.game.core.message.MessageType;
 import org.sunrise.game.core.message.MessageUtils;
 import org.sunrise.game.core.message.SocketMessage;
+import org.sunrise.game.log.LogCore;
+import org.sunrise.game.utils.Utils;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class BaseClientManager {
-    private static final Map<String, BaseClient> baseClients = new HashMap<>();
+    private static final Map<String, BaseClient> baseClients = new ConcurrentHashMap<>();
 
     /**
      * 使用new BaseClient(),创建的客户端,需手动注册到管理器中
@@ -51,12 +52,8 @@ public class BaseClientManager {
         BaseClient baseClient = new BaseClient();
         while (true) {
             if (baseClients.containsKey(baseClient.getNodeId())) {
-                try {
-                    Thread.sleep(5);
-                    baseClient = new BaseClient();
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
+                Utils.sleep(1);
+                baseClient = new BaseClient();
             } else {
                 break;
             }

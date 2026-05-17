@@ -10,8 +10,10 @@ public class ConnectionManger {
         connections.put(connectId, new Connection(connectId, channel));
     }
     public static void removeConnect(String connectId) {
-        var Connection = connections.remove(connectId);
-        Connection.getChannel().close();
+        var connection = connections.remove(connectId);
+        if (connection != null) {
+            connection.getChannel().close();
+        }
     }
     public static Connection getConnect(String connectId) {
         return connections.get(connectId);

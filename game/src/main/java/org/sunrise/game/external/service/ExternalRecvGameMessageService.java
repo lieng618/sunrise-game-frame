@@ -99,7 +99,7 @@ public class ExternalRecvGameMessageService extends BaseService {
                 continue;
             }
             // 此客户断连接的游戏服已经断开连接 需要清理客户端
-            if (!RpcNodeManager.IsServerNodeActive(connection.getGameNodeId())) {
+            if (!RpcNodeManager.isServerNodeActive(connection.getGameNodeId())) {
                 if (connection.isActive()) {
                     connection.close();
                 }

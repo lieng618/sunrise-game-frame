@@ -3,6 +3,7 @@ package org.sunrise.game.thread;
 import lombok.Getter;
 import lombok.Setter;
 import org.sunrise.game.log.LogCore;
+import org.sunrise.game.utils.Utils;
 
 public class DispatchThread {
     private final Thread thread;
@@ -27,10 +28,10 @@ public class DispatchThread {
         while (!stopped) {
             try {
                 task.run();
-                Thread.sleep(interval);
             } catch (Exception e) {
                 LogCore.ServerStartUp.error("DispatchThread pulse, error : ", e);
             }
+            Utils.sleep(interval);
         }
     }
 
@@ -40,7 +41,7 @@ public class DispatchThread {
         LogCore.ServerStartUp.info("DispatchThread Start, name = { {} }, { {} }", thread.getName(), thread);
     }
 
-    public synchronized void shutdown() {
+    public void shutdown() {
         if (stopped)
             return;
         stopped = true;

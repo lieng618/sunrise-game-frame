@@ -2,6 +2,7 @@ package org.sunrise.game.core.message;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.msgpack.jackson.dataformat.MessagePackFactory;
+import org.sunrise.game.log.LogCore;
 
 public class MessageUtils {
 
@@ -12,8 +13,9 @@ public class MessageUtils {
         try {
             return objectMapper.readValue(bytes, clazz);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to deserialize message", e);
+            LogCore.RpcUtils.error("Failed to deserialize message", e);
         }
+        return null;
     }
 
     // 将对象序列化为 MessagePack 字节数组
@@ -21,7 +23,8 @@ public class MessageUtils {
         try {
             return objectMapper.writeValueAsBytes(message);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to serialize message", e);
+            LogCore.RpcUtils.error("Failed to serialize message", e);
         }
+        return new byte[0];
     }
 }

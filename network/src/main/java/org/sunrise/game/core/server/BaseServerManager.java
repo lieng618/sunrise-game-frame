@@ -5,6 +5,7 @@ import org.sunrise.game.core.message.BaseMessage;
 import org.sunrise.game.core.message.MessageType;
 import org.sunrise.game.core.message.MessageUtils;
 import org.sunrise.game.core.message.SocketMessage;
+import org.sunrise.game.utils.Utils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -45,12 +46,8 @@ public class BaseServerManager {
         BaseServer baseServer = new BaseServer();
         while (true) {
             if (baseServers.containsKey(baseServer.getNodeId())) {
-                try {
-                    Thread.sleep(1);
-                    baseServer = new BaseServer();
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
+                Utils.sleep(1);
+                baseServer = new BaseServer();
             } else {
                 break;
             }

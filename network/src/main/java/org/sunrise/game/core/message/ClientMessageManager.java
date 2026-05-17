@@ -15,6 +15,9 @@ public class ClientMessageManager extends BaseMessageManager {
     @Override
     protected void pulseHandlerOne(Object data) {
         var message = MessageUtils.fromMessage((byte[]) data, BaseMessage.class);
+        if (message == null) {
+            return;
+        }
         LogCore.BaseClient.debug("recv msg, cur NodeId = { {} }, from NodeId = { {} }, messageId = { {} }, data = { {} }", getNodeId(), message.getNodeId(), message.getMessageId(), message.getMsg());
     }
     @Override
