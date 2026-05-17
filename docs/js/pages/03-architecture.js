@@ -61,7 +61,7 @@ registerPage('architecture', '架构总览', '多进程架构、服务职责、�
         <span class="flow-node flow-node-secondary"> LogicUtils.handler()</span>
     </div>
 </div>
-<p>消息经过 External 转发时，External 会在首次转发时带上自己的 <code>externalNodeId</code>，Game 收到externalNodeId，则记录此玩家当前在这个对外服，后续回包直接通过rpc调用定向发送到该 External 节点。</p>
+<p>消息经过 External 转发时，External 会在首次转发时带上自己的 <code>externalNodeId</code>，Game 收到<code>externalNodeId</code>，则记录此玩家当前在这个对外服，后续回包直接通过rpc调用定向发送到该 External 节点。</p>
 
 <h3>服务器消息下行（Game → Client）</h3>
 <div class="flow-diagram">
