@@ -122,8 +122,12 @@ public class BaseClient {
 
     public void connectBlock(String ip, int port) {
         connect(ip, port);
-        while (true) {
-            if (connectStatus) {
+        long timeout = 5000;
+        long start = System.currentTimeMillis();
+
+        while (!connectStatus) {
+            if (System.currentTimeMillis() - start > timeout) {
+                LogCore.BaseClient.error("connectBlock timeout: ip = {}, port = {}", ip, port);
                 return;
             }
             Utils.sleep(30);

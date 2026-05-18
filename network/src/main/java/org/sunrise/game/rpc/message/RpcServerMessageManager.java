@@ -10,6 +10,7 @@ import org.sunrise.game.rpc.function.RpcFunction;
 import org.sunrise.game.rpc.function.RpcManager;
 import org.sunrise.game.rpc.service.ServiceManager;
 
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -59,9 +60,12 @@ public class RpcServerMessageManager extends ServerMessageManager {
      */
     private void pulseListenRpcTimeout() {
         long cur = System.currentTimeMillis();
-        for (Map.Entry<Long, Long> entry : RpcManager.checkTimeout.entrySet()) {
+        Iterator<Map.Entry<Long, Long>> iterator = RpcManager.checkTimeout.entrySet().iterator();
+
+        while (iterator.hasNext()) {
+            Map.Entry<Long, Long> entry = iterator.next();
             if (cur > entry.getValue()) {
-                RpcManager.checkTimeout.remove(entry.getKey());
+                iterator.remove();
                 RpcManager.callTimeOut(entry.getKey());
             }
         }

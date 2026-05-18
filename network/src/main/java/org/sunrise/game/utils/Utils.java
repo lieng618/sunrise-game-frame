@@ -49,7 +49,7 @@ public class Utils {
             InetAddress inetAddress = InetAddress.getLocalHost();
             return inetAddress.getHostAddress();
         } catch (Exception e) {
-            return null;
+            return "127.0.0.1";
         }
     }
 

@@ -1,17 +1,17 @@
 package org.sunrise.game.core.server;
 
-import org.sunrise.game.log.LogCore;
 import org.sunrise.game.core.message.BaseMessage;
 import org.sunrise.game.core.message.MessageType;
 import org.sunrise.game.core.message.MessageUtils;
 import org.sunrise.game.core.message.SocketMessage;
+import org.sunrise.game.log.LogCore;
 import org.sunrise.game.utils.Utils;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class BaseServerManager {
-    private static final Map<String, BaseServer> baseServers = new HashMap<>();
+    private static final Map<String, BaseServer> baseServers = new ConcurrentHashMap<>();
 
     /**
      * 使用new BaseServer(),创建的服务器,需手动注册到管理器中

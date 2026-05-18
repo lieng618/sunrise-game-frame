@@ -14,13 +14,13 @@ import java.util.function.Consumer;
 
 public class DbService {
 
-    private HikariDataSource dataSource;
-    private ExecutorService dbExecutor;
+    private final HikariDataSource dataSource;
+    private final ExecutorService dbExecutor;
 
     public DbService() {
         Properties properties = ConfigReader.getProp();
         if (properties == null) {
-            return;
+            properties = getDefaultDbConfig();
         }
         HikariConfig config = new HikariConfig();
         config.setJdbcUrl(properties.getProperty("jdbc.url"));
@@ -34,6 +34,20 @@ public class DbService {
 
         dataSource = new HikariDataSource(config);
         dbExecutor = Executors.newFixedThreadPool(Math.max(2, Runtime.getRuntime().availableProcessors()));
+    }
+
+    // 获取默认数据库配置（当配置未加载时使用）
+    private Properties getDefaultDbConfig() {
+        Properties prop = new Properties();
+        prop.setProperty("jdbc.url", "jdbc:mysql://127.0.0.1:3306/sunrise");
+        prop.setProperty("jdbc.user", "root");
+        prop.setProperty("jdbc.password", "123456");
+        prop.setProperty("jdbc.maximumPoolSize", "5");
+        prop.setProperty("jdbc.minimumIdle", "3");
+        prop.setProperty("jdbc.connectionTimeout", "30000");
+        prop.setProperty("jdbc.idleTimeout", "600000");
+        prop.setProperty("jdbc.maxLifetime", "1800000");
+        return prop;
     }
 
     public Connection getConnection() throws SQLException {

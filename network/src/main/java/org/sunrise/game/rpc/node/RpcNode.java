@@ -46,7 +46,7 @@ public class RpcNode {
     private EventLoopGroup group = null;
     private Bootstrap b = null;
     private BaseServer rpcServer;
-    private Map<Integer, BaseClient> connectToOthers = new ConcurrentHashMap<>();
+    private final Map<Integer, BaseClient> connectToOthers = new ConcurrentHashMap<>();
     private RpcClientMessageManager fromOtherMessageManager = null;
 
     public RpcNode(int serverId) {
@@ -128,15 +128,21 @@ public class RpcNode {
     }
 
     public void otherOffline(int id) {
-        BaseClient remove = connectToOthers.remove(id);
-        if (remove != null) {
-            BaseClientManager.remove(remove.getNodeId());
+        BaseClient removeClient;
 
-            // 更新RpcFunction.callIdNodes
+        synchronized (connectToOthers) {
+            // 原子：先移除连接
+            removeClient = connectToOthers.remove(id);
+            if (removeClient == null) {
+                return;
+            }
+            String serverNodeId = removeClient.getServerNodeId();
             for (List<String> callIdNodes : RpcFunction.callIdNodes.values()) {
-                callIdNodes.remove(remove.getServerNodeId());
+                callIdNodes.remove(serverNodeId);
             }
         }
+
+        BaseClientManager.remove(removeClient.getNodeId());
     }
 
     public void connectOther(BaseMessage message) {

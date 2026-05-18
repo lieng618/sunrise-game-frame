@@ -154,9 +154,13 @@ public class RpcFunction {
      */
     public void listenResult(Callback<RpcResult> callback, Object... contexts) {
         if (calls.isEmpty()) {
+            LogCore.RpcClient.error("rpc listenResult, calls empty");
             return;
         }
         Call last = calls.getLast();
+        if (contexts.length % 2 != 0) {
+            LogCore.RpcClient.error("rpc listenResult, contexts length error, contexts = {}", contexts);
+        }
         CallResult callResult = new CallResult(callback, contexts);
         if (last.getNodeId() != null) {
             RpcManager.registerCallback(last.getMessageId(), callResult);

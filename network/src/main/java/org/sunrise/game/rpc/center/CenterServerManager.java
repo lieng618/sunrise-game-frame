@@ -4,7 +4,7 @@ import lombok.Getter;
 
 public class CenterServerManager {
     @Getter
-    public static CenterServer centerServer;
+    private static CenterServer centerServer;
 
     public static CenterServer createCenterServer(int id, String ip, int port) {
         centerServer = new CenterServer(id, ip, port);
