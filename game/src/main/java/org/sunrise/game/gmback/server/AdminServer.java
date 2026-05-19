@@ -13,6 +13,7 @@ import org.sunrise.game.gmback.server.controller.AnnouncementController;
 import org.sunrise.game.gmback.server.controller.BanHumanController;
 import org.sunrise.game.gmback.server.controller.ControllerManager;
 import org.sunrise.game.gmback.server.controller.GmController;
+import org.sunrise.game.gmback.server.controller.HotswapController;
 import org.sunrise.game.gmback.server.controller.MuteHumanController;
 import org.sunrise.game.gmback.server.controller.NodeController;
 import org.sunrise.game.gmback.server.controller.OnlinePlayerController;
@@ -94,6 +95,7 @@ public class AdminServer {
         app.post("/api/login", ControllerManager.getController(AuthController.class)::login);
         app.get("/api/nodes", ControllerManager.getController(NodeController.class)::list);
         app.post("/api/config/reload", ControllerManager.getController(NodeController.class)::reloadConfig);
+        app.post("/api/hotswap/jar", ControllerManager.getController(HotswapController.class)::hotswapJar);
         app.post("/api/gm/send-mail", ControllerManager.getController(GmController.class)::sendMail);
         app.post("/api/gm/kick", ControllerManager.getController(GmController.class)::kick);
         app.get("/api/logs", ControllerManager.getController(OperationLogController.class)::list);

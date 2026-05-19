@@ -2,6 +2,7 @@ package org.sunrise.game.game.service;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
+import org.sunrise.game.core.HotswapScanner;
 import org.sunrise.game.game.human.HumanObjectManger;
 import org.sunrise.game.game.logic.ConfigUtils;
 import org.sunrise.game.genRpc.gen.CallEnum;
@@ -46,6 +47,9 @@ public class GameRecvGmBackMessageService extends BaseService {
                     case "muteHumanList":
                         handleMuteHumanList(dataMap);
                         break;
+                    case "hotswapJar":
+                        handleHotswapJar(dataMap);
+                        break;
                     default:
                         LogCore.GameServer.warn("Unknown GM operation: {}", operation);
                         break;
@@ -81,6 +85,25 @@ public class GameRecvGmBackMessageService extends BaseService {
         HumanObjectManger.banHumanQueue.addAll(bans);
         HumanObjectManger.deleteHumanQueue.addAll(bans);
         LogCore.GameServer.debug("Received BanHumanList command, humanIds: {}", humanIds);
+    }
+
+    /**
+     * 处理代码热更 JAR
+     */
+    private void handleHotswapJar(Map<String, Object> data) {
+        String jarPath = (String) data.get("jarPath");
+        if (jarPath == null || jarPath.isEmpty()) {
+            LogCore.GameServer.error("hotswapJar: jarPath is empty");
+            return;
+        }
+        LogCore.GameServer.info("Received hotswapJar command, jarPath: {}", jarPath);
+        try {
+            HotswapScanner scanner = new HotswapScanner(jarPath);
+            scanner.reloadClasses();
+            LogCore.GameServer.info("Hotswap jar [{}] result:\n{}", jarPath, scanner.getRecentLogs());
+        } catch (Exception e) {
+            LogCore.GameServer.error("Hotswap jar [{}] failed", jarPath, e);
+        }
     }
 
     /**

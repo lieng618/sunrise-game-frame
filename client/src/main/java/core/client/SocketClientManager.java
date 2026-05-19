@@ -1,15 +1,12 @@
 package core.client;
 
 import lombok.Getter;
-import lombok.Setter;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-@Getter
-@Setter
 public class SocketClientManager {
     @Getter
-    private static ConcurrentHashMap<String, SocketClient> clients = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, SocketClient> clients = new ConcurrentHashMap<>();
     public static void addClient(SocketClient client) {
         clients.put(client.uid, client);
     }

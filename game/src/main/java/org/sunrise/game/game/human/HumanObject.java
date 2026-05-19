@@ -97,6 +97,7 @@ public class HumanObject {
     }
 
     public Map<String, String> save() {
+        roleData.clear();
         for (Map.Entry<String, BaseModule> entry : modules.entrySet()) {
             entry.getValue().save();
             if (!entry.getValue().getDataMap().isEmpty()) {

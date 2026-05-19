@@ -106,3 +106,8 @@ body {
     background: linear-gradient(135deg, #5bb6c2 0%, #051d96 100%);
     color: white;
 }
+
+.operation-type.HOTSWAP_JAR {
+    background: linear-gradient(135deg, #5bb6c2 0%, #16a134 100%);
+    color: white;
+}

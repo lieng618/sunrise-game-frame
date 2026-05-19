@@ -68,6 +68,12 @@
                     </el-icon>
                     <span>配置更新</span>
                 </el-menu-item>
+                <el-menu-item index="hotswap_jar">
+                    <el-icon>
+                        <Upload/>
+                    </el-icon>
+                    <span>代码热更</span>
+                </el-menu-item>
                 <el-menu-item index="send_mail">
                     <el-icon>
                         <Message/>
@@ -177,6 +183,7 @@
                     'server_status': 'server_status.html',
                     'online_player': 'online_player.html',
                     'config_update': 'config_update.html',
+                    'hotswap_jar': 'hotswap_jar.html',
                     'send_mail': 'send_mail.html',
                     'kick_human': 'kick_human.html',
                     'ban_player': 'ban_player.html',
@@ -194,6 +201,7 @@
                 if (state.activeTab === 'server_status') return '服务器关闭';
                 if (state.activeTab === 'online_player') return '在线玩家';
                 if (state.activeTab === 'config_update') return '配置更新';
+                if (state.activeTab === 'hotswap_jar') return '代码热更';
                 if (state.activeTab === 'send_mail') return '发送邮件';
                 if (state.activeTab === 'kick_human') return '玩家下线';
                 if (state.activeTab === 'ban_player') return '玩家封禁';

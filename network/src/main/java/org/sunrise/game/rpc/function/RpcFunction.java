@@ -10,8 +10,8 @@ import org.sunrise.game.utils.IdGenerator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * 使用rpc需创建RpcNode，一个进程仅能创建一个RpcNode
@@ -116,8 +116,7 @@ public class RpcFunction {
             }
 
             // 随机挑选一个远端进行发送
-            Random random = new Random();
-            int index = random.nextInt(callNode.size());
+            int index = ThreadLocalRandom.current().nextInt(callNode.size());
             Call call = new Call(getCurNodeByServerNode(callNode.get(index)), id);
             call.setType(CallType.Call.ordinal());
             call.setData(params);

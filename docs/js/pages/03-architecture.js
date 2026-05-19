@@ -122,7 +122,7 @@ registerPage('architecture', '架构总览', '多进程架构、服务职责、�
         <span class="flow-node flow-node-secondary">Game A/B/C</span>
     </div>
 </div>
-<p>GM 后台通过 <code>GameRecvGmBackMessageService_recvMessage</code> 广播指令（reloadConfig/kickHuman/banHumanList/muteHumanList），每个 Game 节点根据本地在线玩家情况执行对应动作。</p>
+<p>GM 后台通过 <code>GameRecvGmBackMessageService_recvMessage</code> 广播指令（reloadConfig/hotswapJar/kickHuman/banHumanList/muteHumanList），每个 Game 节点根据本地在线玩家情况执行对应动作。</p>
 
 <h2>单线程无锁设计</h2>
 <p>本项目采用 <strong>单线程 DispatchThread + 消息队列</strong> 模型：</p>

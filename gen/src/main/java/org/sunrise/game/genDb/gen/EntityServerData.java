@@ -1,24 +1,31 @@
 package org.sunrise.game.genDb.gen;
 
-import lombok.Data;
+import lombok.Value;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Map;
 
-@Data
+/**
+ * 数据库表 server_data 的不可变实体类
+ * 自动生成，请勿手动修改
+ */
+@Value
 public class EntityServerData {
-    private final int id;
-    private final LocalDateTime create_time;
-    private final LocalDateTime update_time;
-    private final int server_id;
-    private final String name;
-    private final byte[] data;
+    int id;
+    LocalDateTime createTime;
+    LocalDateTime updateTime;
+    int serverId;
+    String name;
+    byte[] data;
 
     public EntityServerData(Map<String, Object> dataMap) {
-        this.id = (int) dataMap.get("id");
-        this.create_time = (LocalDateTime) dataMap.get("create_time");
-        this.update_time = (LocalDateTime) dataMap.get("update_time");
-        this.server_id = (int) dataMap.get("server_id");
-        this.name = (String) dataMap.get("name");
-        this.data = (byte[]) dataMap.get("data");
+        this.id = EntityConverter.convertToType(dataMap.get("id"), int.class);
+        this.createTime = EntityConverter.convertToType(dataMap.get("create_time"), LocalDateTime.class);
+        this.updateTime = EntityConverter.convertToType(dataMap.get("update_time"), LocalDateTime.class);
+        this.serverId = EntityConverter.convertToType(dataMap.get("server_id"), int.class);
+        this.name = EntityConverter.convertToType(dataMap.get("name"), String.class);
+        this.data = EntityConverter.convertToType(dataMap.get("data"), byte[].class);
     }
 }

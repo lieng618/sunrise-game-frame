@@ -10,6 +10,7 @@
     </parent>
 
     <artifactId>game</artifactId>
+    <version>${project.sunrise.version}</version>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
@@ -21,12 +22,17 @@
         <dependency>
             <groupId>org.sunrise.game</groupId>
             <artifactId>network</artifactId>
-            <version>1.0</version>
+            <version>${project.sunrise.version}</version>
         </dependency>
         <dependency>
             <groupId>org.sunrise.game</groupId>
             <artifactId>gen</artifactId>
-            <version>1.0</version>
+            <version>${project.sunrise.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.sunrise.game</groupId>
+            <artifactId>hotswap</artifactId>
+            <version>${project.sunrise.version}</version>
         </dependency>
     </dependencies>
 

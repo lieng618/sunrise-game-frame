@@ -25,6 +25,7 @@ public class OperationLogController extends BaseController {
         SEND_MAIL("发送邮件"),
         KICK_PLAYER("踢出玩家"),
         RELOAD_CONFIG("热更配置"),
+        HOTSWAP_JAR("代码热更"),
         TOGGLE_NODE("切换节点状态"),
         USER_MANAGER("用户管理"),
         BAN_PLAYER("封禁玩家"),

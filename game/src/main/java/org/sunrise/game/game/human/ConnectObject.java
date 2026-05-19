@@ -77,11 +77,11 @@ public class ConnectObject {
         LoginProto.MS2C_HumanList.Builder builder = LoginProto.MS2C_HumanList.newBuilder();
         for (EntityHumanList entityInfo : humanLists) {
             LoginProto.STHumanShowInfo.Builder humanBuilder = LoginProto.STHumanShowInfo.newBuilder();
-            humanBuilder.setHumanId(entityInfo.getHuman_id());
+            humanBuilder.setHumanId(entityInfo.getHumanId());
             humanBuilder.setName(entityInfo.getName());
             humanBuilder.setLevel(entityInfo.getLevel());
             humanBuilder.setPos(entityInfo.getPos());
-            humanBuilder.setServerId(entityInfo.getServer_id());
+            humanBuilder.setServerId(entityInfo.getServerId());
 
             builder.addHumanList(humanBuilder);
         }

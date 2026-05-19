@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.sunrise.game</groupId>
+        <artifactId>sunrise-game-frame</artifactId>
+        <version>1.0</version>
+    </parent>
+
+    <artifactId>hotswap</artifactId>
+    <version>${project.sunrise.version}</version>
+
+    <properties>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <!-- 热更模块不需要任何外部依赖，只依赖JDK自带的instrument API -->
+    <dependencies>
+        <!-- 无任何依赖，保持Agent Jar最小化 -->
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- 核心：配置JAR插件生成符合Agent规范的MANIFEST.MF -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.4.1</version>
+                <configuration>
+                    <archive>
+                        <!-- 自动生成MANIFEST.MF并添加Agent必需的属性 -->
+                        <manifestEntries>
+                            <!-- 指定Agent入口类（必须和Hotswap.java的全类名一致） -->
+                            <Premain-Class>org.sunrise.game.core.Hotswap</Premain-Class>
+                            <!-- 声明允许类重定义（核心权限，缺一不可） -->
+                            <Can-Redefine-Classes>true</Can-Redefine-Classes>
+                            <Can-Retransform-Classes>true</Can-Retransform-Classes>
+                            <!-- 可选：添加版本信息方便排查 -->
+                            <Implementation-Title>Hotswap Agent</Implementation-Title>
+                            <Implementation-Version>${project.version}</Implementation-Version>
+                        </manifestEntries>
+                    </archive>
+                    <!-- 可选：输出到和业务Jar相同的目录，方便部署 -->
+                    <outputDirectory>${project.basedir}/../start/jar</outputDirectory>
+                    <!-- 最终生成的Agent Jar名称 -->
+                    <finalName>hotswap-agent</finalName>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

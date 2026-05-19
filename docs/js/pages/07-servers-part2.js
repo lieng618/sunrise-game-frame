@@ -10,7 +10,7 @@ registerPage('game-server', '游戏服', '玩家对象、模块系统、消息�
     <li>玩家模块生命周期管理（init/load/save/sendToClient）</li>
     <li>定时保存玩家数据（每分钟）</li>
     <li>调用 Global 服完成跨服业务</li>
-    <li>响应 GM 后台命令（reloadConfig/kick/ban/mute）</li>
+    <li>响应 GM 后台命令（reloadConfig/hotswapJar/kick/ban/mute）</li>
 </ul>
 
 <h2>GameServerStartUp 启动流程</h2>
@@ -378,6 +378,7 @@ registerPage('gmback-server', 'GM 后台', '登录认证、节点监控、配置
     <li>JWT 登录认证（HS256 签名 + Token 黑名单）</li>
     <li>节点监控（查看所有 RPC 节点状态）</li>
     <li>热更配置（广播 reloadConfig 给所有 Game 节点）</li>
+    <li>代码热更（广播 hotswapJar，通过 JVM Agent redefine 类）</li>
     <li>发送邮件（单人/群发/全服）</li>
     <li>踢人下线（广播 kickHuman）</li>
     <li>封禁/禁言名单广播（banHumanList/muteHumanList）</li>
@@ -393,7 +394,8 @@ registerPage('gmback-server', 'GM 后台', '登录认证、节点监控、配置
 <tr><td>/api/nodes</td><td>GET</td><td>获取所有节点状态</td><td>需要</td></tr>
 <tr><td>/api/gm/send-mail</td><td>POST</td><td>发送邮件</td><td>需要</td></tr>
 <tr><td>/api/gm/kick</td><td>POST</td><td>踢玩家下线</td><td>需要</td></tr>
-<tr><td>/api/gm/reload-config</td><td>POST</td><td>热更配置</td><td>需要</td></tr>
+<tr><td>/api/config/reload</td><td>POST</td><td>热更配置</td><td>需要</td></tr>
+<tr><td>/api/hotswap/jar</td><td>POST</td><td>代码热更 JAR</td><td>需要</td></tr>
 <tr><td>/api/ban/add</td><td>POST</td><td>添加封禁</td><td>需要</td></tr>
 <tr><td>/api/ban/remove</td><td>POST</td><td>解除封禁</td><td>需要</td></tr>
 <tr><td>/api/ban/list</td><td>GET</td><td>封禁列表</td><td>需要</td></tr>
@@ -435,6 +437,7 @@ registerPage('gmback-server', 'GM 后台', '登录认证、节点监控、配置
 <tr><td>server_status.html</td><td>服务器开关/白名单</td></tr>
 <tr><td>online_player.html</td><td>在线玩家</td></tr>
 <tr><td>config_update.html</td><td>配置热更</td></tr>
+<tr><td>hotswap_jar.html</td><td>代码热更 JAR</td></tr>
 <tr><td>send_mail.html</td><td>发送邮件</td></tr>
 <tr><td>kick_human.html</td><td>踢人下线</td></tr>
 <tr><td>ban_player.html</td><td>封禁管理</td></tr>

@@ -1,30 +1,35 @@
 package org.sunrise.game.db.entity;
 
-import lombok.Data;
+import lombok.Value;
+
 import java.time.LocalDateTime;
 import java.util.Map;
 
-@Data
+/**
+ * 数据库表 human_list 的不可变实体类
+ * 自动生成，请勿手动修改
+ */
+@Value
 public class EntityHumanList {
-    private final int id;
-    private final LocalDateTime create_time;
-    private final LocalDateTime update_time;
-    private final String uid;
-    private final String human_id;
-    private final int server_id;
-    private final int pos;
-    private final String name;
-    private final int level;
+    int id;
+    LocalDateTime createTime;
+    LocalDateTime updateTime;
+    String uid;
+    String humanId;
+    int serverId;
+    int pos;
+    String name;
+    int level;
 
     public EntityHumanList(Map<String, Object> dataMap) {
-        this.id = (int) dataMap.get("id");
-        this.create_time = (LocalDateTime) dataMap.get("create_time");
-        this.update_time = (LocalDateTime) dataMap.get("update_time");
-        this.uid = (String) dataMap.get("uid");
-        this.human_id = (String) dataMap.get("human_id");
-        this.server_id = (int) dataMap.get("server_id");
-        this.pos = (int) dataMap.get("pos");
-        this.name = (String) dataMap.get("name");
-        this.level = (int) dataMap.get("level");
+        this.id = EntityConverter.convertToType(dataMap.get("id"), int.class);
+        this.createTime = EntityConverter.convertToType(dataMap.get("create_time"), LocalDateTime.class);
+        this.updateTime = EntityConverter.convertToType(dataMap.get("update_time"), LocalDateTime.class);
+        this.uid = EntityConverter.convertToType(dataMap.get("uid"), String.class);
+        this.humanId = EntityConverter.convertToType(dataMap.get("human_id"), String.class);
+        this.serverId = EntityConverter.convertToType(dataMap.get("server_id"), int.class);
+        this.pos = EntityConverter.convertToType(dataMap.get("pos"), int.class);
+        this.name = EntityConverter.convertToType(dataMap.get("name"), String.class);
+        this.level = EntityConverter.convertToType(dataMap.get("level"), int.class);
     }
 }

@@ -1,24 +1,31 @@
 package org.sunrise.game.genDb.gen;
 
-import lombok.Data;
+import lombok.Value;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Map;
 
-@Data
+/**
+ * 数据库表 rpc_server_system 的不可变实体类
+ * 自动生成，请勿手动修改
+ */
+@Value
 public class EntityRpcServerSystem {
-    private final int id;
-    private final LocalDateTime create_time;
-    private final LocalDateTime update_time;
-    private final String ip;
-    private final int port;
-    private final int status;
+    int id;
+    LocalDateTime createTime;
+    LocalDateTime updateTime;
+    String ip;
+    int port;
+    int status;
 
     public EntityRpcServerSystem(Map<String, Object> dataMap) {
-        this.id = (int) dataMap.get("id");
-        this.create_time = (LocalDateTime) dataMap.get("create_time");
-        this.update_time = (LocalDateTime) dataMap.get("update_time");
-        this.ip = (String) dataMap.get("ip");
-        this.port = (int) dataMap.get("port");
-        this.status = (int) dataMap.get("status");
+        this.id = EntityConverter.convertToType(dataMap.get("id"), int.class);
+        this.createTime = EntityConverter.convertToType(dataMap.get("create_time"), LocalDateTime.class);
+        this.updateTime = EntityConverter.convertToType(dataMap.get("update_time"), LocalDateTime.class);
+        this.ip = EntityConverter.convertToType(dataMap.get("ip"), String.class);
+        this.port = EntityConverter.convertToType(dataMap.get("port"), int.class);
+        this.status = EntityConverter.convertToType(dataMap.get("status"), int.class);
     }
 }

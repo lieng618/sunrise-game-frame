@@ -99,7 +99,7 @@ public class LoginMsgHandler {
 
                 EntityHumanList humanShowInfo = null;
                 for (EntityHumanList entityInfo : humanLists) {
-                    if (entityInfo.getPos() == msg.getPos() && entityInfo.getServer_id() == msg.getServerId()) {
+                    if (entityInfo.getPos() == msg.getPos() && entityInfo.getServerId() == msg.getServerId()) {
                         humanShowInfo = entityInfo;
                         break;
                     }
@@ -127,10 +127,10 @@ public class LoginMsgHandler {
                     DbManager.getDbService().executeAsync("insert into `human_info` (human_id, role_data) values (?,?)", humanId, JSON.toJSONBytes(humanObject.save()));
                 } else {
                     // 检测是否被封禁
-                    boolean ban = HumanObjectManger.banHumanQueue.contains(humanShowInfo.getHuman_id());
+                    boolean ban = HumanObjectManger.banHumanQueue.contains(humanShowInfo.getHumanId());
                     // 根据玩家id 加载数据
                     // 重连无需加载
-                    HumanObject humanObject = HumanObjectManger.getHumanObject(humanShowInfo.getHuman_id());
+                    HumanObject humanObject = HumanObjectManger.getHumanObject(humanShowInfo.getHumanId());
                     if (humanObject != null) {
                         // 清理旧的连接对象
                         humanObject.getConnectObject().kick("login elsewhere");
@@ -138,7 +138,7 @@ public class LoginMsgHandler {
                         HumanObjectManger.humanIds.remove(humanObject.getConnectObject().getConnectId());
                         // 设置新的连接对象
                         humanObject.setConnectObject(connectObject);
-                        HumanObjectManger.humanIds.put(connectId, humanShowInfo.getHuman_id());
+                        HumanObjectManger.humanIds.put(connectId, humanShowInfo.getHumanId());
                         // 选择角色回包
                         connectObject.onSelectHuman();
                         humanObject.sendHumanData();
@@ -150,7 +150,7 @@ public class LoginMsgHandler {
                             HumanObjectManger.removeConnectObject(connectId);
                             return;
                         }
-                        loadHumanInfo(connectId, humanShowInfo.getServer_id(), humanShowInfo.getHuman_id());
+                        loadHumanInfo(connectId, humanShowInfo.getServerId(), humanShowInfo.getHumanId());
                     }
                 }
                 break;
@@ -198,13 +198,13 @@ public class LoginMsgHandler {
                 if (result != null) {
                     EntityHumanInfo entityHumanInfo = new EntityHumanInfo(result);
 
-                    HumanObjectManger.humanIds.put(connectId, entityHumanInfo.getHuman_id());
+                    HumanObjectManger.humanIds.put(connectId, entityHumanInfo.getHumanId());
                     // 创建玩家 并解析数据
-                    createHumanObject(connectId, serverId, entityHumanInfo.getHuman_id(), false);
+                    createHumanObject(connectId, serverId, entityHumanInfo.getHumanId(), false);
 
-                    HumanObject humanObject = HumanObjectManger.getHumanObject(entityHumanInfo.getHuman_id());
+                    HumanObject humanObject = HumanObjectManger.getHumanObject(entityHumanInfo.getHumanId());
                     humanObject.getConnectObject().onSelectHuman();
-                    humanObject.load(entityHumanInfo.getRole_data());
+                    humanObject.load(entityHumanInfo.getRoleData());
                     humanObject.sendHumanData();
                 } else {
                     // human_list和human_info表数据不匹配

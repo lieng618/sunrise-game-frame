@@ -45,20 +45,28 @@ public class TcpClient extends SocketClient {
                             pipeline.addLast(new SimpleChannelInboundHandler<SocketMessage>() {
                                 @Override
                                 public void channelActive(ChannelHandlerContext ctx) {
-                                    String connectMessage = Utils.CLIENT_CONNECT;
-                                    ctx.writeAndFlush(new SocketMessage(MessageType.biz, connectMessage.getBytes(StandardCharsets.UTF_8)));
-                                }
-
-                                @Override
-                                public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-                                    super.channelInactive(ctx);
-                                    connectSuccess = false;
+                                    sendInitialMessage(ctx);
+                                    connectSuccess = true;
                                 }
 
                                 @Override
                                 protected void channelRead0(ChannelHandlerContext ctx, SocketMessage socketMessage) throws Exception {
                                     byte[] data = socketMessage.getData();
                                     MessageHandler.handler(uid, data);
+                                }
+
+                                private void sendInitialMessage(ChannelHandlerContext ctx) {
+                                    String connectMessage = Utils.CLIENT_CONNECT;
+                                    SocketMessage initialMessage = new SocketMessage(MessageType.biz, connectMessage.getBytes(StandardCharsets.UTF_8));
+                                    ctx.writeAndFlush(initialMessage);
+                                    LogCore.Client.info("Sent initial message: {}", connectMessage);
+                                }
+
+                                @Override
+                                public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+                                    super.channelInactive(ctx);
+                                    connectSuccess = false;
+                                    group.shutdownGracefully();
                                 }
 
                                 @Override
@@ -72,7 +80,6 @@ public class TcpClient extends SocketClient {
             b.connect(host, port).addListener((ChannelFutureListener) future -> {
                 if (future.isSuccess()) {
                     this.channel = future.channel();
-                    connectSuccess = true;
                     // 异步监听连接关闭事件
                     future.channel().closeFuture().addListener((ChannelFutureListener) closeFuture -> group.shutdownGracefully());
                 } else {
