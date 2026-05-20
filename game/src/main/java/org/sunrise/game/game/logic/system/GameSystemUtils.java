@@ -155,7 +155,7 @@ public class GameSystemUtils {
         long cur = System.currentTimeMillis();
 
         // 每分钟保存一次数据库
-        if (lastSaveDbTime + ToolsUtils.MINUTE_MILLS <= cur) {
+        if (lastSaveDbTime + ToolsUtils.MINUTE_MILLIS <= cur) {
             lastSaveDbTime = cur;
             save();
         }

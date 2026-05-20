@@ -124,7 +124,7 @@ public class GameMasterService extends BaseService {
     private void pulseHandlerHumanDbSave() {
         long cur = System.currentTimeMillis();
         for (HumanObject humanObject : HumanObjectManger.getHumanObjects()) {
-            if (humanObject.getLastSaveDbTime() + ToolsUtils.MINUTE_MILLS < cur) {
+            if (humanObject.getLastSaveDbTime() + ToolsUtils.MINUTE_MILLIS < cur) {
                 humanObject.setLastSaveDbTime(cur);
                 DbManager.getDbService().executeAsync("update `human_info` set `role_data` = ? where `human_id` = ?", JSON.toJSONBytes(humanObject.save()),  humanObject.getHumanId());
             }
