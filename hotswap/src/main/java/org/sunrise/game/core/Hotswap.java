@@ -69,19 +69,6 @@ public final class Hotswap {
     }
 
     private static byte[] loadBytesFromClassFile(File classFile) throws IOException {
-//        byte[] buffer = new byte[(int) classFile.length()];
-//        FileInputStream fis = new FileInputStream(classFile);
-//        BufferedInputStream bis = new BufferedInputStream(fis);
-//
-//        try {
-//            bis.read(buffer);
-//        } catch (IOException var8) {
-//            throw var8;
-//        } finally {
-//            bis.close();
-//        }
-//
-//        return buffer;
         try (FileInputStream fis = new FileInputStream(classFile);
              BufferedInputStream bis = new BufferedInputStream(fis)) {
             return bis.readAllBytes();
@@ -89,26 +76,6 @@ public final class Hotswap {
     }
 
     private static byte[] loadBytesFromJarFile(Class<?> cls, File file) throws IOException, ClassNotFoundException {
-//        try (JarFile jarFile = new JarFile(file)) {
-//            String name = cls.getName();
-//            name = name.replaceAll("\\.", "/") + ".class";
-//            JarEntry en = jarFile.getJarEntry(name);
-//            if (en == null) {
-//                throw new ClassNotFoundException(name);
-//            } else {
-//                byte[] buffer = new byte[(int) en.getSize()];
-//                BufferedInputStream bis = new BufferedInputStream(jarFile.getInputStream(en));
-//                try {
-//                    bis.read(buffer);
-//                } catch (IOException var11) {
-//                    throw var11;
-//                } finally {
-//                    bis.close();
-//                }
-//
-//                return buffer;
-//            }
-//        }
         try (JarFile jarFile = new JarFile(file)) {
             String name = cls.getName().replace('.', '/') + ".class";
             JarEntry en = jarFile.getJarEntry(name);

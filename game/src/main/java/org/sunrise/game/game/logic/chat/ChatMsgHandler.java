@@ -4,6 +4,7 @@ import org.sunrise.game.game.annotation.MsgHandlerClass;
 import org.sunrise.game.game.annotation.MsgHandlerMethod;
 import org.sunrise.game.game.human.HumanObject;
 import org.sunrise.game.game.human.HumanObjectManger;
+import org.sunrise.game.game.logic.gm.GmCommandManager;
 import org.sunrise.game.genProto.gen.ChatProto;
 import org.sunrise.game.genProto.gen.TopicProto;
 import org.sunrise.game.genRpc.gen.CallEnum;
@@ -17,7 +18,14 @@ public class ChatMsgHandler {
         if (HumanObjectManger.muteHumanQueue.contains(humanObject.getHumanId())) {
             return;
         }
-        RpcFunction.newInstance().call(CallEnum.GlobalChatService_chat, "humanId", humanObject.getHumanId(), "message", data.getMsg());
+
+        String msg = data.getMsg();
+        if (msg.startsWith(".")) {
+            GmCommandManager.handleGmCommand(humanObject, msg);
+            return;
+        }
+
+        RpcFunction.newInstance().call(CallEnum.GlobalChatService_chat, "humanId", humanObject.getHumanId(), "message", msg);
     }
 
     @MsgHandlerMethod(packetId = ChatProto.FROM_CLIENT.C2S_Horn_VALUE)

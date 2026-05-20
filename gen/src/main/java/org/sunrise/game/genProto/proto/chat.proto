@@ -12,6 +12,7 @@ enum FROM_SERVER {
   S2C_Chat = 0;     // 实时聊天消息
   S2C_Horn = 1;     // 大喇叭
   S2C_History = 2;  // 新增历史记录响应
+  S2C_Tips = 3;     // 提示消息
 }
 
 message MC2S_Chat {
@@ -30,4 +31,9 @@ message MC2S_GetHistory {
 
 message MS2C_History {
   repeated MS2C_Chat history = 1;  // 历史记录列表
+}
+
+message MS2C_Tips {
+  int32 id = 1;       // 提示配置表的id，如果大于1，客户端优先从配置表中读取
+  string msg = 2;     // 消息内容
 }

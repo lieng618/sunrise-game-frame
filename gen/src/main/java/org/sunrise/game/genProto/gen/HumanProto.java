@@ -220,6 +220,14 @@ public final class HumanProto {
      * <code>S2C_SendInfoEnd = 4;</code>
      */
     S2C_SendInfoEnd(4),
+    /**
+     * <pre>
+     * 玩家数据变化
+     * </pre>
+     *
+     * <code>S2C_HumanInfoChange = 5;</code>
+     */
+    S2C_HumanInfoChange(5),
     UNRECOGNIZED(-1),
     ;
 
@@ -272,6 +280,14 @@ public final class HumanProto {
      * <code>S2C_SendInfoEnd = 4;</code>
      */
     public static final int S2C_SendInfoEnd_VALUE = 4;
+    /**
+     * <pre>
+     * 玩家数据变化
+     * </pre>
+     *
+     * <code>S2C_HumanInfoChange = 5;</code>
+     */
+    public static final int S2C_HumanInfoChange_VALUE = 5;
 
 
     public final int getNumber() {
@@ -303,6 +319,7 @@ public final class HumanProto {
         case 2: return S2C_ChangeSex;
         case 3: return S2C_HumanInfo;
         case 4: return S2C_SendInfoEnd;
+        case 5: return S2C_HumanInfoChange;
         default: return null;
       }
     }
@@ -4920,6 +4937,646 @@ public final class HumanProto {
 
   }
 
+  public interface MS2C_HumanInfoChangeOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:org.sunrise.game.genProto.gen.MS2C_HumanInfoChange)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <pre>
+     * 角色等级
+     * </pre>
+     *
+     * <code>uint32 level = 1;</code>
+     * @return The level.
+     */
+    int getLevel();
+
+    /**
+     * <pre>
+     * 经验
+     * </pre>
+     *
+     * <code>uint64 exp = 2;</code>
+     * @return The exp.
+     */
+    long getExp();
+
+    /**
+     * <pre>
+     * 战斗力
+     * </pre>
+     *
+     * <code>uint64 fight_power = 3;</code>
+     * @return The fightPower.
+     */
+    long getFightPower();
+  }
+  /**
+   * Protobuf type {@code org.sunrise.game.genProto.gen.MS2C_HumanInfoChange}
+   */
+  public static final class MS2C_HumanInfoChange extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:org.sunrise.game.genProto.gen.MS2C_HumanInfoChange)
+      MS2C_HumanInfoChangeOrBuilder {
+  private static final long serialVersionUID = 0L;
+    static {
+      com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
+        com.google.protobuf.RuntimeVersion.RuntimeDomain.PUBLIC,
+        /* major= */ 4,
+        /* minor= */ 28,
+        /* patch= */ 2,
+        /* suffix= */ "",
+        MS2C_HumanInfoChange.class.getName());
+    }
+    // Use MS2C_HumanInfoChange.newBuilder() to construct.
+    private MS2C_HumanInfoChange(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+    }
+    private MS2C_HumanInfoChange() {
+    }
+
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return org.sunrise.game.genProto.gen.HumanProto.internal_static_org_sunrise_game_genProto_gen_MS2C_HumanInfoChange_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return org.sunrise.game.genProto.gen.HumanProto.internal_static_org_sunrise_game_genProto_gen_MS2C_HumanInfoChange_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              org.sunrise.game.genProto.gen.HumanProto.MS2C_HumanInfoChange.class, org.sunrise.game.genProto.gen.HumanProto.MS2C_HumanInfoChange.Builder.class);
+    }
+
+    public static final int LEVEL_FIELD_NUMBER = 1;
+    private int level_ = 0;
+    /**
+     * <pre>
+     * 角色等级
+     * </pre>
+     *
+     * <code>uint32 level = 1;</code>
+     * @return The level.
+     */
+    @java.lang.Override
+    public int getLevel() {
+      return level_;
+    }
+
+    public static final int EXP_FIELD_NUMBER = 2;
+    private long exp_ = 0L;
+    /**
+     * <pre>
+     * 经验
+     * </pre>
+     *
+     * <code>uint64 exp = 2;</code>
+     * @return The exp.
+     */
+    @java.lang.Override
+    public long getExp() {
+      return exp_;
+    }
+
+    public static final int FIGHT_POWER_FIELD_NUMBER = 3;
+    private long fightPower_ = 0L;
+    /**
+     * <pre>
+     * 战斗力
+     * </pre>
+     *
+     * <code>uint64 fight_power = 3;</code>
+     * @return The fightPower.
+     */
+    @java.lang.Override
+    public long getFightPower() {
+      return fightPower_;
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (level_ != 0) {
+        output.writeUInt32(1, level_);
+      }
+      if (exp_ != 0L) {
+        output.writeUInt64(2, exp_);
+      }
+      if (fightPower_ != 0L) {
+        output.writeUInt64(3, fightPower_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (level_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeUInt32Size(1, level_);
+      }
+      if (exp_ != 0L) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeUInt64Size(2, exp_);
+      }
+      if (fightPower_ != 0L) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeUInt64Size(3, fightPower_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof org.sunrise.game.genProto.gen.HumanProto.MS2C_HumanInfoChange)) {
+        return super.equals(obj);
+      }
+      org.sunrise.game.genProto.gen.HumanProto.MS2C_HumanInfoChange other = (org.sunrise.game.genProto.gen.HumanProto.MS2C_HumanInfoChange) obj;
+
+      if (getLevel()
+          != other.getLevel()) return false;
+      if (getExp()
+          != other.getExp()) return false;
+      if (getFightPower()
+          != other.getFightPower()) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + LEVEL_FIELD_NUMBER;
+      hash = (53 * hash) + getLevel();
+      hash = (37 * hash) + EXP_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          getExp());
+      hash = (37 * hash) + FIGHT_POWER_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          getFightPower());
+      hash = (29 * hash) + getUnknownFields().hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static org.sunrise.game.genProto.gen.HumanProto.MS2C_HumanInfoChange parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.sunrise.game.genProto.gen.HumanProto.MS2C_HumanInfoChange parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.sunrise.game.genProto.gen.HumanProto.MS2C_HumanInfoChange parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.sunrise.game.genProto.gen.HumanProto.MS2C_HumanInfoChange parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.sunrise.game.genProto.gen.HumanProto.MS2C_HumanInfoChange parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.sunrise.game.genProto.gen.HumanProto.MS2C_HumanInfoChange parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.sunrise.game.genProto.gen.HumanProto.MS2C_HumanInfoChange parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static org.sunrise.game.genProto.gen.HumanProto.MS2C_HumanInfoChange parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static org.sunrise.game.genProto.gen.HumanProto.MS2C_HumanInfoChange parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static org.sunrise.game.genProto.gen.HumanProto.MS2C_HumanInfoChange parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static org.sunrise.game.genProto.gen.HumanProto.MS2C_HumanInfoChange parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static org.sunrise.game.genProto.gen.HumanProto.MS2C_HumanInfoChange parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(org.sunrise.game.genProto.gen.HumanProto.MS2C_HumanInfoChange prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code org.sunrise.game.genProto.gen.MS2C_HumanInfoChange}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:org.sunrise.game.genProto.gen.MS2C_HumanInfoChange)
+        org.sunrise.game.genProto.gen.HumanProto.MS2C_HumanInfoChangeOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return org.sunrise.game.genProto.gen.HumanProto.internal_static_org_sunrise_game_genProto_gen_MS2C_HumanInfoChange_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return org.sunrise.game.genProto.gen.HumanProto.internal_static_org_sunrise_game_genProto_gen_MS2C_HumanInfoChange_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                org.sunrise.game.genProto.gen.HumanProto.MS2C_HumanInfoChange.class, org.sunrise.game.genProto.gen.HumanProto.MS2C_HumanInfoChange.Builder.class);
+      }
+
+      // Construct using org.sunrise.game.genProto.gen.HumanProto.MS2C_HumanInfoChange.newBuilder()
+      private Builder() {
+
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        bitField0_ = 0;
+        level_ = 0;
+        exp_ = 0L;
+        fightPower_ = 0L;
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return org.sunrise.game.genProto.gen.HumanProto.internal_static_org_sunrise_game_genProto_gen_MS2C_HumanInfoChange_descriptor;
+      }
+
+      @java.lang.Override
+      public org.sunrise.game.genProto.gen.HumanProto.MS2C_HumanInfoChange getDefaultInstanceForType() {
+        return org.sunrise.game.genProto.gen.HumanProto.MS2C_HumanInfoChange.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public org.sunrise.game.genProto.gen.HumanProto.MS2C_HumanInfoChange build() {
+        org.sunrise.game.genProto.gen.HumanProto.MS2C_HumanInfoChange result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public org.sunrise.game.genProto.gen.HumanProto.MS2C_HumanInfoChange buildPartial() {
+        org.sunrise.game.genProto.gen.HumanProto.MS2C_HumanInfoChange result = new org.sunrise.game.genProto.gen.HumanProto.MS2C_HumanInfoChange(this);
+        if (bitField0_ != 0) { buildPartial0(result); }
+        onBuilt();
+        return result;
+      }
+
+      private void buildPartial0(org.sunrise.game.genProto.gen.HumanProto.MS2C_HumanInfoChange result) {
+        int from_bitField0_ = bitField0_;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.level_ = level_;
+        }
+        if (((from_bitField0_ & 0x00000002) != 0)) {
+          result.exp_ = exp_;
+        }
+        if (((from_bitField0_ & 0x00000004) != 0)) {
+          result.fightPower_ = fightPower_;
+        }
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof org.sunrise.game.genProto.gen.HumanProto.MS2C_HumanInfoChange) {
+          return mergeFrom((org.sunrise.game.genProto.gen.HumanProto.MS2C_HumanInfoChange)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(org.sunrise.game.genProto.gen.HumanProto.MS2C_HumanInfoChange other) {
+        if (other == org.sunrise.game.genProto.gen.HumanProto.MS2C_HumanInfoChange.getDefaultInstance()) return this;
+        if (other.getLevel() != 0) {
+          setLevel(other.getLevel());
+        }
+        if (other.getExp() != 0L) {
+          setExp(other.getExp());
+        }
+        if (other.getFightPower() != 0L) {
+          setFightPower(other.getFightPower());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
+        try {
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 8: {
+                level_ = input.readUInt32();
+                bitField0_ |= 0x00000001;
+                break;
+              } // case 8
+              case 16: {
+                exp_ = input.readUInt64();
+                bitField0_ |= 0x00000002;
+                break;
+              } // case 16
+              case 24: {
+                fightPower_ = input.readUInt64();
+                bitField0_ |= 0x00000004;
+                break;
+              } // case 24
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.unwrapIOException();
+        } finally {
+          onChanged();
+        } // finally
+        return this;
+      }
+      private int bitField0_;
+
+      private int level_ ;
+      /**
+       * <pre>
+       * 角色等级
+       * </pre>
+       *
+       * <code>uint32 level = 1;</code>
+       * @return The level.
+       */
+      @java.lang.Override
+      public int getLevel() {
+        return level_;
+      }
+      /**
+       * <pre>
+       * 角色等级
+       * </pre>
+       *
+       * <code>uint32 level = 1;</code>
+       * @param value The level to set.
+       * @return This builder for chaining.
+       */
+      public Builder setLevel(int value) {
+
+        level_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * 角色等级
+       * </pre>
+       *
+       * <code>uint32 level = 1;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearLevel() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        level_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private long exp_ ;
+      /**
+       * <pre>
+       * 经验
+       * </pre>
+       *
+       * <code>uint64 exp = 2;</code>
+       * @return The exp.
+       */
+      @java.lang.Override
+      public long getExp() {
+        return exp_;
+      }
+      /**
+       * <pre>
+       * 经验
+       * </pre>
+       *
+       * <code>uint64 exp = 2;</code>
+       * @param value The exp to set.
+       * @return This builder for chaining.
+       */
+      public Builder setExp(long value) {
+
+        exp_ = value;
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * 经验
+       * </pre>
+       *
+       * <code>uint64 exp = 2;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearExp() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        exp_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      private long fightPower_ ;
+      /**
+       * <pre>
+       * 战斗力
+       * </pre>
+       *
+       * <code>uint64 fight_power = 3;</code>
+       * @return The fightPower.
+       */
+      @java.lang.Override
+      public long getFightPower() {
+        return fightPower_;
+      }
+      /**
+       * <pre>
+       * 战斗力
+       * </pre>
+       *
+       * <code>uint64 fight_power = 3;</code>
+       * @param value The fightPower to set.
+       * @return This builder for chaining.
+       */
+      public Builder setFightPower(long value) {
+
+        fightPower_ = value;
+        bitField0_ |= 0x00000004;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * 战斗力
+       * </pre>
+       *
+       * <code>uint64 fight_power = 3;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearFightPower() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        fightPower_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:org.sunrise.game.genProto.gen.MS2C_HumanInfoChange)
+    }
+
+    // @@protoc_insertion_point(class_scope:org.sunrise.game.genProto.gen.MS2C_HumanInfoChange)
+    private static final org.sunrise.game.genProto.gen.HumanProto.MS2C_HumanInfoChange DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new org.sunrise.game.genProto.gen.HumanProto.MS2C_HumanInfoChange();
+    }
+
+    public static org.sunrise.game.genProto.gen.HumanProto.MS2C_HumanInfoChange getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<MS2C_HumanInfoChange>
+        PARSER = new com.google.protobuf.AbstractParser<MS2C_HumanInfoChange>() {
+      @java.lang.Override
+      public MS2C_HumanInfoChange parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
+      }
+    };
+
+    public static com.google.protobuf.Parser<MS2C_HumanInfoChange> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<MS2C_HumanInfoChange> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public org.sunrise.game.genProto.gen.HumanProto.MS2C_HumanInfoChange getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_org_sunrise_game_genProto_gen_MC2S_ChangeName_descriptor;
   private static final 
@@ -4955,6 +5612,11 @@ public final class HumanProto {
   private static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_org_sunrise_game_genProto_gen_MS2C_HumanInfo_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_org_sunrise_game_genProto_gen_MS2C_HumanInfoChange_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_org_sunrise_game_genProto_gen_MS2C_HumanInfoChange_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -4975,12 +5637,15 @@ public final class HumanProto {
       "\030\003 \001(\t\022\r\n\005level\030\004 \001(\r\022\021\n\tserver_id\030\005 \001(\r" +
       "\022\013\n\003exp\030\006 \001(\004\022\022\n\naccount_id\030\007 \001(\004\022\021\n\thea" +
       "d_icon\030\010 \001(\t\022\023\n\013fight_power\030\t \001(\004\022\013\n\003sex" +
-      "\030\n \001(\r*L\n\013FROM_CLIENT\022\022\n\016C2S_ChangeName\020" +
-      "\000\022\026\n\022C2S_ChangeHeadIcon\020\001\022\021\n\rC2S_ChangeS" +
-      "ex\020\002*t\n\013FROM_SERVER\022\022\n\016S2C_ChangeName\020\000\022" +
-      "\026\n\022S2C_ChangeHeadIcon\020\001\022\021\n\rS2C_ChangeSex" +
-      "\020\002\022\021\n\rS2C_HumanInfo\020\003\022\023\n\017S2C_SendInfoEnd" +
-      "\020\004B\014B\nHumanProtob\006proto3"
+      "\030\n \001(\r\"G\n\024MS2C_HumanInfoChange\022\r\n\005level\030" +
+      "\001 \001(\r\022\013\n\003exp\030\002 \001(\004\022\023\n\013fight_power\030\003 \001(\004*" +
+      "L\n\013FROM_CLIENT\022\022\n\016C2S_ChangeName\020\000\022\026\n\022C2" +
+      "S_ChangeHeadIcon\020\001\022\021\n\rC2S_ChangeSex\020\002*\215\001" +
+      "\n\013FROM_SERVER\022\022\n\016S2C_ChangeName\020\000\022\026\n\022S2C" +
+      "_ChangeHeadIcon\020\001\022\021\n\rS2C_ChangeSex\020\002\022\021\n\r" +
+      "S2C_HumanInfo\020\003\022\023\n\017S2C_SendInfoEnd\020\004\022\027\n\023" +
+      "S2C_HumanInfoChange\020\005B\014B\nHumanProtob\006pro" +
+      "to3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -5028,6 +5693,12 @@ public final class HumanProto {
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_org_sunrise_game_genProto_gen_MS2C_HumanInfo_descriptor,
         new java.lang.String[] { "Uid", "Name", "HumanId", "Level", "ServerId", "Exp", "AccountId", "HeadIcon", "FightPower", "Sex", });
+    internal_static_org_sunrise_game_genProto_gen_MS2C_HumanInfoChange_descriptor =
+      getDescriptor().getMessageTypes().get(7);
+    internal_static_org_sunrise_game_genProto_gen_MS2C_HumanInfoChange_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_org_sunrise_game_genProto_gen_MS2C_HumanInfoChange_descriptor,
+        new java.lang.String[] { "Level", "Exp", "FightPower", });
     descriptor.resolveAllFeaturesImmutable();
   }
 

@@ -41,5 +41,9 @@ public final class ConfigParam {
      * 新角色初始化地图id
      */
      public int getMapInitId() { return _data.MapInitId; }
+    /**
+     * gm指令开启状态
+     */
+     public int getGMCmdStatus() { return _data.GMCmdStatus; }
 
 }

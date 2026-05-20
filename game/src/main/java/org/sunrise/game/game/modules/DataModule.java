@@ -86,6 +86,32 @@ public class DataModule extends BaseModule {
     }
 
     /**
+     * 修改等级
+     */
+    public void changeLevel(int newLevel) {
+        this.level = newLevel;
+        syncToPlayerInfoSystem();
+
+        HumanProto.MS2C_HumanInfoChange.Builder builder = HumanProto.MS2C_HumanInfoChange.newBuilder();
+        builder.setLevel(newLevel);
+        getHuman().sendMsg(TopicProto.TOPIC.TOPIC_TYPE_HUMAN_VALUE,
+                HumanProto.FROM_SERVER.S2C_HumanInfoChange_VALUE, builder);
+    }
+
+    /**
+     * 修改经验
+     */
+    public void changeExp(int newExp) {
+        this.exp = newExp;
+        syncToPlayerInfoSystem();
+
+        HumanProto.MS2C_HumanInfoChange.Builder builder = HumanProto.MS2C_HumanInfoChange.newBuilder();
+        builder.setExp(newExp);
+        getHuman().sendMsg(TopicProto.TOPIC.TOPIC_TYPE_HUMAN_VALUE,
+                HumanProto.FROM_SERVER.S2C_HumanInfoChange_VALUE, builder);
+    }
+
+    /**
      * 修改头像
      */
     public void changeHeadIcon(int headIconId) {

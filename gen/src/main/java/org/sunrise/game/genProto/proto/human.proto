@@ -16,6 +16,7 @@ enum FROM_SERVER
   S2C_ChangeSex = 2;  //修改性别
   S2C_HumanInfo = 3; //上线发送玩家数据
   S2C_SendInfoEnd = 4; //玩家数据全部发送完成
+  S2C_HumanInfoChange = 5; //玩家数据变化
 }
 
 message MC2S_ChangeName
@@ -60,4 +61,11 @@ message MS2C_HumanInfo
   string head_icon = 8;  //角色头像
   uint64 fight_power = 9;  //战斗力
   uint32 sex = 10;  //性别
+}
+
+message MS2C_HumanInfoChange
+{
+  uint32 level = 1;  //角色等级
+  uint64 exp = 2;  //经验
+  uint64 fight_power = 3;  //战斗力
 }

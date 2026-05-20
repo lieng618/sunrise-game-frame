@@ -7,6 +7,7 @@ import lombok.Data;
 import org.sunrise.game.game.modules.BaseModule;
 import org.sunrise.game.game.modules.DataModule;
 import org.sunrise.game.game.modules.ModuleUtils;
+import org.sunrise.game.genProto.gen.ChatProto;
 import org.sunrise.game.genProto.gen.HumanProto;
 import org.sunrise.game.genProto.gen.TopicProto;
 
@@ -129,6 +130,21 @@ public class HumanObject {
 
     public void sendMsg(int packetType, int packetId, byte[] rawData) {
         connectObject.sendMsg(packetType, packetId, rawData);
+    }
+
+    public void sendTips(String tipMsg) {
+        sendTips(0, tipMsg);
+    }
+
+    public void sendTips(int id) {
+        sendTips(0, "");
+    }
+
+    public void sendTips(int id, String tipMsg) {
+        ChatProto.MS2C_Tips.Builder builder = ChatProto.MS2C_Tips.newBuilder();
+        builder.setId(id);
+        builder.setMsg(tipMsg);
+        sendMsg(TopicProto.TOPIC.TOPIC_TYPE_CHAT_VALUE, ChatProto.FROM_SERVER.S2C_Tips_VALUE, builder);
     }
 
     public void kick(String reason) {
