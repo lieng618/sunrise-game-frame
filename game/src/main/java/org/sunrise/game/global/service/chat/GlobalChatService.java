@@ -47,7 +47,7 @@ public class GlobalChatService extends BaseService {
 
         RpcFunction.newInstance(RpcFunction.RpcCallType.SendAll)
                 .call(CallEnum.GameRpcListenService_sendToAllHuman, "packetType", TopicProto.TOPIC.TOPIC_TYPE_CHAT_VALUE, "packetId", ChatProto.FROM_SERVER.S2C_Chat_VALUE,
-                        "time", ChatProto.MS2C_Chat.newBuilder().setId(humanId).setMsg(message).setTime(time).build().toByteArray());
+                        "protoData", ChatProto.MS2C_Chat.newBuilder().setId(humanId).setMsg(message).setTime(time).build().toByteArray());
     }
 
     @RpcMethod

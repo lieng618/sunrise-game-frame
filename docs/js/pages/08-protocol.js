@@ -3,7 +3,7 @@ registerPage('protocol', '协议规范', 'Protobuf 协议定义、命名规则�
 <p class="page-desc">基于 Protobuf 的消息协议定义，包含命名规则、消息结构、TOPIC 枚举。框架通过命名约定自动反射解析协议类，必须严格遵循规则</p>
 
 <h2>外层消息结构</h2>
-<p>客户端与服务器之间业务消息统一使用 <code>TopicProto.MBasePacketData</code>：</p>
+<p>客户端与对外服服务器之间业务消息统一使用protobuf格式的消息，结构为 <code>TopicProto.MBasePacketData</code>：</p>
 <pre><code class="language-protobuf">message MBasePacketData {
   TOPIC packet_type = 1; // 模块类型（对应 TOPIC 枚举）
   uint32 packet_id = 2;  // 模块内消息 ID（对应 FROM_CLIENT/FROM_SERVER 枚举）
@@ -11,7 +11,7 @@ registerPage('protocol', '协议规范', 'Protobuf 协议定义、命名规则�
 }</code></pre>
 
 <h2>网络包结构</h2>
-<p>TCP/WebSocket 层传输的 SocketMessage：</p>
+<p>TCP/WebSocket/KCP 层传输的 SocketMessage：</p>
 <pre><code class="language-java">public class SocketMessage {
     int messageType;
     byte[] data;
@@ -33,8 +33,12 @@ public class SocketMessageEncoder extends MessageToByteEncoder<SocketMessage> {
     }
 }
 </code></pre>
-<p>四个字节写入消息类型，心跳类型主要用于节点间的底层心跳通信，客户端与对外服的通信、所有节点间的rpc调用都为业务类型。
-四个字节写入data的长度，之后在写入真正的业务数据。</p>
+<p>客户端与对外服服务器、各个rpc服务器之间通信的网络包的消息结构都为SocketMessage，只是data代表的结构不一样。</p>
+<p>对外服会把要发给客户端的protobuf消息放入SocketMessage.data中（参考ExternalRecvGameMessageService.recvMessage()）。</p>
+<p>各个rpc服务器之间通信，也就是RpcFunction.call()方法，会把Call对象转化为字节，放入SocketMessage.data中（参考BaseClientManager.sendMsgToServer()）。</p>
+<p>最终在网络上传输时，会通过netty的编解码方法（包org.sunrise.game.core.coder），进行编解码。</p>
+<p>四个字节写入消息类型（MessageType），心跳类型主要用于节点间的底层心跳通信，客户端与对外服的通信、所有节点间的rpc调用都为业务类型。</p>
+<p>四个字节写入data的长度，之后在写入真正的业务数据。</p>
 
 <pre><code class="language-java">public class ConnectObject {
     public void sendMsg(int packetType, int packetId) {
@@ -43,7 +47,7 @@ public class SocketMessageEncoder extends MessageToByteEncoder<SocketMessage> {
     }
 }
 </code></pre>
-<p>在ConnectObject中，调用sendMsg() 发送protobuf消息，游戏服通过rpc调用，把protobuf数据作为参数传递给对外服。</p>
+<p>游戏服在ConnectObject中，调用sendMsg() 发送protobuf消息，游戏服通过rpc调用，把protobuf数据作为参数传递给对外服。这些参数都会封装到Call对象中，最终放入SocketMessage进行网络传输。</p>
 
 <pre><code class="language-java">@RpcService
 public class ExternalRecvGameMessageService extends BaseService {
@@ -72,8 +76,9 @@ public class ClientConnection {
     }
 }
 </code></pre>
-<p>在对外服ExternalRecvGameMessageService中，recvMessage()接收到数据。对外服接收到rpc后，把protobuf数据，通过ClientConnection.sendMessage()发给客户端可以看到，最终的protobuf数据在对外服传递给客户端时，放入了SocketMessage中。
+<p>在对外服ExternalRecvGameMessageService中，recvMessage()接收到数据。对外服接收到rpc后，把protobuf数据，通过ClientConnection.sendMessage()发给客户端。可以看到，最终的protobuf数据在对外服传递给客户端时，放入了SocketMessage中。
 </p>
+<p>以上是底层消息结构的完整解析，只编写业务逻辑的话，只需要参考其他模块，实现起来是比较简单的，但了解底层结构对框架的理解有很多帮助。</p>
 
 <h2>TOPIC 模块枚举</h2>
 <table>
