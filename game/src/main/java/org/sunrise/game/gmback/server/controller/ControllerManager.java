@@ -2,7 +2,7 @@ package org.sunrise.game.gmback.server.controller;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
-import org.sunrise.game.db.DbService;
+import org.sunrise.game.db.DbManager;
 import org.sunrise.game.db.entity.EntityServerData;
 import org.sunrise.game.log.LogCore;
 import org.sunrise.game.thread.DispatchThread;
@@ -14,7 +14,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class ControllerManager {
     private static long initStartTime;
-    public static final DbService dbService = new DbService();
     private static final Map<String, BaseController> controllers = new HashMap<>();
     private static long lastSaveDbTime = System.currentTimeMillis(); //上次保存数据的时间
     public static ConcurrentLinkedQueue<Runnable> asyncQueue = new ConcurrentLinkedQueue<>();
@@ -71,13 +70,13 @@ public class ControllerManager {
      */
     public static void load() {
         for (Map.Entry<String, BaseController> entry : controllers.entrySet()) {
-            dbService.queryGetOneByParamsAsync((result -> {
+            DbManager.getDbService().queryGetOneByParamsAsync((result -> {
                 if (result != null) {
                     EntityServerData serverData = new EntityServerData(result);
                     entry.getValue().setDataMap(JSON.parseObject(serverData.getData(), new TypeReference<Map<String, String>>() {}.getType()));
                     entry.getValue().load();
                 } else {
-                    dbService.executeAsync("insert into `server_data` (server_id,name,data) values (?,?,?)", 0, entry.getKey(), JSON.toJSONBytes(entry.getValue().getDataMap()));
+                    DbManager.getDbService().executeAsync("insert into `server_data` (server_id,name,data) values (?,?,?)", 0, entry.getKey(), JSON.toJSONBytes(entry.getValue().getDataMap()));
                 }
                 entry.getValue().setInitEnd(true);
             }), "select * from `server_data` where `server_id` = ? and `name` = ?", 0, entry.getKey());
@@ -91,7 +90,7 @@ public class ControllerManager {
         for (Map.Entry<String, BaseController> entry : controllers.entrySet()) {
             entry.getValue().save();
 
-            dbService.executeAsync("update `server_data` set `data` = ? where `server_id` = ? and `name` = ?",
+            DbManager.getDbService().executeAsync("update `server_data` set `data` = ? where `server_id` = ? and `name` = ?",
                     JSON.toJSONBytes(entry.getValue().getDataMap()), 0, entry.getKey());
         }
     }
@@ -103,7 +102,7 @@ public class ControllerManager {
         for (Map.Entry<String, BaseController> entry : controllers.entrySet()) {
             entry.getValue().save();
 
-            dbService.execute("update `server_data` set `data` = ? where `server_id` = ? and `name` = ?",
+            DbManager.getDbService().execute("update `server_data` set `data` = ? where `server_id` = ? and `name` = ?",
                     JSON.toJSONBytes(entry.getValue().getDataMap()), 0, entry.getKey());
         }
     }

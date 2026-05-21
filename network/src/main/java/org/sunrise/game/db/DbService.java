@@ -10,6 +10,8 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 public class DbService {
@@ -33,7 +35,16 @@ public class DbService {
         config.setMaxLifetime(Long.parseLong(properties.getProperty("jdbc.maxLifetime")));
 
         dataSource = new HikariDataSource(config);
-        dbExecutor = Executors.newFixedThreadPool(Math.max(2, Runtime.getRuntime().availableProcessors()));
+        dbExecutor = Executors.newFixedThreadPool(Math.max(2, Runtime.getRuntime().availableProcessors()), new ThreadFactory() {
+            private final AtomicInteger counter = new AtomicInteger(0);
+            @Override
+            public Thread newThread(Runnable r) {
+                Thread thread = new Thread(r);
+                thread.setName("DbServiceTaskThreadPool-" + counter.incrementAndGet());
+                thread.setDaemon(false);
+                return thread;
+            }
+        });
     }
 
     // 获取默认数据库配置（当配置未加载时使用）

@@ -2,8 +2,7 @@ package org.sunrise.game.rpc.service;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
-
-import org.sunrise.game.db.DbService;
+import org.sunrise.game.db.DbManager;
 import org.sunrise.game.db.entity.EntityServerData;
 import org.sunrise.game.log.LogCore;
 import org.sunrise.game.rpc.node.RpcNodeManager;
@@ -17,7 +16,6 @@ public class ServiceManager {
     private static long lastPulsePerMinTime = 0L; //上次系统每分钟心跳的时间
     private static long lastPulsePerSecTime = 0L; //上次系统每秒心跳的时间
     private static long lastPulsePer5SecTime = 0L; //上次系统每5秒心跳的时间
-    public static final DbService dbService = new DbService();
     private static final Map<String, BaseService> services = new HashMap<>();
 
     public static void registerService(BaseService instance) {
@@ -65,13 +63,13 @@ public class ServiceManager {
      */
     public static void load() {
         for (Map.Entry<String, BaseService> entry : services.entrySet()) {
-            dbService.queryGetOneByParamsAsync((result -> {
+            DbManager.getDbService().queryGetOneByParamsAsync((result -> {
                 if (result != null) {
                     EntityServerData serverData = new EntityServerData(result);
                     entry.getValue().setDataMap(JSON.parseObject(serverData.getData(), new TypeReference<Map<String, String>>() {}.getType()));
                     entry.getValue().load();
                 } else {
-                    dbService.executeAsync("insert into `server_data` (server_id,name,data) values (?,?,?)", RpcNodeManager.getRpcServerId(), entry.getKey(), JSON.toJSONBytes(entry.getValue().getDataMap()));
+                    DbManager.getDbService().executeAsync("insert into `server_data` (server_id,name,data) values (?,?,?)", RpcNodeManager.getRpcServerId(), entry.getKey(), JSON.toJSONBytes(entry.getValue().getDataMap()));
                 }
                 entry.getValue().setInitEnd(true);
             }), "select * from `server_data` where `server_id` = ? and `name` = ?", RpcNodeManager.getRpcServerId(), entry.getKey());
@@ -85,7 +83,7 @@ public class ServiceManager {
         for (Map.Entry<String, BaseService> entry : services.entrySet()) {
             entry.getValue().save();
 
-            dbService.executeAsync("update `server_data` set `data` = ? where `server_id` = ? and `name` = ?",
+            DbManager.getDbService().executeAsync("update `server_data` set `data` = ? where `server_id` = ? and `name` = ?",
                     JSON.toJSONBytes(entry.getValue().getDataMap()), RpcNodeManager.getRpcServerId(), entry.getKey());
         }
     }
@@ -97,7 +95,7 @@ public class ServiceManager {
         for (Map.Entry<String, BaseService> entry : services.entrySet()) {
             entry.getValue().save();
 
-            dbService.execute("update `server_data` set `data` = ? where `server_id` = ? and `name` = ?",
+            DbManager.getDbService().execute("update `server_data` set `data` = ? where `server_id` = ? and `name` = ?",
                     JSON.toJSONBytes(entry.getValue().getDataMap()), RpcNodeManager.getRpcServerId(), entry.getKey());
         }
     }

@@ -1,6 +1,5 @@
-package org.sunrise.game.game.db;
+package org.sunrise.game.db;
 
-import org.sunrise.game.db.DbService;
 import org.sunrise.game.rpc.node.RpcNodeManager;
 
 public class DbManager {

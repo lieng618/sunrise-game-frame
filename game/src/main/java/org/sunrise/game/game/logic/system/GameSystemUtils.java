@@ -2,9 +2,9 @@ package org.sunrise.game.game.logic.system;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
+import org.sunrise.game.db.DbManager;
 import org.sunrise.game.db.entity.EntityServerData;
 import org.sunrise.game.game.annotation.GameSystem;
-import org.sunrise.game.game.db.DbManager;
 import org.sunrise.game.game.human.HumanObject;
 import org.sunrise.game.game.human.HumanObjectManger;
 import org.sunrise.game.game.logic.ToolsUtils;

@@ -2,11 +2,11 @@ package org.sunrise.game.game.login;
 
 import com.alibaba.fastjson2.JSON;
 
+import org.sunrise.game.db.DbManager;
 import org.sunrise.game.db.entity.EntityAccount;
 import org.sunrise.game.db.entity.EntityHumanInfo;
 import org.sunrise.game.db.entity.EntityHumanList;
 import org.sunrise.game.game.async.AsyncEventManager;
-import org.sunrise.game.game.db.DbManager;
 import org.sunrise.game.game.human.ConnectObject;
 import org.sunrise.game.game.human.HumanObject;
 import org.sunrise.game.game.human.HumanObjectManger;

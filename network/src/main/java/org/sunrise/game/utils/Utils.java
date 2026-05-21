@@ -21,6 +21,8 @@ import org.sunrise.game.thread.DispatchThread;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.management.GarbageCollectorMXBean;
+import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -167,11 +169,20 @@ public class Utils {
         long totalMemory = runtime.totalMemory(); // 当前JVM堆内存总量
         long freeMemory = runtime.freeMemory(); // 当前JVM堆内存空闲量
         long usedMemory = totalMemory - freeMemory; // 当前JVM堆内存已使用量
-        sb.append(" total memory: ").append(totalMemory / 1024 / 1024).append(" MB").append(",");
-        sb.append(" free memory: ").append(freeMemory / 1024 / 1024).append(" MB").append(",");
-        sb.append(" used memory: ").append(usedMemory / 1024 / 1024).append(" MB");
+        sb.append(" total memory: ").append(totalMemory / 1024 / 1024).append(" MB ");
+        sb.append(" free memory: ").append(freeMemory / 1024 / 1024).append(" MB ");
+        sb.append(" used memory: ").append(usedMemory / 1024 / 1024).append(" MB ").append(";");
 
-        LogCore.ServerStartUp.info("Memory : { {} }", sb);
+        List<GarbageCollectorMXBean> gcBeans = ManagementFactory.getGarbageCollectorMXBeans();
+        for (GarbageCollectorMXBean gcBean : gcBeans) {
+            long count = gcBean.getCollectionCount();
+            long timeMs = gcBean.getCollectionTime();
+            if (count > 0) {
+                sb.append(String.format(" %s: %d次耗时%dms ", gcBean.getName(), count, timeMs));
+            }
+        }
+
+        LogCore.ServerStartUp.info("ServerMemory : { {} }", sb);
     }
 
     public static void startMemoryCheck() {

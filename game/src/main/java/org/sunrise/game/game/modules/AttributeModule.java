@@ -40,8 +40,8 @@ public class AttributeModule extends BaseModule {
         container.setBaseValue(AttributeType.MP_RECOVER, 1);
         container.setBaseValue(AttributeType.ATTACK_PERCENT, 0);
         container.setBaseValue(AttributeType.DEFENSE_PERCENT, 0);
-        container.setBaseValue(AttributeType.HP_PERCENT, 0);
-        container.setBaseValue(AttributeType.MP_PERCENT, 0);
+        container.setBaseValue(AttributeType.HP_PERCENT, 0.01);
+        container.setBaseValue(AttributeType.MP_PERCENT, 0.02);
         container.setBaseValue(AttributeType.SPEED_PERCENT, 0);
     }
 

@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
 import lombok.Getter;
 import lombok.Setter;
+import org.sunrise.game.db.DbManager;
 import org.sunrise.game.db.DbService;
 import org.sunrise.game.rpc.function.Call;
 import org.sunrise.game.rpc.function.CallUtils;
@@ -79,7 +80,7 @@ public class BaseService {
     }
 
     public DbService getDbService() {
-        return ServiceManager.dbService;
+        return DbManager.getDbService();
     }
 
     public void returns(Object ... params) {

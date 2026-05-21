@@ -1,14 +1,26 @@
 package org.sunrise.game.game.logic.attribute;
 
 import lombok.Getter;
+import org.sunrise.game.game.config.Enum.AttributeType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 public class AttributeContainer {
+    private static final Map<Integer, int[]> PERCENT_TO_TARGETS = new LinkedHashMap<>();
+
+    static {
+        PERCENT_TO_TARGETS.put(AttributeType.ATTACK_PERCENT, new int[]{AttributeType.ATTACK});
+        PERCENT_TO_TARGETS.put(AttributeType.DEFENSE_PERCENT, new int[]{AttributeType.DEFENSE});
+        PERCENT_TO_TARGETS.put(AttributeType.HP_PERCENT, new int[]{AttributeType.HP, AttributeType.MAX_HP});
+        PERCENT_TO_TARGETS.put(AttributeType.MP_PERCENT, new int[]{AttributeType.MP, AttributeType.MAX_MP});
+        PERCENT_TO_TARGETS.put(AttributeType.SPEED_PERCENT, new int[]{AttributeType.SPEED});
+    }
+
     // 基础属性
     @Getter
     private final Map<Integer, Double> baseValues = new HashMap<>();
@@ -70,6 +82,17 @@ public class AttributeContainer {
         for (AttributeProvider provider : providers) {
             for (Map.Entry<Integer, Double> entry : provider.getExtraValues().entrySet()) {
                 cachedFinalValues.merge(entry.getKey(), entry.getValue(), Double::sum);
+            }
+        }
+
+        for (Map.Entry<Integer, int[]> entry : PERCENT_TO_TARGETS.entrySet()) {
+            int percentType = entry.getKey();
+            double percentBonus = cachedFinalValues.getOrDefault(percentType, 0.0);
+            if (percentBonus != 0) {
+                for (int targetType : entry.getValue()) {
+                    double flatValue = cachedFinalValues.getOrDefault(targetType, 0.0);
+                    cachedFinalValues.put(targetType, flatValue * (1 + percentBonus));
+                }
             }
         }
 

@@ -21,7 +21,7 @@ import lombok.Data;
 import org.sunrise.game.core.coder.SocketMessageDecoder;
 import org.sunrise.game.core.coder.SocketMessageEncoder;
 import org.sunrise.game.core.coder.WebSocketMessageCodec;
-import org.sunrise.game.db.DbService;
+import org.sunrise.game.db.DbManager;
 import org.sunrise.game.db.entity.EntityExternalSystem;
 import org.sunrise.game.log.LogCore;
 import org.sunrise.game.rpc.node.RpcNodeManager;
@@ -33,7 +33,6 @@ import java.util.Map;
 
 @Data
 public class ExternalServer {
-    private final DbService dbService = new DbService();
     private String externalHost;
     private int externalPort;
     private KcpServer kcpServer;
@@ -45,7 +44,7 @@ public class ExternalServer {
         int maxPort = 0;
         List<EntityExternalSystem> externalSystems = new ArrayList<>();
         try {
-            var resultSet = dbService.queryAll("select * from `external_system`");
+            var resultSet = DbManager.getDbService().queryAll("select * from `external_system`");
             for (Map<String, Object> objectMap : resultSet) {
                 externalSystems.add(new EntityExternalSystem(objectMap));
             }
@@ -65,7 +64,7 @@ public class ExternalServer {
             if (ip == null) {
                 ip = Utils.getListenIpAddress();
                 port = maxPort == 0 ? 10000 : maxPort + 3;
-                dbService.execute("insert into `external_system` (id,ip,port) values (?,?,?)", serverId, Utils.getLocalIpAddress(), port);
+                DbManager.getDbService().execute("insert into `external_system` (id,ip,port) values (?,?,?)", serverId, Utils.getLocalIpAddress(), port);
             }
             externalPort = port;
             startTcpListen(ip, port);
@@ -75,7 +74,7 @@ public class ExternalServer {
             LogCore.ExternalServer.error("Server StartUp Failed, name = { ExternalServer }, serverId = {}, reason = {}", serverId, e.getLocalizedMessage());
             System.exit(-1);
         }
-        Utils.setShutdownHook(() -> dbService.execute("update `external_system` set `status` = ? where `id` = ?", 0, serverId));
+        Utils.setShutdownHook(() -> DbManager.getDbService().execute("update `external_system` set `status` = ? where `id` = ?", 0, serverId));
     }
 
     private void startTcpListen(String ip, int port) {
@@ -103,7 +102,7 @@ public class ExternalServer {
         b.bind(ip, port).addListener((ChannelFuture future) -> {
             if (future.isSuccess()) {
                 LogCore.ExternalServer.info("External Tcp Server start, port = { {} }", port);
-                dbService.execute("update `external_system` set `status` = ?, `ip` = ? where `id` = ?", 1, Utils.getLocalIpAddress(), RpcNodeManager.getRpcServerId());
+                DbManager.getDbService().execute("update `external_system` set `status` = ?, `ip` = ? where `id` = ?", 1, Utils.getLocalIpAddress(), RpcNodeManager.getRpcServerId());
             } else {
                 LogCore.ExternalServer.error("Failed to bind server on ip: {} and port: {}", ip, port, future.cause());
                 bossGroup.shutdownGracefully().syncUninterruptibly();
