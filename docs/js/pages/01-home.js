@@ -56,7 +56,9 @@ registerPage('home', '项目概览', 'Sunrise Game Frame 分布式游戏服务�
 │       ├─ game/               # 游戏服（玩家对象/模块/协议路由/系统）
 │       ├─ global/             # 全局服（聊天/好友/邮件/玩家信息）
 │       ├─ http/               # HTTP 服务（地址分发）
-│       └─ gmback/             # GM 后台（REST API + 静态页面）
+│       ├─ gmback/             # GM 后台（REST API + 静态页面）
+│       └─ runone/             # 单进程部署（将所有模块集成到一个进程中运行）
+├─ hotswap/                    # java代码热更新支持
 ├─ client/                     # 客户端工具
 │   └─ src/main/java/
 │       ├─ core/               # SocketClient / TcpClient / WsClient / KcpClient

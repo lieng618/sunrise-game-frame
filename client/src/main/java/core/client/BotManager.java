@@ -148,7 +148,7 @@ public class BotManager {
             }, loginExecutor);
             futures.add(future);
 
-            Utils.sleep(30);
+//            Utils.sleep(30);
         }
 
         CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))

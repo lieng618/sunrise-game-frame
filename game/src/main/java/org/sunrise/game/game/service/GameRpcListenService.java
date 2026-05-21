@@ -3,8 +3,10 @@ package org.sunrise.game.game.service;
 import org.sunrise.game.game.human.HumanObject;
 import org.sunrise.game.game.human.HumanObjectManger;
 import org.sunrise.game.rpc.annotation.RpcMethod;
+import org.sunrise.game.rpc.annotation.RpcService;
 import org.sunrise.game.rpc.service.BaseService;
 
+@RpcService
 public class GameRpcListenService extends BaseService {
     public GameRpcListenService(String nodeId) {
         super(nodeId);

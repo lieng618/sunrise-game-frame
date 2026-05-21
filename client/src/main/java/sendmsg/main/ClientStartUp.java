@@ -1,6 +1,7 @@
 package sendmsg.main;
 
 import core.client.LoginManager;
+import org.sunrise.game.utils.Utils;
 import sendmsg.frame.MainFrame;
 import core.message.MessageUtil;
 import org.sunrise.game.config.ConfigReader;
@@ -19,6 +20,8 @@ public class ClientStartUp {
         if (properties == null) {
             return;
         }
+        // 设置日志等级
+        Utils.setLogLevel(properties.getProperty("log.level"));
         String httpUrl = properties.getProperty("http.address") + ":" + properties.getProperty("http.port");
 
         LoginManager.initialize(httpUrl);

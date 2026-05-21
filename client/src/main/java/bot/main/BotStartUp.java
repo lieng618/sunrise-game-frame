@@ -6,6 +6,7 @@ import core.client.BotManager;
 import core.client.LoginManager;
 import org.sunrise.game.config.ConfigReader;
 import org.sunrise.game.log.LogCore;
+import org.sunrise.game.utils.Utils;
 
 import java.util.Properties;
 
@@ -21,6 +22,8 @@ public class BotStartUp {
             return;
         }
         String httpUrl = properties.getProperty("http.address") + ":" + properties.getProperty("http.port");
+        // 设置日志等级
+        Utils.setLogLevel(properties.getProperty("log.level"));
         LogCore.setLogLevel("kcp", Level.WARN);
         LoginManager.initialize(httpUrl);
         BotManager.initialize();
