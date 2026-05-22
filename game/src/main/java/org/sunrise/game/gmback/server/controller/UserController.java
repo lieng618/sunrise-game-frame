@@ -10,9 +10,15 @@ import org.sunrise.game.log.LogCore;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import org.sunrise.game.gmback.server.PermissionHelper;
+
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -25,6 +31,7 @@ public class UserController extends BaseController {
         private String username;      // 用户名
         private String password;      // 加密后的密码
         private Long createTime;      // 创建时间
+        private List<String> permissions; // 页面权限 key 列表
 
         public User() {
         }
@@ -172,9 +179,10 @@ public class UserController extends BaseController {
             }
         }
 
-        // 加密密码并添加用户
+        // 加密密码并添加用户，默认无页面权限，需管理员在权限管理中分配
         String encryptedPassword = encryptPassword(password);
         User newUser = new User(username, encryptedPassword);
+        newUser.setPermissions(new ArrayList<>());
         users.add(newUser);
         save();
 
@@ -282,5 +290,105 @@ public class UserController extends BaseController {
                 ctx, OperationLogController.OperationType.USER_MANAGER, "修改用户密码: " + username);
 
         success(ctx, null, "Password updated successfully");
+    }
+
+    /**
+     * 获取可分配的页面列表（仅 admin）
+     */
+    public void listPages(Context ctx) {
+        if (!isAdmin(ctx)) {
+            fail(ctx, 403, "Forbidden: Only admin can access permission management");
+            return;
+        }
+        success(ctx, PermissionHelper.getAssignablePages());
+    }
+
+    /**
+     * 获取指定用户的页面权限（仅 admin）
+     */
+    public void getPermissions(Context ctx) {
+        if (!isAdmin(ctx)) {
+            fail(ctx, 403, "Forbidden: Only admin can access permission management");
+            return;
+        }
+
+        String username = ctx.pathParam("username");
+        if (username.trim().isEmpty()) {
+            fail(ctx, 400, "Username cannot be empty");
+            return;
+        }
+
+        Properties properties = ConfigReader.getProp();
+        if (properties != null) {
+            String adminUsername = properties.getProperty("admin.user");
+            if (adminUsername != null && adminUsername.equals(username)) {
+                fail(ctx, 400, "Admin user permissions cannot be modified");
+                return;
+            }
+        }
+
+        User user = findUser(username);
+        if (user == null) {
+            fail(ctx, 404, "User not found");
+            return;
+        }
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("username", username);
+        data.put("permissions", PermissionHelper.getUserPermissions(username));
+        data.put("pages", PermissionHelper.getAssignablePages());
+        success(ctx, data);
+    }
+
+    /**
+     * 更新用户页面权限（仅 admin），修改后强制该用户重新登录
+     */
+    @SuppressWarnings("unchecked")
+    public void updatePermissions(Context ctx) {
+        if (!isAdmin(ctx)) {
+            fail(ctx, 403, "Forbidden: Only admin can update permissions");
+            return;
+        }
+
+        String username = ctx.pathParam("username");
+        if (username.trim().isEmpty()) {
+            fail(ctx, 400, "Username cannot be empty");
+            return;
+        }
+
+        User user = findUser(username);
+        if (user == null) {
+            fail(ctx, 404, "User not found");
+            return;
+        }
+
+        List<String> permissions = getBodyParam(ctx, "permissions", List.class);
+        if (permissions == null) {
+            fail(ctx, 400, "Permissions cannot be empty");
+            return;
+        }
+
+        Set<String> validKeys = new HashSet<>(PermissionHelper.ASSIGNABLE_PAGE_KEYS);
+        List<String> sanitized = new ArrayList<>();
+        for (Object item : permissions) {
+            if (item == null) {
+                continue;
+            }
+            String key = item.toString();
+            if (validKeys.contains(key) && !sanitized.contains(key)) {
+                sanitized.add(key);
+            }
+        }
+
+        user.setPermissions(sanitized);
+        save();
+
+        JwtUtil.invalidateUserTokens(username);
+
+        ControllerManager.getController(OperationLogController.class).recordLog(
+                ctx, OperationLogController.OperationType.USER_MANAGER,
+                "修改用户权限: " + username + " -> " + sanitized);
+
+        success(ctx, null, "Permissions updated successfully");
     }
 }

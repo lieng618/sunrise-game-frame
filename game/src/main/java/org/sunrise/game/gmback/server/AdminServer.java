@@ -86,13 +86,20 @@ public class AdminServer {
             String token = ctx.header("Authorization");
             // Token 校验
             if (token == null || token.isEmpty() || JwtUtil.verifyToken(token) == null) {
-                // 401 未授权，拦截请求
                 ctx.status(HttpStatus.UNAUTHORIZED).result("Unauthorized");
-                ctx.skipRemainingHandlers(); // 停止后续处理
+                ctx.skipRemainingHandlers();
+                return;
+            }
+
+            // 页面级 API 权限校验
+            if (!PermissionHelper.checkApiAccess(token, ctx.method().name(), ctx.path())) {
+                ctx.status(HttpStatus.FORBIDDEN).result("Forbidden");
+                ctx.skipRemainingHandlers();
             }
         });
 
         app.post("/api/login", ControllerManager.getController(AuthController.class)::login);
+        app.get("/api/auth/info", ControllerManager.getController(AuthController.class)::sessionInfo);
         app.get("/api/nodes", ControllerManager.getController(NodeController.class)::list);
         app.post("/api/config/reload", ControllerManager.getController(NodeController.class)::reloadConfig);
         app.post("/api/hotswap/jar", ControllerManager.getController(HotswapController.class)::hotswapJar);
@@ -105,6 +112,9 @@ public class AdminServer {
         app.post("/api/users", ControllerManager.getController(UserController.class)::add);
         app.delete("/api/users/{username}", ControllerManager.getController(UserController.class)::delete);
         app.put("/api/users/{username}/password", ControllerManager.getController(UserController.class)::updatePassword);
+        app.get("/api/permission/pages", ControllerManager.getController(UserController.class)::listPages);
+        app.get("/api/users/{username}/permissions", ControllerManager.getController(UserController.class)::getPermissions);
+        app.put("/api/users/{username}/permissions", ControllerManager.getController(UserController.class)::updatePermissions);
 
         // 封禁玩家路由
         app.get("/api/ban/list", ControllerManager.getController(BanHumanController.class)::list);

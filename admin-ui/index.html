@@ -14,7 +14,10 @@
 <body>
 
 <div id="app">
-    <div v-if="!isLoggedIn" class="login-container min-h-screen flex items-center justify-center">
+    <div v-if="!sessionReady" class="login-container min-h-screen flex items-center justify-center">
+        <div class="text-gray-500">加载中...</div>
+    </div>
+    <div v-else-if="!isLoggedIn" class="login-container min-h-screen flex items-center justify-center">
         <el-card class="login-card w-96 rounded-xl relative z-10">
             <template #header>
                 <div class="text-center">Sunrise Game Frame</div>
@@ -44,73 +47,73 @@
             </div>
 
             <el-menu :default-active="activeTab" class="flex-1" @select="handleSelect">
-                <el-menu-item index="monitor">
+                <el-menu-item index="monitor" v-if="hasPermission('monitor')">
                     <el-icon>
                         <House/>
                     </el-icon>
                     <span>节点监控</span>
                 </el-menu-item>
-                <el-menu-item index="server_status">
+                <el-menu-item index="server_status" v-if="hasPermission('server_status')">
                     <el-icon>
                         <Open/>
                     </el-icon>
                     <span>服务器关闭</span>
                 </el-menu-item>
-                <el-menu-item index="online_player">
+                <el-menu-item index="online_player" v-if="hasPermission('online_player')">
                     <el-icon>
                         <User/>
                     </el-icon>
                     <span>在线玩家</span>
                 </el-menu-item>
-                <el-menu-item index="config_update">
+                <el-menu-item index="config_update" v-if="hasPermission('config_update')">
                     <el-icon>
                         <Refresh/>
                     </el-icon>
                     <span>配置更新</span>
                 </el-menu-item>
-                <el-menu-item index="hotswap_jar">
+                <el-menu-item index="hotswap_jar" v-if="hasPermission('hotswap_jar')">
                     <el-icon>
                         <Upload/>
                     </el-icon>
                     <span>代码热更</span>
                 </el-menu-item>
-                <el-menu-item index="send_mail">
+                <el-menu-item index="send_mail" v-if="hasPermission('send_mail')">
                     <el-icon>
                         <Message/>
                     </el-icon>
                     <span>发送邮件</span>
                 </el-menu-item>
-                <el-menu-item index="kick_human">
+                <el-menu-item index="kick_human" v-if="hasPermission('kick_human')">
                     <el-icon>
                         <Delete/>
                     </el-icon>
                     <span>玩家下线</span>
                 </el-menu-item>
-                <el-menu-item index="ban_player">
+                <el-menu-item index="ban_player" v-if="hasPermission('ban_player')">
                     <el-icon>
                         <Lock/>
                     </el-icon>
                     <span>玩家封禁</span>
                 </el-menu-item>
-                <el-menu-item index="mute_player">
+                <el-menu-item index="mute_player" v-if="hasPermission('mute_player')">
                     <el-icon>
                         <Mute/>
                     </el-icon>
                     <span>玩家禁言</span>
                 </el-menu-item>
-                <el-menu-item index="whitelist">
+                <el-menu-item index="whitelist" v-if="hasPermission('whitelist')">
                     <el-icon>
                         <Key/>
                     </el-icon>
                     <span>白名单</span>
                 </el-menu-item>
-                <el-menu-item index="announcement">
+                <el-menu-item index="announcement" v-if="hasPermission('announcement')">
                     <el-icon>
                         <Bell/>
                     </el-icon>
                     <span>全服公告</span>
                 </el-menu-item>
-                <el-menu-item index="operation_log">
+                <el-menu-item index="operation_log" v-if="hasPermission('operation_log')">
                     <el-icon>
                         <Document/>
                     </el-icon>
@@ -160,7 +163,10 @@
             </el-header>
 
             <el-main style="padding: 0; overflow: hidden; position: relative;">
-                <iframe :src="currentSrc" ref="contentFrame"></iframe>
+                <div v-if="!hasAnyPagePermission" class="flex items-center justify-center h-full text-gray-500">
+                    暂无页面访问权限，请联系管理员分配权限后重新登录
+                </div>
+                <iframe v-else :src="currentSrc" ref="contentFrame"></iframe>
             </el-main>
         </el-container>
     </el-container>
@@ -193,8 +199,129 @@
                     'operation_log': 'operation_log.html',
                     'user_manager': 'user_manager.html',
                 },
-                isAdmin: false // 是否为管理员
+                isAdmin: false, // 是否为管理员
+                permissions: [], // 当前用户页面权限
+                sessionReady: false // 会话信息是否已加载完成
             });
+
+            const hasPermission = (pageKey) => {
+                if (state.isAdmin) return true;
+                const perms = state.permissions;
+                return Array.isArray(perms) && perms.includes(pageKey);
+            };
+
+            const hasAnyPagePermission = computed(() => {
+                if (state.isAdmin) return true;
+                return Object.keys(state.menuMap).some(key => {
+                    if (key === 'user_manager') return false;
+                    return hasPermission(key);
+                });
+            });
+
+            const savePermissions = (permissions, isAdmin) => {
+                state.permissions = permissions || [];
+                state.isAdmin = !!isAdmin;
+                localStorage.setItem('admin_permissions', JSON.stringify(state.permissions));
+                localStorage.setItem('admin_is_admin', state.isAdmin ? '1' : '0');
+            };
+
+            const loadPermissionsFromStorage = () => {
+                try {
+                    const saved = localStorage.getItem('admin_permissions');
+                    if (saved) {
+                        const parsed = JSON.parse(saved);
+                        state.permissions = Array.isArray(parsed) ? parsed : [];
+                    }
+                    state.isAdmin = localStorage.getItem('admin_is_admin') === '1';
+                } catch (e) {
+                    state.permissions = [];
+                    state.isAdmin = false;
+                }
+            };
+
+            const applyLegacySession = async (token) => {
+                const savedPerms = localStorage.getItem('admin_permissions');
+                if (savedPerms !== null) {
+                    try {
+                        const parsed = JSON.parse(savedPerms);
+                        state.permissions = Array.isArray(parsed) ? parsed : [];
+                    } catch (e) {
+                        state.permissions = [];
+                    }
+                } else {
+                    state.permissions = [];
+                }
+                try {
+                    const res = await fetch('/api/users', {headers: {'Authorization': token}});
+                    state.isAdmin = res.status === 200 && (await res.json()).code === 200;
+                } catch (e) {
+                    state.isAdmin = false;
+                }
+                savePermissions(state.permissions, state.isAdmin);
+                state.isLoggedIn = true;
+                return true;
+            };
+
+            const refreshSession = async () => {
+                const token = localStorage.getItem('admin_token');
+                if (!token) {
+                    state.isLoggedIn = false;
+                    return false;
+                }
+                try {
+                    const res = await fetch('/api/auth/info', {
+                        headers: {'Authorization': token}
+                    });
+                    if (res.status === 401) {
+                        localStorage.removeItem('admin_token');
+                        localStorage.removeItem('admin_username');
+                        localStorage.removeItem('admin_permissions');
+                        localStorage.removeItem('admin_is_admin');
+                        state.isLoggedIn = false;
+                        state.permissions = [];
+                        state.isAdmin = false;
+                        return false;
+                    }
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data.code === 200 && data.data) {
+                            savePermissions(data.data.permissions, data.data.isAdmin);
+                            if (data.data.username) {
+                                state.form.user = data.data.username;
+                                localStorage.setItem('admin_username', data.data.username);
+                            }
+                            state.isLoggedIn = true;
+                            return true;
+                        }
+                    }
+                    return await applyLegacySession(token);
+                } catch (e) {
+                    console.error('刷新会话失败，使用本地缓存', e);
+                    return await applyLegacySession(token);
+                }
+            };
+
+            const getFirstAllowedTab = () => {
+                const order = Object.keys(state.menuMap);
+                for (const key of order) {
+                    if (key === 'user_manager') {
+                        if (state.isAdmin) return key;
+                        continue;
+                    }
+                    if (hasPermission(key)) return key;
+                }
+                return null;
+            };
+
+            const ensureActiveTabAllowed = () => {
+                if (state.activeTab === 'user_manager' && !state.isAdmin) {
+                    state.activeTab = getFirstAllowedTab();
+                    return;
+                }
+                if (state.activeTab && state.activeTab !== 'user_manager' && !hasPermission(state.activeTab)) {
+                    state.activeTab = getFirstAllowedTab();
+                }
+            };
 
             const pageTitle = computed(() => {
                 if (state.activeTab === 'monitor') return '节点监控';
@@ -213,9 +340,13 @@
                 return '';
             });
 
-            // 计算当前 iframe 地址
             const currentSrc = computed(() => {
-                return state.menuMap[state.activeTab] || 'monitor.html';
+                if (!state.activeTab) return 'about:blank';
+                if (state.activeTab === 'user_manager' && state.isAdmin) {
+                    return state.menuMap[state.activeTab];
+                }
+                if (!hasPermission(state.activeTab)) return 'about:blank';
+                return state.menuMap[state.activeTab] || 'about:blank';
             });
 
             // --- 登录逻辑 ---
@@ -234,14 +365,16 @@
                     const data = await res.json();
 
                     if (data.code === 200) {
-                        // 1. 存 Token (子页面 iframe 会自己去 localStorage 拿)
                         localStorage.setItem('admin_token', data.token);
-                        // 2. 保存用户名到本地存储
                         localStorage.setItem('admin_username', state.form.user);
-                        // 3. 切换状态
+                        if (Array.isArray(data.permissions)) {
+                            savePermissions(data.permissions, data.isAdmin);
+                        } else {
+                            await refreshSession();
+                        }
                         state.isLoggedIn = true;
-                        // 4. 检查是否为 admin
-                        await checkAdmin();
+                        state.activeTab = getFirstAllowedTab();
+                        ensureActiveTabAllowed();
                         ElementPlus.ElMessage.success('登录成功');
                     } else {
                         ElementPlus.ElMessage.error(data.msg || '登录失败');
@@ -260,60 +393,42 @@
                 state.form.user = ''; // 清空用户名
                 localStorage.removeItem('admin_token');
                 localStorage.removeItem('admin_username');
+                localStorage.removeItem('admin_permissions');
+                localStorage.removeItem('admin_is_admin');
+                state.permissions = [];
+                state.isAdmin = false;
                 ElementPlus.ElMessage.success('已退出登录');
             };
 
             // --- 菜单切换 ---
             const handleSelect = (index) => {
-                // 如果选择用户管理但当前用户不是 admin，则不允许切换
                 if (index === 'user_manager' && !state.isAdmin) {
                     ElementPlus.ElMessage.warning('权限不足：只有管理员可以访问用户管理');
+                    return;
+                }
+                if (index !== 'user_manager' && !hasPermission(index)) {
+                    ElementPlus.ElMessage.warning('权限不足：无法访问该页面');
                     return;
                 }
                 state.activeTab = index;
             };
 
-            // 检查当前用户是否为 admin
-            const checkAdmin = async () => {
-                const token = localStorage.getItem('admin_token');
-                if (!token) {
-                    state.isAdmin = false;
-                    return;
-                }
-                try {
-                    // 尝试访问用户管理接口，只有返回 200 才认为是 admin
-                    const res = await fetch('/api/users', {
-                        headers: {'Authorization': token}
-                    });
-                    // 只有明确返回 200 时才认为是 admin
-                    if (res.status === 200) {
-                        const json = await res.json();
-                        state.isAdmin = json.code === 200;
-                    } else {
-                        state.isAdmin = false;
-                    }
-                } catch (e) {
-                    state.isAdmin = false;
-                }
-            };
-
             // --- 初始化 ---
             onMounted(async () => {
-                // 检查是否已有 Token，实现自动登录
-                if (localStorage.getItem('admin_token')) {
-                    state.isLoggedIn = true;
-                    // 恢复用户名
+                const token = localStorage.getItem('admin_token');
+                if (token) {
                     const savedUsername = localStorage.getItem('admin_username');
                     if (savedUsername) {
                         state.form.user = savedUsername;
                     }
-                    // 检查是否为 admin
-                    await checkAdmin();
-                    // 如果当前选中的是用户管理页面，但用户不是 admin，则切换到监控页面
-                    if (state.activeTab === 'user_manager' && !state.isAdmin) {
-                        state.activeTab = 'monitor';
+                    loadPermissionsFromStorage();
+                    const ok = await refreshSession();
+                    if (ok) {
+                        state.activeTab = getFirstAllowedTab();
+                        ensureActiveTabAllowed();
                     }
                 }
+                state.sessionReady = true;
             });
 
             return {
@@ -323,7 +438,8 @@
                 handleSelect,
                 pageTitle,
                 currentSrc,
-                checkAdmin
+                hasPermission,
+                hasAnyPagePermission
             };
         }
     });

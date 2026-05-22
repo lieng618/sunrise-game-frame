@@ -6,6 +6,16 @@
     <link rel="stylesheet" href="https://unpkg.com/element-plus/dist/index.css"/>
     <link rel="stylesheet" href="css/common.css"/>
     <link rel="stylesheet" href="css/pages.css"/>
+    <style>
+        .perm-checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px 16px;
+        }
+        .perm-checkbox-item {
+            margin-right: 0;
+        }
+    </style>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://unpkg.com/element-plus"></script>
     <script src="https://unpkg.com/@element-plus/icons-vue"></script>
@@ -45,8 +55,15 @@
                 </template>
             </el-table-column>
 
-            <el-table-column label="操作" width="200" align="center">
+            <el-table-column label="操作" width="320" align="center">
                 <template #default="scope">
+                    <el-button
+                            type="success"
+                            size="small"
+                            @click="handleEditPermissions(scope.row)"
+                            :icon="Setting">
+                        权限管理
+                    </el-button>
                     <el-button
                             type="primary"
                             size="small"
@@ -102,6 +119,34 @@
         </template>
     </el-dialog>
 
+    <!-- 权限管理对话框 -->
+    <el-dialog v-model="showPermDialog" width="560px" @close="resetPermForm">
+        <template #header>
+            <div class="flex items-center gap-2">
+                <el-icon class="text-green-500">
+                    <Setting/>
+                </el-icon>
+                <span>权限管理 - {{ permForm.username }}</span>
+            </div>
+        </template>
+        <div class="text-gray-500 text-sm mb-4">勾选该用户可访问的前端页面，保存后该用户需重新登录生效。</div>
+        <el-checkbox-group v-model="permForm.permissions" class="perm-checkbox-grid">
+            <el-checkbox
+                    v-for="page in permForm.pages"
+                    :key="page.key"
+                    :label="page.key"
+                    class="perm-checkbox-item">
+                {{ page.label }}
+            </el-checkbox>
+        </el-checkbox-group>
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button @click="showPermDialog = false">取消</el-button>
+                <el-button type="primary" @click="handleSavePermissions" :loading="permLoading">保存</el-button>
+            </span>
+        </template>
+    </el-dialog>
+
     <!-- 修改密码对话框 -->
     <el-dialog v-model="showEditDialog" width="400px" @close="resetEditForm">
         <template #header>
@@ -149,8 +194,10 @@
                 tableData: [],
                 showAddDialog: false,
                 showEditDialog: false,
+                showPermDialog: false,
                 addLoading: false,
                 editLoading: false,
+                permLoading: false,
                 addForm: {
                     username: '',
                     password: ''
@@ -158,6 +205,11 @@
                 editForm: {
                     username: '',
                     password: ''
+                },
+                permForm: {
+                    username: '',
+                    permissions: [],
+                    pages: []
                 }
             });
 
@@ -281,6 +333,85 @@
                 }
             };
 
+            // 打开权限管理对话框
+            const handleEditPermissions = async (row) => {
+                state.permLoading = true;
+                try {
+                    const res = await fetch(`/api/users/${encodeURIComponent(row.username)}/permissions`, {
+                        headers: {'Authorization': localStorage.getItem('admin_token')}
+                    });
+
+                    if (res.status === 401) {
+                        if (typeof handleLoginExpired === 'function') handleLoginExpired();
+                        return;
+                    }
+                    if (res.status === 403) {
+                        ElMessage.error('权限不足：只有管理员可以管理用户权限');
+                        return;
+                    }
+
+                    const json = await res.json();
+                    if (json.code === 200) {
+                        state.permForm.username = row.username;
+                        state.permForm.permissions = [...(json.data.permissions || [])];
+                        state.permForm.pages = json.data.pages || [];
+                        state.showPermDialog = true;
+                    } else {
+                        ElMessage.error(json.msg || '获取用户权限失败');
+                    }
+                } catch (e) {
+                    console.error("获取用户权限失败", e);
+                    ElMessage.error('网络连接错误');
+                } finally {
+                    state.permLoading = false;
+                }
+            };
+
+            // 保存权限
+            const handleSavePermissions = async () => {
+                state.permLoading = true;
+                try {
+                    const res = await fetch(`/api/users/${encodeURIComponent(state.permForm.username)}/permissions`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': localStorage.getItem('admin_token')
+                        },
+                        body: JSON.stringify({permissions: state.permForm.permissions})
+                    });
+
+                    if (res.status === 401) {
+                        if (typeof handleLoginExpired === 'function') handleLoginExpired();
+                        return;
+                    }
+                    if (res.status === 403) {
+                        ElMessage.error('权限不足：只有管理员可以修改用户权限');
+                        return;
+                    }
+
+                    const json = await res.json();
+                    if (json.code === 200) {
+                        ElMessage.success('权限保存成功，该用户需重新登录后生效');
+                        state.showPermDialog = false;
+                        resetPermForm();
+                        fetchUsers();
+                    } else {
+                        ElMessage.error(json.msg || '保存权限失败');
+                    }
+                } catch (e) {
+                    console.error("保存权限失败", e);
+                    ElMessage.error('网络连接错误');
+                } finally {
+                    state.permLoading = false;
+                }
+            };
+
+            const resetPermForm = () => {
+                state.permForm.username = '';
+                state.permForm.permissions = [];
+                state.permForm.pages = [];
+            };
+
             // 打开修改密码对话框
             const handleEditPassword = (row) => {
                 state.editForm.username = row.username;
@@ -359,10 +490,13 @@
                 fetchUsers,
                 handleAdd,
                 handleDelete,
+                handleEditPermissions,
+                handleSavePermissions,
                 handleEditPassword,
                 handleUpdatePassword,
                 resetAddForm,
                 resetEditForm,
+                resetPermForm,
                 formatTime
             };
         }
