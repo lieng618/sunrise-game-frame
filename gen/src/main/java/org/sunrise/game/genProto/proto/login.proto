@@ -18,6 +18,7 @@ enum FROM_SERVER
   S2C_ClientPing = 3; //客户端ping
   S2C_ServerInfo = 4; //服务器信息
   S2C_Kick = 5; //下线
+  S2C_Queue = 6; //排队信息
 }
 
 message STHumanShowInfo
@@ -70,4 +71,11 @@ message MS2C_ServerInfo
 message MS2C_Kick
 {
   string reason = 1;    //原因
+}
+
+message MS2C_Queue
+{
+  int32 pos = 1;    //当前所处的位置
+  int32 queues = 2; //排队总人数
+  int32 need_time = 3; //预计等待时间
 }

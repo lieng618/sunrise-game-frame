@@ -245,6 +245,14 @@ public final class LoginProto {
      * <code>S2C_Kick = 5;</code>
      */
     S2C_Kick(5),
+    /**
+     * <pre>
+     * 排队信息
+     * </pre>
+     *
+     * <code>S2C_Queue = 6;</code>
+     */
+    S2C_Queue(6),
     UNRECOGNIZED(-1),
     ;
 
@@ -305,6 +313,14 @@ public final class LoginProto {
      * <code>S2C_Kick = 5;</code>
      */
     public static final int S2C_Kick_VALUE = 5;
+    /**
+     * <pre>
+     * 排队信息
+     * </pre>
+     *
+     * <code>S2C_Queue = 6;</code>
+     */
+    public static final int S2C_Queue_VALUE = 6;
 
 
     public final int getNumber() {
@@ -337,6 +353,7 @@ public final class LoginProto {
         case 3: return S2C_ClientPing;
         case 4: return S2C_ServerInfo;
         case 5: return S2C_Kick;
+        case 6: return S2C_Queue;
         default: return null;
       }
     }
@@ -5894,6 +5911,644 @@ public final class LoginProto {
 
   }
 
+  public interface MS2C_QueueOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:org.sunrise.game.genProto.gen.MS2C_Queue)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <pre>
+     * 当前所处的位置
+     * </pre>
+     *
+     * <code>int32 pos = 1;</code>
+     * @return The pos.
+     */
+    int getPos();
+
+    /**
+     * <pre>
+     * 排队总人数
+     * </pre>
+     *
+     * <code>int32 queues = 2;</code>
+     * @return The queues.
+     */
+    int getQueues();
+
+    /**
+     * <pre>
+     * 预计等待时间
+     * </pre>
+     *
+     * <code>int32 need_time = 3;</code>
+     * @return The needTime.
+     */
+    int getNeedTime();
+  }
+  /**
+   * Protobuf type {@code org.sunrise.game.genProto.gen.MS2C_Queue}
+   */
+  public static final class MS2C_Queue extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:org.sunrise.game.genProto.gen.MS2C_Queue)
+      MS2C_QueueOrBuilder {
+  private static final long serialVersionUID = 0L;
+    static {
+      com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
+        com.google.protobuf.RuntimeVersion.RuntimeDomain.PUBLIC,
+        /* major= */ 4,
+        /* minor= */ 28,
+        /* patch= */ 2,
+        /* suffix= */ "",
+        MS2C_Queue.class.getName());
+    }
+    // Use MS2C_Queue.newBuilder() to construct.
+    private MS2C_Queue(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+    }
+    private MS2C_Queue() {
+    }
+
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return org.sunrise.game.genProto.gen.LoginProto.internal_static_org_sunrise_game_genProto_gen_MS2C_Queue_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return org.sunrise.game.genProto.gen.LoginProto.internal_static_org_sunrise_game_genProto_gen_MS2C_Queue_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              org.sunrise.game.genProto.gen.LoginProto.MS2C_Queue.class, org.sunrise.game.genProto.gen.LoginProto.MS2C_Queue.Builder.class);
+    }
+
+    public static final int POS_FIELD_NUMBER = 1;
+    private int pos_ = 0;
+    /**
+     * <pre>
+     * 当前所处的位置
+     * </pre>
+     *
+     * <code>int32 pos = 1;</code>
+     * @return The pos.
+     */
+    @java.lang.Override
+    public int getPos() {
+      return pos_;
+    }
+
+    public static final int QUEUES_FIELD_NUMBER = 2;
+    private int queues_ = 0;
+    /**
+     * <pre>
+     * 排队总人数
+     * </pre>
+     *
+     * <code>int32 queues = 2;</code>
+     * @return The queues.
+     */
+    @java.lang.Override
+    public int getQueues() {
+      return queues_;
+    }
+
+    public static final int NEED_TIME_FIELD_NUMBER = 3;
+    private int needTime_ = 0;
+    /**
+     * <pre>
+     * 预计等待时间
+     * </pre>
+     *
+     * <code>int32 need_time = 3;</code>
+     * @return The needTime.
+     */
+    @java.lang.Override
+    public int getNeedTime() {
+      return needTime_;
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (pos_ != 0) {
+        output.writeInt32(1, pos_);
+      }
+      if (queues_ != 0) {
+        output.writeInt32(2, queues_);
+      }
+      if (needTime_ != 0) {
+        output.writeInt32(3, needTime_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (pos_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(1, pos_);
+      }
+      if (queues_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(2, queues_);
+      }
+      if (needTime_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(3, needTime_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof org.sunrise.game.genProto.gen.LoginProto.MS2C_Queue)) {
+        return super.equals(obj);
+      }
+      org.sunrise.game.genProto.gen.LoginProto.MS2C_Queue other = (org.sunrise.game.genProto.gen.LoginProto.MS2C_Queue) obj;
+
+      if (getPos()
+          != other.getPos()) return false;
+      if (getQueues()
+          != other.getQueues()) return false;
+      if (getNeedTime()
+          != other.getNeedTime()) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + POS_FIELD_NUMBER;
+      hash = (53 * hash) + getPos();
+      hash = (37 * hash) + QUEUES_FIELD_NUMBER;
+      hash = (53 * hash) + getQueues();
+      hash = (37 * hash) + NEED_TIME_FIELD_NUMBER;
+      hash = (53 * hash) + getNeedTime();
+      hash = (29 * hash) + getUnknownFields().hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static org.sunrise.game.genProto.gen.LoginProto.MS2C_Queue parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.sunrise.game.genProto.gen.LoginProto.MS2C_Queue parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.sunrise.game.genProto.gen.LoginProto.MS2C_Queue parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.sunrise.game.genProto.gen.LoginProto.MS2C_Queue parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.sunrise.game.genProto.gen.LoginProto.MS2C_Queue parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.sunrise.game.genProto.gen.LoginProto.MS2C_Queue parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.sunrise.game.genProto.gen.LoginProto.MS2C_Queue parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static org.sunrise.game.genProto.gen.LoginProto.MS2C_Queue parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static org.sunrise.game.genProto.gen.LoginProto.MS2C_Queue parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static org.sunrise.game.genProto.gen.LoginProto.MS2C_Queue parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static org.sunrise.game.genProto.gen.LoginProto.MS2C_Queue parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static org.sunrise.game.genProto.gen.LoginProto.MS2C_Queue parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(org.sunrise.game.genProto.gen.LoginProto.MS2C_Queue prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code org.sunrise.game.genProto.gen.MS2C_Queue}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:org.sunrise.game.genProto.gen.MS2C_Queue)
+        org.sunrise.game.genProto.gen.LoginProto.MS2C_QueueOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return org.sunrise.game.genProto.gen.LoginProto.internal_static_org_sunrise_game_genProto_gen_MS2C_Queue_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return org.sunrise.game.genProto.gen.LoginProto.internal_static_org_sunrise_game_genProto_gen_MS2C_Queue_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                org.sunrise.game.genProto.gen.LoginProto.MS2C_Queue.class, org.sunrise.game.genProto.gen.LoginProto.MS2C_Queue.Builder.class);
+      }
+
+      // Construct using org.sunrise.game.genProto.gen.LoginProto.MS2C_Queue.newBuilder()
+      private Builder() {
+
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        bitField0_ = 0;
+        pos_ = 0;
+        queues_ = 0;
+        needTime_ = 0;
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return org.sunrise.game.genProto.gen.LoginProto.internal_static_org_sunrise_game_genProto_gen_MS2C_Queue_descriptor;
+      }
+
+      @java.lang.Override
+      public org.sunrise.game.genProto.gen.LoginProto.MS2C_Queue getDefaultInstanceForType() {
+        return org.sunrise.game.genProto.gen.LoginProto.MS2C_Queue.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public org.sunrise.game.genProto.gen.LoginProto.MS2C_Queue build() {
+        org.sunrise.game.genProto.gen.LoginProto.MS2C_Queue result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public org.sunrise.game.genProto.gen.LoginProto.MS2C_Queue buildPartial() {
+        org.sunrise.game.genProto.gen.LoginProto.MS2C_Queue result = new org.sunrise.game.genProto.gen.LoginProto.MS2C_Queue(this);
+        if (bitField0_ != 0) { buildPartial0(result); }
+        onBuilt();
+        return result;
+      }
+
+      private void buildPartial0(org.sunrise.game.genProto.gen.LoginProto.MS2C_Queue result) {
+        int from_bitField0_ = bitField0_;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.pos_ = pos_;
+        }
+        if (((from_bitField0_ & 0x00000002) != 0)) {
+          result.queues_ = queues_;
+        }
+        if (((from_bitField0_ & 0x00000004) != 0)) {
+          result.needTime_ = needTime_;
+        }
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof org.sunrise.game.genProto.gen.LoginProto.MS2C_Queue) {
+          return mergeFrom((org.sunrise.game.genProto.gen.LoginProto.MS2C_Queue)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(org.sunrise.game.genProto.gen.LoginProto.MS2C_Queue other) {
+        if (other == org.sunrise.game.genProto.gen.LoginProto.MS2C_Queue.getDefaultInstance()) return this;
+        if (other.getPos() != 0) {
+          setPos(other.getPos());
+        }
+        if (other.getQueues() != 0) {
+          setQueues(other.getQueues());
+        }
+        if (other.getNeedTime() != 0) {
+          setNeedTime(other.getNeedTime());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
+        try {
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 8: {
+                pos_ = input.readInt32();
+                bitField0_ |= 0x00000001;
+                break;
+              } // case 8
+              case 16: {
+                queues_ = input.readInt32();
+                bitField0_ |= 0x00000002;
+                break;
+              } // case 16
+              case 24: {
+                needTime_ = input.readInt32();
+                bitField0_ |= 0x00000004;
+                break;
+              } // case 24
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.unwrapIOException();
+        } finally {
+          onChanged();
+        } // finally
+        return this;
+      }
+      private int bitField0_;
+
+      private int pos_ ;
+      /**
+       * <pre>
+       * 当前所处的位置
+       * </pre>
+       *
+       * <code>int32 pos = 1;</code>
+       * @return The pos.
+       */
+      @java.lang.Override
+      public int getPos() {
+        return pos_;
+      }
+      /**
+       * <pre>
+       * 当前所处的位置
+       * </pre>
+       *
+       * <code>int32 pos = 1;</code>
+       * @param value The pos to set.
+       * @return This builder for chaining.
+       */
+      public Builder setPos(int value) {
+
+        pos_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * 当前所处的位置
+       * </pre>
+       *
+       * <code>int32 pos = 1;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearPos() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        pos_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private int queues_ ;
+      /**
+       * <pre>
+       * 排队总人数
+       * </pre>
+       *
+       * <code>int32 queues = 2;</code>
+       * @return The queues.
+       */
+      @java.lang.Override
+      public int getQueues() {
+        return queues_;
+      }
+      /**
+       * <pre>
+       * 排队总人数
+       * </pre>
+       *
+       * <code>int32 queues = 2;</code>
+       * @param value The queues to set.
+       * @return This builder for chaining.
+       */
+      public Builder setQueues(int value) {
+
+        queues_ = value;
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * 排队总人数
+       * </pre>
+       *
+       * <code>int32 queues = 2;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearQueues() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        queues_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private int needTime_ ;
+      /**
+       * <pre>
+       * 预计等待时间
+       * </pre>
+       *
+       * <code>int32 need_time = 3;</code>
+       * @return The needTime.
+       */
+      @java.lang.Override
+      public int getNeedTime() {
+        return needTime_;
+      }
+      /**
+       * <pre>
+       * 预计等待时间
+       * </pre>
+       *
+       * <code>int32 need_time = 3;</code>
+       * @param value The needTime to set.
+       * @return This builder for chaining.
+       */
+      public Builder setNeedTime(int value) {
+
+        needTime_ = value;
+        bitField0_ |= 0x00000004;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * 预计等待时间
+       * </pre>
+       *
+       * <code>int32 need_time = 3;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearNeedTime() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        needTime_ = 0;
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:org.sunrise.game.genProto.gen.MS2C_Queue)
+    }
+
+    // @@protoc_insertion_point(class_scope:org.sunrise.game.genProto.gen.MS2C_Queue)
+    private static final org.sunrise.game.genProto.gen.LoginProto.MS2C_Queue DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new org.sunrise.game.genProto.gen.LoginProto.MS2C_Queue();
+    }
+
+    public static org.sunrise.game.genProto.gen.LoginProto.MS2C_Queue getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<MS2C_Queue>
+        PARSER = new com.google.protobuf.AbstractParser<MS2C_Queue>() {
+      @java.lang.Override
+      public MS2C_Queue parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
+      }
+    };
+
+    public static com.google.protobuf.Parser<MS2C_Queue> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<MS2C_Queue> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public org.sunrise.game.genProto.gen.LoginProto.MS2C_Queue getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_org_sunrise_game_genProto_gen_STHumanShowInfo_descriptor;
   private static final 
@@ -5939,6 +6594,11 @@ public final class LoginProto {
   private static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_org_sunrise_game_genProto_gen_MS2C_Kick_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_org_sunrise_game_genProto_gen_MS2C_Queue_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_org_sunrise_game_genProto_gen_MS2C_Queue_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -5961,12 +6621,14 @@ public final class LoginProto {
       "e\030\001 \001(\004\"S\n\017MS2C_ServerInfo\022\023\n\013server_tim" +
       "e\030\001 \001(\004\022\021\n\ttime_zone\030\002 \001(\005\022\030\n\020server_ope" +
       "n_time\030\003 \001(\004\"\033\n\tMS2C_Kick\022\016\n\006reason\030\001 \001(" +
-      "\t*X\n\013FROM_CLIENT\022\r\n\tC2S_Login\020\000\022\021\n\rC2S_H" +
-      "umanList\020\001\022\023\n\017C2S_SelectHuman\020\002\022\022\n\016C2S_C" +
-      "lientPing\020\003*z\n\013FROM_SERVER\022\r\n\tS2C_Login\020" +
-      "\000\022\021\n\rS2C_HumanList\020\001\022\023\n\017S2C_SelectHuman\020" +
-      "\002\022\022\n\016S2C_ClientPing\020\003\022\022\n\016S2C_ServerInfo\020" +
-      "\004\022\014\n\010S2C_Kick\020\005B\014B\nLoginProtob\006proto3"
+      "\t\"<\n\nMS2C_Queue\022\013\n\003pos\030\001 \001(\005\022\016\n\006queues\030\002" +
+      " \001(\005\022\021\n\tneed_time\030\003 \001(\005*X\n\013FROM_CLIENT\022\r" +
+      "\n\tC2S_Login\020\000\022\021\n\rC2S_HumanList\020\001\022\023\n\017C2S_" +
+      "SelectHuman\020\002\022\022\n\016C2S_ClientPing\020\003*\211\001\n\013FR" +
+      "OM_SERVER\022\r\n\tS2C_Login\020\000\022\021\n\rS2C_HumanLis" +
+      "t\020\001\022\023\n\017S2C_SelectHuman\020\002\022\022\n\016S2C_ClientPi" +
+      "ng\020\003\022\022\n\016S2C_ServerInfo\020\004\022\014\n\010S2C_Kick\020\005\022\r" +
+      "\n\tS2C_Queue\020\006B\014B\nLoginProtob\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -6026,6 +6688,12 @@ public final class LoginProto {
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_org_sunrise_game_genProto_gen_MS2C_Kick_descriptor,
         new java.lang.String[] { "Reason", });
+    internal_static_org_sunrise_game_genProto_gen_MS2C_Queue_descriptor =
+      getDescriptor().getMessageTypes().get(9);
+    internal_static_org_sunrise_game_genProto_gen_MS2C_Queue_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_org_sunrise_game_genProto_gen_MS2C_Queue_descriptor,
+        new java.lang.String[] { "Pos", "Queues", "NeedTime", });
     descriptor.resolveAllFeaturesImmutable();
   }
 

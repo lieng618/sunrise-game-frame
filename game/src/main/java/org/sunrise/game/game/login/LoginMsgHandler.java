@@ -7,6 +7,8 @@ import org.sunrise.game.db.entity.EntityAccount;
 import org.sunrise.game.db.entity.EntityHumanInfo;
 import org.sunrise.game.db.entity.EntityHumanList;
 import org.sunrise.game.game.async.AsyncEventManager;
+import org.sunrise.game.game.logic.system.GameSystemUtils;
+import org.sunrise.game.game.logic.system.LoginQueueSystem;
 import org.sunrise.game.game.human.ConnectObject;
 import org.sunrise.game.game.human.HumanObject;
 import org.sunrise.game.game.human.HumanObjectManger;
@@ -24,40 +26,19 @@ public class LoginMsgHandler {
         ConnectObject connectObject = HumanObjectManger.getConnectObject(connectId);
         switch (packetId) {
             case LoginProto.FROM_CLIENT.C2S_Login_VALUE: {
-                if (connectObject != null) {
-                    return;
-                }
                 LoginProto.MC2S_Login msg = (LoginProto.MC2S_Login) data;
                 if (msg.getUid().isEmpty()) {
                     return;
                 }
-                connectObject = new ConnectObject(connectId, msg.getUid(), externalNodeId);
-                HumanObjectManger.addConnectObject(connectId, connectObject);
+                if (connectObject != null) {
+                    return;
+                }
 
-                Long accountId = HumanObjectManger.uidAccounts.get(msg.getUid());
-                if (accountId != null) {
-                    HumanObjectManger.getConnectObject(connectId).onLoadAccount(accountId);
+                LoginQueueSystem loginQueue = GameSystemUtils.getSystem(LoginQueueSystem.class);
+                if (loginQueue != null && loginQueue.tryEnterOrQueue(connectId, msg.getUid(), externalNodeId)) {
+                    loginQueue.sendQueueInfo(connectId, msg.getUid(), externalNodeId);
                 } else {
-                    // 加载账号
-                    DbManager.getDbService().queryGetOneByParamsAsync(result -> {
-                        // 将任务放入异步队列
-                        AsyncEventManager.addAsyncEvent(() -> {
-                            if (result != null) {
-                                EntityAccount account = new EntityAccount(result);
-                                ConnectObject connectContext = HumanObjectManger.getConnectObject(connectId);
-                                connectContext.onLoadAccount(account.getId());
-                                HumanObjectManger.uidAccounts.put(connectContext.getUid(), (long) account.getId());
-                            } else {
-                                DbManager.getDbService().executeAsyncWithGeneratedKey(r -> {
-                                    AsyncEventManager.addAsyncEvent(() -> {
-                                        ConnectObject connectContext = HumanObjectManger.getConnectObject(connectId);
-                                        connectContext.onLoadAccount((long) r);
-                                        HumanObjectManger.uidAccounts.put(connectContext.getUid(), (long) r);
-                                    });
-                                }, "insert into `account` (uid) values (?)", msg.getUid());
-                            }
-                        });
-                    }, "select * from `account` where `uid` = ?", msg.getUid());
+                    processLogin(connectId, msg.getUid(), externalNodeId);
                 }
 
                 break;
@@ -172,12 +153,61 @@ public class LoginMsgHandler {
         }
     }
 
+    public static void processLogin(long connectId, String uid, String externalNodeId) {
+        LoginQueueSystem loginQueue = GameSystemUtils.getSystem(LoginQueueSystem.class);
+        if (loginQueue != null) {
+            loginQueue.removeFromQueue(connectId);
+        }
+        if (HumanObjectManger.getConnectObject(connectId) != null) {
+            return;
+        }
+        ConnectObject connectObject = new ConnectObject(connectId, uid, externalNodeId);
+        HumanObjectManger.addConnectObject(connectId, connectObject);
+
+        Long accountId = HumanObjectManger.uidAccounts.get(uid);
+        if (accountId != null) {
+            HumanObjectManger.getConnectObject(connectId).onLoadAccount(accountId);
+        } else {
+            loadAccount(connectId, uid);
+        }
+    }
+
+    private static void loadAccount(long connectId, String uid) {
+        DbManager.getDbService().queryGetOneByParamsAsync(result -> {
+            AsyncEventManager.addAsyncEvent(() -> {
+                ConnectObject connectContext = HumanObjectManger.getConnectObject(connectId);
+                if (connectContext == null) {
+                    return;
+                }
+                if (result != null) {
+                    EntityAccount account = new EntityAccount(result);
+                    connectContext.onLoadAccount(account.getId());
+                    HumanObjectManger.uidAccounts.put(connectContext.getUid(), (long) account.getId());
+                } else {
+                    DbManager.getDbService().executeAsyncWithGeneratedKey(r -> {
+                        AsyncEventManager.addAsyncEvent(() -> {
+                            ConnectObject ctx = HumanObjectManger.getConnectObject(connectId);
+                            if (ctx == null) {
+                                return;
+                            }
+                            ctx.onLoadAccount((long) r);
+                            HumanObjectManger.uidAccounts.put(ctx.getUid(), (long) r);
+                        });
+                    }, "insert into `account` (uid) values (?)", uid);
+                }
+            });
+        }, "select * from `account` where `uid` = ?", uid);
+    }
+
     private static void loadHumanList(long connectId, boolean send) {
         ConnectObject connectObject = HumanObjectManger.getConnectObject(connectId);
         DbManager.getDbService().queryGetAllByParamsAsync(result -> {
             // 将任务放入异步队列
             AsyncEventManager.addAsyncEvent(() -> {
                 ConnectObject contextObject = HumanObjectManger.getConnectObject(connectId);
+                if (contextObject == null) {
+                    return;
+                }
                 List<EntityHumanList> humanLists = new ArrayList<>();
                 if (result != null) {
                     for (Map<String, Object> objectMap : result) {
@@ -213,6 +243,7 @@ public class LoginMsgHandler {
             });
         }, "select * from `human_info` where `human_id` = ?", humanId);
     }
+
 
     private static void createHumanObject(long connectId, int serverId, String humanId, boolean newHumanObj) {
         HumanObjectManger.addHumanObject(humanId, new HumanObject(humanId, serverId, HumanObjectManger.getConnectObject(connectId), newHumanObj));
