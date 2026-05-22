@@ -113,6 +113,12 @@
                     </el-icon>
                     <span>全服公告</span>
                 </el-menu-item>
+                <el-menu-item index="cdk" v-if="hasPermission('cdk')">
+                    <el-icon>
+                        <Ticket/>
+                    </el-icon>
+                    <span>兑换码</span>
+                </el-menu-item>
                 <el-menu-item index="operation_log" v-if="hasPermission('operation_log')">
                     <el-icon>
                         <Document/>
@@ -196,6 +202,7 @@
                     'mute_player': 'mute_player.html',
                     'whitelist': 'whitelist.html',
                     'announcement': 'announcement.html',
+                    'cdk': 'cdk.html',
                     'operation_log': 'operation_log.html',
                     'user_manager': 'user_manager.html',
                 },
@@ -335,6 +342,7 @@
                 if (state.activeTab === 'mute_player') return '玩家禁言';
                 if (state.activeTab === 'whitelist') return '白名单';
                 if (state.activeTab === 'announcement') return '全服公告';
+                if (state.activeTab === 'cdk') return '兑换码';
                 if (state.activeTab === 'operation_log') return '操作记录';
                 if (state.activeTab === 'user_manager') return '用户管理';
                 return '';

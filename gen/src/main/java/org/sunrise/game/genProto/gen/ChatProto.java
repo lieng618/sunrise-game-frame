@@ -40,12 +40,20 @@ public final class ChatProto {
     C2S_Horn(1),
     /**
      * <pre>
-     * 新增获取历史记录请求
+     * 获取历史记录请求
      * </pre>
      *
      * <code>C2S_GetHistory = 2;</code>
      */
     C2S_GetHistory(2),
+    /**
+     * <pre>
+     * 使用cdk
+     * </pre>
+     *
+     * <code>C2S_CDK = 3;</code>
+     */
+    C2S_CDK(3),
     UNRECOGNIZED(-1),
     ;
 
@@ -68,12 +76,20 @@ public final class ChatProto {
     public static final int C2S_Horn_VALUE = 1;
     /**
      * <pre>
-     * 新增获取历史记录请求
+     * 获取历史记录请求
      * </pre>
      *
      * <code>C2S_GetHistory = 2;</code>
      */
     public static final int C2S_GetHistory_VALUE = 2;
+    /**
+     * <pre>
+     * 使用cdk
+     * </pre>
+     *
+     * <code>C2S_CDK = 3;</code>
+     */
+    public static final int C2S_CDK_VALUE = 3;
 
 
     public final int getNumber() {
@@ -103,6 +119,7 @@ public final class ChatProto {
         case 0: return C2S_Chat;
         case 1: return C2S_Horn;
         case 2: return C2S_GetHistory;
+        case 3: return C2S_CDK;
         default: return null;
       }
     }
@@ -182,7 +199,7 @@ public final class ChatProto {
     S2C_Horn(1),
     /**
      * <pre>
-     * 新增历史记录响应
+     * 历史记录响应
      * </pre>
      *
      * <code>S2C_History = 2;</code>
@@ -226,7 +243,7 @@ public final class ChatProto {
     public static final int S2C_Horn_VALUE = 1;
     /**
      * <pre>
-     * 新增历史记录响应
+     * 历史记录响应
      * </pre>
      *
      * <code>S2C_History = 2;</code>
@@ -872,6 +889,552 @@ public final class ChatProto {
 
   }
 
+  public interface MC2S_CDKOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:org.sunrise.game.genProto.gen.MC2S_CDK)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <pre>
+     * 兑换码内容
+     * </pre>
+     *
+     * <code>string code = 1;</code>
+     * @return The code.
+     */
+    java.lang.String getCode();
+    /**
+     * <pre>
+     * 兑换码内容
+     * </pre>
+     *
+     * <code>string code = 1;</code>
+     * @return The bytes for code.
+     */
+    com.google.protobuf.ByteString
+        getCodeBytes();
+  }
+  /**
+   * Protobuf type {@code org.sunrise.game.genProto.gen.MC2S_CDK}
+   */
+  public static final class MC2S_CDK extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:org.sunrise.game.genProto.gen.MC2S_CDK)
+      MC2S_CDKOrBuilder {
+  private static final long serialVersionUID = 0L;
+    static {
+      com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
+        com.google.protobuf.RuntimeVersion.RuntimeDomain.PUBLIC,
+        /* major= */ 4,
+        /* minor= */ 28,
+        /* patch= */ 2,
+        /* suffix= */ "",
+        MC2S_CDK.class.getName());
+    }
+    // Use MC2S_CDK.newBuilder() to construct.
+    private MC2S_CDK(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+    }
+    private MC2S_CDK() {
+      code_ = "";
+    }
+
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return org.sunrise.game.genProto.gen.ChatProto.internal_static_org_sunrise_game_genProto_gen_MC2S_CDK_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return org.sunrise.game.genProto.gen.ChatProto.internal_static_org_sunrise_game_genProto_gen_MC2S_CDK_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              org.sunrise.game.genProto.gen.ChatProto.MC2S_CDK.class, org.sunrise.game.genProto.gen.ChatProto.MC2S_CDK.Builder.class);
+    }
+
+    public static final int CODE_FIELD_NUMBER = 1;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object code_ = "";
+    /**
+     * <pre>
+     * 兑换码内容
+     * </pre>
+     *
+     * <code>string code = 1;</code>
+     * @return The code.
+     */
+    @java.lang.Override
+    public java.lang.String getCode() {
+      java.lang.Object ref = code_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        code_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * 兑换码内容
+     * </pre>
+     *
+     * <code>string code = 1;</code>
+     * @return The bytes for code.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getCodeBytes() {
+      java.lang.Object ref = code_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        code_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(code_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 1, code_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(code_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(1, code_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof org.sunrise.game.genProto.gen.ChatProto.MC2S_CDK)) {
+        return super.equals(obj);
+      }
+      org.sunrise.game.genProto.gen.ChatProto.MC2S_CDK other = (org.sunrise.game.genProto.gen.ChatProto.MC2S_CDK) obj;
+
+      if (!getCode()
+          .equals(other.getCode())) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + CODE_FIELD_NUMBER;
+      hash = (53 * hash) + getCode().hashCode();
+      hash = (29 * hash) + getUnknownFields().hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static org.sunrise.game.genProto.gen.ChatProto.MC2S_CDK parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.sunrise.game.genProto.gen.ChatProto.MC2S_CDK parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.sunrise.game.genProto.gen.ChatProto.MC2S_CDK parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.sunrise.game.genProto.gen.ChatProto.MC2S_CDK parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.sunrise.game.genProto.gen.ChatProto.MC2S_CDK parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.sunrise.game.genProto.gen.ChatProto.MC2S_CDK parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.sunrise.game.genProto.gen.ChatProto.MC2S_CDK parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static org.sunrise.game.genProto.gen.ChatProto.MC2S_CDK parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static org.sunrise.game.genProto.gen.ChatProto.MC2S_CDK parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static org.sunrise.game.genProto.gen.ChatProto.MC2S_CDK parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static org.sunrise.game.genProto.gen.ChatProto.MC2S_CDK parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static org.sunrise.game.genProto.gen.ChatProto.MC2S_CDK parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(org.sunrise.game.genProto.gen.ChatProto.MC2S_CDK prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code org.sunrise.game.genProto.gen.MC2S_CDK}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:org.sunrise.game.genProto.gen.MC2S_CDK)
+        org.sunrise.game.genProto.gen.ChatProto.MC2S_CDKOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return org.sunrise.game.genProto.gen.ChatProto.internal_static_org_sunrise_game_genProto_gen_MC2S_CDK_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return org.sunrise.game.genProto.gen.ChatProto.internal_static_org_sunrise_game_genProto_gen_MC2S_CDK_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                org.sunrise.game.genProto.gen.ChatProto.MC2S_CDK.class, org.sunrise.game.genProto.gen.ChatProto.MC2S_CDK.Builder.class);
+      }
+
+      // Construct using org.sunrise.game.genProto.gen.ChatProto.MC2S_CDK.newBuilder()
+      private Builder() {
+
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        bitField0_ = 0;
+        code_ = "";
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return org.sunrise.game.genProto.gen.ChatProto.internal_static_org_sunrise_game_genProto_gen_MC2S_CDK_descriptor;
+      }
+
+      @java.lang.Override
+      public org.sunrise.game.genProto.gen.ChatProto.MC2S_CDK getDefaultInstanceForType() {
+        return org.sunrise.game.genProto.gen.ChatProto.MC2S_CDK.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public org.sunrise.game.genProto.gen.ChatProto.MC2S_CDK build() {
+        org.sunrise.game.genProto.gen.ChatProto.MC2S_CDK result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public org.sunrise.game.genProto.gen.ChatProto.MC2S_CDK buildPartial() {
+        org.sunrise.game.genProto.gen.ChatProto.MC2S_CDK result = new org.sunrise.game.genProto.gen.ChatProto.MC2S_CDK(this);
+        if (bitField0_ != 0) { buildPartial0(result); }
+        onBuilt();
+        return result;
+      }
+
+      private void buildPartial0(org.sunrise.game.genProto.gen.ChatProto.MC2S_CDK result) {
+        int from_bitField0_ = bitField0_;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.code_ = code_;
+        }
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof org.sunrise.game.genProto.gen.ChatProto.MC2S_CDK) {
+          return mergeFrom((org.sunrise.game.genProto.gen.ChatProto.MC2S_CDK)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(org.sunrise.game.genProto.gen.ChatProto.MC2S_CDK other) {
+        if (other == org.sunrise.game.genProto.gen.ChatProto.MC2S_CDK.getDefaultInstance()) return this;
+        if (!other.getCode().isEmpty()) {
+          code_ = other.code_;
+          bitField0_ |= 0x00000001;
+          onChanged();
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
+        try {
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 10: {
+                code_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000001;
+                break;
+              } // case 10
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.unwrapIOException();
+        } finally {
+          onChanged();
+        } // finally
+        return this;
+      }
+      private int bitField0_;
+
+      private java.lang.Object code_ = "";
+      /**
+       * <pre>
+       * 兑换码内容
+       * </pre>
+       *
+       * <code>string code = 1;</code>
+       * @return The code.
+       */
+      public java.lang.String getCode() {
+        java.lang.Object ref = code_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          code_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * 兑换码内容
+       * </pre>
+       *
+       * <code>string code = 1;</code>
+       * @return The bytes for code.
+       */
+      public com.google.protobuf.ByteString
+          getCodeBytes() {
+        java.lang.Object ref = code_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          code_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * 兑换码内容
+       * </pre>
+       *
+       * <code>string code = 1;</code>
+       * @param value The code to set.
+       * @return This builder for chaining.
+       */
+      public Builder setCode(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        code_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * 兑换码内容
+       * </pre>
+       *
+       * <code>string code = 1;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearCode() {
+        code_ = getDefaultInstance().getCode();
+        bitField0_ = (bitField0_ & ~0x00000001);
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * 兑换码内容
+       * </pre>
+       *
+       * <code>string code = 1;</code>
+       * @param value The bytes for code to set.
+       * @return This builder for chaining.
+       */
+      public Builder setCodeBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        code_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:org.sunrise.game.genProto.gen.MC2S_CDK)
+    }
+
+    // @@protoc_insertion_point(class_scope:org.sunrise.game.genProto.gen.MC2S_CDK)
+    private static final org.sunrise.game.genProto.gen.ChatProto.MC2S_CDK DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new org.sunrise.game.genProto.gen.ChatProto.MC2S_CDK();
+    }
+
+    public static org.sunrise.game.genProto.gen.ChatProto.MC2S_CDK getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<MC2S_CDK>
+        PARSER = new com.google.protobuf.AbstractParser<MC2S_CDK>() {
+      @java.lang.Override
+      public MC2S_CDK parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
+      }
+    };
+
+    public static com.google.protobuf.Parser<MC2S_CDK> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<MC2S_CDK> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public org.sunrise.game.genProto.gen.ChatProto.MC2S_CDK getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   public interface MS2C_ChatOrBuilder extends
       // @@protoc_insertion_point(interface_extends:org.sunrise.game.genProto.gen.MS2C_Chat)
       com.google.protobuf.MessageOrBuilder {
@@ -918,7 +1481,7 @@ public final class ChatProto {
 
     /**
      * <pre>
-     * 新增时间戳（毫秒级）
+     * 时间戳（毫秒级）
      * </pre>
      *
      * <code>int64 time = 3;</code>
@@ -1063,7 +1626,7 @@ public final class ChatProto {
     private long time_ = 0L;
     /**
      * <pre>
-     * 新增时间戳（毫秒级）
+     * 时间戳（毫秒级）
      * </pre>
      *
      * <code>int64 time = 3;</code>
@@ -1603,7 +2166,7 @@ public final class ChatProto {
       private long time_ ;
       /**
        * <pre>
-       * 新增时间戳（毫秒级）
+       * 时间戳（毫秒级）
        * </pre>
        *
        * <code>int64 time = 3;</code>
@@ -1615,7 +2178,7 @@ public final class ChatProto {
       }
       /**
        * <pre>
-       * 新增时间戳（毫秒级）
+       * 时间戳（毫秒级）
        * </pre>
        *
        * <code>int64 time = 3;</code>
@@ -1631,7 +2194,7 @@ public final class ChatProto {
       }
       /**
        * <pre>
-       * 新增时间戳（毫秒级）
+       * 时间戳（毫秒级）
        * </pre>
        *
        * <code>int64 time = 3;</code>
@@ -3645,6 +4208,11 @@ public final class ChatProto {
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_org_sunrise_game_genProto_gen_MC2S_Chat_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_org_sunrise_game_genProto_gen_MC2S_CDK_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_org_sunrise_game_genProto_gen_MC2S_CDK_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_org_sunrise_game_genProto_gen_MS2C_Chat_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
@@ -3674,16 +4242,17 @@ public final class ChatProto {
   static {
     java.lang.String[] descriptorData = {
       "\n\nchat.proto\022\035org.sunrise.game.genProto." +
-      "gen\"\030\n\tMC2S_Chat\022\013\n\003msg\030\001 \001(\t\"2\n\tMS2C_Ch" +
-      "at\022\n\n\002id\030\001 \001(\t\022\013\n\003msg\030\002 \001(\t\022\014\n\004time\030\003 \001(" +
-      "\003\" \n\017MC2S_GetHistory\022\r\n\005count\030\001 \001(\005\"I\n\014M" +
-      "S2C_History\0229\n\007history\030\001 \003(\0132(.org.sunri" +
-      "se.game.genProto.gen.MS2C_Chat\"$\n\tMS2C_T" +
-      "ips\022\n\n\002id\030\001 \001(\005\022\013\n\003msg\030\002 \001(\t*=\n\013FROM_CLI" +
-      "ENT\022\014\n\010C2S_Chat\020\000\022\014\n\010C2S_Horn\020\001\022\022\n\016C2S_G" +
-      "etHistory\020\002*H\n\013FROM_SERVER\022\014\n\010S2C_Chat\020\000" +
-      "\022\014\n\010S2C_Horn\020\001\022\017\n\013S2C_History\020\002\022\014\n\010S2C_T" +
-      "ips\020\003B\013B\tChatProtob\006proto3"
+      "gen\"\030\n\tMC2S_Chat\022\013\n\003msg\030\001 \001(\t\"\030\n\010MC2S_CD" +
+      "K\022\014\n\004code\030\001 \001(\t\"2\n\tMS2C_Chat\022\n\n\002id\030\001 \001(\t" +
+      "\022\013\n\003msg\030\002 \001(\t\022\014\n\004time\030\003 \001(\003\" \n\017MC2S_GetH" +
+      "istory\022\r\n\005count\030\001 \001(\005\"I\n\014MS2C_History\0229\n" +
+      "\007history\030\001 \003(\0132(.org.sunrise.game.genPro" +
+      "to.gen.MS2C_Chat\"$\n\tMS2C_Tips\022\n\n\002id\030\001 \001(" +
+      "\005\022\013\n\003msg\030\002 \001(\t*J\n\013FROM_CLIENT\022\014\n\010C2S_Cha" +
+      "t\020\000\022\014\n\010C2S_Horn\020\001\022\022\n\016C2S_GetHistory\020\002\022\013\n" +
+      "\007C2S_CDK\020\003*H\n\013FROM_SERVER\022\014\n\010S2C_Chat\020\000\022" +
+      "\014\n\010S2C_Horn\020\001\022\017\n\013S2C_History\020\002\022\014\n\010S2C_Ti" +
+      "ps\020\003B\013B\tChatProtob\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -3695,26 +4264,32 @@ public final class ChatProto {
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_org_sunrise_game_genProto_gen_MC2S_Chat_descriptor,
         new java.lang.String[] { "Msg", });
-    internal_static_org_sunrise_game_genProto_gen_MS2C_Chat_descriptor =
+    internal_static_org_sunrise_game_genProto_gen_MC2S_CDK_descriptor =
       getDescriptor().getMessageTypes().get(1);
+    internal_static_org_sunrise_game_genProto_gen_MC2S_CDK_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_org_sunrise_game_genProto_gen_MC2S_CDK_descriptor,
+        new java.lang.String[] { "Code", });
+    internal_static_org_sunrise_game_genProto_gen_MS2C_Chat_descriptor =
+      getDescriptor().getMessageTypes().get(2);
     internal_static_org_sunrise_game_genProto_gen_MS2C_Chat_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_org_sunrise_game_genProto_gen_MS2C_Chat_descriptor,
         new java.lang.String[] { "Id", "Msg", "Time", });
     internal_static_org_sunrise_game_genProto_gen_MC2S_GetHistory_descriptor =
-      getDescriptor().getMessageTypes().get(2);
+      getDescriptor().getMessageTypes().get(3);
     internal_static_org_sunrise_game_genProto_gen_MC2S_GetHistory_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_org_sunrise_game_genProto_gen_MC2S_GetHistory_descriptor,
         new java.lang.String[] { "Count", });
     internal_static_org_sunrise_game_genProto_gen_MS2C_History_descriptor =
-      getDescriptor().getMessageTypes().get(3);
+      getDescriptor().getMessageTypes().get(4);
     internal_static_org_sunrise_game_genProto_gen_MS2C_History_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_org_sunrise_game_genProto_gen_MS2C_History_descriptor,
         new java.lang.String[] { "History", });
     internal_static_org_sunrise_game_genProto_gen_MS2C_Tips_descriptor =
-      getDescriptor().getMessageTypes().get(4);
+      getDescriptor().getMessageTypes().get(5);
     internal_static_org_sunrise_game_genProto_gen_MS2C_Tips_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_org_sunrise_game_genProto_gen_MS2C_Tips_descriptor,

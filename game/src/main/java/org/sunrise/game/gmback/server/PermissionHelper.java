@@ -33,7 +33,8 @@ public class PermissionHelper {
             "ban_player",
             "mute_player",
             "whitelist",
-            "announcement"
+            "announcement",
+            "cdk"
     );
 
     private static final Map<String, String> PAGE_LABELS = new LinkedHashMap<>();
@@ -50,6 +51,7 @@ public class PermissionHelper {
         PAGE_LABELS.put("mute_player", "玩家禁言");
         PAGE_LABELS.put("whitelist", "白名单");
         PAGE_LABELS.put("announcement", "全服公告");
+        PAGE_LABELS.put("cdk", "兑换码");
     }
 
     /** API 路径 -> 所需权限（任一匹配即可，用于共享接口如 /api/nodes） */
@@ -78,6 +80,11 @@ public class PermissionHelper {
         addApiPermission("POST", "/api/announcements", "announcement");
         addApiPermission("POST", "/api/announcements/update", "announcement");
         addApiPermission("POST", "/api/announcements/remove", "announcement");
+        addApiPermission("GET", "/api/cdk", "cdk");
+        addApiPermission("POST", "/api/cdk", "cdk");
+        addApiPermission("POST", "/api/cdk/update", "cdk");
+        addApiPermission("POST", "/api/cdk/adjust-count", "cdk");
+        addApiPermission("POST", "/api/cdk/remove", "cdk");
     }
 
     private static void addApiPermission(String method, String path, String... permissions) {

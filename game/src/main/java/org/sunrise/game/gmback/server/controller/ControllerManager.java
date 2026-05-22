@@ -31,6 +31,7 @@ public class ControllerManager {
         controllers.put(ServerStatusController.class.getSimpleName(), new ServerStatusController());
         controllers.put(WhitelistController.class.getSimpleName(), new WhitelistController());
         controllers.put(AnnouncementController.class.getSimpleName(), new AnnouncementController());
+        controllers.put(CdkController.class.getSimpleName(), new CdkController());
         controllers.put(HotswapController.class.getSimpleName(), new HotswapController());
         load();
         waitInitEnd();

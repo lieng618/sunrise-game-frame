@@ -5,6 +5,8 @@ import com.alibaba.fastjson2.TypeReference;
 import org.sunrise.game.core.HotswapScanner;
 import org.sunrise.game.game.human.HumanObjectManger;
 import org.sunrise.game.game.logic.ConfigUtils;
+import org.sunrise.game.game.logic.system.CdkSystem;
+import org.sunrise.game.game.logic.system.GameSystemUtils;
 import org.sunrise.game.genRpc.gen.CallEnum;
 import org.sunrise.game.log.LogCore;
 import org.sunrise.game.rpc.annotation.RpcMethod;
@@ -49,6 +51,9 @@ public class GameRecvGmBackMessageService extends BaseService {
                         break;
                     case "hotswapJar":
                         handleHotswapJar(dataMap);
+                        break;
+                    case "cdkList":
+                        handleCdkList(dataMap);
                         break;
                     default:
                         LogCore.GameServer.warn("Unknown GM operation: {}", operation);
@@ -103,6 +108,18 @@ public class GameRecvGmBackMessageService extends BaseService {
             LogCore.GameServer.info("Hotswap jar [{}] result:\n{}", jarPath, scanner.getRecentLogs());
         } catch (Exception e) {
             LogCore.GameServer.error("Hotswap jar [{}] failed", jarPath, e);
+        }
+    }
+
+    /**
+     * 同步兑换码列表
+     */
+    private void handleCdkList(Map<String, Object> data) {
+        String cdkListJson = (String) data.get("cdkList");
+        CdkSystem cdkSystem = GameSystemUtils.getSystem(CdkSystem.class);
+        if (cdkSystem != null) {
+            cdkSystem.syncFromGm(cdkListJson);
+            LogCore.GameServer.debug("Received cdkList sync, data : {}", cdkListJson);
         }
     }
 

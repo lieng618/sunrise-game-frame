@@ -33,6 +33,7 @@
                         <el-option label="解封玩家" value="UNBAN_PLAYER"></el-option>
                         <el-option label="服务器关闭" value="SERVER_STATUS"></el-option>
                         <el-option label="全服公告" value="ANNOUNCEMENT"></el-option>
+                        <el-option label="兑换码" value="CDK"></el-option>
                         <el-option label="其他操作" value="OTHER"></el-option>
                     </el-select>
                 </div>
@@ -187,6 +188,7 @@
                     'UNBAN_PLAYER': '解封玩家',
                     'SERVER_STATUS': '服务器关闭',
                     'ANNOUNCEMENT': '全服公告',
+                    'CDK': '兑换码',
                     'OTHER': '其他操作'
                 };
                 return typeMap[type] || type || '未知';

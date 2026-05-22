@@ -5,13 +5,14 @@ package org.sunrise.game.genProto.gen;
 enum FROM_CLIENT {
   C2S_Chat = 0;
   C2S_Horn = 1;
-  C2S_GetHistory = 2;  // 新增获取历史记录请求
+  C2S_GetHistory = 2;  // 获取历史记录请求
+  C2S_CDK = 3; // 使用cdk
 }
 
 enum FROM_SERVER {
   S2C_Chat = 0;     // 实时聊天消息
   S2C_Horn = 1;     // 大喇叭
-  S2C_History = 2;  // 新增历史记录响应
+  S2C_History = 2;  // 历史记录响应
   S2C_Tips = 3;     // 提示消息
 }
 
@@ -19,10 +20,14 @@ message MC2S_Chat {
   string msg = 1;  // 消息内容
 }
 
+message MC2S_CDK {
+  string code = 1;  // 兑换码内容
+}
+
 message MS2C_Chat {
   string id = 1;     // 玩家id
   string msg = 2;    // 消息内容
-  int64 time = 3;    // 新增时间戳（毫秒级）
+  int64 time = 3;    // 时间戳（毫秒级）
 }
 
 message MC2S_GetHistory {

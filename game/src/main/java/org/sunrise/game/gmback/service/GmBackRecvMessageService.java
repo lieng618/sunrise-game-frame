@@ -5,6 +5,7 @@ import com.alibaba.fastjson2.TypeReference;
 import org.sunrise.game.gmback.server.AdminServer;
 import org.sunrise.game.gmback.server.controller.AnnouncementController;
 import org.sunrise.game.gmback.server.controller.BanHumanController;
+import org.sunrise.game.gmback.server.controller.CdkController;
 import org.sunrise.game.gmback.server.controller.ControllerManager;
 import org.sunrise.game.gmback.server.controller.MuteHumanController;
 import org.sunrise.game.gmback.server.controller.NodeController;
@@ -44,6 +45,9 @@ public class GmBackRecvMessageService extends BaseService {
                     case "reportNodeData":
                         handleNodeData(dataMap);
                         break;
+                    case "cdkRedeem":
+                        handleCdkRedeem(dataMap);
+                        break;
                     default:
                         LogCore.GmBackServer.warn("Unknown GM operation: {}", operation);
                         break;
@@ -81,5 +85,14 @@ public class GmBackRecvMessageService extends BaseService {
         ControllerManager.getController(WhitelistController.class).syncWhitelistToHttp();
         // 定时同步公告到HttpServer
         ControllerManager.getController(AnnouncementController.class).syncAnnouncementsToHttp();
+        // 定时同步兑换码到GameServer
+        ControllerManager.getController(CdkController.class).syncCdkToGame();
+    }
+
+    private void handleCdkRedeem(Map<String, Object> dataMap) {
+        String code = (String) dataMap.get("code");
+        if (code != null && !code.isEmpty()) {
+            ControllerManager.getController(CdkController.class).onRedeem(code);
+        }
     }
 }
