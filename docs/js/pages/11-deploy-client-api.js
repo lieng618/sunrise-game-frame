@@ -389,6 +389,10 @@ registerPage('api-reference', 'API 参考', 'RPC 服务 API、HTTP 接口、注�
 <tr><td>/api/announcements</td><td>GET/POST</td><td>公告列表/发布公告</td></tr>
 <tr><td>/api/announcements/update</td><td>POST</td><td>修改公告</td></tr>
 <tr><td>/api/announcements/remove</td><td>POST</td><td>删除公告</td></tr>
+<tr><td>/api/cdk</td><td>GET/POST</td><td>兑换码列表/创建</td></tr>
+<tr><td>/api/cdk/update</td><td>POST</td><td>修改兑换码</td></tr>
+<tr><td>/api/cdk/adjust-count</td><td>POST</td><td>增减兑换码数量</td></tr>
+<tr><td>/api/cdk/remove</td><td>POST</td><td>删除兑换码</td></tr>
 <tr><td>/api/users</td><td>GET</td><td>用户管理</td></tr>
 <tr><td>/api/logs</td><td>GET</td><td>操作日志</td></tr>
 </tbody>

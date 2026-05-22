@@ -20,7 +20,7 @@ registerPage('home', '项目概览', 'Sunrise Game Frame 分布式游戏服务�
     <div class="feature-item"><span class="feature-icon">📭</span><span class="feature-text">零中间件依赖，无需 Redis / ZooKeeper / MQ</span></div>
     <div class="feature-item"><span class="feature-icon">🔒</span><span class="feature-text">单线程 DispatchThread + 消息队列，无需加锁</span></div>
     <div class="feature-item"><span class="feature-icon">🔌</span><span class="feature-text">支持TCP / WebSocket / KCP 三协议统一接入</span></div>
-    <div class="feature-item"><span class="feature-icon">🛠️</span><span class="feature-text">GM 后台管理，节点监控 + 热更配置 + 热更jar包</span></div>
+    <div class="feature-item"><span class="feature-icon">🛠️</span><span class="feature-text">GM 后台管理，节点监控、热更、运营服务、权限管理 </span></div>
     <div class="feature-item"><span class="feature-icon">🤖</span><span class="feature-text">压测机器人，批量创建，登录 + 消息包发送，模拟真实环境</span></div>
     <div class="feature-item"><span class="feature-icon">🔃</span><span class="feature-text">业务代码编写规范，业务模块化设计，开发便捷</span></div>
 </div>

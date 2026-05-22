@@ -98,7 +98,8 @@ registerPage('database', '数据库', 'MySQL 表结构、数据存储方式、Db
     "MailModule": "{\\"mails\\":[]}",
     "ActivityModule": "{\\"activities\\":[]}",
     "AttributeModule": "{\\"attributes\\":{}}",
-    "MinerModule": "{\\"minerData\\":{}}"
+    "MinerModule": "{\\"minerData\\":{}}",
+    "CdkModule": "{\\"usedCodes\\":[\\"VIP666\\",\\"ABCD1234EFGH\\"]}"
 }</code></pre>
 
 <h3>服务数据</h3>

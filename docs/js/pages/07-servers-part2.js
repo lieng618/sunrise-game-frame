@@ -10,7 +10,8 @@ registerPage('game-server', '游戏服', '玩家对象、模块系统、消息�
     <li>玩家模块生命周期管理（init/load/save/sendToClient）</li>
     <li>定时保存玩家数据（每分钟）</li>
     <li>调用 Global 服完成跨服业务</li>
-    <li>响应 GM 后台命令（reloadConfig/hotswapJar/kick/ban/mute）</li>
+    <li>响应 GM 后台命令（reloadConfig/hotswapJar/kick/ban/mute/cdkList）</li>
+    <li>兑换码校验与发奖（CdkSystem + CdkModule + ChatMsgHandler）</li>
 </ul>
 
 <h2>GameServerStartUp 启动流程</h2>
@@ -114,9 +115,8 @@ registerPage('game-server', '游戏服', '玩家对象、模块系统、消息�
 <tr><td>ActivityModule</td><td>活动系统</td><td>活动参与状态</td></tr>
 <tr><td>AttributeModule</td><td>属性系统</td><td>玩家属性值</td></tr>
 <tr><td>MinerModule</td><td>矿工玩法</td><td>挖矿状态</td></tr>
-</tbody>
+<tr><td>CdkModule</td><td>兑换码</td><td>usedCodes：该角色已兑换的码集合，每码仅可兑换一次</td></tr>
 </table>
-
 <h2>协议路由</h2>
 <h3>自动注册机制</h3>
 <p>游戏服启动时执行两个初始化：</p>
@@ -185,6 +185,8 @@ public class ItemMsgHandler {
 <tr><td>kickHuman</td><td>踢玩家下线（加入下线队列）</td></tr>
 <tr><td>banHumanList</td><td>更新封禁名单（加入 banHumanQueue）</td></tr>
 <tr><td>muteHumanList</td><td>更新禁言名单（加入 muteHumanQueue）</td></tr>
+<tr><td>hotswapJar</td><td>代码热更 JAR（HotswapScanner）</td></tr>
+<tr><td>cdkList</td><td>同步当前有效兑换码列表到 CdkSystem</td></tr>
 </tbody>
 </table>
 `);
@@ -383,6 +385,7 @@ registerPage('gmback-server', 'GM 后台', '登录认证、节点监控、配置
     <li>踢人下线（广播 kickHuman）</li>
     <li>封禁/禁言名单广播（banHumanList/muteHumanList）</li>
     <li>全服公告管理（发布/编辑/删除，定时同步到HttpServer）</li>
+    <li>兑换码管理（创建/编辑/调数量/删除，定时同步到GameServer）</li>
     <li>用户与操作日志管理</li>
 </ul>
 
@@ -408,6 +411,10 @@ registerPage('gmback-server', 'GM 后台', '登录认证、节点监控、配置
 <tr><td>/api/announcements</td><td>GET/POST</td><td>公告列表/发布公告</td><td>需要</td></tr>
 <tr><td>/api/announcements/update</td><td>POST</td><td>修改公告</td><td>需要</td></tr>
 <tr><td>/api/announcements/remove</td><td>POST</td><td>删除公告</td><td>需要</td></tr>
+<tr><td>/api/cdk</td><td>GET/POST</td><td>兑换码列表/创建兑换码</td><td>需要</td></tr>
+<tr><td>/api/cdk/update</td><td>POST</td><td>修改兑换码（时间、模板、附件）</td><td>需要</td></tr>
+<tr><td>/api/cdk/adjust-count</td><td>POST</td><td>增减兑换码总量（delta）</td><td>需要</td></tr>
+<tr><td>/api/cdk/remove</td><td>POST</td><td>删除兑换码</td><td>需要</td></tr>
 <tr><td>/api/users</td><td>GET</td><td>用户管理</td><td>需要</td></tr>
 <tr><td>/api/logs</td><td>GET</td><td>操作日志</td><td>需要</td></tr>
 </tbody>
@@ -444,6 +451,7 @@ registerPage('gmback-server', 'GM 后台', '登录认证、节点监控、配置
 <tr><td>mute_player.html</td><td>禁言管理</td></tr>
 <tr><td>whitelist.html</td><td>白名单管理</td></tr>
 <tr><td>announcement.html</td><td>全服公告管理</td></tr>
+<tr><td>cdk.html</td><td>兑换码管理</td></tr>
 <tr><td>operation_log.html</td><td>操作日志</td></tr>
 <tr><td>user_manager.html</td><td>用户管理</td></tr>
 </tbody>

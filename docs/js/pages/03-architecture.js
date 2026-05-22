@@ -37,7 +37,7 @@ registerPage('architecture', '架构总览', '多进程架构、服务职责、�
     <div class="card">
         <div class="card-icon">🛡️</div>
         <div class="card-title">GmBackServer</div>
-        <div class="card-desc">GM 后台（基于 Javalin + JWT）。登录认证、节点监控、配置热更、发邮件、踢人、封禁/禁言名单广播、用户与操作日志管理。前端使用 Vue 3 + Element Plus</div>
+        <div class="card-desc">GM 后台（基于 Javalin + JWT）。登录认证、节点监控、配置热更、发邮件、踢人、封禁/禁言名单广播、公告/白名单/兑换码管理、用户与操作日志。前端使用 Vue 3 + Element Plus</div>
     </div>
 </div>
 
@@ -122,7 +122,7 @@ registerPage('architecture', '架构总览', '多进程架构、服务职责、�
         <span class="flow-node flow-node-secondary">Game A/B/C</span>
     </div>
 </div>
-<p>GM 后台通过 <code>GameRecvGmBackMessageService_recvMessage</code> 广播指令（reloadConfig/hotswapJar/kickHuman/banHumanList/muteHumanList），每个 Game 节点根据本地在线玩家情况执行对应动作。</p>
+<p>GM 后台通过 <code>GameRecvGmBackMessageService_recvMessage</code> 广播指令（reloadConfig/hotswapJar/kickHuman/banHumanList/muteHumanList/cdkList），每个 Game 节点根据本地在线玩家情况执行对应动作。兑换码兑换成功后 Game 反向上报 <code>cdkRedeem</code> 至 GmBack。</p>
 
 <h2>单线程无锁设计</h2>
 <p>本项目采用 <strong>单线程 DispatchThread + 消息队列</strong> 模型：</p>

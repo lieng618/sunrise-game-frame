@@ -211,10 +211,13 @@ message MTaskInfo {
 <table>
 <thead><tr><th>方向</th><th>消息</th><th>字段</th><th>说明</th></tr></thead>
 <tbody>
-<tr><td>C→S</td><td>C2S_Chat</td><td>message</td><td>发送聊天</td></tr>
-<tr><td>C→S</td><td>C2S_ChatHistory</td><td>（空）</td><td>请求聊天历史</td></tr>
-<tr><td>S→C</td><td>S2C_Chat</td><td>humanId, message, time</td><td>聊天消息推送</td></tr>
-<tr><td>S→C</td><td>S2C_ChatHistory</td><td>messages</td><td>聊天历史</td></tr>
+<tr><td>C→S</td><td>C2S_Chat</td><td>msg</td><td>发送聊天</td></tr>
+<tr><td>C→S</td><td>C2S_Horn</td><td>（空）</td><td>喇叭</td></tr>
+<tr><td>C→S</td><td>C2S_GetHistory</td><td>（空）</td><td>请求聊天历史</td></tr>
+<tr><td>C→S</td><td>C2S_CDK</td><td>code</td><td>使用兑换码，成功/失败均 S2C_Tips 提示，成功发邮件</td></tr>
+<tr><td>S→C</td><td>S2C_Chat</td><td>id, msg, time</td><td>聊天消息推送</td></tr>
+<tr><td>S→C</td><td>S2C_History</td><td>records</td><td>聊天历史</td></tr>
+<tr><td>S→C</td><td>S2C_Tips</td><td>id, msg</td><td>Tips 提示</td></tr>
 </tbody>
 </table>
 
