@@ -1,6 +1,7 @@
 package org.sunrise.game.game.modules;
 
 import com.alibaba.fastjson2.TypeReference;
+import com.github.houbb.sensitive.word.core.SensitiveWordHelper;
 import lombok.Getter;
 import lombok.Setter;
 import org.sunrise.game.game.annotation.HumanModule;
@@ -76,6 +77,10 @@ public class DataModule extends BaseModule {
      * 修改名字
      */
     public void changeName(String newName) {
+        if (SensitiveWordHelper.contains(newName)) {
+            getHuman().sendTips("包含屏蔽词");
+            return;
+        }
         this.name = newName;
         syncToPlayerInfoSystem();
 

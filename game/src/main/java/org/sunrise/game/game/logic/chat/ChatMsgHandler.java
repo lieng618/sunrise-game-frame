@@ -1,5 +1,6 @@
 package org.sunrise.game.game.logic.chat;
 
+import com.github.houbb.sensitive.word.core.SensitiveWordHelper;
 import org.sunrise.game.game.annotation.MsgHandlerClass;
 import org.sunrise.game.game.annotation.MsgHandlerMethod;
 import org.sunrise.game.game.human.HumanObject;
@@ -25,7 +26,7 @@ public class ChatMsgHandler {
             return;
         }
 
-        RpcFunction.newInstance().call(CallEnum.GlobalChatService_chat, "humanId", humanObject.getHumanId(), "message", msg);
+        RpcFunction.newInstance().call(CallEnum.GlobalChatService_chat, "humanId", humanObject.getHumanId(), "message", SensitiveWordHelper.replace(msg));
     }
 
     @MsgHandlerMethod(packetId = ChatProto.FROM_CLIENT.C2S_Horn_VALUE)
