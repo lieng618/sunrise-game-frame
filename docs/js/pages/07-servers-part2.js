@@ -147,20 +147,9 @@ public class ItemMsgHandler {
     <li>带协议体：<code>public static void useItem(HumanObject humanObject, ItemProto.MC2S_UseItem data)</code></li>
 </ul>
 
-<h2>登录排队（LoginQueueSystem）</h2>
-<p>继承 <code>BaseSystem</code>，由 <code>GameSystemUtils.pulsePerSec()</code> 驱动出队。限流参数 <code>login.queue.maxPerSecond</code> 见文档「配置参考」。</p>
-<table>
-<thead><tr><th>阶段</th><th>行为</th></tr></thead>
-<tbody>
-<tr><td>收到 C2S_Login</td><td>队列为空且本秒未达上限 → 直通 <code>processLogin</code>；否则入队并下发 <code>S2C_Queue(pos, queues, need_time)</code></td></tr>
-<tr><td>每秒 pulsePerSec</td><td>超时踢出；按上限出队并 <code>processLogin</code>，主动推送 <code>S2C_Login</code></td></tr>
-<tr><td>已登录重发 C2S_Login</td><td>已有 ConnectObject 时不再重复建连（账号已缓存时可重发 S2C_Login）</td></tr>
-</tbody>
-</table>
-
 <h2>登录完整流程</h2>
 <ol class="step-list">
-    <li>客户端发送 <code>C2S_Login(uid)</code>（可能先收到 <code>S2C_Queue</code>，出队后由服务端推送 <code>S2C_Login</code>）</li>
+    <li>客户端发送 <code>C2S_Login(uid)</code>（若触发排队则收到 <code>S2C_Queue</code>，出队后由服务端主动推送 <code>S2C_Login</code>，客户端可定时请求<code>C2S_Login</code>获取排队状态）</li>
     <li>Game 创建 ConnectObject，查询/创建 Account，返回 <code>S2C_Login(accountId)</code></li>
     <li>客户端发送 <code>C2S_HumanList</code></li>
     <li>Game 查询 human_list 表，返回 <code>S2C_HumanList</code>（角色列表）</li>

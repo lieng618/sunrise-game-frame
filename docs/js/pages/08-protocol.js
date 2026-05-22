@@ -172,6 +172,7 @@ message MTaskInfo {
 <tr><td>C→S</td><td>C2S_SelectHuman</td><td>pos, server_id</td><td>选择角色</td></tr>
 <tr><td>C→S</td><td>C2S_ClientPing</td><td>time</td><td>客户端心跳（60秒超时）</td></tr>
 <tr><td>S→C</td><td>S2C_Login</td><td>account_id</td><td>登录响应</td></tr>
+<tr><td>S→C</td><td>S2C_Queue</td><td>pos, queues, need_time</td><td>排队信息）</td></tr>
 <tr><td>S→C</td><td>S2C_HumanList</td><td>human_list</td><td>角色列表</td></tr>
 <tr><td>S→C</td><td>S2C_SelectHuman</td><td>（空）</td><td>选角响应</td></tr>
 <tr><td>S→C</td><td>S2C_Kick</td><td>reason</td><td>被踢下线</td></tr>

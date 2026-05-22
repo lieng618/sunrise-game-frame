@@ -27,17 +27,16 @@ public class LoginQueueSystem extends BaseSystem {
 
     private final LinkedList<QueueEntry> queue = new LinkedList<>();
     private final HashMap<Long, QueueEntry> queueMap = new HashMap<>();
+    private final HashMap<Long, String> connectExternalNodeId = new HashMap<>();
 
     public static class QueueEntry {
         public final long connectId;
         public final String uid;
-        public final String externalNodeId;
         public long enqueueTime;
 
-        QueueEntry(long connectId, String uid, String externalNodeId, long enqueueTime) {
+        QueueEntry(long connectId, String uid, long enqueueTime) {
             this.connectId = connectId;
             this.uid = uid;
-            this.externalNodeId = externalNodeId;
             this.enqueueTime = enqueueTime;
         }
     }
@@ -72,7 +71,7 @@ public class LoginQueueSystem extends BaseSystem {
     /**
      * @return true 表示需要排队；false 表示本秒可直接登录
      */
-    public boolean tryEnterOrQueue(long connectId, String uid, String externalNodeId) {
+    public boolean tryEnterOrQueue(long connectId, String uid) {
         long now = System.currentTimeMillis();
         checkSecondReset(now);
 
@@ -87,20 +86,41 @@ public class LoginQueueSystem extends BaseSystem {
             return false;
         }
 
-        QueueEntry entry = new QueueEntry(connectId, uid, externalNodeId, now);
+        QueueEntry entry = new QueueEntry(connectId, uid, now);
         queue.addLast(entry);
         queueMap.put(connectId, entry);
         LogCore.GameServer.info("player queued, uid = {}, connectId = {}, queueSize = {}", uid, connectId, queue.size());
         return true;
     }
 
-    public void sendQueueInfo(long connectId, String uid, String externalNodeId) {
+    /**
+     * 当传入的对外服节点有效时，进行绑定
+     */
+    public void saveExternalNodeIdIfPresent(long connectId, String externalNodeId) {
+        if (externalNodeId != null && !externalNodeId.isEmpty()) {
+            connectExternalNodeId.put(connectId, externalNodeId);
+        }
+    }
+
+    public String getExternalNodeId(long connectId) {
+        return connectExternalNodeId.getOrDefault(connectId, "");
+    }
+
+    public void releaseConnect(long connectId) {
+        connectExternalNodeId.remove(connectId);
+    }
+
+    public void sendQueueInfo(long connectId) {
+        QueueEntry entry = queueMap.get(connectId);
+        if (entry == null) {
+            return;
+        }
         int pos = getPosition(connectId);
         if (pos <= 0) {
             return;
         }
-        ConnectObject tempConn = new ConnectObject(connectId, uid, externalNodeId);
-        tempConn.sendMsg(TopicProto.TOPIC.TOPIC_TYPE_LOGIN_VALUE, LoginProto.FROM_SERVER.S2C_Queue_VALUE,
+        ConnectObject.sendToClient(connectId, getExternalNodeId(connectId),
+                TopicProto.TOPIC.TOPIC_TYPE_LOGIN_VALUE, LoginProto.FROM_SERVER.S2C_Queue_VALUE,
                 LoginProto.MS2C_Queue.newBuilder().setPos(pos).setQueues(getQueueSize()).setNeedTime(getEstimatedWaitSeconds(pos)));
     }
 
@@ -142,11 +162,13 @@ public class LoginQueueSystem extends BaseSystem {
         PulseResult result = pulseQueue();
 
         for (QueueEntry entry : result.timedOut) {
-            ConnectObject tempConn = new ConnectObject(entry.connectId, entry.uid, entry.externalNodeId);
-            tempConn.kick("queue timeout");
+            ConnectObject.sendToClient(entry.connectId, getExternalNodeId(entry.connectId),
+                    TopicProto.TOPIC.TOPIC_TYPE_LOGIN_VALUE, LoginProto.FROM_SERVER.S2C_Kick_VALUE,
+                    LoginProto.MS2C_Kick.newBuilder().setReason("queue timeout"));
+            releaseConnect(entry.connectId);
         }
         for (QueueEntry entry : result.dequeued) {
-            LoginMsgHandler.processLogin(entry.connectId, entry.uid, entry.externalNodeId);
+            LoginMsgHandler.processLogin(entry.connectId, entry.uid);
         }
     }
 

@@ -35,10 +35,17 @@ public class LoginMsgHandler {
                 }
 
                 LoginQueueSystem loginQueue = GameSystemUtils.getSystem(LoginQueueSystem.class);
-                if (loginQueue != null && loginQueue.tryEnterOrQueue(connectId, msg.getUid(), externalNodeId)) {
-                    loginQueue.sendQueueInfo(connectId, msg.getUid(), externalNodeId);
+                if (loginQueue == null) {
+                    return;
+                }
+                // 绑定连接id对应的对外服节点
+                loginQueue.saveExternalNodeIdIfPresent(connectId, externalNodeId);
+
+                // 直接登录或者进入排队队列
+                if (loginQueue.tryEnterOrQueue(connectId, msg.getUid())) {
+                    loginQueue.sendQueueInfo(connectId);
                 } else {
-                    processLogin(connectId, msg.getUid(), externalNodeId);
+                    processLogin(connectId, msg.getUid());
                 }
 
                 break;
@@ -153,16 +160,26 @@ public class LoginMsgHandler {
         }
     }
 
-    public static void processLogin(long connectId, String uid, String externalNodeId) {
+    public static void processLogin(long connectId, String uid) {
         LoginQueueSystem loginQueue = GameSystemUtils.getSystem(LoginQueueSystem.class);
-        if (loginQueue != null) {
-            loginQueue.removeFromQueue(connectId);
-        }
-        if (HumanObjectManger.getConnectObject(connectId) != null) {
+        if (loginQueue == null) {
             return;
         }
+
+        // 从排队队列移除
+        loginQueue.removeFromQueue(connectId);
+        // 未正确绑定对外服节点
+        String externalNodeId = loginQueue.getExternalNodeId(connectId);
+        if (externalNodeId == null || externalNodeId.isEmpty()) {
+            LogCore.GameServer.error("processLogin failed, externalNodeId empty, connectId = {}, uid = {}", connectId, uid);
+            return;
+        }
+        // 创建连接对象
         ConnectObject connectObject = new ConnectObject(connectId, uid, externalNodeId);
         HumanObjectManger.addConnectObject(connectId, connectObject);
+
+        // 删除缓存的绑定信息
+        loginQueue.releaseConnect(connectId);
 
         Long accountId = HumanObjectManger.uidAccounts.get(uid);
         if (accountId != null) {

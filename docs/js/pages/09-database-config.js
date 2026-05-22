@@ -168,7 +168,8 @@ registerPage('config', '配置参考', '各服务配置项说明', () => `
 <table>
 <thead><tr><th>配置键</th><th>说明</th><th>示例</th></tr></thead>
 <tbody>
-<tr><td>config.path</td><td>Luban 配置 JSON 路径</td><td>tables/json</td></tr>
+<tr><td>config.path</td><td>Luban 配置 JSON 路径</td><td>E:/sunrise-game-frame/tables/json</td></tr>
+<tr><td>login.queue.maxPerSecond</td><td>登录排队：每秒允许放行的最大登录数（含直通与出队），超出则入队等待</td><td>100</td></tr>
 </tbody>
 </table>
 
@@ -203,7 +204,22 @@ registerPage('config', '配置参考', '各服务配置项说明', () => `
 </table>
 
 <h3>runallone-config.properties</h3>
-<p>单进程合服模式，<code>master.id=0</code> 表示不连接中心服。</p>
+<p>单进程合服模式（External + Game + Http + GmBack 等同进程），<code>master.id=0</code> 表示不连接中心服。除下列项外，也包含上文「通用配置项」</p>
+<table>
+<thead><tr><th>配置键</th><th>说明</th><th>示例</th></tr></thead>
+<tbody>
+<tr><td>master.id</td><td>中心服 ID，合服固定为 0（不连 Center）</td><td>0</td></tr>
+<tr><td>external.address</td><td>对外暴露 IP（客户端连接、Http 注册 External 地址）</td><td>127.0.0.1</td></tr>
+<tr><td>config.path</td><td>Luban 配置 JSON 路径</td><td>E:/sunrise-game-frame/tables/json</td></tr>
+<tr><td>http.port</td><td>合服内嵌 Http 服务端口</td><td>8090</td></tr>
+<tr><td>admin.port</td><td>GM 后台端口</td><td>8010</td></tr>
+<tr><td>admin.user</td><td>GM 登录用户名</td><td>admin</td></tr>
+<tr><td>admin.password</td><td>GM 登录密码</td><td>sunrise</td></tr>
+<tr><td>admin.uipath</td><td>GM 静态资源目录</td><td>admin-ui/</td></tr>
+<tr><td>admin.jwt.expiration</td><td>JWT 过期时间（毫秒）</td><td>864000000</td></tr>
+<tr><td>login.queue.maxPerSecond</td><td>登录排队每秒放行上限（与 game-config 含义相同）</td><td>100</td></tr>
+</tbody>
+</table>
 
 <h2>Docker 配置差异</h2>
 <table>

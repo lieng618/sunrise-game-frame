@@ -37,6 +37,26 @@ public class ConnectObject {
         this.externalNodeId = externalNodeId;
     }
 
+    /**
+     * 向客户端发包静态方法
+     */
+    public static void sendToClient(long connectId, String externalNodeId,
+                                    int packetType, int packetId, Message.Builder builder) {
+        var sendBuilder = TopicProto.MBasePacketData.newBuilder()
+                .setPacketType(TopicProto.TOPIC.forNumber(packetType))
+                .setPacketId(packetId);
+        if (builder != null) {
+            sendBuilder.setPacketData(builder.build().toByteString());
+        }
+        RpcFunction.newInstance(externalNodeId).call(
+                CallEnum.ExternalRecvGameMessageService_recvMessage,
+                "id", connectId,
+                "data", sendBuilder.build().toByteArray(),
+                "nodeId", RpcNodeManager.getRpcServerNodeId());
+        LogCore.GameServer.debug("sendToClient, connectionId = {}, packetType = {}, packetId = {}, msgData = {{}}",
+                connectId, packetType, packetId, builder == null ? "" : builder.toString().replace("\n", ""));
+    }
+
     public void sendMsg(int packetType, int packetId) {
         var sendBuilder = TopicProto.MBasePacketData.newBuilder().setPacketType(TopicProto.TOPIC.forNumber(packetType)).setPacketId(packetId);
 
