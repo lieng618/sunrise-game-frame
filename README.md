@@ -25,6 +25,9 @@
     <div class="feature-item"><span class="feature-icon">🔃</span><span class="feature-text">业务模块化，已实现游戏必需的模块如登录、存库、消息处理、玩家模块、系统模块等</span></div>
 </div>
 
+<h2>项目文档</h2>
+https://sunrise-game-frame.pages.dev
+
 <h2>项目结构</h2>
 <pre><code class="language-bash">sunrise-game-frame/
 ├─ pom.xml                     # Maven 聚合工程（父 POM）
