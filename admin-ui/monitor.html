@@ -48,6 +48,11 @@
                     </span>
                 </template>
             </el-table-column>
+            <el-table-column prop="processId" label="进程 ID" width="120" sortable align="center">
+                <template #default="scope">
+                    <span>{{ scope.row.processId || '-' }}</span>
+                </template>
+            </el-table-column>
             <el-table-column prop="online" label="在线人数" width="240" sortable align="center">
                 <template #default="scope">
                     <span v-else class="text-gray-400">{{ scope.row.online }}</span>

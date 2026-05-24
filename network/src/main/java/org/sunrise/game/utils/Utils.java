@@ -55,6 +55,10 @@ public class Utils {
         }
     }
 
+    public static long getProcessId() {
+        return ProcessHandle.current().pid();
+    }
+
     /**
      * 获取监听ip，所有节点默认都绑定在此ip上
      */

@@ -68,8 +68,9 @@ public class GmBackRecvMessageService extends BaseService {
         int port = (int) data.get("port");
         int online = (int) data.get("online");
         String type = (String) data.get("type");
+        long processId = ((Number) data.get("processId")).longValue();
         List<String> humanIds = JSON.parseObject((String) data.get("humanIds"), new TypeReference<List<String>>() {});
-        ControllerManager.getController(NodeController.class).updateNodeData(nodeId, serverId, ip, port, online, type);
+        ControllerManager.getController(NodeController.class).updateNodeData(nodeId, serverId, ip, port, online, type, processId);
         if (humanIds != null) {
             ControllerManager.getController(OnlinePlayerController.class).updateHumanData(serverId, humanIds);
         }

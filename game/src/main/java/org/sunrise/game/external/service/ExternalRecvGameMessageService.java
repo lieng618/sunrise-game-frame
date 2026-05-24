@@ -117,6 +117,7 @@ public class ExternalRecvGameMessageService extends BaseService {
         dataMap.put("ip", Utils.getLocalIpAddress());
         dataMap.put("port", externalServer.getExternalPort());
         dataMap.put("online", ExternalConnectionManger.getOnlineCount());
+        dataMap.put("processId", Utils.getProcessId());
         dataMap.put("type", "ExternalServer");
         RpcFunction.newInstance().call(CallEnum.GmBackRecvMessageService_recvMessage, "operation", "reportNodeData", "data", JSON.toJSONString(dataMap));
     }

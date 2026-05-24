@@ -18,10 +18,11 @@ public class NodeController extends BaseController {
         private int serverId;
         private String nodeId;
         private String type;
+        private long processId;
     }
 
     private final ConcurrentHashMap<String, NodeRemoteData> nodes = new ConcurrentHashMap<>();
-    public void updateNodeData(String nodeId, int serverId, String ip, int port, int online, String type) {
+    public void updateNodeData(String nodeId, int serverId, String ip, int port, int online, String type, long processId) {
         NodeRemoteData nodeRemoteData = nodes.computeIfAbsent(type + nodeId, k -> new NodeRemoteData());
         nodeRemoteData.nodeId = nodeId;
         nodeRemoteData.serverId = serverId;
@@ -29,6 +30,7 @@ public class NodeController extends BaseController {
         nodeRemoteData.ip = ip;
         nodeRemoteData.port = port;
         nodeRemoteData.online = online;
+        nodeRemoteData.processId = processId;
     }
 
     public void list(Context ctx) {
@@ -43,6 +45,7 @@ public class NodeController extends BaseController {
             map.put("type", node.getType());
             map.put("port", node.getPort());
             map.put("serverId", node.getServerId());
+            map.put("processId", node.getProcessId());
             map.put("status", 1);
             map.put("online", node.getOnline());
             voList.add(map);
