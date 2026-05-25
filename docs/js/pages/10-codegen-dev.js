@@ -114,8 +114,8 @@ Tables.ConfigItem.getDataList().forEach(item -> {
 });</code></pre>
 
 <h3>热更配置</h3>
-<p>GM 后台"配置更新"会广播 <code>reloadConfig</code> 指令，Game 服收到后执行 <code>ConfigUtils.load()</code> 重新加载配置。新增功能如果走 Tables，天然支持热更。</p>
-<p>业务代码热更请使用 GM 后台「代码热更」页面，详见 <a href="#/hotswap">代码热更文档</a>。</p>
+<p>gmback-ui「配置更新」会调用 <code>/api/config/reload</code>，GmBack 广播 <code>reloadConfig</code>，Game 服收到后执行 <code>ConfigUtils.load()</code> 重新加载配置。新增功能如果走 Tables，天然支持热更。</p>
+<p>业务代码热更请使用 gmback-ui「代码热更」（<code>/hotswap-jar</code>），详见 <a href="#/hotswap">代码热更文档</a>。</p>
 `);
 
 registerPage('development', '开发指南', '新增业务模块的完整开发流程与常见坑', () => `

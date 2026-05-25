@@ -11,7 +11,8 @@ registerPage('deployment', '部署指南', '本地部署、Docker 部署、Linux
 <tr><td>ExternalServer</td><td>10001</td><td>WebSocket</td><td>客户端 WS 连接</td></tr>
 <tr><td>ExternalServer</td><td>10002</td><td>KCP</td><td>客户端 KCP 连接</td></tr>
 <tr><td>HttpServer</td><td>8090</td><td>HTTP</td><td>地址分发接口</td></tr>
-<tr><td>GmBackServer</td><td>8010</td><td>HTTP</td><td>GM 后台管理</td></tr>
+<tr><td>GmBackServer</td><td>8010</td><td>HTTP</td><td>GM 后台 REST API（gmback-ui 通过 /api 访问）</td></tr>
+<tr><td>gmback-ui（前端目录）</td><td>5173</td><td>HTTP</td><td>开发环境下Vite 开发服务器，代理 /api → admin.port</td></tr>
 <tr><td>MySQL</td><td>3306</td><td>TCP</td><td>数据库</td></tr>
 <tr><td>RPC节点</td><td>20000 + </td><td>TCP</td><td>RPC 节点服务占用端口</td></tr>
 </tbody>
@@ -82,7 +83,7 @@ sh start/linux/server_run_allone.sh</code></pre>
 <tr><td>game</td><td>无</td><td>mysql(healthy), center</td><td>游戏服</td></tr>
 <tr><td>global</td><td>无</td><td>mysql(healthy), center</td><td>全局服</td></tr>
 <tr><td>http</td><td>8090:8090</td><td>mysql(healthy), center</td><td>HTTP 服务</td></tr>
-<tr><td>gmback</td><td>8010:8010</td><td>mysql(healthy), center</td><td>GM 后台</td></tr>
+<tr><td>gmback</td><td>8010:8010</td><td>mysql(healthy), center</td><td>GM 后台 API</td></tr>
 </tbody>
 </table>
 
@@ -130,7 +131,7 @@ sh start/linux/server_run_allone.sh</code></pre>
 以上展示的是，不同服务节点，分别使用一个进程部署（多进程）或者都在同一个进程部署（单进程）。那么在实际生产中，该如何部署呢？
 首先中心服一定只有一个，让所有服务节点都连接同一中心服，实现rpc通信。
 HTTP服一般也只部署一个，因为有白名单、地址分配、kcp连接id分配的业务，多个节点还需考虑数据同步的问题，客户端只请求一个地址获取相关数据是比较便捷的。
-GM后台一般也只部署一个，在一个地址就可以管理所有节点，管理所有的玩家（如封禁禁言、发邮件等等）。
+GM 后台一般也只部署一套：<strong>gmback</strong>（API 进程）+ <strong>gmback-ui</strong>（Nginx 托管前端，反代 <code>/api</code>），在同一域名即可管理所有节点与玩家（封禁、发邮件等）。
 Global服拆分时，一般一个业务作为一个节点，也可以多个业务同一节点（如果数据量不大）。如果想一个业务拆分多个节点，需在业务层面实现分节点处理
 （比如将邮件服务拆分为多个节点，根据玩家id计算落到哪个节点，每个节点管理一部分玩家的邮件信息）。
 <h3>全球通服</h3>
@@ -141,7 +142,7 @@ Global服拆分时，一般一个业务作为一个节点，也可以多个业�
 <tbody>
 <tr><td>中心服</td><td>部署一个中心服，一个进程</td></tr>
 <tr><td>HTTP服</td><td>部署一个HTTP服，一个进程</td></tr>
-<tr><td>GM后台</td><td>部署一个GM后台，一个进程</td></tr>
+<tr><td>GM后台</td><td>部署一个GM后台服 + gmback-ui（前端）</td></tr>
 <tr><td>对外服</td><td>部署多个对外服，多个进程</td></tr>
 <tr><td>游戏服</td><td>部署多个游戏服，多个进程</td></tr>
 <tr><td>Global服</td><td>可拆分为多个进程，如一个聊天节点、一个邮件节点等等</td></tr>
@@ -157,7 +158,7 @@ Global服拆分时，一般一个业务作为一个节点，也可以多个业�
 <tbody>
 <tr><td>中心服</td><td>部署一个中心服，一个进程</td></tr>
 <tr><td>HTTP服</td><td>部署一个HTTP服，一个进程</td></tr>
-<tr><td>GM后台</td><td>部署一个GM后台，一个进程</td></tr>
+<tr><td>GM后台</td><td>部署一个GM后台服 + gmback-ui（前端）</td></tr>
 <tr><td>对外服和游戏服</td><td>部署为同一进程，一个进程就是一个区服</td></tr>
 <tr><td>Global服</td><td>可拆分为多个进程，如一个聊天节点、一个邮件节点等等</td></tr>
 </tbody>
@@ -406,31 +407,25 @@ registerPage('api-reference', 'API 参考', 'RPC 服务 API、HTTP 接口、注�
 </table>
 
 <h3>GmBackServer（端口 8010）</h3>
+<p>由 gmback-ui 调用的 REST 接口；完整列表与鉴权说明见 <a href="#/gmback-server">GM 后台 → REST API</a>。常用接口：</p>
 <table>
 <thead><tr><th>接口</th><th>方法</th><th>说明</th></tr></thead>
 <tbody>
-<tr><td>/api/login</td><td>POST</td><td>登录认证，返回 JWT Token</td></tr>
+<tr><td>/api/login</td><td>POST</td><td>登录，返回 JWT</td></tr>
+<tr><td>/api/auth/info</td><td>GET</td><td>会话与页面权限</td></tr>
 <tr><td>/api/nodes</td><td>GET</td><td>节点监控</td></tr>
+<tr><td>/api/config/reload</td><td>POST</td><td>热更 Luban 配置</td></tr>
+<tr><td>/api/hotswap/jar</td><td>POST</td><td>代码热更 JAR</td></tr>
 <tr><td>/api/gm/send-mail</td><td>POST</td><td>发送邮件</td></tr>
 <tr><td>/api/gm/kick</td><td>POST</td><td>踢人下线</td></tr>
-<tr><td>/api/gm/reload-config</td><td>POST</td><td>热更配置</td></tr>
-<tr><td>/api/ban/add</td><td>POST</td><td>添加封禁</td></tr>
-<tr><td>/api/ban/remove</td><td>POST</td><td>解除封禁</td></tr>
-<tr><td>/api/ban/list</td><td>GET</td><td>封禁列表</td></tr>
-<tr><td>/api/mute/add</td><td>POST</td><td>添加禁言</td></tr>
-<tr><td>/api/mute/remove</td><td>POST</td><td>解除禁言</td></tr>
-<tr><td>/api/mute/list</td><td>GET</td><td>禁言列表</td></tr>
+<tr><td>/api/ban、/api/unban、/api/ban/list</td><td>POST/GET</td><td>封禁</td></tr>
+<tr><td>/api/mute、/api/unmute、/api/mute/list</td><td>POST/GET</td><td>禁言</td></tr>
 <tr><td>/api/online-players</td><td>GET</td><td>在线玩家</td></tr>
 <tr><td>/api/server-status</td><td>GET/POST</td><td>服务器开关</td></tr>
-<tr><td>/api/whitelist</td><td>GET/POST</td><td>白名单管理</td></tr>
-<tr><td>/api/announcements</td><td>GET/POST</td><td>公告列表/发布公告</td></tr>
-<tr><td>/api/announcements/update</td><td>POST</td><td>修改公告</td></tr>
-<tr><td>/api/announcements/remove</td><td>POST</td><td>删除公告</td></tr>
-<tr><td>/api/cdk</td><td>GET/POST</td><td>兑换码列表/创建</td></tr>
-<tr><td>/api/cdk/update</td><td>POST</td><td>修改兑换码</td></tr>
-<tr><td>/api/cdk/adjust-count</td><td>POST</td><td>增减兑换码数量</td></tr>
-<tr><td>/api/cdk/remove</td><td>POST</td><td>删除兑换码</td></tr>
-<tr><td>/api/users</td><td>GET</td><td>用户管理</td></tr>
+<tr><td>/api/whitelist、/api/whitelist/remove</td><td>GET/POST</td><td>白名单</td></tr>
+<tr><td>/api/announcements …</td><td>多种</td><td>公告 CRUD</td></tr>
+<tr><td>/api/cdk …</td><td>多种</td><td>兑换码 CRUD</td></tr>
+<tr><td>/api/users …</td><td>多种</td><td>用户与权限（管理员）</td></tr>
 <tr><td>/api/logs</td><td>GET</td><td>操作日志</td></tr>
 </tbody>
 </table>

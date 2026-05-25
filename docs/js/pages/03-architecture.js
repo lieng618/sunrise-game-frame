@@ -37,7 +37,7 @@ registerPage('architecture', '架构总览', '多进程架构、服务职责、�
     <div class="card">
         <div class="card-icon">🛡️</div>
         <div class="card-title">GmBackServer</div>
-        <div class="card-desc">GM 后台（基于 Javalin + JWT）。登录认证、节点监控、配置热更、发邮件、踢人、封禁/禁言名单广播、公告/白名单/兑换码管理、用户与操作日志。前端使用 Vue 3 + Element Plus</div>
+        <div class="card-desc">GM 后台 API（Javalin + JWT，端口 admin.port）。运营指令、节点监控、配置/代码热更、用户权限与操作日志。浏览器页面由前端工程 gmback-ui（Vue 3 SPA）提供</div>
     </div>
 </div>
 
@@ -115,8 +115,8 @@ registerPage('architecture', '架构总览', '多进程架构、服务职责、�
 <h3>GM 指令广播流程</h3>
 <div class="flow-diagram">
     <div class="flow-row">
-        <span class="flow-node flow-node-danger">GM 后台</span>
-        <span class="flow-arrow">→ REST API →</span>
+        <span class="flow-node flow-node-danger">gmback-ui</span>
+        <span class="flow-arrow">→ /api →</span>
         <span class="flow-node flow-node-danger">GmBackServer</span>
         <span class="flow-arrow">→ RpcFunction.call(SendAll) →</span>
         <span class="flow-node flow-node-secondary">Game A/B/C</span>
@@ -159,7 +159,7 @@ registerPage('architecture', '架构总览', '多进程架构、服务职责、�
 <tr><td>ExternalServer</td><td>10001</td><td>WebSocket</td><td>客户端 WS 连接</td></tr>
 <tr><td>ExternalServer</td><td>10002</td><td>KCP</td><td>客户端 KCP 连接</td></tr>
 <tr><td>HttpServer</td><td>8090</td><td>HTTP</td><td>地址分发接口</td></tr>
-<tr><td>GmBackServer</td><td>8010</td><td>HTTP</td><td>GM 后台管理</td></tr>
+<tr><td>GmBackServer</td><td>8010</td><td>HTTP</td><td>GM 后台 REST API（页面见 gmback-ui）</td></tr>
 <tr><td>MySQL</td><td>3306</td><td>TCP</td><td>数据库</td></tr>
 <tr><td>RPC服务</td><td>20000+ 自动分配</td><td>TCP</td><td>RPC 服务端口，所有RPC节点都会占用一个端口</td></tr>
 </tbody>

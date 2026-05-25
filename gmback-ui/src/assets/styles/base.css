@@ -1,0 +1,173 @@
+/* 全局基础与 Element 组件增强 */
+html,
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#app {
+    height: 100%;
+}
+
+.page-background {
+    background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 100%);
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.el-card {
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.08);
+    border: 1px solid rgba(219, 234, 254, 0.9);
+    background: rgba(255, 255, 255, 0.92);
+}
+
+.el-card__header {
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    border-bottom: 1px solid #dbeafe;
+    padding: 16px 20px;
+}
+
+.el-table {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.el-table th {
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    color: #3e496e;
+    font-weight: 600;
+    border-bottom: 2px solid #dbeafe;
+}
+
+.el-table tr:hover {
+    background-color: #f0f9ff;
+}
+
+.el-table--striped .el-table__body tr.el-table__row--striped td {
+    background-color: #f8fafc;
+}
+
+.el-tag {
+    border-radius: 6px;
+    font-weight: 500;
+    padding: 4px 12px;
+}
+
+.el-button {
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.el-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.el-button--primary {
+    background: linear-gradient(135deg, #5c7398 0%, #4c5f94 100%);
+    border: none;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.el-button--primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
+}
+
+.el-button--primary:active {
+    transform: translateY(0);
+}
+
+.el-button--danger:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.el-input__wrapper {
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.el-input__wrapper:hover {
+    box-shadow: 0 2px 6px rgba(59, 130, 246, 0.2);
+}
+
+.el-input.is-focus .el-input__wrapper {
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.el-form-item {
+    margin-bottom: 24px;
+}
+
+.el-form-item__label {
+    font-weight: 600;
+    color: #374151;
+    font-size: 14px;
+}
+
+.status-dot {
+    height: 10px;
+    width: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 6px;
+    position: relative;
+}
+
+.bg-online {
+    background-color: #67c23a;
+    box-shadow: 0 0 8px rgba(103, 194, 58, 0.6);
+    animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+    0%,
+    100% {
+        box-shadow: 0 0 8px rgba(103, 194, 58, 0.6);
+        transform: scale(1);
+    }
+    50% {
+        box-shadow: 0 0 12px rgba(103, 194, 58, 0.8);
+        transform: scale(1.1);
+    }
+}
+
+.bg-offline {
+    background-color: #f56c6c;
+    box-shadow: 0 0 4px rgba(245, 108, 108, 0.4);
+}
+
+.address-badge,
+.ip-badge {
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    color: #475569;
+}
+
+.el-pagination {
+    margin-top: 16px;
+}
+
+.el-pagination .el-pager li {
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.el-pagination .el-pager li:hover {
+    background-color: #f3f4f6;
+}
+
+.el-pagination .el-pager li.is-active {
+    background: linear-gradient(135deg, #4d6080 0%, #495e9a 100%);
+    color: white;
+}

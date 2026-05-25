@@ -371,61 +371,86 @@ KCP 要在 UDP 之上实现类似 TCP 的可靠传输（确认、重传、流量
 </table>
 `);
 
-registerPage('gmback-server', 'GM 后台', '登录认证、节点监控、配置热更、封禁禁言', () => `
+registerPage('gmback-server', 'GM 后台', 'gmback API、gmback-ui SPA、权限与 Nginx 部署', () => `
 <h1>GM 后台</h1>
-<p class="page-desc">GmBackServer 提供后台登录与管理接口，基于 Javalin + JWT 鉴权，也负责和 Game 服做 GM 指令同步</p>
+<p class="page-desc">后端 <code>GmBackServer</code>（Javalin + JWT）提供 REST API 并与 Game 服同步 GM 指令；前端 <code>gmback-ui</code>（Vue 3 SPA）独立部署，通过同源 <code>/api</code> 访问后端</p>
 
-<h2>核心职责</h2>
+<h2>整体架构</h2>
+<div class="flow-diagram">
+    <div class="flow-row">
+        <span class="flow-node flow-node-primary">浏览器</span>
+        <span class="flow-arrow">→ 开发环境5173端口 / 生产环境Nginx →</span>
+        <span class="flow-node flow-node-primary">gmback-ui<br/>dist/</span>
+    </div>
+    <div class="flow-row">
+        <span class="flow-node flow-node-primary">gmback-ui</span>
+        <span class="flow-arrow">→ fetch /api/* →</span>
+        <span class="flow-node flow-node-danger">GmBackServer<br/>admin.port</span>
+        <span class="flow-arrow">→ RPC SendAll / 定向 →</span>
+        <span class="flow-node flow-node-secondary">Game / Http …</span>
+    </div>
+</div>
 <ul>
-    <li>JWT 登录认证（HS256 签名 + Token 黑名单）</li>
-    <li>节点监控（查看所有 RPC 节点状态）</li>
-    <li>热更配置（广播 reloadConfig 给所有 Game 节点）</li>
-    <li>代码热更（广播 hotswapJar，通过 JVM Agent redefine 类）</li>
-    <li>发送邮件（单人/群发/全服）</li>
-    <li>踢人下线（广播 kickHuman）</li>
-    <li>封禁/禁言名单广播（banHumanList/muteHumanList）</li>
-    <li>全服公告管理（发布/编辑/删除，定时同步到HttpServer）</li>
-    <li>兑换码管理（创建/编辑/调数量/删除，定时同步到GameServer）</li>
-    <li>用户与操作日志管理</li>
+    <li><strong>gmback</strong>（<code>game/.../gmback</code>）：不托管静态页面，只监听 <code>admin.port</code>（默认 8010），路径均为 <code>/api/...</code></li>
+    <li><strong>gmback-ui</strong>（仓库根目录）：Vite + Vue Router（History 模式）单页应用；请求使用相对路径 <code>/api/...</code>，需与页面同源（开发靠 Vite 代理，生产靠 Nginx 反代）</li>
+    <li>鉴权：登录后 JWT 存于 <code>localStorage</code>，<code>apiFetch</code> 自动附加 <code>Authorization</code> 头；除 <code>/api/login</code> 外均需有效 Token</li>
+    <li>页面权限：非管理员账号按 <code>permissions</code> 控制侧栏菜单与 API（<code>PermissionHelper</code>）</li>
 </ul>
 
-<h2>REST API</h2>
+<h2>GmBackServer 核心职责</h2>
+<ul>
+    <li>JWT 登录与会话（<code>/api/login</code>、<code>/api/auth/info</code>）</li>
+    <li>节点监控（<code>/api/nodes</code>）</li>
+    <li>配置热更（<code>/api/config/reload</code> → 广播 reloadConfig）</li>
+    <li>代码热更（<code>/api/hotswap/jar</code> → 广播 hotswapJar，详见 <a href="#/hotswap">代码热更</a>）</li>
+    <li>运营：发邮件、踢人、封禁/禁言、在线玩家、服务器开关、白名单、公告、兑换码</li>
+    <li>后台用户、页面权限、操作日志</li>
+</ul>
+
+<h2>REST API（GmBackServer）</h2>
+<p>以下与 <code>AdminServer.java</code> 注册路由一致。鉴权列「需要」表示需有效 JWT（<code>Authorization</code> 头）。</p>
 <table>
 <thead><tr><th>接口</th><th>方法</th><th>说明</th><th>鉴权</th></tr></thead>
 <tbody>
-<tr><td>/api/login</td><td>POST</td><td>登录认证，返回 JWT Token</td><td>无需</td></tr>
-<tr><td>/api/nodes</td><td>GET</td><td>获取所有节点状态</td><td>需要</td></tr>
+<tr><td>/api/login</td><td>POST</td><td>登录，返回 JWT</td><td>无需</td></tr>
+<tr><td>/api/auth/info</td><td>GET</td><td>当前会话（权限列表、是否管理员）</td><td>需要</td></tr>
+<tr><td>/api/nodes</td><td>GET</td><td>所有 RPC 节点状态</td><td>需要</td></tr>
+<tr><td>/api/config/reload</td><td>POST</td><td>热更 Luban 配置（广播 reloadConfig）</td><td>需要</td></tr>
+<tr><td>/api/hotswap/jar</td><td>POST</td><td>代码热更 JAR 路径</td><td>需要</td></tr>
 <tr><td>/api/gm/send-mail</td><td>POST</td><td>发送邮件</td><td>需要</td></tr>
 <tr><td>/api/gm/kick</td><td>POST</td><td>踢玩家下线</td><td>需要</td></tr>
-<tr><td>/api/config/reload</td><td>POST</td><td>热更配置</td><td>需要</td></tr>
-<tr><td>/api/hotswap/jar</td><td>POST</td><td>代码热更 JAR</td><td>需要</td></tr>
-<tr><td>/api/ban/add</td><td>POST</td><td>添加封禁</td><td>需要</td></tr>
-<tr><td>/api/ban/remove</td><td>POST</td><td>解除封禁</td><td>需要</td></tr>
 <tr><td>/api/ban/list</td><td>GET</td><td>封禁列表</td><td>需要</td></tr>
-<tr><td>/api/mute/add</td><td>POST</td><td>添加禁言</td><td>需要</td></tr>
-<tr><td>/api/mute/remove</td><td>POST</td><td>解除禁言</td><td>需要</td></tr>
+<tr><td>/api/ban</td><td>POST</td><td>添加封禁</td><td>需要</td></tr>
+<tr><td>/api/unban</td><td>POST</td><td>解除封禁</td><td>需要</td></tr>
 <tr><td>/api/mute/list</td><td>GET</td><td>禁言列表</td><td>需要</td></tr>
+<tr><td>/api/mute</td><td>POST</td><td>添加禁言</td><td>需要</td></tr>
+<tr><td>/api/unmute</td><td>POST</td><td>解除禁言</td><td>需要</td></tr>
 <tr><td>/api/online-players</td><td>GET</td><td>在线玩家列表</td><td>需要</td></tr>
 <tr><td>/api/server-status</td><td>GET/POST</td><td>服务器开关</td><td>需要</td></tr>
-<tr><td>/api/whitelist</td><td>GET/POST</td><td>白名单管理</td><td>需要</td></tr>
-<tr><td>/api/announcements</td><td>GET/POST</td><td>公告列表/发布公告</td><td>需要</td></tr>
+<tr><td>/api/whitelist</td><td>GET/POST</td><td>白名单列表 / 添加</td><td>需要</td></tr>
+<tr><td>/api/whitelist/remove</td><td>POST</td><td>移除白名单</td><td>需要</td></tr>
+<tr><td>/api/announcements</td><td>GET/POST</td><td>公告列表 / 发布</td><td>需要</td></tr>
 <tr><td>/api/announcements/update</td><td>POST</td><td>修改公告</td><td>需要</td></tr>
 <tr><td>/api/announcements/remove</td><td>POST</td><td>删除公告</td><td>需要</td></tr>
-<tr><td>/api/cdk</td><td>GET/POST</td><td>兑换码列表/创建兑换码</td><td>需要</td></tr>
-<tr><td>/api/cdk/update</td><td>POST</td><td>修改兑换码（时间、模板、附件）</td><td>需要</td></tr>
-<tr><td>/api/cdk/adjust-count</td><td>POST</td><td>增减兑换码总量（delta）</td><td>需要</td></tr>
+<tr><td>/api/cdk</td><td>GET/POST</td><td>兑换码列表 / 创建</td><td>需要</td></tr>
+<tr><td>/api/cdk/update</td><td>POST</td><td>修改兑换码</td><td>需要</td></tr>
+<tr><td>/api/cdk/adjust-count</td><td>POST</td><td>增减兑换码数量</td><td>需要</td></tr>
 <tr><td>/api/cdk/remove</td><td>POST</td><td>删除兑换码</td><td>需要</td></tr>
-<tr><td>/api/users</td><td>GET</td><td>用户管理</td><td>需要</td></tr>
+<tr><td>/api/users</td><td>GET/POST</td><td>用户列表 / 新增</td><td>需要（管理员）</td></tr>
+<tr><td>/api/users/{username}</td><td>DELETE</td><td>删除用户</td><td>需要（管理员）</td></tr>
+<tr><td>/api/users/{username}/password</td><td>PUT</td><td>修改密码</td><td>需要（管理员）</td></tr>
+<tr><td>/api/users/{username}/permissions</td><td>GET/PUT</td><td>页面权限</td><td>需要（管理员）</td></tr>
+<tr><td>/api/permission/pages</td><td>GET</td><td>可分配的页面列表</td><td>需要（管理员）</td></tr>
 <tr><td>/api/logs</td><td>GET</td><td>操作日志</td><td>需要</td></tr>
 </tbody>
 </table>
 
 <h2>GM 指令广播</h2>
-<p>GM 后台通过 <code>SendAll</code> 广播指令给所有 Game 节点：</p>
+<p>部分运营操作在 GmBack 收到 REST 请求后，通过 RPC <code>SendAll</code> 或定向调用下发到 Game 节点（如 reloadConfig、hotswapJar、kickHuman、banHumanList、muteHumanList、cdkList）：</p>
 <div class="flow-diagram">
     <div class="flow-row">
-        <span class="flow-node flow-node-danger">GM 后台</span>
-        <span class="flow-arrow">→ REST API →</span>
+        <span class="flow-node flow-node-danger">gmback-ui</span>
+        <span class="flow-arrow">→ /api/* →</span>
         <span class="flow-node flow-node-danger">GmBackServer</span>
         <span class="flow-arrow">→ RPC SendAll →</span>
         <span class="flow-node flow-node-secondary">Game A</span>
@@ -433,38 +458,141 @@ registerPage('gmback-server', 'GM 后台', '登录认证、节点监控、配置
         <span class="flow-node flow-node-secondary">Game C</span>
     </div>
 </div>
-<p>每个 Game 节点根据本地在线玩家情况执行对应动作。</p>
+<p>每个 Game 节点在 <code>GameRecvGmBackMessageService</code> 中处理指令；兑换码兑换成功后 Game 可反向上报 <code>cdkRedeem</code> 至 GmBack。</p>
 
-<h2>Admin UI</h2>
-<p>GM 后台前端基于 Vue 3 + Element Plus + Tailwind CSS，通过 iframe 嵌入各功能页面：</p>
+<h2>gmback-ui 前端</h2>
+<p>独立 npm 工程，技术栈：<strong>Vue 3 + Vue Router + Element Plus + Tailwind CSS + Vite</strong></p>
+
+<h3>开发与访问</h3>
+<pre><code class="language-bash"># 先启动 gmback（GmBackServer 或 RunAllOne，admin.port 默认 8010）
+cd gmback-ui
+npm install
+npm run dev</code></pre>
+<p>浏览器打开 <code>http://localhost:5173/</code>。Vite 将 <code>/api</code> 代理到 <code>.env.development</code> 中的 <code>VITE_API_PROXY_TARGET</code>（默认 <code>http://127.0.0.1:8010</code>）。默认账号见 <code>admin.user</code> / <code>admin.password</code>（如 admin / sunrise）。</p>
+
+<h3>生产构建与 Nginx</h3>
+<pre><code class="language-bash">cd gmback-ui
+npm run build   # 产物在 dist/</code></pre>
+<p>生产环境由 Nginx 托管 <code>dist/</code>，并将 <code>/api/</code> 反代到本机 <code>admin.port</code>（与页面同源）。SPA 需配置 <code>try_files $uri $uri/ /index.html;</code>；<code>proxy_pass</code> 勿在 URL 末尾加 <code>/</code>，否则会去掉 <code>/api</code> 前缀。</p>
+<pre><code class="language-nginx">server {
+    listen 80;
+    server_name gm.example.com;   # 改为你的域名或 _
+
+    root /var/www/gmback-ui/dist;
+    index index.html;
+
+    # Vue Router History：先找静态文件，否则回退 SPA 入口
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    # 所有 API 转发到 gmback（保留 /api 前缀，勿在 proxy_pass 末尾加 /）
+    location /api/ {
+        proxy_pass http://127.0.0.1:8010;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        # 前端通过 Authorization 头传递 JWT，无需额外配置
+    }
+}</code></pre>
+
+<p>HTTPS：在 80 上跳转 443，并为 443 使用与上文相同的 \`root\`、\`location /\`、\`location /api/\`：</p>
+<pre><code class="language-nginx">server {
+    listen 80;
+    server_name gm.example.com;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name gm.example.com;
+
+    ssl_certificate     /etc/nginx/cert/fullchain.pem;
+    ssl_certificate_key /etc/nginx/cert/privkey.pem;
+
+    root /var/www/gmback-ui/dist;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    location /api/ {
+        proxy_pass http://127.0.0.1:8010;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}</code></pre>
+
+<h3>功能页面（路由）</h3>
 <table>
-<thead><tr><th>页面</th><th>说明</th></tr></thead>
+<thead><tr><th>路由</th><th>权限 key</th><th>说明</th></tr></thead>
 <tbody>
-<tr><td>monitor.html</td><td>节点监控</td></tr>
-<tr><td>server_status.html</td><td>服务器开关/白名单</td></tr>
-<tr><td>online_player.html</td><td>在线玩家</td></tr>
-<tr><td>config_update.html</td><td>配置热更</td></tr>
-<tr><td>hotswap_jar.html</td><td>代码热更 JAR</td></tr>
-<tr><td>send_mail.html</td><td>发送邮件</td></tr>
-<tr><td>kick_human.html</td><td>踢人下线</td></tr>
-<tr><td>ban_player.html</td><td>封禁管理</td></tr>
-<tr><td>mute_player.html</td><td>禁言管理</td></tr>
-<tr><td>whitelist.html</td><td>白名单管理</td></tr>
-<tr><td>announcement.html</td><td>全服公告管理</td></tr>
-<tr><td>cdk.html</td><td>兑换码管理</td></tr>
-<tr><td>operation_log.html</td><td>操作日志</td></tr>
-<tr><td>user_manager.html</td><td>用户管理</td></tr>
+<tr><td>/monitor</td><td>monitor</td><td>节点监控</td></tr>
+<tr><td>/server-status</td><td>server_status</td><td>服务器关闭</td></tr>
+<tr><td>/online-player</td><td>online_player</td><td>在线玩家</td></tr>
+<tr><td>/config-update</td><td>config_update</td><td>配置更新</td></tr>
+<tr><td>/hotswap-jar</td><td>hotswap_jar</td><td>代码热更</td></tr>
+<tr><td>/send-mail</td><td>send_mail</td><td>发送邮件</td></tr>
+<tr><td>/kick-human</td><td>kick_human</td><td>玩家下线</td></tr>
+<tr><td>/ban-player</td><td>ban_player</td><td>玩家封禁</td></tr>
+<tr><td>/mute-player</td><td>mute_player</td><td>玩家禁言</td></tr>
+<tr><td>/whitelist</td><td>whitelist</td><td>白名单</td></tr>
+<tr><td>/announcement</td><td>announcement</td><td>全服公告</td></tr>
+<tr><td>/cdk</td><td>cdk</td><td>兑换码</td></tr>
+<tr><td>/operation-log</td><td>operation_log</td><td>操作记录</td></tr>
+<tr><td>/user-manager</td><td>user_manager</td><td>用户管理（仅管理员）</td></tr>
 </tbody>
 </table>
+<p>新增页面：在 <code>src/views/</code> 添加 Vue 组件，并在 <code>menu.js</code> 的 <code>MENU_ITEMS</code> 增加一项；路由由 <code>router/routes.js</code> 自动生成，一般无需改 Java 后端。</p>
 
-<h2>配置项</h2>
+<h3>目录结构</h3>
+<pre><code class="language-bash">gmback-ui/
+├── index.html              # 唯一 HTML 入口
+├── vite.config.js
+├── .env.development
+├── .env.production
+└── src/
+    ├── main.js             # 应用入口
+    ├── App.vue             # 根组件（会话门闸）
+    ├── api/
+    │   └── client.js       # apiFetch、鉴权 token
+    ├── assets/
+    │   └── styles/         # 全局样式（Tailwind + EP + 布局/业务）
+    ├── components/
+    │   └── layout/         # 侧栏、顶栏等可复用布局组件
+    ├── composables/
+    │   └── useAuth.js      # 登录、权限、会话
+    ├── constants/
+    │   ├── menu.js         # 菜单与路由元数据
+    │   └── menu-icons.js
+    ├── layouts/
+    │   └── MainLayout.vue  # 登录后主壳
+    ├── plugins/
+    │   └── element-plus.js # 按需注册 EP 组件
+    ├── router/
+    │   ├── index.js
+    │   ├── routes.js
+    │   └── guards.js
+    ├── utils/index.js      # 工具函数（API 响应、分页、对话框等，统一导出）
+    └── views/              # 业务页面（按路由懒加载）
+        ├── auth/
+        │   └── LoginView.vue
+        ├── Monitor.vue
+        └── ...</code></pre>
+
+<h2>配置项（gmback / runallone）</h2>
 <table>
 <thead><tr><th>配置键</th><th>说明</th><th>示例</th></tr></thead>
 <tbody>
 <tr><td>admin.port</td><td>GM 后台端口</td><td>8010</td></tr>
 <tr><td>admin.user</td><td>登录用户名</td><td>admin</td></tr>
 <tr><td>admin.password</td><td>登录密码</td><td>sunrise</td></tr>
-<tr><td>admin.uipath</td><td>静态资源路径</td><td>admin-ui/</td></tr>
 <tr><td>admin.jwt.expiration</td><td>JWT 过期时间（毫秒）</td><td>86400000</td></tr>
 </tbody>
 </table>

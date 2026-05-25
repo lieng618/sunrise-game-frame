@@ -1,0 +1,260 @@
+/* 登录、侧栏、顶栏 */
+.login-container {
+    background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 50%, #bfdbfe 100%);
+    background-size: 400% 400%;
+    animation: gradientShift 15s ease infinite;
+    position: relative;
+    overflow: hidden;
+}
+
+.login-container::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.3) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+@keyframes gradientShift {
+    0% {
+        background-position: 0 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0 50%;
+    }
+}
+
+.login-card {
+    animation: fadeInUp 0.6s ease-out;
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.login-card .el-card__header {
+    background: linear-gradient(135deg, #3d4e69 0%, #182648 100%);
+    color: white;
+    border-radius: 12px 12px 0 0;
+    padding: 20px;
+    font-size: 24px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.login-card .el-input__wrapper {
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.login-card .el-input__wrapper:hover {
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.login-card .el-input.is-focus .el-input__wrapper {
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.login-button {
+    background: linear-gradient(135deg, #60728f 0%, #30498d 100%);
+    border: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+}
+
+.login-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
+}
+
+.login-button:active {
+    transform: translateY(0);
+}
+
+.sidebar-wrapper {
+    background: linear-gradient(180deg, #374151 0%, #1f2937 100%);
+    border-right: none;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.logo-area {
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logo-area .logo-title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease;
+    text-align: center;
+    line-height: 1.3;
+}
+
+.logo-area .logo-title:hover {
+    transform: scale(1.03);
+}
+
+.el-menu {
+    border-right: none;
+    background: transparent;
+}
+
+.el-menu-item {
+    color: rgba(255, 255, 255, 0.7);
+    transition: all 0.3s ease;
+    margin: 4px 8px;
+    border-radius: 8px;
+}
+
+.el-menu-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    transform: translateX(4px);
+}
+
+.el-menu-item.is-active {
+    background: linear-gradient(90deg, rgba(96, 165, 250, 0.3) 0%, rgba(102, 126, 234, 0.3) 100%);
+    color: white;
+    border-left: 3px solid #3c597e;
+}
+
+.el-menu-item .el-icon {
+    margin-right: 8px;
+    transition: transform 0.3s ease;
+}
+
+.el-menu-item:hover .el-icon {
+    transform: scale(1.1);
+}
+
+.sidebar-footer {
+    padding: 16px;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.2);
+}
+
+/* ---------- 主壳布局（SPA） ---------- */
+.app-layout {
+    height: 100vh;
+    overflow: hidden;
+}
+
+.app-layout > .el-aside {
+    height: 100%;
+}
+
+.app-layout__main {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    overflow: hidden;
+}
+
+.main-content.el-main {
+    flex: 1;
+    min-height: 0;
+    padding: 0 !important;
+    overflow: hidden;
+    background: linear-gradient(160deg, #e0f2fe 0%, #dbeafe 45%, #e8eeff 100%);
+}
+
+.page-content {
+    height: 100%;
+    overflow: auto;
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.empty-permission {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #6b7280;
+    font-size: 15px;
+}
+
+.main-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    flex-shrink: 0;
+    padding: 0 24px !important;
+    background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
+    border-bottom: 1px solid #dbeafe;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.08);
+}
+
+.main-header .page-title {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    color: #334155;
+    font-weight: 600;
+    font-size: 20px;
+    letter-spacing: 0.02em;
+}
+
+.user-dropdown {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid #dbeafe;
+    color: #475569;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.user-dropdown:hover {
+    background: #fff;
+    color: #2563eb;
+}
+
+.user-dropdown .user-icon {
+    font-size: 16px;
+}
+
+.user-dropdown .user-name {
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.user-dropdown,
+.user-dropdown:focus,
+.user-dropdown:focus-visible,
+.main-header .el-dropdown-link {
+    outline: none !important;
+    box-shadow: none !important;
+}

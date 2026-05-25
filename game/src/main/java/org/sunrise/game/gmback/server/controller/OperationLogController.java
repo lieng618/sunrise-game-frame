@@ -29,7 +29,7 @@ public class OperationLogController extends BaseController {
         TOGGLE_NODE("切换节点状态"),
         USER_MANAGER("用户管理"),
         BAN_PLAYER("封禁玩家"),
-        UNBAN_PLAYER("解封玩家"),
+        UNBAN_PLAYER("解除封禁"),
         MUTE_PLAYER("禁言玩家"),
         UNMUTE_PLAYER("解除禁言"),
         SERVER_STATUS("服务器状态切换"),
@@ -83,7 +83,8 @@ public class OperationLogController extends BaseController {
     }
 
     public void recordLoginLog(Context ctx, String user, OperationType operationType, String action) {
-        ControllerManager.addAsyncEvent(() -> logs.addFirst(new OperationLog(user, ctx.ip(), operationType, action)));
+        String ip = resolveClientIp(ctx);
+        ControllerManager.addAsyncEvent(() -> logs.addFirst(new OperationLog(user, ip, operationType, action)));
     }
 
     /**
@@ -92,8 +93,27 @@ public class OperationLogController extends BaseController {
     public void recordLog(Context ctx, OperationType operationType, String action) {
         String token = ctx.header("Authorization");
         if (token != null && !token.isEmpty()) {
-            ControllerManager.addAsyncEvent(() -> logs.addFirst(new OperationLog(JwtUtil.verifyToken(token), ctx.ip(), operationType, action)));
+            String operator = JwtUtil.verifyToken(token);
+            String ip = resolveClientIp(ctx);
+            ControllerManager.addAsyncEvent(() -> logs.addFirst(new OperationLog(operator, ip, operationType, action)));
         }
+    }
+
+    private static String resolveClientIp(Context ctx) {
+        String ip = ctx.ip();
+        if (ip != null && !ip.isBlank()) {
+            return ip.trim();
+        }
+        String forwarded = ctx.header("X-Forwarded-For");
+        if (forwarded != null && !forwarded.isBlank()) {
+            int comma = forwarded.indexOf(',');
+            return (comma >= 0 ? forwarded.substring(0, comma) : forwarded).trim();
+        }
+        String realIp = ctx.header("X-Real-IP");
+        if (realIp != null && !realIp.isBlank()) {
+            return realIp.trim();
+        }
+        return "";
     }
 
     /**

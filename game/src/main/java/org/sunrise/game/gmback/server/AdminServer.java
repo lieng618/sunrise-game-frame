@@ -4,7 +4,6 @@ import ch.qos.logback.classic.Level;
 import com.alibaba.fastjson2.JSON;
 import io.javalin.Javalin;
 import io.javalin.http.HttpStatus;
-import io.javalin.http.staticfiles.Location;
 import io.javalin.json.JsonMapper;
 import org.jetbrains.annotations.NotNull;
 import org.sunrise.game.config.ConfigReader;
@@ -25,7 +24,6 @@ import org.sunrise.game.gmback.server.controller.WhitelistController;
 import org.sunrise.game.jwt.JwtUtil;
 import org.sunrise.game.log.LogCore;
 
-import java.io.File;
 import java.lang.reflect.Type;
 import java.util.Properties;
 
@@ -39,45 +37,26 @@ public class AdminServer {
         }
 
         int port = Integer.parseInt(properties.getProperty("admin.port"));
-        String uiPath = properties.getProperty("admin.uipath");
-
-        // 确保 UI 目录存在
-        File uiDir = new File(uiPath);
-        if (!uiDir.exists() || !uiDir.isDirectory()) {
-            LogCore.GmBackServer.error("Admin UI path not found: " + uiPath);
-            return;
-        }
-
-        // 初始化 JWT Key
-        long jwtExpiration = Long.parseLong(properties.getProperty("admin.jwt.expiration", "3600000")); // 默认1小时
+        long jwtExpiration = Long.parseLong(properties.getProperty("admin.jwt.expiration", "3600000"));
         JwtUtil.init(jwtExpiration);
 
-        Javalin app = Javalin.create(config -> {
-            // 配置静态资源 (前端页面)
-            if (uiDir.exists()) {
-                config.staticFiles.add(uiPath, Location.EXTERNAL);
+        Javalin app = Javalin.create(config -> config.jsonMapper(new JsonMapper() {
+            @NotNull
+            @Override
+            public String toJsonString(@NotNull Object obj, @NotNull Type type) {
+                return JSON.toJSONString(obj);
             }
 
-            // 配置 FastJSON 作为默认 JSON 处理引擎
-            config.jsonMapper(new JsonMapper() {
-                @NotNull
-                @Override
-                public String toJsonString(@NotNull Object obj, @NotNull Type type) {
-                    return JSON.toJSONString(obj);
-                }
-
-                @NotNull
-                @Override
-                public <T> T fromJsonString(@NotNull String json, @NotNull Type targetType) {
-                    return JSON.parseObject(json, targetType);
-                }
-            });
-        });
+            @NotNull
+            @Override
+            public <T> T fromJsonString(@NotNull String json, @NotNull Type targetType) {
+                return JSON.parseObject(json, targetType);
+            }
+        }));
 
         // 初始化控制器
         ControllerManager.initController();
 
-        // 统一鉴权
         app.before("/api/*", ctx -> {
             // 登录接口无需鉴权
             if (ctx.path().equals("/api/login")) {
@@ -92,7 +71,6 @@ public class AdminServer {
                 return;
             }
 
-            // 页面级 API 权限校验
             if (!PermissionHelper.checkApiAccess(token, ctx.method().name(), ctx.path())) {
                 ctx.status(HttpStatus.FORBIDDEN).result("Forbidden");
                 ctx.skipRemainingHandlers();
@@ -155,7 +133,7 @@ public class AdminServer {
         LogCore.setLogLevel("io.javalin", Level.WARN);
         try {
             app.start(port);
-            LogCore.GmBackServer.info("AdminServer started on : {}", app.jettyServer().server().getURI());
+            LogCore.GmBackServer.info("AdminServer API started on : {}", app.jettyServer().server().getURI());
         } catch (Exception e) {
             LogCore.GmBackServer.error("AdminServer start failed", e);
         }

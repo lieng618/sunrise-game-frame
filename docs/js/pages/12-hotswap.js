@@ -6,7 +6,7 @@ registerPage('hotswap', '代码热更', 'JVM Agent 类热更、GM 后台触发�
 <ol class="step-list">
     <li>编译 <code>hotswap</code> 模块，生成 <code>start/jar/hotswap-agent.jar</code></li>
     <li>Game 进程启动时必须挂载 Java Agent：<code>-javaagent:hotswap-agent.jar</code>（单进程脚本 <code>runallone.bat</code> 已内置，可参考使用）</li>
-    <li>执行 <code>mvn package</code> 将新代码打入 JAR，通过GM后台代码热更页面，传入新jar包的路径进行热加载</li>
+    <li>执行 <code>mvn package</code> 将新代码打入 JAR，在 gmback-ui「代码热更」页面填写 JAR 绝对路径触发热加载</li>
     <li>JAR 路径必须是 <strong>Game 进程所在机器</strong> 可访问的绝对路径</li>
 </ol>
 
@@ -22,7 +22,7 @@ registerPage('hotswap', '代码热更', 'JVM Agent 类热更、GM 后台触发�
 <h2>GM 后台触发流程</h2>
 <div class="flow-diagram">
     <div class="flow-row">
-        <span class="flow-node flow-node-danger">Admin UI<br/>hotswap_jar.html</span>
+        <span class="flow-node flow-node-danger">gmback-ui<br/>/hotswap-jar</span>
         <span class="flow-arrow">→ POST /api/hotswap/jar →</span>
         <span class="flow-node flow-node-danger">HotswapController</span>
         <span class="flow-arrow">→ RPC SendAll / 指定节点 →</span>
@@ -54,7 +54,7 @@ scanner.reloadClasses();</code></pre>
 <ol class="step-list">
     <li>修改 game 模块业务代码</li>
     <li>在项目根目录执行 <code>mvn package -pl game -am</code>，生成新的 <code>start/jar/sunrise-game.jar</code></li>
-    <li>登录 GM 后台 →「代码热更」</li>
+    <li>登录 gmback-ui → 侧栏「代码热更」（<code>/hotswap-jar</code>）</li>
     <li>填写 JAR 绝对路径</li>
     <li>选择目标节点或「全部热更」</li>
     <li>在 Game 服日志中查看 <code>Hotswap jar [...] result</code> 输出</li>

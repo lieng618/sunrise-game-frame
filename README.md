@@ -59,15 +59,15 @@ https://sunrise-game-frame.pages.dev
 │       ├─ game/               # 游戏服（玩家对象/模块/协议路由/系统）
 │       ├─ global/             # 全局服（聊天/好友/邮件/玩家信息）
 │       ├─ http/               # HTTP 服务（地址分发）
-│       ├─ gmback/             # GM 后台（REST API + 静态页面）
+│       ├─ gmback/             # GM 后台（REST API）
 │       └─ runone/             # 单进程部署（将所有模块集成到一个进程中运行）
+├─ gmback-ui/                  # GM 后台前端（Vite + Vue 3 SPA）
 ├─ hotswap/                    # java代码热更新支持
 ├─ client/                     # 客户端工具
 │   └─ src/main/java/
 │       ├─ core/               # SocketClient / TcpClient / WsClient / KcpClient
-│       ├─ swing/              # MainFrame / SendMsgFrame（消息发送 GUI）
-│       └─ bot/                # BotManager / BotFrame（压测机器人）
-├─ admin-ui/                   # GM 后台前端（Vue 3 + Element Plus）
+│       ├─ swing/              # MainFrame / SendMsgFrame（消息发送工具）
+│       └─ bot/                # BotManager / BotFrame（压测机器人工具）
 ├─ start/                      # 启动脚本
 │   ├─ windows/                # .bat 脚本（多进程/单进程/客户端/机器人）
 │   ├─ linux/                  # .sh 脚本（pm2 管理）
@@ -95,15 +95,18 @@ https://sunrise-game-frame.pages.dev
 <tr><td>Luban</td><td>4.x</td><td>游戏配置工作流（Excel → JSON）</td><td>tables</td></tr>
 <tr><td>yitter</td><td>1.0.6</td><td>分布式雪花算法 ID 生成</td><td>network</td></tr>
 <tr><td>JWT</td><td>0.13.0</td><td>GM 后台鉴权</td><td>network</td></tr>
+<tr><td>Vue</td><td>3.5+</td><td>GM后台前端 SPA</td><td>gmback-ui</td></tr>
+<tr><td>Vite</td><td>6.x</td><td>GM后台前端 构建与开发</td><td>gmback-ui</td></tr>
 </tbody>
 </table>
 
 <table>
-<thead><tr><th>模块</th><th>artifactId</th><th>职责</th><th>关键包</th></tr></thead>
+<thead><tr><th>模块</th><th>artifactId</th><th>职责</th><th>关键包 / 说明</th></tr></thead>
 <tbody>
 <tr><td>network</td><td>network</td><td>核心网络/RPC/DB 基础设施</td><td>org.sunrise.game.network</td></tr>
 <tr><td>center</td><td>center</td><td>中心服（节点发现与注册）</td><td>org.sunrise.game.center</td></tr>
-<tr><td>game</td><td>game</td><td>业务逻辑（支持多进程或单进程部署）</td><td>org.sunrise.game.game、org.sunrise.game.external、org.sunrise.game.global、org.sunrise.game.http、org.sunrise.game.gmback</td></tr>
+<tr><td>game</td><td>game</td><td>业务逻辑（支持多进程或单进程部署）</td><td>org.sunrise.game.game/external/global/gmback/http</td></tr>
+<tr><td>gmback-ui</td><td>-</td><td>GM 后台前端</td><td>/gmback-ui</td></tr>
 <tr><td>gen</td><td>gen</td><td>代码生成（RPC 枚举、DB 实体、Proto）</td><td>org.sunrise.game.gen*</td></tr>
 <tr><td>client</td><td>client</td><td>客户端工具（消息发送器、压测机器人）</td><td>org.sunrise.game.client</td></tr>
 </tbody>

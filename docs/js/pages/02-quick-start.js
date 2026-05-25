@@ -25,7 +25,7 @@ mvn clean package</code></pre>
 <tr><td>sunrise-game.jar</td><td>GameServerStartUp</td><td>游戏逻辑服</td><td>game-config.properties</td></tr>
 <tr><td>sunrise-global.jar</td><td>GlobalServerStartUp</td><td>全局服</td><td>global-config.properties</td></tr>
 <tr><td>sunrise-http.jar</td><td>HttpServerStartUp</td><td>HTTP 服务</td><td>http-config.properties</td></tr>
-<tr><td>sunrise-gmback.jar</td><td>GmBackServerStartUp</td><td>GM 后台服</td><td>gmback-config.properties</td></tr>
+<tr><td>sunrise-gmback.jar</td><td>GmBackServerStartUp</td><td>GM 后台服务（前端见 gmback-ui）</td><td>gmback-config.properties</td></tr>
 <tr><td>sunrise-runallone.jar</td><td>RunAllOneServerStartUp</td><td>单进程合服</td><td>runallone-config.properties</td></tr>
 <tr><td>sunrise-client.jar</td><td>ClientStartUp</td><td>消息发送客户端（Swing GUI）</td><td>client-config.properties</td></tr>
 <tr><td>sunrise-bot.jar</td><td>BotStartUp</td><td>压测机器人（Swing GUI）</td><td>client-config.properties</td></tr>
@@ -129,7 +129,17 @@ sh start/linux/server_run_allone.sh</code></pre>
 <pre><code class="language-bash">start\\windows\\bot.bat</code></pre>
 
 <h2>6. 访问 GM 后台</h2>
-<p>启动后访问 <code>http://127.0.0.1:8010/</code>，使用配置中设置的账号密码登录（默认 admin/sunrise）。
-登录后在节点监控页面可以看到对外服和游戏服的节点信息，使用客户端可正常登录，则说明服务运行成功。</p>
+<p>GM 后台分为<strong>后端 API</strong>与<strong>前端页面</strong>两部分：</p>
+<ul>
+    <li><strong>gmback</strong>（<code>GmBackServer</code> 或合服 <code>RunAllOne</code>）：提供API服务，默认地址 <code>http://127.0.0.1:8010/api/...</code></li>
+    <li><strong>gmback-ui</strong>：Vue 3 前端应用</li>
+</ul>
+<pre><code class="language-bash"># 确保已启动 gmback后台服务（多进程：gmback.bat；单进程：runallone.bat）
+
+cd gmback-ui
+npm install
+npm run dev</code></pre>
+<p>浏览器打开 <code>http://localhost:5173/</code>，使用配置中的账号登录（默认 <code>admin</code> / <code>sunrise</code>，见 <code>gmback-config.properties</code> 或 <code>runallone-config.properties</code> 的 <code>admin.user</code>、<code>admin.password</code>）。</p>
+<p>登录后进入「节点监控」，应能看到对外服、游戏服等 RPC 节点；客户端能正常登录则说明服务运行成功。生产环境需 <code>npm run build</code> 后用 Nginx 托管 <code>dist/</code> 并反代 <code>/api</code>，详见 <a href="#/gmback-server">GM 后台文档</a>。</p>
 
 `);

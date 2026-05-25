@@ -183,13 +183,13 @@ registerPage('config', '配置参考', '各服务配置项说明', () => `
 </table>
 
 <h3>gmback-config.properties</h3>
+<p>仅配置 <strong>GmBackServer API</strong> 进程；Web 页面在 <code>gmback-ui/</code> 单独构建部署，不读取本文件。</p>
 <table>
 <thead><tr><th>配置键</th><th>说明</th><th>示例</th></tr></thead>
 <tbody>
-<tr><td>admin.port</td><td>GM 后台端口</td><td>8010</td></tr>
+<tr><td>admin.port</td><td>GM 后台 API 端口（非前端页面端口）</td><td>8010</td></tr>
 <tr><td>admin.user</td><td>登录用户名</td><td>admin</td></tr>
 <tr><td>admin.password</td><td>登录密码</td><td>sunrise</td></tr>
-<tr><td>admin.uipath</td><td>静态资源路径</td><td>admin-ui/</td></tr>
 <tr><td>admin.jwt.expiration</td><td>JWT 过期时间（毫秒）</td><td>86400000</td></tr>
 </tbody>
 </table>
@@ -213,10 +213,9 @@ registerPage('config', '配置参考', '各服务配置项说明', () => `
 <tr><td>external.address</td><td>对外暴露 IP（客户端连接、Http 注册 External 地址）</td><td>127.0.0.1</td></tr>
 <tr><td>config.path</td><td>Luban 配置 JSON 路径</td><td>E:/sunrise-game-frame/tables/json</td></tr>
 <tr><td>http.port</td><td>合服内嵌 Http 服务端口</td><td>8090</td></tr>
-<tr><td>admin.port</td><td>GM 后台端口</td><td>8010</td></tr>
-<tr><td>admin.user</td><td>GM 登录用户名</td><td>admin</td></tr>
+<tr><td>admin.port</td><td>合服内嵌 GM API 端口</td><td>8010</td></tr>
+<tr><td>admin.user</td><td>GM 登录用户名（gmback-ui 登录）</td><td>admin</td></tr>
 <tr><td>admin.password</td><td>GM 登录密码</td><td>sunrise</td></tr>
-<tr><td>admin.uipath</td><td>GM 静态资源目录</td><td>admin-ui/</td></tr>
 <tr><td>admin.jwt.expiration</td><td>JWT 过期时间（毫秒）</td><td>864000000</td></tr>
 <tr><td>login.queue.maxPerSecond</td><td>登录排队每秒放行上限（与 game-config 含义相同）</td><td>100</td></tr>
 </tbody>
@@ -231,7 +230,6 @@ registerPage('config', '配置参考', '各服务配置项说明', () => `
 <tr><td>report.address</td><td>127.0.0.1</td><td>各自容器名</td><td>如 game、external</td></tr>
 <tr><td>external.address</td><td>127.0.0.1</td><td>宿主机 IP</td><td>客户端连接地址</td></tr>
 <tr><td>config.path</td><td>本地路径</td><td>/app/tables/json</td><td>容器内路径</td></tr>
-<tr><td>admin.uipath</td><td>本地路径</td><td>/app/admin-ui</td><td>容器内路径</td></tr>
 </tbody>
 </table>
 `);

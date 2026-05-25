@@ -1,0 +1,33 @@
+import {
+    Bell,
+    Delete,
+    Document,
+    Edit,
+    House,
+    Key,
+    Lock,
+    Message,
+    Mute,
+    Open,
+    Refresh,
+    Ticket,
+    Upload,
+    User,
+} from '@element-plus/icons-vue';
+
+export const MENU_ICONS = {
+    monitor: House,
+    server_status: Open,
+    online_player: User,
+    config_update: Refresh,
+    hotswap_jar: Upload,
+    send_mail: Message,
+    kick_human: Delete,
+    ban_player: Lock,
+    mute_player: Mute,
+    whitelist: Key,
+    announcement: Bell,
+    cdk: Ticket,
+    operation_log: Document,
+    user_manager: Edit,
+};
