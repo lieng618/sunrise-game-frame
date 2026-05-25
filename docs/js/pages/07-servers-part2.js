@@ -473,7 +473,7 @@ npm run dev</code></pre>
 <h3>生产构建与 Nginx</h3>
 <pre><code class="language-bash">cd gmback-ui
 npm run build   # 产物在 dist/</code></pre>
-<p>生产环境由 Nginx 托管 <code>dist/</code>，并将 <code>/api/</code> 反代到本机 <code>admin.port</code>（与页面同源）。SPA 需配置 <code>try_files $uri $uri/ /index.html;</code>；<code>proxy_pass</code> 勿在 URL 末尾加 <code>/</code>，否则会去掉 <code>/api</code> 前缀。</p>
+<p>生产环境由 Nginx 托管 <code>dist/</code>，并将 <code>/api/</code> 反代到本机 <code>admin.port</code>（与页面同源）。SPA 需配置 <code>try_files $uri $uri/ /index.html;</code>。</p>
 <pre><code class="language-nginx">server {
     listen 80;
     server_name gm.example.com;   # 改为你的域名或 _
