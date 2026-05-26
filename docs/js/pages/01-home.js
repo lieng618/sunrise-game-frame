@@ -1,13 +1,13 @@
 registerPage('home', '项目概览', 'Sunrise Game Frame 分布式游戏服务器框架介绍', () => `
 <div class="hero">
     <h1>Sunrise Game Frame</h1>
-    <p class="subtitle">基于 Java 21 实现的分布式游戏服务器框架，采用"中心服 + 对外服 + 游戏服 + 全局服 + HTTP 服务 + GM 后台"的多服务多进程架构，也可部署为多服务单进程，
+    <p class="subtitle">基于 Java 21 实现的轻量级分布式游戏服务器框架，采用"中心服 + 对外服 + 游戏服 + 全局服 + HTTP 服务 + GM 后台"的多服务多进程架构，也可部署为多服务单进程，
     不同服务支持随意的拆分和组合，支持全球通服模式和滚服模式，框架不依赖任何第三方中间件，仅需Java环境即可运行。</p>
     <div class="hero-badges">
         <span class="hero-badge">☕ Java 21</span>
         <span class="hero-badge">🌐 Netty</span>
         <span class="hero-badge">📦 Protobuf</span>
-        <span class="hero-badge">🔗 自研 RPC</span>
+        <span class="hero-badge">🔗 RPC</span>
         <span class="hero-badge">🗄️ MySQL</span>
         <span class="hero-badge">🐳 Docker</span>
     </div>
@@ -16,7 +16,7 @@ registerPage('home', '项目概览', 'Sunrise Game Frame 分布式游戏服务�
 <h2>核心特性</h2>
 <div class="feature-grid">
     <div class="feature-item"><span class="feature-icon">🏗️</span><span class="feature-text">分布式多节点架构，不同服务可随意组合拆分为多进程或单进程部署，支持动态扩容</span></div>
-    <div class="feature-item"><span class="feature-icon">📡</span><span class="feature-text">自研 RPC 框架，支持随机/广播/定向三种调用模式，含回调与超时机制</span></div>
+    <div class="feature-item"><span class="feature-icon">📡</span><span class="feature-text">高性能RPC 框架，支持随机/广播/定向三种调用模式，含回调与超时机制</span></div>
     <div class="feature-item"><span class="feature-icon">📭</span><span class="feature-text">零中间件依赖，无需 Redis / ZooKeeper / MQ，真正做到轻量级</span></div>
     <div class="feature-item"><span class="feature-icon">🚀</span><span class="feature-text">业务代码无需修改，仅修改部署方式，即可支持全球通服与滚服模式</span></div>
     <div class="feature-item"><span class="feature-icon">🔒</span><span class="feature-text">RPC服与游戏服单线程处理业务，无需加锁，无需考虑线程安全问题</span></div>
@@ -42,7 +42,7 @@ registerPage('home', '项目概览', 'Sunrise Game Frame 分布式游戏服务�
 ├─ network/                    # 网络层、DB、RPC、基础工具（所有服务依赖）
 │   └─ src/main/java/org/sunrise/game/
 │       ├─ core/               # BaseServer / BaseClient / 消息 / 编解码
-│       ├─ rpc/                # 自研 RPC 框架（注解/节点/调用/服务管理）
+│       ├─ rpc/                # RPC 框架（注解/节点/调用/服务管理）
 │       ├─ db/                 # DbService（HikariCP）/ 实体类
 │       ├─ config/             # ConfigReader 配置加载
 │       └─ utils/              # IdGenerator / LogCore / JwtUtil / Utils

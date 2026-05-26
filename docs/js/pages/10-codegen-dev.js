@@ -30,15 +30,16 @@ gen.bat</code></pre>
 
 <h2>RPC 枚举生成</h2>
 <h3>运行方式</h3>
-<p>运行主类 <code>org.sunrise.game.genRpc.GenRpcStartUp</code></p>
+<p>运行主类 <code>org.sunrise.game.genRpc.GenRpcStartUp</code>（工作目录为项目根目录）</p>
 
 <h3>生成逻辑</h3>
 <ol class="step-list">
-    <li>扫描所有 <code>@RpcService</code> 类</li>
-    <li>提取所有 <code>@RpcMethod</code> 方法</li>
-    <li>按 <code>类名_方法名</code> 格式生成常量</li>
-    <li>输出到 <code>CallEnum.java</code></li>
+    <li>扫描 <code>gen/src/main/java/org/sunrise/game/genRpc/service/</code> 下所有 Stub 接口（<code>void 方法名();</code>）</li>
+    <li>按 <code>类名_方法名</code> 格式生成 <code>CallEnum</code> 常量（已有 id 保留，新方法递增）</li>
+    <li>扫描 <code>game</code> 模块中带 <code>@RpcService</code> 的实现类，为常量补充 <code>{@code 实现类#方法}</code> 注释</li>
+    <li>输出到 <code>gen/src/main/java/org/sunrise/game/genRpc/gen/CallEnum.java</code></li>
 </ol>
+<p>新增 RPC 方法时：先在 <code>genRpc/service</code> 增加 Stub 方法 → 在 game 实现 <code>@RpcMethod</code> → 运行 GenRpcStartUp → 各节点用新常量调用。完整流程见 <a href="#/custom-rpc-service">可扩展 RPC 服务</a>。</p>
 
 <h3>生成的 CallEnum 示例</h3>
 <pre><code class="language-java">public class CallEnum {

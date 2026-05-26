@@ -5,7 +5,7 @@ registerPage('network', '网络层', 'Netty Server/Client、编解码、消息�
 <h2>模块组成</h2>
 <div class="card-grid">
     <div class="card"><div class="card-icon">🔌</div><div class="card-title">core/</div><div class="card-desc">Netty Server/Client 基础封装、消息体系、编解码器</div></div>
-    <div class="card"><div class="card-icon">🔗</div><div class="card-title">rpc/</div><div class="card-desc">自研 RPC 框架（注解/节点管理/调用/服务管理/中心服）</div></div>
+    <div class="card"><div class="card-icon">🔗</div><div class="card-title">rpc/</div><div class="card-desc">RPC 框架（注解/节点管理/调用/服务管理/中心服）</div></div>
     <div class="card"><div class="card-icon">🗄️</div><div class="card-title">db/</div><div class="card-desc">数据库访问（DbService + HikariCP）、实体类</div></div>
     <div class="card"><div class="card-icon">⚙️</div><div class="card-title">config/</div><div class="card-desc">ConfigReader 配置文件加载器</div></div>
     <div class="card"><div class="card-icon">🔧</div><div class="card-title">utils/</div><div class="card-desc">日志(LogCore)、ID生成(IdGenerator/yitter)、类扫描(Utils)、JWT(JwtUtil)</div></div>

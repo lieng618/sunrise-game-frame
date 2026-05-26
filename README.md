@@ -1,21 +1,22 @@
 <div class="hero">
     <h1>Sunrise Game Frame</h1>
-    <p class="subtitle">基于 Java 21 实现的分布式游戏服务器框架，采用"中心服 + 对外服 + 游戏服 + 全局服 + HTTP 服务 + GM 后台"的多服务多进程架构，也可部署为多服务单进程，
-    不同服务支持随意的拆分和组合，支持全球通服模式和滚服模式，框架不依赖任何第三方中间件，仅需Java环境即可运行。</p>
+    <p class="subtitle">基于 Java 21 实现的轻量级分布式游戏服务器框架，采用"中心服 + 对外服 + 游戏服 + 全局服 + HTTP 服务 + GM 后台"的多服务多进程架构，也可部署为多服务单进程，
+    不同服务支持随意的拆分和组合，支持全球通服模式和滚服模式，框架不依赖任何第三方中间件，仅需Java环境即可运行，架构简单，代码易理解、易扩展。</p>
     <div class="hero-badges">
         <span class="hero-badge">☕ Java 21</span>
         <span class="hero-badge">🌐 Netty</span>
         <span class="hero-badge">📦 Protobuf</span>
-        <span class="hero-badge">🔗 自研 RPC</span>
+        <span class="hero-badge">🔗 RPC</span>
         <span class="hero-badge">🗄️ MySQL</span>
         <span class="hero-badge">🐳 Docker</span>
     </div>
 </div>
 
+
 <h2>核心特性</h2>
 <div class="feature-grid">
     <div class="feature-item"><span class="feature-icon">🏗️</span><span class="feature-text">分布式多节点架构，不同服务可随意组合拆分为多进程或单进程部署，支持动态扩容</span></div>
-    <div class="feature-item"><span class="feature-icon">📡</span><span class="feature-text">自研 RPC 框架，支持随机/广播/定向三种调用模式，含回调与超时机制</span></div>
+    <div class="feature-item"><span class="feature-icon">📡</span><span class="feature-text">RPC 框架，支持随机/广播/定向三种调用模式，含回调与超时机制</span></div>
     <div class="feature-item"><span class="feature-icon">📭</span><span class="feature-text">零中间件依赖，无需 Redis / ZooKeeper / MQ，真正做到轻量级</span></div>
     <div class="feature-item"><span class="feature-icon">🚀</span><span class="feature-text">业务代码无需修改，仅修改部署方式，即可支持全球通服与滚服模式</span></div>
     <div class="feature-item"><span class="feature-icon">🔒</span><span class="feature-text">RPC服与游戏服单线程处理业务，无需加锁，无需考虑线程安全问题</span></div>
@@ -25,8 +26,45 @@
     <div class="feature-item"><span class="feature-icon">🔃</span><span class="feature-text">业务模块化，已实现游戏必需的模块如登录、存库、消息处理、玩家模块、系统模块等</span></div>
 </div>
 
+<h2>架构图</h2>
+<div class="arch-diagram">
+    <img src="https://files.seeusercontent.com/2026/04/27/Im3e/sunrise-game-frame.png" alt="架构图" style="max-width:100%;border-radius:8px;" />
+</div>
+
+<h2>各服务职责</h2>
+<div class="card-grid">
+    <div class="card">
+        <h4>CenterServer</h4>
+        <div class="card-desc">中心服，所有 RPC 节点的注册中心，负责节点发现与信息广播，不执行任何业务 RPC，只做"节点通讯录同步。各节点收到其他节点地址后，自己完成互连。 中心服挂掉不影响已互连的节点间通信，但新节点无法加入。支持断线重连，中心服重新启动后，所有节点都会重新注册。</div>
+    </div>
+    <div class="card">
+    <h4>ExternalServer</h4>
+        <div class="card-desc">对外网关服，同时支持 TCP、WebSocket、KCP 三种协议，是客户端与服务器之间的唯一入口，验证客户端首包认证、分配 connectionId、做消息频率限制、转发消息到 Game 服、接收 Game 回包发回客户端。</div>
+    </div>
+    <div class="card">
+    <h4>GameServer</h4>
+        <div class="card-desc">游戏核心业务服，处理登录流程（创建/加载账号、角色）、玩家对象管理（HumanObject）、模块生命周期（init/load/save/sendToClient）、协议路由（@MsgHandlerClass、@MsgHandlerMethod）、定时数据库存档、调用 Global 跨服服务，处理gm后台指令。</div>
+    </div>
+    <div class="card">
+    <h4>GlobalServer</h4>
+        <div class="card-desc">全局跨服服务，所有需要跨服共享的数据和逻辑都放在这里，目前实现了：聊天服务（GlobalChatService）、好友服务（GlobalFriendService）、邮件服务（GlobalMailService）、玩家简要信息查询（GlobalPlayerInfoService）。</div>
+    </div>
+    <div class="card">
+    <h4>HttpServer</h4>
+        <div class="card-desc">HTTP 服务，客户端登录时，先通过curl请求分配对外服地址。提供对外服地址、服务器状态和白名单接口。</div>
+    </div>
+    <div class="card">
+    <h4>GmBackServer</h4>
+        <div class="card-desc">GM 后台 API服务，提供 REST API 并与 Game 服同步 GM 指令。前后端分离，浏览器页面由前端工程 gmback-ui独立部署。提供运营指令（发邮件、踢人、封禁/禁言、在线玩家、服务器开关、白名单、公告、兑换码）、节点监控、配置与代码热更、用户权限与操作日志。</div>
+    </div>
+    <div class="card">
+        <h4>可扩展的 RPC 服务</h4>
+        <div class="card-desc">除内置进程外，可按同一套模式新增任意 RPC 业务进程：创建 RpcNode、接入中心服、注册 @RpcService，并与集群内其他节点互连通信。详见文档：<a href="https://sunrise-game-frame.pages.dev/#/custom-rpc-service">可扩展 RPC 服务</a>。</div>
+    </div>
+</div>
+
 <h2>项目文档</h2>
-https://sunrise-game-frame.pages.dev
+<a href="https://sunrise-game-frame.pages.dev">https://sunrise-game-frame.pages.dev</a>
 
 <h2>项目结构</h2>
 <pre><code class="language-bash">sunrise-game-frame/
@@ -44,7 +82,7 @@ https://sunrise-game-frame.pages.dev
 ├─ network/                    # 网络层、DB、RPC、基础工具（所有服务依赖）
 │   └─ src/main/java/org/sunrise/game/
 │       ├─ core/               # BaseServer / BaseClient / 消息 / 编解码
-│       ├─ rpc/                # 自研 RPC 框架（注解/节点/调用/服务管理）
+│       ├─ rpc/                # RPC 框架（注解/节点/调用/服务管理）
 │       ├─ db/                 # DbService（HikariCP）/ 实体类
 │       ├─ config/             # ConfigReader 配置加载
 │       └─ utils/              # IdGenerator / LogCore / JwtUtil / Utils
