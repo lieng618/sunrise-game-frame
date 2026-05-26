@@ -1,6 +1,6 @@
 <div class="hero">
     <h1>Sunrise Game Frame</h1>
-    <p class="subtitle">基于 Java 21 实现的轻量级分布式游戏服务器框架，采用"中心服 + 对外服 + 游戏服 + 全局服 + HTTP 服务 + GM 后台"的多服务多进程架构，也可部署为多服务单进程，不同服务支持随意的拆分和组合，支持全球通服模式和滚服模式，框架不依赖任何第三方中间件，仅需Java环境即可运行，代码简洁规范、易理解、易扩展。</p>
+    <p class="subtitle">基于 Java 21 实现的轻量级分布式游戏服务器框架，采用"中心服 + 对外服 + 游戏服 + 全局服 + HTTP 服务 + GM 后台 + 可扩展RPC服务"的多服务多进程架构，也可部署为多服务单进程，不同服务支持随意的拆分和组合，支持全球通服模式和滚服模式（一套业务代码，仅修改部署方式），框架不依赖任何第三方中间件，仅需Java环境即可运行，代码简洁规范、易理解、易扩展。</p>
     <div class="hero-badges">
         <span class="hero-badge">☕ Java 21</span>
         <span class="hero-badge">🌐 Netty</span>
@@ -11,6 +11,52 @@
     </div>
 </div>
 
+<h2>项目文档</h2>
+<a href="https://sunrise-game-frame.pages.dev">https://sunrise-game-frame.pages.dev</a>
+
+
+<h2>快速开始</h2>
+<p>环境要求：<strong>JDK 21+</strong>、<strong>Maven 3.8+</strong>、<strong>MySQL 5.7+</strong></p>
+
+<h4>1. 编译</h4>
+<pre><code class="language-bash">git clone https://gitee.com/lieng618/sunrise-game-frame.git
+或 git clone https://github.com/lieng618/sunrise-game-frame.git
+cd sunrise-game-frame
+mvn install
+mvn clean package</code></pre>
+<p>编译完成后，会在<code>start/jar/</code> 目录下生成可执行 jar包</p>
+
+<h4>2. 初始化数据库</h4>
+<p>执行建表脚本，需先修改脚本内的 MySQL 连接信息</p>
+<pre><code class="language-bash"># Windows
+start\windows\create_sql_table.bat</code></pre>
+<pre><code class="language-bash"># Linux
+sh start/linux/create_sql_table.sh</code></pre>
+
+<h4>3. 单进程启动（RunAllOneServerStartUp）</h4>
+<p>将对外服、游戏服、全局服、HTTP 服务、GM 后台合并到一个进程中运行，无需单独启动中心服，适合本地开发调试</p>
+<p>修改配置文件： <code>config/runallone-config.properties</code>
+<a href="https://sunrise-game-frame.pages.dev/#/config">配置参考</a></p>
+<pre><code class="language-bash"># Windows
+start\windows\single\runallone.bat</code></pre>
+<pre><code class="language-bash"># Linux
+sh start/linux/server_run_allone.sh</code></pre>
+
+<h4>4.访问 GM 后台</h4>
+<pre><code class="language-bash">cd gmback-ui
+npm install
+npm run dev</code></pre>
+
+<p>浏览器访问 <a href="http://localhost:5173">http://localhost:5173</a>，使用配置中的账号登录（默认 admin / sunrise，见runallone-config.properties）</p>
+
+<h4>5. 客户端启动</h4>
+<p>消息发送工具：支持多标签页，每标签页一个玩家连接，可向服务器发送消息包</p>
+<pre><code class="language-bash">start/windows/client.bat</code></pre>
+<p>压测机器人：支持批量创建客户端、一键登录、批量定时向服务器发消息包</p>
+<pre><code class="language-bash">start/windows/bot.bat</code></pre>
+
+<h4>6. 生产环境部署</h4>
+<p>生产环境建议多服务多进程运行，根据需求拆分与合并服务。详见文档：<a href="https://sunrise-game-frame.pages.dev/#/deployment">部署指南</a></p>
 
 <h2>核心特性</h2>
 <div class="feature-grid">
@@ -61,9 +107,6 @@
         <div class="card-desc">除内置进程外，可按同一套模式新增任意 RPC 业务进程：创建 RpcNode、接入中心服、注册 @RpcService，并与集群内其他节点互连通信。详见文档：<a href="https://sunrise-game-frame.pages.dev/#/custom-rpc-service">可扩展 RPC 服务</a>。</div>
     </div>
 </div>
-
-<h2>项目文档</h2>
-<a href="https://sunrise-game-frame.pages.dev">https://sunrise-game-frame.pages.dev</a>
 
 <h2>项目结构</h2>
 <pre><code class="language-bash">sunrise-game-frame/
