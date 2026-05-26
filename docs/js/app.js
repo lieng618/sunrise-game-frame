@@ -8,6 +8,7 @@ function init() {
     document.getElementById('themeToggle').addEventListener('click', toggleTheme);
     document.getElementById('sidebarToggle').addEventListener('click', toggleSidebar);
 
+    // Search
     const searchInput = document.getElementById('searchInput');
     const searchResults = document.getElementById('searchResults');
 
@@ -49,6 +50,36 @@ function init() {
             searchResults.classList.remove('active');
         }
     });
+
+    // Scroll progress bar
+    const scrollProgress = document.getElementById('scrollProgress');
+    const backToTop = document.getElementById('backToTop');
+
+    window.addEventListener('scroll', () => {
+        const scrollTop = window.scrollY;
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+        scrollProgress.style.width = progress + '%';
+
+        // Back to top visibility
+        if (scrollTop > 300) {
+            backToTop.classList.add('visible');
+        } else {
+            backToTop.classList.remove('visible');
+        }
+    }, { passive: true });
+
+    backToTop.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // Keyboard shortcut: Ctrl/Cmd + K to focus search
+    document.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+            e.preventDefault();
+            searchInput.focus();
+        }
+    });
 }
 
 function handleRoute() {
@@ -56,14 +87,33 @@ function handleRoute() {
     const page = pages[hash];
     if (page) {
         const content = document.getElementById('contentInner');
-        content.innerHTML = page();
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.classList.toggle('active', link.dataset.page === hash);
-        });
-        window.scrollTo(0, 0);
-        content.querySelectorAll('pre code').forEach(block => {
-            hljs.highlightElement(block);
-        });
+
+        // Fade out, then update, then fade in
+        content.style.opacity = '0';
+        content.style.transform = 'translateY(8px)';
+
+        setTimeout(() => {
+            content.innerHTML = page();
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.toggle('active', link.dataset.page === hash);
+            });
+            window.scrollTo(0, 0);
+
+            // Reset scroll progress
+            const scrollProgress = document.getElementById('scrollProgress');
+            if (scrollProgress) scrollProgress.style.width = '0%';
+
+            content.querySelectorAll('pre code').forEach(block => {
+                hljs.highlightElement(block);
+            });
+
+            // Fade in
+            requestAnimationFrame(() => {
+                content.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                content.style.opacity = '1';
+                content.style.transform = 'translateY(0)';
+            });
+        }, 150);
     }
 }
 
