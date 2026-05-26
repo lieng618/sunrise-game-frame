@@ -1,7 +1,6 @@
 <div class="hero">
     <h1>Sunrise Game Frame</h1>
-    <p class="subtitle">基于 Java 21 实现的轻量级分布式游戏服务器框架，采用"中心服 + 对外服 + 游戏服 + 全局服 + HTTP 服务 + GM 后台"的多服务多进程架构，也可部署为多服务单进程，
-    不同服务支持随意的拆分和组合，支持全球通服模式和滚服模式，框架不依赖任何第三方中间件，仅需Java环境即可运行，架构简单，代码易理解、易扩展。</p>
+    <p class="subtitle">基于 Java 21 实现的轻量级分布式游戏服务器框架，采用"中心服 + 对外服 + 游戏服 + 全局服 + HTTP 服务 + GM 后台"的多服务多进程架构，也可部署为多服务单进程，不同服务支持随意的拆分和组合，支持全球通服模式和滚服模式，框架不依赖任何第三方中间件，仅需Java环境即可运行，代码简洁规范、易理解、易扩展。</p>
     <div class="hero-badges">
         <span class="hero-badge">☕ Java 21</span>
         <span class="hero-badge">🌐 Netty</span>
