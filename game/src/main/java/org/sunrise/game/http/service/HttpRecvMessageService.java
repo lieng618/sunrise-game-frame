@@ -23,6 +23,9 @@ public class HttpRecvMessageService extends BaseService {
         private String ip;
         private int port;
         private int serverId;
+        private boolean tcpEnabled;
+        private boolean wsEnabled;
+        private boolean kcpEnabled;
     }
     private static final Map<Integer, ExternalRemoteData> remoteStatus = new HashMap<>();
     private final HttpServer httpServer;
@@ -39,7 +42,7 @@ public class HttpRecvMessageService extends BaseService {
     }
 
     @RpcMethod
-    public void updateExternalRemoteData(int serverId, String host, int port) {
+    public void updateExternalRemoteData(int serverId, String host, int port, boolean tcpEnabled, boolean wsEnabled, boolean kcpEnabled) {
         ExternalRemoteData externalRemoteData = remoteStatus.get(serverId);
         if (externalRemoteData == null) {
             externalRemoteData = new ExternalRemoteData();
@@ -48,6 +51,9 @@ public class HttpRecvMessageService extends BaseService {
         externalRemoteData.serverId = serverId;
         externalRemoteData.ip = host;
         externalRemoteData.port = port;
+        externalRemoteData.tcpEnabled = tcpEnabled;
+        externalRemoteData.wsEnabled = wsEnabled;
+        externalRemoteData.kcpEnabled = kcpEnabled;
         externalRemoteData.time = System.currentTimeMillis();
     }
 
@@ -72,14 +78,27 @@ public class HttpRecvMessageService extends BaseService {
     public void pulsePer5Sec() {
         super.pulsePer5Sec();
         for (ExternalRemoteData remoteData : remoteStatus.values()) {
+            int serverId = remoteData.getServerId();
             ConcurrentHashMap<Integer, String> tcp = httpServer.getExternalAddress().computeIfAbsent("tcp", k -> new ConcurrentHashMap<>());
-            tcp.put(remoteData.getServerId(), remoteData.getIp() + ":" + remoteData.getPort());
+            if (remoteData.isTcpEnabled()) {
+                tcp.put(serverId, remoteData.getIp() + ":" + remoteData.getPort());
+            } else {
+                tcp.remove(serverId);
+            }
 
             ConcurrentHashMap<Integer, String> websocket = httpServer.getExternalAddress().computeIfAbsent("websocket", k -> new ConcurrentHashMap<>());
-            websocket.put(remoteData.getServerId(), remoteData.getIp() + ":" + (remoteData.getPort() + 1));
+            if (remoteData.isWsEnabled()) {
+                websocket.put(serverId, remoteData.getIp() + ":" + (remoteData.getPort() + 1));
+            } else {
+                websocket.remove(serverId);
+            }
 
             ConcurrentHashMap<Integer, String> kcp = httpServer.getExternalAddress().computeIfAbsent("kcp", k -> new ConcurrentHashMap<>());
-            kcp.put(remoteData.getServerId(), remoteData.getIp() + ":" + (remoteData.getPort() + 2));
+            if (remoteData.isKcpEnabled()) {
+                kcp.put(serverId, remoteData.getIp() + ":" + (remoteData.getPort() + 2));
+            } else {
+                kcp.remove(serverId);
+            }
         }
     }
 }

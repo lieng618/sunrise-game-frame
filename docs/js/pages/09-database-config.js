@@ -170,6 +170,9 @@ registerPage('config', '配置参考', '各服务配置项说明', () => `
 <thead><tr><th>配置键</th><th>说明</th><th>示例</th></tr></thead>
 <tbody>
 <tr><td>external.address</td><td>对外暴露的 IP（客户端连接地址）</td><td>127.0.0.1</td></tr>
+<tr><td>external.listen.tcp</td><td>tcp协议是否启动</td><td>true</td></tr>
+<tr><td>external.listen.ws</td><td>ws协议是否启动</td><td>true</td></tr>
+<tr><td>external.listen.kcp</td><td>kcp协议是否启动</td><td>true</td></tr>
 </tbody>
 </table>
 

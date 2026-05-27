@@ -19,10 +19,19 @@ public class NodeController extends BaseController {
         private String nodeId;
         private String type;
         private long processId;
+        private boolean tcpEnabled;
+        private boolean wsEnabled;
+        private boolean kcpEnabled;
     }
 
     private final ConcurrentHashMap<String, NodeRemoteData> nodes = new ConcurrentHashMap<>();
+
     public void updateNodeData(String nodeId, int serverId, String ip, int port, int online, String type, long processId) {
+        updateNodeData(nodeId, serverId, ip, port, online, type, processId, false, false, false);
+    }
+
+    public void updateNodeData(String nodeId, int serverId, String ip, int port, int online, String type, long processId,
+                               boolean tcpEnabled, boolean wsEnabled, boolean kcpEnabled) {
         NodeRemoteData nodeRemoteData = nodes.computeIfAbsent(type + nodeId, k -> new NodeRemoteData());
         nodeRemoteData.nodeId = nodeId;
         nodeRemoteData.serverId = serverId;
@@ -31,6 +40,9 @@ public class NodeController extends BaseController {
         nodeRemoteData.port = port;
         nodeRemoteData.online = online;
         nodeRemoteData.processId = processId;
+        nodeRemoteData.tcpEnabled = tcpEnabled;
+        nodeRemoteData.wsEnabled = wsEnabled;
+        nodeRemoteData.kcpEnabled = kcpEnabled;
     }
 
     public void list(Context ctx) {
@@ -44,6 +56,11 @@ public class NodeController extends BaseController {
             map.put("ip", node.getIp());
             map.put("type", node.getType());
             map.put("port", node.getPort());
+            if ("ExternalServer".equals(node.getType())) {
+                map.put("tcpEnabled", node.isTcpEnabled());
+                map.put("wsEnabled", node.isWsEnabled());
+                map.put("kcpEnabled", node.isKcpEnabled());
+            }
             map.put("serverId", node.getServerId());
             map.put("processId", node.getProcessId());
             map.put("status", 1);

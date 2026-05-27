@@ -33,6 +33,14 @@
                     </span>
         </template>
       </el-table-column>
+      <el-table-column label="开放协议" min-width="120" align="center">
+        <template #default="scope">
+          <span v-if="scope.row.type === 'ExternalServer'" class="address-badge listen-types">
+            {{ formatExternalListenTypes(scope.row) }}
+          </span>
+          <span v-else class="text-gray-400">-</span>
+        </template>
+      </el-table-column>
       <el-table-column prop="processId" label="进程 ID" min-width="100" sortable align="center">
         <template #default="scope">
           <span>{{ scope.row.processId || '-' }}</span>
@@ -85,6 +93,14 @@ export default {
       return state.tableData;
     });
 
+    const formatExternalListenTypes = (row) => {
+      const types = [];
+      if (row.tcpEnabled) types.push('tcp');
+      if (row.wsEnabled) types.push('ws');
+      if (row.kcpEnabled) types.push('kcp');
+      return types.length ? types.join('|') : '-';
+    };
+
     // 获取数据
     const fetchNodes = async () => {
       state.loadingData = true;
@@ -127,6 +143,7 @@ export default {
       formatTime,
       fetchNodes,
       filteredTableData,
+      formatExternalListenTypes,
     };
   }
 };

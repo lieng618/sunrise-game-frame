@@ -18,6 +18,7 @@ import io.netty.handler.logging.LoggingHandler;
 import kcp.ChannelConfig;
 import kcp.KcpServer;
 import lombok.Data;
+import org.sunrise.game.config.ConfigReader;
 import org.sunrise.game.core.coder.SocketMessageDecoder;
 import org.sunrise.game.core.coder.SocketMessageEncoder;
 import org.sunrise.game.core.coder.WebSocketMessageCodec;
@@ -30,12 +31,18 @@ import org.sunrise.game.utils.Utils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 @Data
 public class ExternalServer {
     private String externalHost;
     private int externalPort;
     private KcpServer kcpServer;
+    private boolean tcpEnabled;
+    private boolean wsEnabled;
+    private boolean kcpEnabled;
+
+    private volatile boolean statusUpdated;
 
     public void start() {
         int serverId = RpcNodeManager.getRpcServerId();
@@ -67,9 +74,19 @@ public class ExternalServer {
                 DbManager.getDbService().execute("insert into `external_system` (id,ip,port) values (?,?,?)", serverId, Utils.getLocalIpAddress(), port);
             }
             externalPort = port;
-            startTcpListen(ip, port);
-            startWsListen(ip, port + 1);
-            startKcpListen(ip, port + 2);
+            Properties properties = ConfigReader.getProp();
+            if ("true".equalsIgnoreCase(properties.getProperty("external.listen.tcp", "true"))) {
+                tcpEnabled = true;
+                startTcpListen(ip, port);
+            }
+            if ("true".equalsIgnoreCase(properties.getProperty("external.listen.ws", "false"))) {
+                wsEnabled = true;
+                startWsListen(ip, port + 1);
+            }
+            if ("true".equalsIgnoreCase(properties.getProperty("external.listen.kcp", "false"))) {
+                kcpEnabled = true;
+                startKcpListen(ip, port + 2);
+            }
         } catch (Exception e) {
             LogCore.ExternalServer.error("Server StartUp Failed, name = { ExternalServer }, serverId = {}, reason = {}", serverId, e.getLocalizedMessage());
             System.exit(-1);
@@ -102,7 +119,7 @@ public class ExternalServer {
         b.bind(ip, port).addListener((ChannelFuture future) -> {
             if (future.isSuccess()) {
                 LogCore.ExternalServer.info("External Tcp Server start, port = { {} }", port);
-                DbManager.getDbService().execute("update `external_system` set `status` = ?, `ip` = ? where `id` = ?", 1, Utils.getLocalIpAddress(), RpcNodeManager.getRpcServerId());
+                markServerRunning();
             } else {
                 LogCore.ExternalServer.error("Failed to bind server on ip: {} and port: {}", ip, port, future.cause());
                 bossGroup.shutdownGracefully().syncUninterruptibly();
@@ -137,6 +154,7 @@ public class ExternalServer {
         b.bind(ip, port).addListener((ChannelFuture future) -> {
             if (future.isSuccess()) {
                 LogCore.ExternalServer.info("External Ws Server start, port = { {} }", port);
+                markServerRunning();
             } else {
                 LogCore.ExternalServer.error("Failed to bind server on ip: {} and port: {}", ip, port, future.cause());
                 bossGroup.shutdownGracefully();
@@ -162,5 +180,14 @@ public class ExternalServer {
         kcpServer.init(kcpServerHandler, channelConfig, port);
 
         LogCore.ExternalServer.info("External Kcp Server start, port = { {} }", port);
+        markServerRunning();
+    }
+
+    private void markServerRunning() {
+        if (statusUpdated) {
+            return;
+        }
+        statusUpdated = true;
+        DbManager.getDbService().execute("update `external_system` set `status` = ?, `ip` = ? where `id` = ?", 1, Utils.getLocalIpAddress(), RpcNodeManager.getRpcServerId());
     }
 }

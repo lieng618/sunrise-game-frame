@@ -50,7 +50,13 @@ public class ExternalRecvGameMessageService extends BaseService {
     public void pulsePer5Sec() {
         super.pulsePer5Sec();
         pulseRemoveClients();
-        RpcFunction.newInstance().call(CallEnum.HttpRecvMessageService_updateExternalRemoteData, "serverId", RpcNodeManager.getRpcServerId(), "host", externalServer.getExternalHost(), "port", externalServer.getExternalPort());
+        RpcFunction.newInstance().call(CallEnum.HttpRecvMessageService_updateExternalRemoteData,
+                "serverId", RpcNodeManager.getRpcServerId(),
+                "host", externalServer.getExternalHost(),
+                "port", externalServer.getExternalPort(),
+                "tcpEnabled", externalServer.isTcpEnabled(),
+                "wsEnabled", externalServer.isWsEnabled(),
+                "kcpEnabled", externalServer.isKcpEnabled());
     }
 
     @Override
@@ -119,6 +125,9 @@ public class ExternalRecvGameMessageService extends BaseService {
         dataMap.put("online", ExternalConnectionManger.getOnlineCount());
         dataMap.put("processId", Utils.getProcessId());
         dataMap.put("type", "ExternalServer");
+        dataMap.put("tcpEnabled", externalServer.isTcpEnabled());
+        dataMap.put("wsEnabled", externalServer.isWsEnabled());
+        dataMap.put("kcpEnabled", externalServer.isKcpEnabled());
         RpcFunction.newInstance().call(CallEnum.GmBackRecvMessageService_recvMessage, "operation", "reportNodeData", "data", JSON.toJSONString(dataMap));
     }
 }

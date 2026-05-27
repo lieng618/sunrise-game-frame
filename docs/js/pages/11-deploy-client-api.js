@@ -164,6 +164,70 @@ Global服拆分时，一般一个业务作为一个节点，也可以多个业�
 <tr><td>Global服</td><td>可拆分为多个进程，如一个聊天节点、一个邮件节点等等</td></tr>
 </tbody>
 </table>
+
+<h2>nginx配置</h2>
+<p>本地测试一般会直连对外服的 ip+端口，正式上线需要域名与 SSL，由 Nginx 统一入口：WebSocket（<code>/ws/端口</code>）、HTTP 接口（8090）、GM 后台 API（8010）与 gmback-ui 静态页（<code>dist/</code>）。以下示例假设域名为 <code>www.goldminer.cloud</code>，GM 后台构建产物在 <code>/home/sunrise-game-frame/gmback-ui/dist/</code>。</p>
+
+<pre><code>server {
+    listen 80;
+    server_name goldminer.cloud www.goldminer.cloud;
+    return 301 https://\$host\$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name goldminer.cloud www.goldminer.cloud;
+
+    ssl_certificate     /etc/nginx/cert/www.goldminer.cloud_bundle.crt;
+    ssl_certificate_key /etc/nginx/cert/www.goldminer.cloud.key;
+
+    ssl_protocols       TLSv1 TLSv1.1 TLSv1.2 TLSv1.3;
+    ssl_ciphers         ECDHE-RSA-AES128-GCM-SHA256:ECDHE:ECDH:AES:HIGH:!NULL:!aNULL:!MD5:!ADH:!RC4;
+    ssl_session_timeout 20m;
+    ssl_verify_client off;
+
+    # 动态 WebSocket 端口转发
+    # 客户端连接地址示例: wss://www.goldminer.cloud/ws/10001
+    location ~ ^/ws/(?<forward_port>\\d+)$ {
+        rewrite ^/ws/\\d+ / break;
+        proxy_pass http://127.0.0.1:\$forward_port;
+
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header Host \$host;
+    }
+
+    # HTTP 接口转发到 HttpServer（8090）
+    location ~ ^/external_address {
+        proxy_pass http://127.0.0.1:8090;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+    }
+
+    # GM 后台 API 转发到 gmback（8010，保留 /api 前缀）
+    location /api/ {
+        proxy_pass http://127.0.0.1:8010;
+        proxy_http_version 1.1;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+    }
+
+    # GM 后台静态文件（npm run build 后的 dist/）
+    root /home/sunrise-game-frame/gmback-ui/dist;
+    index index.html;
+
+    location / {
+        try_files \$uri \$uri/ /index.html;
+    }
+}
+</code></pre>
 `);
 
 registerPage('client-tools', '客户端工具', '消息发送工具、压测机器人', () => `
@@ -304,69 +368,6 @@ const targetPort = parts[1]; // 拿到对外服端口
 const wsUrl = \`wss://\${networkConfig.serverdomain}/ws/\${targetPort}\`;
 </code></pre>
 
-<h2>nginx配置</h2>
-<p>本地测试一般会直连对外服的 ip+端口，正式上线需要域名与 SSL，由 Nginx 统一入口：WebSocket（<code>/ws/端口</code>）、HTTP 接口（8090）、GM 后台 API（8010）与 gmback-ui 静态页（<code>dist/</code>）。以下示例假设域名为 <code>www.goldminer.cloud</code>，GM 后台构建产物在 <code>/home/sunrise-game-frame/gmback-ui/dist/</code>。</p>
-
-<pre><code>server {
-    listen 80;
-    server_name goldminer.cloud www.goldminer.cloud;
-    return 301 https://\$host\$request_uri;
-}
-
-server {
-    listen 443 ssl http2;
-    server_name goldminer.cloud www.goldminer.cloud;
-
-    ssl_certificate     /etc/nginx/cert/www.goldminer.cloud_bundle.crt;
-    ssl_certificate_key /etc/nginx/cert/www.goldminer.cloud.key;
-
-    ssl_protocols       TLSv1 TLSv1.1 TLSv1.2 TLSv1.3;
-    ssl_ciphers         ECDHE-RSA-AES128-GCM-SHA256:ECDHE:ECDH:AES:HIGH:!NULL:!aNULL:!MD5:!ADH:!RC4;
-    ssl_session_timeout 20m;
-    ssl_verify_client off;
-
-    # 动态 WebSocket 端口转发
-    # 客户端连接地址示例: wss://www.goldminer.cloud/ws/10001
-    location ~ ^/ws/(?<forward_port>\\d+)$ {
-        rewrite ^/ws/\\d+ / break;
-        proxy_pass http://127.0.0.1:\$forward_port;
-
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade \$http_upgrade;
-        proxy_set_header Connection "upgrade";
-        proxy_set_header X-Real-IP \$remote_addr;
-        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        proxy_set_header Host \$host;
-    }
-
-    # HTTP 接口转发到 HttpServer（8090）
-    location ~ ^/external_address {
-        proxy_pass http://127.0.0.1:8090;
-        proxy_set_header Host \$host;
-        proxy_set_header X-Real-IP \$remote_addr;
-        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto \$scheme;
-    }
-
-    # GM 后台 API 转发到 gmback（8010，保留 /api 前缀）
-    location /api/ {
-        proxy_pass http://127.0.0.1:8010;
-        proxy_http_version 1.1;
-        proxy_set_header Host \$host;
-        proxy_set_header X-Real-IP \$remote_addr;
-        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto \$scheme;
-    }
-
-    # GM 后台静态文件（npm run build 后的 dist/）
-    root /home/sunrise-game-frame/gmback-ui/dist;
-    index index.html;
-
-    location / {
-        try_files \$uri \$uri/ /index.html;
-    }
-}
-</code></pre>
 `);
 
 registerPage('api-reference', 'API 参考', 'RPC 服务 API、HTTP 接口、注解参考', () => `
