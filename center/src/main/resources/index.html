@@ -118,6 +118,7 @@
   <header>
     <div style="display:flex;align-items:center;gap:16px">
       <h1 style="font-size:18px;font-weight:700;letter-spacing:-.5px">RPC 节点拓扑</h1>
+      <span id="data-source-tag" class="data-source-tag demo">未连接</span>
     </div>
     <div style="display:flex;align-items:center;gap:12px">
       <div id="conn-status" style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--fg-muted)">
@@ -144,13 +145,13 @@
         <input type="text" class="config-input" id="cfg-api-url" placeholder="http://127.0.0.1:8088/api/topology">
       </div>
       <div>
-        <label class="config-label">WebSocket 地址（实时推送）</label>
-        <input type="text" class="config-input" id="cfg-ws-url" placeholder="ws://localhost:8080/ws/topology">
-      </div>
-      <div>
         <label class="config-label">轮询间隔（毫秒，0 为不轮询）</label>
         <input type="number" class="config-input" id="cfg-poll-interval" value="5000" min="0" step="1000">
       </div>
+      <p style="font-size:12px;color:var(--fg-muted);line-height:1.5">
+        打开本页地址应为 <span class="font-mono" style="color:var(--accent)">http://127.0.0.1:8088/</span>（与 <span class="font-mono">dashboard.port</span> 一致）。
+        数据通过上方 API 定时拉取
+      </p>
       <div style="display:flex;gap:8px;margin-top:4px">
         <button class="config-btn config-btn-primary" onclick="applyConfig()">连接</button>
       </div>
@@ -245,7 +246,6 @@
   let hasDragged = false;
   let activeFilters = new Set();
   let dashOffset = 0;
-  let ws = null;
   let pollTimer = null;
   let isLiveData = false;
 
@@ -345,39 +345,6 @@
       result.stats = data.stats;
     }
     return result;
-  }
-
-  // WebSocket 连接
-  function connectWebSocket(wsUrl) {
-    if (ws) { ws.close(); ws = null; }
-    try {
-      ws = new WebSocket(wsUrl);
-      ws.onopen = () => {
-        updateConnectionStatus('online', 'WebSocket 已连接');
-        showToast('WebSocket 连接成功', 'success');
-      };
-      ws.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data);
-          const topo = normalizeTopology(data);
-          applyTopology(topo, true);
-        } catch (e) {
-          console.warn('WebSocket 消息解析失败:', e);
-        }
-      };
-      ws.onclose = () => {
-        updateConnectionStatus('offline', 'WebSocket 断开');
-        // 自动重连
-        setTimeout(() => {
-          if (isLiveData) connectWebSocket(wsUrl);
-        }, 5000);
-      };
-      ws.onerror = () => {
-        updateConnectionStatus('error', 'WebSocket 错误');
-      };
-    } catch (e) {
-      console.error('WebSocket 连接失败:', e);
-    }
   }
 
   // 轮询
@@ -506,67 +473,72 @@
     document.getElementById('config-panel').classList.remove('open');
   }
 
+  function getDefaultApiUrl() {
+    if (window.location.protocol === 'http:' || window.location.protocol === 'https:') {
+      return window.location.origin + '/api/topology';
+    }
+    return 'http://127.0.0.1:8088/api/topology';
+  }
+
+  function restoreFormFromStorage() {
+    const apiInput = document.getElementById('cfg-api-url');
+    apiInput.value = getDefaultApiUrl();
+    try {
+      const saved = JSON.parse(localStorage.getItem('rpc-topo-config'));
+      if (saved && saved.pollInterval != null) {
+        document.getElementById('cfg-poll-interval').value = saved.pollInterval;
+      }
+    } catch (e) {}
+  }
+
+  async function connectApi(apiUrl, pollInterval, options = {}) {
+    const { silent = false, save = true } = options;
+    stopPolling();
+    const topo = await fetchTopology(apiUrl);
+    applyTopology(topo);
+    isLiveData = true;
+    document.getElementById('loading-overlay').classList.add('hidden');
+    document.getElementById('cfg-api-url').value = apiUrl;
+    updateConnectionStatus('online', 'API 已连接');
+    updateDataSourceTag('live');
+    if (save) {
+      try {
+        localStorage.setItem('rpc-topo-config', JSON.stringify({ apiUrl, pollInterval }));
+      } catch (e) {
+        console.warn('无法保存配置到 localStorage:', e);
+      }
+    }
+    startPolling(apiUrl, pollInterval);
+    if (!silent) {
+      showToast(`已连接，${topo.nodes.length} 个节点`, 'success');
+    }
+    return topo;
+  }
+
   async function applyConfig() {
-    const apiUrl = document.getElementById('cfg-api-url').value.trim();
-    const wsUrl = document.getElementById('cfg-ws-url').value.trim();
+    const apiUrl = document.getElementById('cfg-api-url').value.trim() || getDefaultApiUrl();
     const pollInterval = parseInt(document.getElementById('cfg-poll-interval').value) || 0;
     const msgEl = document.getElementById('config-msg');
-
-    if (!apiUrl && !wsUrl) {
-      msgEl.innerHTML = '<span style="color:#FF6B6B">请至少填写 API 地址或 WebSocket 地址</span>';
-      return;
-    }
 
     msgEl.innerHTML = '<span style="color:#FFB800">正在连接...</span>';
     updateConnectionStatus('connecting', '正在连接...');
 
-    // 保存配置到 localStorage
-    const config = { apiUrl, wsUrl, pollInterval };
-    localStorage.setItem('rpc-topo-config', JSON.stringify(config));
-
-    if (apiUrl) {
-      try {
-        const topo = await fetchTopology(apiUrl);
-        applyTopology(topo);
-        isLiveData = true;
-        updateConnectionStatus('online', 'API 已连接');
-        updateDataSourceTag('live');
-        showToast(`已从 API 加载 ${topo.nodes.length} 个节点`, 'success');
-        msgEl.innerHTML = '<span style="color:#00E5CC">API 连接成功</span>';
-
-        // 启动轮询
-        startPolling(apiUrl, pollInterval);
-      } catch (e) {
-        msgEl.innerHTML = `<span style="color:#FF6B6B">API 连接失败: ${e.message}</span>`;
-        updateConnectionStatus('error', '连接失败');
-        showToast(`API 连接失败: ${e.message}`, 'error');
-      }
-    }
-
-    if (wsUrl) {
-      connectWebSocket(wsUrl);
-    }
-
-    if (apiUrl || wsUrl) {
-      setTimeout(closeConfig, 1000);
-    }
-  }
-
-  function loadSavedConfig() {
     try {
-      const saved = JSON.parse(localStorage.getItem('rpc-topo-config'));
-      if (saved) {
-        document.getElementById('cfg-api-url').value = saved.apiUrl || '';
-        document.getElementById('cfg-ws-url').value = saved.wsUrl || '';
-        document.getElementById('cfg-poll-interval').value = saved.pollInterval || 5000;
-        // 自动连接
-        if (saved.apiUrl || saved.wsUrl) {
-          applyConfig();
-          return true;
-        }
+      await connectApi(apiUrl, pollInterval);
+      msgEl.innerHTML = '<span style="color:#00E5CC">API 连接成功</span>';
+      setTimeout(closeConfig, 800);
+    } catch (e) {
+      if (isLiveData && nodes.length > 0) {
+        msgEl.innerHTML = '<span style="color:#00E5CC">已连接</span>';
+        return;
       }
-    } catch (e) {}
-    return false;
+      const hint = e.message === 'Failed to fetch'
+        ? '（网络不可达：请确认中心服已启动）'
+        : '';
+      msgEl.innerHTML = `<span style="color:#FF6B6B">API 连接失败: ${e.message}${hint}</span>`;
+      updateConnectionStatus('error', '连接失败');
+      showToast(`API 连接失败: ${e.message}`, 'error');
+    }
   }
 
   // ========== 连接状态 ==========
@@ -579,6 +551,7 @@
 
   function updateDataSourceTag(type) {
     const tag = document.getElementById('data-source-tag');
+    if (!tag) return;
     if (type === 'live') { tag.className = 'data-source-tag live'; tag.textContent = '实时数据'; }
     else if (type === 'demo') { tag.className = 'data-source-tag demo'; tag.textContent = '演示数据'; }
     else { tag.className = 'data-source-tag error'; tag.textContent = '连接失败'; }
@@ -1070,45 +1043,30 @@
     updateStats();
     buildNodeList();
     loop();
-
-    // 尝试自动连接保存的配置
-    const autoConnected = loadSavedConfig();
-    if (!autoConnected) {
-      // 没有保存的配置，尝试默认地址
-      tryAutoConnect();
-    }
+    restoreFormFromStorage();
+    initConnection();
   }
 
-  async function tryAutoConnect() {
-    // 尝试常见的本地 API 地址
-    const port = window.location.port || (window.location.protocol === 'https:' ? '443' : '80');
-    const candidates = [
-      window.location.origin + '/api/topology',
-      window.location.origin + '/topology',
-      `http://127.0.0.1:${port}/api/topology`,
-      'http://127.0.0.1:8088/api/topology',
-    ];
+  async function initConnection() {
+    const pollInterval = parseInt(document.getElementById('cfg-poll-interval').value) || 5000;
+    const apiUrl = getDefaultApiUrl();
 
-    for (const url of candidates) {
-      try {
-        const topo = await fetchTopology(url);
-        applyTopology(topo);
-        isLiveData = true;
-        updateConnectionStatus('online', 'API 已连接');
-        updateDataSourceTag('live');
-        // 保存成功的配置
-        document.getElementById('cfg-api-url').value = url;
-        showToast(`自动连接成功: ${url}`, 'success');
-        return;
-      } catch(e) {
-        // 继续尝试下一个
-      }
+    try {
+      await connectApi(apiUrl, pollInterval, { silent: true, save: true });
+      return;
+    } catch (e) {
+      console.warn('拓扑 API 连接失败:', apiUrl, e.message);
+    }
+
+    if (isLiveData && nodes.length > 0) {
+      return;
     }
 
     document.getElementById('loading-overlay').classList.add('hidden');
-    document.getElementById('loading-text').textContent = '未连接到 API，请在配置中填写地址';
-    updateConnectionStatus('offline', '未连接');
+    document.getElementById('loading-text').textContent = '未连接到 API';
+    updateConnectionStatus('error', 'API 连接失败');
     updateDataSourceTag('error');
+    showToast('无法连接拓扑 API', 'error', 6000);
   }
 
   window.addEventListener('resize',()=>{resizeCanvas();if(nodes.length>0)zoomFit();});
