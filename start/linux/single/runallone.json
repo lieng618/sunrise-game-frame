@@ -6,8 +6,7 @@
     "-Xmx1024m",
     "-jar",
     "../../jar/sunrise-runallone.jar",
-    "../../../config/runallone-config.properties",
-    "100"
+    "../../../config/runallone-config.properties"
   ],
   "error_file": "../log/runallone-err.log",
   "out_file": "../log/runallone.log",

@@ -6,8 +6,7 @@
     "-Xmx1024m",
     "-jar",
     "../../jar/sunrise-gmback.jar",
-    "../../../config/gmback-config.properties",
-    "2"
+    "../../../config/gmback-config.properties"
   ],
   "error_file": "../log/gmback-err.log",
   "out_file": "../log/gmback.log",

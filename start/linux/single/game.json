@@ -6,8 +6,7 @@
     "-Xmx1024m",
     "-jar",
     "../../jar/sunrise-game.jar",
-    "../../../config/game-config.properties",
-    "200"
+    "../../../config/game-config.properties"
   ],
   "error_file": "../log/game-err.log",
   "out_file": "../log/game.log",

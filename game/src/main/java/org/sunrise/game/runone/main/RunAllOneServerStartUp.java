@@ -16,21 +16,22 @@ import java.util.Properties;
 
 public class RunAllOneServerStartUp {
     public static void main(String[] args) {
-        // args[0]:config path args[1]:server_id
         if (args.length == 0) {
-            args = new String[]{"./config/runallone-config.properties", "100"};
+            args = new String[]{"./config/runallone-config.properties"};
         }
-        System.setProperty("programName", "RunAllOneServer-" + args[1]);
         ConfigReader.loadConfig(args[0]);
         Properties properties = ConfigReader.getProp();
         if (properties == null) {
             return;
         }
+        int serverId = Integer.parseInt(properties.getProperty("rpc.node.serverId"));
+        String nodeType = properties.getProperty("rpc.node.type");
+        System.setProperty("programName", "RunAllOneServer-" + serverId);
         // 设置日志等级
         Utils.setLogLevel(properties.getProperty("log.level"));
 
         // 创建rpc节点
-        var rpcNode = RpcNodeManager.createRpcNode(Integer.parseInt(args[1]));
+        var rpcNode = RpcNodeManager.createRpcNode(serverId, nodeType);
         // 添加当前模块要注册的rpc
         CallUtils.init(rpcNode.getNodeId(), Collections.singletonList("org.sunrise.game"), CallEnum.class);
 

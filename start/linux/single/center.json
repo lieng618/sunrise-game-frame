@@ -6,8 +6,7 @@
     "-Xmx1024m",
     "-jar",
     "../../jar/sunrise-center.jar",
-    "../../../config/center-config.properties",
-    "1"
+    "../../../config/center-config.properties"
   ],
   "error_file": "../log/center-err.log",
   "out_file": "../log/center.log",

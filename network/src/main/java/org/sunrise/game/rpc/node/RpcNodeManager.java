@@ -11,8 +11,8 @@ public class RpcNodeManager {
     @Getter
     private static RpcNode rpcNode;
 
-    public static RpcNode createRpcNode(int serverId) {
-        rpcNode = new RpcNode(serverId);
+    public static RpcNode createRpcNode(int serverId, String nodeType) {
+        rpcNode = new RpcNode(serverId, nodeType);
         return rpcNode;
     }
 

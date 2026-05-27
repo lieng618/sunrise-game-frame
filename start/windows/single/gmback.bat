@@ -1,1 +1,1 @@
-start java -Xms256m -Xmx1024m -jar ../../jar/sunrise-gmback.jar ../../../config/gmback-config.properties 2
+start java -Xms256m -Xmx1024m -jar ../../jar/sunrise-gmback.jar ../../../config/gmback-config.properties

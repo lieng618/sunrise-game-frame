@@ -7,6 +7,7 @@ registerPage('deployment', '部署指南', '本地部署、Docker 部署、Linux
 <thead><tr><th>服务</th><th>端口</th><th>协议</th><th>用途</th></tr></thead>
 <tbody>
 <tr><td>CenterServer</td><td>8000</td><td>TCP</td><td>RPC 节点注册中心（内部）</td></tr>
+<tr><td>Center Dashboard</td><td>8088</td><td>HTTP</td><td>RPC 拓扑可视化（0=关闭）</td></tr>
 <tr><td>ExternalServer</td><td>10000</td><td>TCP</td><td>客户端 TCP 连接</td></tr>
 <tr><td>ExternalServer</td><td>10001</td><td>WebSocket</td><td>客户端 WS 连接</td></tr>
 <tr><td>ExternalServer</td><td>10002</td><td>KCP</td><td>客户端 KCP 连接</td></tr>
@@ -78,7 +79,7 @@ sh start/linux/server_run_allone.sh</code></pre>
 <thead><tr><th>服务</th><th>端口映射</th><th>依赖</th><th>说明</th></tr></thead>
 <tbody>
 <tr><td>mysql</td><td>13306:3306</td><td>无</td><td>MySQL 数据库，健康检查 mysqladmin ping</td></tr>
-<tr><td>center</td><td>无</td><td>mysql(healthy)</td><td>中心服</td></tr>
+<tr><td>center</td><td>8088:8088</td><td>mysql(healthy)</td><td>中心服 + RPC 拓扑 Dashboard</td></tr>
 <tr><td>external</td><td>10000:10000, 10001:10001, 10002:10002</td><td>mysql(healthy), center</td><td>对外服</td></tr>
 <tr><td>game</td><td>无</td><td>mysql(healthy), center</td><td>游戏服</td></tr>
 <tr><td>global</td><td>无</td><td>mysql(healthy), center</td><td>全局服</td></tr>

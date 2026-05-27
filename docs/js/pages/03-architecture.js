@@ -12,7 +12,7 @@ registerPage('architecture', '架构总览', '多进程架构、服务职责、�
     <div class="card">
         <div class="card-icon">⚙️</div>
         <div class="card-title">CenterServer</div>
-        <div class="card-desc">所有 RPC 节点的注册中心。接收节点上报（ip/port/serverId/nodeId）、维护在线节点信息、新节点加入时双向广播、让各节点互连。不执行业务 RPC，只做"节点通讯录同步"。6秒无上报视为失效</div>
+        <div class="card-desc">所有 RPC 节点的注册中心。接收节点上报（ip/port/serverId/nodeId/nodeType）、按 rpc.connect.* 连接策略决定向谁广播地址（未配置则全量互连）、维护在线节点信息。内置 Dashboard（默认 8088）展示 RPC 拓扑。不执行业务 RPC。6 秒无上报视为失效</div>
     </div>
     <div class="card">
         <div class="card-icon">🌐</div>

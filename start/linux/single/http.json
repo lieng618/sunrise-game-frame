@@ -6,8 +6,7 @@
     "-Xmx1024m",
     "-jar",
     "../../jar/sunrise-http.jar",
-    "../../../config/http-config.properties",
-    "3"
+    "../../../config/http-config.properties"
   ],
   "error_file": "../log/http-err.log",
   "out_file": "../log/http.log",

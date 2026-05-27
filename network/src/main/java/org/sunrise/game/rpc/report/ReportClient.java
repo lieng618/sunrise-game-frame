@@ -13,6 +13,7 @@ public class ReportClient {
     private String clientIp; //当前节点上报ip
     private int clientPort; //当前节点上报port
     private int serverId; //服务id
+    private String nodeType; //节点类型
 
     private String masterIp;
     private int masterPort;
@@ -32,10 +33,11 @@ public class ReportClient {
         BaseClientManager.register(connectToCenter);
     }
 
-    public ReportClient(String nodeId, int serverId, String clientIp, int clientPort) {
+    public ReportClient(String nodeId, int serverId, String clientIp, int clientPort, String nodeType) {
         this.clientIp = clientIp;
         this.clientPort = clientPort;
         this.serverId = serverId;
+        this.nodeType = nodeType;
         this.connectToCenter = new BaseClient(nodeId) {
             @Override
             public void onFail() {

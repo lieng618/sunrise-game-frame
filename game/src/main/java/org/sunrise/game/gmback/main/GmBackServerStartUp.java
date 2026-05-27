@@ -11,26 +11,23 @@ import java.util.Properties;
 
 public class GmBackServerStartUp {
     public static void main(String[] args) {
-        // args[0]:config path args[1]:global_id
         if (args.length == 0) {
-            args = new String[] { "./config/gmback-config.properties", "2" };
+            args = new String[]{"./config/gmback-config.properties"};
         }
-        System.setProperty("programName", "GmBackServer-" + args[1]);
         ConfigReader.loadConfig(args[0]);
         Properties properties = ConfigReader.getProp();
         if (properties == null) {
             return;
         }
-        // 设置日志等级
+        int serverId = Integer.parseInt(properties.getProperty("rpc.node.serverId"));
+        String nodeType = properties.getProperty("rpc.node.type");
+        System.setProperty("programName", "GmBackServer-" + serverId);
         Utils.setLogLevel(properties.getProperty("log.level"));
 
-        // 创建rpc节点
-        var rpcNode = RpcNodeManager.createRpcNode(Integer.parseInt(args[1]));
-        // 添加当前模块要注册的rpc
+        var rpcNode = RpcNodeManager.createRpcNode(serverId, nodeType);
         CallUtils.init(rpcNode.getNodeId(), Collections.singletonList("org.sunrise.game.gmback.service"), CallEnum.class);
-        // 启动
         rpcNode.start();
-        // 内存检测
+
         Utils.startMemoryCheck();
     }
 }

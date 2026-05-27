@@ -1,1 +1,1 @@
-start java -Xms256m -Xmx1024m -javaagent:../../jar/hotswap-agent.jar -jar ../../jar/sunrise-runallone.jar ../../../config/runallone-config.properties 100
+start java -Xms256m -Xmx1024m -javaagent:../../jar/hotswap-agent.jar -jar ../../jar/sunrise-runallone.jar ../../../config/runallone-config.properties

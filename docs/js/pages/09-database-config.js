@@ -149,13 +149,21 @@ registerPage('config', '配置参考', '各服务配置项说明', () => `
 <tr><td>master.address</td><td>中心服地址</td><td>127.0.0.1</td></tr>
 <tr><td>master.port</td><td>中心服端口</td><td>8000</td></tr>
 <tr><td>report.address</td><td>本机上报 IP</td><td>127.0.0.1</td></tr>
+<tr><td>rpc.node.type</td><td>RPC 节点类型，用于连接策略与拓扑展示（external/game/global/http/gmback 等）</td><td>game</td></tr>
+<tr><td>rpc.node.serverId</td><td>RPC 节点 ID，写入 rpc_server_system，集群内唯一</td><td>200</td></tr>
 <tr><td>log.level</td><td>日志级别</td><td>DEBUG</td></tr>
 </tbody>
 </table>
 
 <h2>各服务特有配置</h2>
 <h3>center-config.properties</h3>
-<p>中心服只需通用配置中的 master.id/address/port。</p>
+<table>
+<thead><tr><th>配置键</th><th>说明</th><th>示例</th></tr></thead>
+<tbody>
+<tr><td>dashboard.port</td><td>RPC 拓扑 Dashboard 端口；0 表示不启动</td><td>8088</td></tr>
+<tr><td>rpc.connect.&lt;type&gt;</td><td>该类型节点允许主动连接的目标类型列表（逗号分隔）；不配任何 rpc.connect.* 则全量互连</td><td>rpc.connect.game=external,global,gmback</td></tr>
+</tbody>
+</table>
 
 <h3>external-config.properties</h3>
 <table>

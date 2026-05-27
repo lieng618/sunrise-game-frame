@@ -61,7 +61,7 @@ npm run dev</code></pre>
 <h2>核心特性</h2>
 <div class="feature-grid">
     <div class="feature-item"><span class="feature-icon">🏗️</span><span class="feature-text">分布式多节点架构，不同服务可随意组合拆分为多进程或单进程部署，支持动态扩容</span></div>
-    <div class="feature-item"><span class="feature-icon">📡</span><span class="feature-text">RPC 框架，支持随机/广播/定向三种调用模式，含回调与超时机制</span></div>
+    <div class="feature-item"><span class="feature-icon">📡</span><span class="feature-text">RPC 框架，支持随机/广播/定向三种调用模式，含回调与超时机制；中心服可配置连接策略，内置拓扑可视化面板</span></div>
     <div class="feature-item"><span class="feature-icon">📭</span><span class="feature-text">零中间件依赖，无需 Redis / ZooKeeper / MQ，真正做到轻量级</span></div>
     <div class="feature-item"><span class="feature-icon">🚀</span><span class="feature-text">业务代码无需修改，仅修改部署方式，即可支持全球通服与滚服模式</span></div>
     <div class="feature-item"><span class="feature-icon">🔒</span><span class="feature-text">RPC服与游戏服单线程处理业务，无需加锁，无需考虑线程安全问题</span></div>
@@ -80,7 +80,7 @@ npm run dev</code></pre>
 <div class="card-grid">
     <div class="card">
         <h4>CenterServer</h4>
-        <div class="card-desc">中心服，所有 RPC 节点的注册中心，负责节点发现与信息广播，不执行任何业务 RPC，只做"节点通讯录同步。各节点收到其他节点地址后，自己完成互连。 中心服挂掉不影响已互连的节点间通信，但新节点无法加入。支持断线重连，中心服重新启动后，所有节点都会重新注册。</div>
+        <div class="card-desc">中心服，所有 RPC 节点的注册中心，负责节点发现与信息广播，不执行任何业务 RPC，只做"节点通讯录同步"。各节点上报时携带 nodeType，中心服按 <code>rpc.connect.*</code> 策略决定向谁广播地址（未配置则全量互连）。内置 Dashboard（默认 <code>http://127.0.0.1:8088</code>）实时展示在线节点与 RPC 连接拓扑。中心服挂掉不影响已互连的节点间通信，但新节点无法加入；支持断线重连。</div>
     </div>
     <div class="card">
     <h4>ExternalServer</h4>
@@ -124,7 +124,7 @@ npm run dev</code></pre>
 ├─ network/                    # 网络层、DB、RPC、基础工具（所有服务依赖）
 │   └─ src/main/java/org/sunrise/game/
 │       ├─ core/               # BaseServer / BaseClient / 消息 / 编解码
-│       ├─ rpc/                # RPC 框架（注解/节点/调用/服务管理）
+│       ├─ rpc/                # RPC 框架（注解/节点/调用/服务管理/policy 连接策略）
 │       ├─ db/                 # DbService（HikariCP）/ 实体类
 │       ├─ config/             # ConfigReader 配置加载
 │       └─ utils/              # IdGenerator / LogCore / JwtUtil / Utils

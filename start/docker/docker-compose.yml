@@ -20,10 +20,12 @@ services:
     build:
       context: ../..
       dockerfile: Dockerfile
-    command: ["java", "-Xms256m", "-Xmx1024m", "-jar", "jar/sunrise-center.jar", "config/center-config.properties", "1"]
+    command: ["java", "-Xms256m", "-Xmx1024m", "-jar", "jar/sunrise-center.jar", "config/center-config.properties"]
     depends_on:
       mysql:
         condition: service_healthy
+    ports:
+      - "8088:8088"
     volumes:
       - ./config/center-config.properties:/app/config/center-config.properties
 
@@ -31,7 +33,7 @@ services:
     build:
       context: ../..
       dockerfile: Dockerfile
-    command: ["java", "-Xms256m", "-Xmx1024m", "-jar", "jar/sunrise-external.jar", "config/external-config.properties", "100"]
+    command: ["java", "-Xms256m", "-Xmx1024m", "-jar", "jar/sunrise-external.jar", "config/external-config.properties"]
     depends_on:
       mysql:
         condition: service_healthy
@@ -48,7 +50,7 @@ services:
     build:
       context: ../..
       dockerfile: Dockerfile
-    command: ["java", "-Xms256m", "-Xmx1024m", "-jar", "jar/sunrise-game.jar", "config/game-config.properties", "200"]
+    command: ["java", "-Xms256m", "-Xmx1024m", "-jar", "jar/sunrise-game.jar", "config/game-config.properties"]
     depends_on:
       mysql:
         condition: service_healthy
@@ -61,7 +63,7 @@ services:
     build:
       context: ../..
       dockerfile: Dockerfile
-    command: ["java", "-Xms256m", "-Xmx1024m", "-jar", "jar/sunrise-global.jar", "config/global-config.properties", "4000"]
+    command: ["java", "-Xms256m", "-Xmx1024m", "-jar", "jar/sunrise-global.jar", "config/global-config.properties"]
     depends_on:
       mysql:
         condition: service_healthy
@@ -74,7 +76,7 @@ services:
     build:
       context: ../..
       dockerfile: Dockerfile
-    command: ["java", "-Xms256m", "-Xmx1024m", "-jar", "jar/sunrise-http.jar", "config/http-config.properties", "3"]
+    command: ["java", "-Xms256m", "-Xmx1024m", "-jar", "jar/sunrise-http.jar", "config/http-config.properties"]
     depends_on:
       mysql:
         condition: service_healthy
@@ -89,7 +91,7 @@ services:
     build:
       context: ../..
       dockerfile: Dockerfile
-    command: ["java", "-Xms256m", "-Xmx1024m", "-jar", "jar/sunrise-gmback.jar", "config/gmback-config.properties", "2"]
+    command: ["java", "-Xms256m", "-Xmx1024m", "-jar", "jar/sunrise-gmback.jar", "config/gmback-config.properties"]
     depends_on:
       mysql:
         condition: service_healthy

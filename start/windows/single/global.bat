@@ -1,1 +1,1 @@
-start java -Xms256m -Xmx1024m -jar ../../jar/sunrise-global.jar ../../../config/global-config.properties 4000
+start java -Xms256m -Xmx1024m -jar ../../jar/sunrise-global.jar ../../../config/global-config.properties

@@ -33,12 +33,13 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * 一个完整的rpc服务节点
  * 包含：一个rpcServer服务、若干个连接到其他rpc服务的BaseClient、一个reportClient
- * 使用时通过RpcNodeManager.createRpcNode()创建
+ * 使用时通过 RpcNodeManager.createRpcNode(serverId, nodeType) 创建
  */
 @Getter
 @Setter
 public class RpcNode {
     private final int serverId;
+    private final String nodeType;
     private String ip = null; //绑定ip
     private int port; //绑定端口
     private DbService dbService = new DbService();
@@ -49,8 +50,9 @@ public class RpcNode {
     private final Map<Integer, BaseClient> connectToOthers = new ConcurrentHashMap<>();
     private RpcClientMessageManager fromOtherMessageManager = null;
 
-    public RpcNode(int serverId) {
+    public RpcNode(int serverId, String nodeType) {
         this.serverId = serverId;
+        this.nodeType = nodeType.trim().toLowerCase();
         this.rpcServer = new BaseServer(this.getClass().getSimpleName() + serverId) {
             @Override
             public void onStart() {
@@ -206,7 +208,12 @@ public class RpcNode {
     }
 
     public void connectMaster(String masterIp, int masterPort, String reportIp) {
-        var reportClient = ReportClientManager.createReportClient(rpcServer.getNodeId() + "-ReportClient", serverId, reportIp, port);
+        var reportClient = ReportClientManager.createReportClient(
+                rpcServer.getNodeId() + "-ReportClient",
+                serverId,
+                reportIp,
+                port,
+                nodeType);
         reportClient.getConnectToCenter().setMessageManager(new ReportClientMessageManager(reportClient.getConnectToCenter().getNodeId()));
         reportClient.connectMaster(masterIp, masterPort);
     }

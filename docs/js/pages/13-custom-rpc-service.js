@@ -25,31 +25,29 @@ registerPage('custom-rpc-service', '可扩展 RPC 服务', '新建 RPC 进程、
 <tr><td>4000 ~ 4096</td><td>全局服</td><td>Global 默认 4000</td></tr>
 </tbody>
 </table>
-<p>新增自定义服务时，请在 <strong>3~99</strong>（或你们重新划分的空闲段）选取未占用的 id，且全集群唯一。</p>
+<p>新增自定义服务时，请在 <strong>3~99</strong>（或你们重新划分的空闲段）选取未占用的 id，配置唯一的 <code>rpc.node.type</code>（如 <code>notify</code>），且全集群唯一。</p>
 
 <h2>第一步：启动类（创建 RpcNode 并接入中心服）</h2>
 <p>所有业务 RPC 进程启动模板一致，参考 <code>HttpServerStartUp</code>：</p>
 <pre><code class="language-java">public class HttpServerStartUp {
     public static void main(String[] args) {
-        // args[0]: 配置文件路径  args[1]: 本进程的 serverId（写入 rpc_server_system）
         if (args.length == 0) {
-            args = new String[]{"./config/http-config.properties", "3"};
+            args = new String[]{"./config/http-config.properties"};
         }
-        System.setProperty("programName", "HttpServer-" + args[1]);
         ConfigReader.loadConfig(args[0]);
         Properties properties = ConfigReader.getProp();
         if (properties == null) {
             return;
         }
+        int serverId = Integer.parseInt(properties.getProperty("rpc.node.serverId"));
+        String nodeType = properties.getProperty("rpc.node.type");
+        System.setProperty("programName", "HttpServer-" + serverId);
         Utils.setLogLevel(properties.getProperty("log.level"));
 
-        // 1. 创建 RPC 节点（每个 JVM 仅一个）
-        var rpcNode = RpcNodeManager.createRpcNode(Integer.parseInt(args[1]));
-        // 2. 扫描并注册本进程提供的 @RpcService（包路径 + CallEnum）
+        var rpcNode = RpcNodeManager.createRpcNode(serverId, nodeType);
         CallUtils.init(rpcNode.getNodeId(),
             Collections.singletonList("org.sunrise.game.http.service"),
             CallEnum.class);
-        // 3. 启动：写库分配端口 → 监听 → 连接中心服 → 等待互连
         rpcNode.start();
 
         Utils.startMemoryCheck();
@@ -61,7 +59,7 @@ registerPage('custom-rpc-service', '可扩展 RPC 服务', '新建 RPC 进程、
     <li>查询/插入 <code>rpc_server_system</code>：同一 serverId 已在运行则退出；否则复用或分配 RPC 监听端口（默认从 20000 递增）</li>
     <li>启动本机 <code>BaseServer</code>（RpcServer），对外提供 RPC 调用入口</li>
     <li>读取配置 <code>master.id / master.address / master.port</code>，创建 <code>ReportClient</code> 连接中心服；<code>report.address</code> 为上报给集群的 IP</li>
-    <li>中心服将其他在线节点地址广播过来，本节点 <code>connectOther()</code> 建立 BaseClient 互连，握手后交换各自注册的 CallEnum 列表</li>
+    <li>中心服将符合连接策略的在线节点地址广播过来，本节点 <code>connectOther()</code> 建立 BaseClient，握手后交换 CallEnum 列表</li>
 </ol>
 <p>此后即可使用 <code>RpcFunction</code> 调用任意已注册方法（随机/广播/定向），详见 <a href="#/rpc">RPC 框架</a>。</p>
 
@@ -83,11 +81,15 @@ master.port=8000
 # 本节点上报给集群的 IP（Docker 下改为容器名或宿主机 IP）
 report.address=127.0.0.1
 
+# RPC 节点身份（必填）
+rpc.node.type=http
+rpc.node.serverId=3
+
 # 本服务特有项（示例：HTTP 端口）
 http.port=8090
 
 log.level=DEBUG</code></pre>
-<p>通用项说明见 <a href="#/config">配置参考</a>。启动时传入：<code>java -jar sunrise-xxx.jar config/my-service-config.properties &lt;serverId&gt;</code>。</p>
+<p>通用项说明见 <a href="#/config">配置参考</a>。启动命令：<code>java -jar sunrise-xxx.jar config/my-service-config.properties</code>。</p>
 
 <h2>第三步：在 gen 模块声明 RPC 接口（Stub）</h2>
 <p>框架用 <strong>接口 Stub + 实现类</strong> 分离：genRpc/service 下只声明方法名（无参），用于生成 <code>CallEnum</code>；真实参数写在 <code>game</code> 模块的实现类上。</p>

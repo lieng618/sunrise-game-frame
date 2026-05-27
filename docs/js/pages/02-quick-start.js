@@ -49,7 +49,11 @@ master.port=8000
 report.address=127.0.0.1
 
 # ===== 对外服暴露 IP（客户端连接地址）=====
-external.address=127.0.0.1</code></pre>
+external.address=127.0.0.1
+
+# ===== RPC 节点身份 =====
+rpc.node.type=game
+rpc.node.serverId=200</code></pre>
 
 <div class="callout callout-tip">
     <p><strong>💡 配置优先级</strong>：每个服务读取自己对应的 <code>xxx-config.properties</code>，但数据库和中心服地址是通用配置，每个配置文件都有。单进程模式使用 <code>runallone-config.properties</code>，其中 <code>master.id=0</code> 表示无需连接中心服。</p>
@@ -99,6 +103,7 @@ start\\windows\\game.bat        # 3. 启动游戏服
 start\\windows\\global.bat      # 4. 启动全局服
 start\\windows\\http.bat        # 5. 启动 HTTP 服务
 start\\windows\\gmback.bat      # 6. 启动 GM 后台</code></pre>
+<p>多进程模式下启动中心服后，可打开 <code>http://127.0.0.1:8088/</code> 查看 RPC 节点与连接拓扑。</p>
 </div>
 <div class="tab-content" id="run-linux">
 <pre><code class="language-bash"># 先安装 pm2 进程管理器

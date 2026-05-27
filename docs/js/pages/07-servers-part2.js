@@ -17,8 +17,11 @@ registerPage('game-server', '游戏服', '玩家对象、模块系统、消息�
 <h2>GameServerStartUp 启动流程</h2>
 <pre><code class="language-java">public class GameServerStartUp {
     public static void main(String[] args) {
-        ConfigReader.loadConfig("game-config.properties");
-        RpcNode rpcNode = RpcNodeManager.createRpcNode(1000);
+        ConfigReader.loadConfig(args[0]); // 默认 game-config.properties
+        Properties properties = ConfigReader.getProp();
+        int serverId = Integer.parseInt(properties.getProperty("rpc.node.serverId"));
+        String nodeType = properties.getProperty("rpc.node.type");
+        RpcNode rpcNode = RpcNodeManager.createRpcNode(serverId, nodeType);
         ConfigUtils.load();           // 加载 Luban 配置表
         ProtoParserUtils.init();      // 注册协议解析器（TOPIC → parseFrom）
         LogicUtils.init("org.sunrise.game.game.logic");  // 扫描 @MsgHandler

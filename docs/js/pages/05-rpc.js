@@ -17,7 +17,7 @@ registerPage('rpc', 'RPC 框架', '节点发现、方法注册、调用模式、
     <li>自动分配或复用端口（查询表中已有记录）</li>
     <li>启动本地 RPC Server（BaseServer）</li>
     <li>创建 ReportClient 连接 CenterServer（连接失败 5 秒后自动重连）</li>
-    <li>连接成功后全量上报自身信息（ip/port/serverId/nodeId）</li>
+    <li>连接成功后全量上报自身信息（ip/port/serverId/nodeId/nodeType）</li>
 </ol>
 <pre><code class="language-java">// RpcNode.start() 核心逻辑
 public void start() {
@@ -56,6 +56,30 @@ public void start() {
     <li>握手完成后，<code>RpcServerHandler.onRecvConnect()</code> 推送自身支持的 RPC 方法 ID 列表</li>
     <li>对方收到后调用 <code>RpcFunction.update()</code> 更新路由表</li>
 </ol>
+
+<h3>4. RPC 连接策略（RpcConnectPolicy）</h3>
+<p>多进程部署时，默认各节点会尽量全量互连。若希望减少不必要的 TCP 连接（例如 HTTP 服只需被访问、不必主动连所有 Game），可在<strong>中心服配置</strong> <code>center-config.properties</code> 中声明出站连接规则。中心服在 <code>NodeManager.broadcastToNode()</code> 时按策略过滤：仅当 <code>shouldConnect(接收方类型, 目标类型)</code> 为 true 时才把目标地址广播给接收方。</p>
+<div class="callout callout-info">
+    <p>未配置任何 <code>rpc.connect.*</code> 项时，策略关闭，保持全量互连。</p>
+</div>
+<p>配置格式：</p>
+<pre><code class="language-properties"># rpc.connect.&lt;本节点类型&gt;=&lt;允许主动连接的目标类型&gt;，逗号分隔
+rpc.connect.external=game,http,gmback
+rpc.connect.game=external,global,gmback
+rpc.connect.global=game
+rpc.connect.gmback=game,http
+rpc.connect.http=</code></pre>
+<table>
+<thead><tr><th>nodeType</th><th>对应进程</th><th>配置中的 serverId 示例</th></tr></thead>
+<tbody>
+<tr><td>external</td><td>ExternalServer</td><td>100</td></tr>
+<tr><td>game</td><td>GameServer / RunAllOne</td><td>200</td></tr>
+<tr><td>http</td><td>HttpServer</td><td>3</td></tr>
+<tr><td>gmback</td><td>GmBackServer</td><td>2</td></tr>
+<tr><td>global</td><td>GlobalServer</td><td>4000</td></tr>
+</tbody>
+</table>
+<p>各 RPC 进程须在自身配置中设置 <code>rpc.node.type</code>（与上表一致）和 <code>rpc.node.serverId</code>（集群内唯一整数）。自定义 RPC 服务也需使用未占用的 type 名，并在中心服策略中补充对应规则。</p>
 
 <div class="flow-diagram">
     <div class="flow-row">

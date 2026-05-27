@@ -9,6 +9,7 @@ public class NodeData {
     private int port;
     private long reportTime;
     private int serverId;
+    private String nodeType;
 
     public NodeData(String nodeId) {
         this.nodeId = nodeId;

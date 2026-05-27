@@ -1,1 +1,1 @@
-start java -Xms256m -Xmx1024m -jar ../../jar/sunrise-center.jar ../../../config/center-config.properties 1
+start java -Xms256m -Xmx1024m -jar ../../jar/sunrise-center.jar ../../../config/center-config.properties
