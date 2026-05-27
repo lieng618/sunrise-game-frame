@@ -3,7 +3,9 @@ package core.message;
 import com.google.protobuf.ByteString;
 import core.client.SocketClient;
 import core.client.SocketClientManager;
+import core.client.StressManager;
 import core.message.annotation.Handler;
+import org.sunrise.game.genProto.gen.ItemProto;
 import org.sunrise.game.genProto.gen.LoginProto;
 import org.sunrise.game.genProto.gen.TopicProto;
 import org.sunrise.game.log.LogCore;
@@ -13,6 +15,9 @@ public class MessageHandler {
     public static void handler(String uid, byte[] bytes) {
         SocketClient client = SocketClientManager.getClient(uid);
         if (client == null) {
+            return;
+        }
+        if (StressManager.tryFastRouteStressResponse(client, bytes)) {
             return;
         }
         TopicProto.MBasePacketData packet;
@@ -41,8 +46,21 @@ public class MessageHandler {
 
     @Handler(packetType = TopicProto.TOPIC.TOPIC_TYPE_LOGIN_VALUE, packetId = LoginProto.FROM_SERVER.S2C_SelectHuman_VALUE)
     public static void LOGIN_S2C_SelectHuman(SocketClient client) {
-        LogCore.Client.info("login success, uid = {}, use = {} ms",
-                client.getUid(), System.currentTimeMillis() - client.getLoginStartTime());
+        if (!StressManager.isStressClient(client.getUid())) {
+            LogCore.Client.info("login success, uid = {}, use = {} ms",
+                    client.getUid(), System.currentTimeMillis() - client.getLoginStartTime());
+        }
+        StressManager.onSelectHuman(client);
+    }
+
+    @Handler(packetType = TopicProto.TOPIC.TOPIC_TYPE_LOGIN_VALUE, packetId = LoginProto.FROM_SERVER.S2C_ClientPing_VALUE)
+    public static void LOGIN_S2C_ClientPing(SocketClient client) {
+        StressManager.onPacketResponse(client, StressManager.PacketMode.PING);
+    }
+
+    @Handler(packetType = TopicProto.TOPIC.TOPIC_TYPE_ITEM_VALUE, packetId = ItemProto.FROM_SERVER.S2C_ItemList_VALUE)
+    public static void ITEM_S2C_ItemList(SocketClient client) {
+        StressManager.onPacketResponse(client, StressManager.PacketMode.BUSINESS_GET_ITEM_LIST);
     }
 
     @Handler(packetType = TopicProto.TOPIC.TOPIC_TYPE_LOGIN_VALUE, packetId = LoginProto.FROM_SERVER.S2C_Kick_VALUE)

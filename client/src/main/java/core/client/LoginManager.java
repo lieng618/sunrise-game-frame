@@ -52,62 +52,101 @@ public class LoginManager {
     /**
      * 异步登录
      */
-    private static CompletableFuture<Boolean> loginAsync(SocketClient client, String uid, 
+    private static CompletableFuture<Boolean> loginAsync(SocketClient client, String uid,
                                                          Consumer<String> statusCallback) {
+        return fetchExternalAddressOnly(uid)
+                .thenCompose(address -> {
+                    if (address == null) {
+                        statusCallback.accept("获取服务器地址失败");
+                        return CompletableFuture.completedFuture(false);
+                    }
+                    return connectAndSendLogin(client, address, statusCallback);
+                });
+    }
+
+    /**
+     * 阶段一：仅通过 HTTP 获取对外服地址（server_status + external_address，KCP 时含 conv）
+     */
+    public static CompletableFuture<ExternalAddress> fetchExternalAddressOnly(String uid) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                statusCallback.accept("正在检查服务器状态...");
-
                 if (!checkServerStatus(uid)) {
-                    statusCallback.accept("服务器维护中，暂时无法连接");
-                    return false;
+                    LogCore.Client.warn("Server not open for uid={}", uid);
+                    return null;
                 }
-
-                statusCallback.accept("正在获取服务器信息...");
-
-                // 获取对外服务器地址
                 ServerAddress address = getExternalServerAddress(uid).get(10, TimeUnit.SECONDS);
                 if (address == null) {
-                    statusCallback.accept("获取服务器地址失败");
-                    return false;
+                    return null;
                 }
-
-                // 设置连接ID并连接
                 if ("kcp".equals(ConfigReader.getProp().getProperty("client.socket", "tcp"))) {
-                    int conv = getKcpConv();
-                    address.conv = conv;
-                    if (client instanceof KcpClientImpl kcpClient) {
-                        kcpClient.setConv(conv);
-                    }
+                    address.conv = getKcpConv();
                 }
+                return new ExternalAddress(address.host, address.port, address.conv);
+            } catch (Exception e) {
+                LogCore.Client.error("fetchExternalAddressOnly failed, uid={}", uid, e);
+                return null;
+            }
+        });
+    }
+
+    /**
+     * 阶段二：连接对外服并发送 C2S_Login
+     */
+    public static CompletableFuture<Boolean> connectAndSendLogin(SocketClient client,
+                                                                 ExternalAddress address,
+                                                                 Consumer<String> statusCallback) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                if ("kcp".equals(ConfigReader.getProp().getProperty("client.socket", "tcp"))
+                        && address.conv > 0
+                        && client instanceof KcpClientImpl kcpClient) {
+                    kcpClient.setConv(address.conv);
+                }
+                statusCallback.accept("正在连接对外服...");
                 client.connect(address.host, address.port);
 
-                // 等待连接成功（带超时）
                 statusCallback.accept("等待连接建立...");
                 if (!waitForConnection(client, 10, TimeUnit.SECONDS)) {
                     statusCallback.accept("连接超时");
                     return false;
                 }
-                
-                // 发送登录消息
+
                 statusCallback.accept("发送登录请求...");
                 ByteString loginData = LoginProto.MC2S_Login.newBuilder()
-                        .setUid(uid)
+                        .setUid(client.getUid())
                         .build()
                         .toByteString();
-                client.sendMsg(TopicProto.TOPIC.TOPIC_TYPE_LOGIN,
-                        LoginProto.FROM_CLIENT.C2S_Login_VALUE, 
-                        loginData);
+                if (!client.sendMsg(TopicProto.TOPIC.TOPIC_TYPE_LOGIN,
+                        LoginProto.FROM_CLIENT.C2S_Login_VALUE,
+                        loginData)) {
+                    statusCallback.accept("发送登录请求失败");
+                    LogCore.Client.error("send C2S_Login failed, uid={}, channelActive={}",
+                            client.getUid(), client.isActive());
+                    return false;
+                }
                 client.setLoginStartTime(System.currentTimeMillis());
-                
+
                 statusCallback.accept("登录请求已发送");
                 return true;
             } catch (Exception e) {
-                LogCore.Client.error("Login failed", e);
-                statusCallback.accept("登录失败: " + e.getMessage());
+                LogCore.Client.error("connectAndSendLogin failed, uid={}", client.getUid(), e);
+                statusCallback.accept("连接登录失败: " + e.getMessage());
                 return false;
             }
         });
+    }
+
+    /** 对外服地址（HTTP 阶段结果） */
+    public static class ExternalAddress {
+        public final String host;
+        public final int port;
+        public final int conv;
+
+        public ExternalAddress(String host, int port, int conv) {
+            this.host = host;
+            this.port = port;
+            this.conv = conv;
+        }
     }
 
 
@@ -143,7 +182,9 @@ public class LoginManager {
             
             try {
                 String address = JSON.parseObject(response).getString("address");
-                LogCore.Client.info("Request external_address success, address={}", address);
+                if (!isStressUid(uid)) {
+                    LogCore.Client.info("Request external_address success, address={}", address);
+                }
                 
                 if (address == null || address.isEmpty()) {
                     return null;
@@ -209,12 +250,16 @@ public class LoginManager {
     private static boolean waitForConnection(SocketClient client, long timeout, TimeUnit unit) {
         long deadline = System.currentTimeMillis() + unit.toMillis(timeout);
         while (System.currentTimeMillis() < deadline) {
-            if (client.isConnectSuccess()) {
+            if (client.isConnectSuccess() && client.isActive()) {
                 return true;
             }
-            Utils.sleep(100);
+            Utils.sleep(50);
         }
         return false;
+    }
+
+    private static boolean isStressUid(String uid) {
+        return uid != null && uid.startsWith("stress");
     }
 
     /**

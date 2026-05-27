@@ -16,7 +16,7 @@ import org.sunrise.game.log.LogCore;
 @Getter
 @Setter
 public abstract class SocketClient {
-    protected boolean connectSuccess = false;
+    protected volatile boolean connectSuccess = false;
     protected String uid;
     protected String humanId;
     protected Channel channel;
@@ -37,19 +37,74 @@ public abstract class SocketClient {
         if (bytes != null) {
             msg.setPacketData(bytes);
         }
-        String topicName = ProtocolRouter.getTopicName(packetType.getNumber());
-        LogCore.Client.debug("sendMsg: uid={}, topic={}({}), packetId={}",
-                uid, topicName, packetType.getNumber(), packetId);
-        byte[] data = msg.build().toByteArray();
+        if (LogCore.Client.isDebugEnabled()) {
+            String topicName = ProtocolRouter.getTopicName(packetType.getNumber());
+            LogCore.Client.debug("sendMsg: uid={}, topic={}({}), packetId={}",
+                    uid, topicName, packetType.getNumber(), packetId);
+        }
+        return writeBizBytes(msg.build().toByteArray(), true);
+    }
+
+    /**
+     * 写入已序列化的 MBasePacketData 负载（压测等高频场景）
+     */
+    public boolean writeBizBytes(byte[] data, boolean flush) {
+        if (!isActive() || data == null) {
+            return false;
+        }
         if (channel != null) {
-            channel.writeAndFlush(new SocketMessage(MessageType.biz, data));
-        } else if (ukcp != null) {
-            ByteBuf buf = Unpooled.buffer(4 + 4 + data.length);
-            buf.writeInt(MessageType.biz);
-            buf.writeInt(data.length);
-            buf.writeBytes(data);
-            ukcp.write(buf);
-            buf.release();
+            channel.write(new SocketMessage(MessageType.biz, data));
+            if (flush) {
+                channel.flush();
+            }
+            return true;
+        }
+        return writeBizBytesKcp(data);
+    }
+
+    /**
+     * 复用同一 {@link SocketMessage} 实例写入（压测循环内避免每条 new 对象）
+     */
+    public boolean writeOutbound(SocketMessage msg, boolean flush) {
+        if (!isActive() || msg == null) {
+            return false;
+        }
+        if (channel != null) {
+            channel.write(msg);
+            if (flush) {
+                channel.flush();
+            }
+            return true;
+        }
+        byte[] data = msg.getData();
+        if (data == null) {
+            return false;
+        }
+        return writeBizBytesKcp(data);
+    }
+
+    private boolean writeBizBytesKcp(byte[] data) {
+        if (ukcp == null) {
+            return false;
+        }
+        ByteBuf buf = Unpooled.buffer(8 + data.length);
+        buf.writeInt(MessageType.biz);
+        buf.writeInt(data.length);
+        buf.writeBytes(data);
+        ukcp.write(buf);
+        buf.release();
+        return true;
+    }
+
+    public void flushChannel() {
+        if (channel != null && channel.isActive()) {
+            channel.flush();
+        }
+    }
+
+    public boolean isChannelWritable() {
+        if (channel != null) {
+            return channel.isWritable();
         }
         return true;
     }

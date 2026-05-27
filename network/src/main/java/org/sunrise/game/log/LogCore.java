@@ -24,6 +24,7 @@ public class LogCore {
     public static final Logger HttpServer = LoggerFactory.getLogger("HttpServer");
 
     public static final Logger Bot = LoggerFactory.getLogger("Bot");
+    public static final Logger Stress = LoggerFactory.getLogger("Stress");
     public static final Logger Client = LoggerFactory.getLogger("Client");
 
     public static void setLogLevel(String loggerKey, Level level) {
