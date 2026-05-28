@@ -6,6 +6,7 @@ import org.sunrise.game.external.server.ClientConnection;
 import org.sunrise.game.external.server.ExternalConnectionManger;
 import org.sunrise.game.external.server.ExternalServer;
 import org.sunrise.game.genRpc.gen.CallEnum;
+import org.sunrise.game.log.LogCore;
 import org.sunrise.game.rpc.annotation.RpcMethod;
 import org.sunrise.game.rpc.annotation.RpcService;
 import org.sunrise.game.rpc.function.RpcFunction;
@@ -78,10 +79,10 @@ public class ExternalRecvGameMessageService extends BaseService {
         }
     }
 
-    /**
-     * 心跳将客户端消息发送给游戏服
-     */
     private void pulseHandlerConnectionMsg() {
+        long drainStart = System.currentTimeMillis();
+
+        int forwarded = 0;
         for (ClientConnection connection : ExternalConnectionManger.getClientConnections()) {
             while (!connection.getMsgQueue().isEmpty()) {
                 byte[] data = connection.getMsgQueue().poll();
@@ -92,7 +93,14 @@ public class ExternalRecvGameMessageService extends BaseService {
                 if (!connection.isFirstSend()) {
                     connection.setFirstSend(true);
                 }
+                forwarded++;
             }
+        }
+
+        // 当每秒10万tps时，每帧预计500次转发，打印诊断日志
+        if (forwarded >= 500) {
+            long drainMs = System.currentTimeMillis() - drainStart;
+            LogCore.ExternalServer.warn("当前帧转发总耗时 {} ms, 客户端在线总数 {}, 转发消息总数 {}", drainMs, ExternalConnectionManger.getClientConnections().size(), forwarded);
         }
     }
 

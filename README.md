@@ -14,6 +14,18 @@
 <h2>项目文档</h2>
 <a href="https://sunrise-game-frame.pages.dev">https://sunrise-game-frame.pages.dev</a>
 
+<h2>核心特性</h2>
+<div class="feature-grid">
+    <div class="feature-item"><span class="feature-icon">🏗️</span><span class="feature-text">分布式多节点架构，不同服务可随意组合拆分为多进程或单进程部署，支持动态扩容</span></div>
+    <div class="feature-item"><span class="feature-icon">📡</span><span class="feature-text">RPC 框架，支持随机/广播/定向三种调用模式，含回调与超时机制；中心服可配置连接策略，内置拓扑可视化面板</span></div>
+    <div class="feature-item"><span class="feature-icon">📭</span><span class="feature-text">零中间件依赖，无需 Redis / ZooKeeper / MQ，真正做到轻量级</span></div>
+    <div class="feature-item"><span class="feature-icon">🚀</span><span class="feature-text">业务代码无需修改，仅修改部署方式，即可支持全球通服与滚服模式</span></div>
+    <div class="feature-item"><span class="feature-icon">🔒</span><span class="feature-text">RPC服与游戏服单线程处理业务，无需加锁，无需考虑线程安全问题</span></div>
+    <div class="feature-item"><span class="feature-icon">🔌</span><span class="feature-text">对外服同时支持TCP / WebSocket / KCP 三种协议</span></div>
+    <div class="feature-item"><span class="feature-icon">🛠️</span><span class="feature-text">完善的GM 后台管理，实现节点监控、策划表格与代码热更、运营服务、权限管理等</span></div>
+    <div class="feature-item"><span class="feature-icon">🤖</span><span class="feature-text">消息发送工具、压测机器人与压测统计工具，便于联调与性能基准</span></div>
+    <div class="feature-item"><span class="feature-icon">🔃</span><span class="feature-text">业务模块化，已实现游戏必需的模块如登录、存库、消息处理、玩家模块、系统模块等</span></div>
+</div>
 
 <h2>快速开始</h2>
 <p>环境要求：<strong>JDK 21+</strong>、<strong>Maven 3.8+</strong>、<strong>MySQL 5.7+</strong></p>
@@ -52,24 +64,13 @@ npm run dev</code></pre>
 <h4>5. 客户端启动</h4>
 <p>消息发送工具：支持多标签页，每标签页一个玩家连接，可向服务器发送消息包</p>
 <pre><code class="language-bash">start/windows/client.bat</code></pre>
-<p>压测机器人：支持批量创建客户端、一键登录、批量定时向服务器发消息包</p>
+<p>压测机器人工具：支持批量创建客户端、一键登录、批量定时向服务器发消息包</p>
 <pre><code class="language-bash">start/windows/bot.bat</code></pre>
+<p>压测统计工具：登录耗时 + 以服务器回包为准的发包 TPS，含端到端诊断（详见 <a href="https://sunrise-game-frame.pages.dev/#/stress-testing">压测统计文档</a>）</p>
+<pre><code class="language-bash">start/windows/stress.bat</code></pre>
 
 <h4>6. 生产环境部署</h4>
 <p>生产环境建议多服务多进程运行，根据需求拆分与合并服务。详见文档：<a href="https://sunrise-game-frame.pages.dev/#/deployment">部署指南</a></p>
-
-<h2>核心特性</h2>
-<div class="feature-grid">
-    <div class="feature-item"><span class="feature-icon">🏗️</span><span class="feature-text">分布式多节点架构，不同服务可随意组合拆分为多进程或单进程部署，支持动态扩容</span></div>
-    <div class="feature-item"><span class="feature-icon">📡</span><span class="feature-text">RPC 框架，支持随机/广播/定向三种调用模式，含回调与超时机制；中心服可配置连接策略，内置拓扑可视化面板</span></div>
-    <div class="feature-item"><span class="feature-icon">📭</span><span class="feature-text">零中间件依赖，无需 Redis / ZooKeeper / MQ，真正做到轻量级</span></div>
-    <div class="feature-item"><span class="feature-icon">🚀</span><span class="feature-text">业务代码无需修改，仅修改部署方式，即可支持全球通服与滚服模式</span></div>
-    <div class="feature-item"><span class="feature-icon">🔒</span><span class="feature-text">RPC服与游戏服单线程处理业务，无需加锁，无需考虑线程安全问题</span></div>
-    <div class="feature-item"><span class="feature-icon">🔌</span><span class="feature-text">对外服同时支持TCP / WebSocket / KCP 三种协议</span></div>
-    <div class="feature-item"><span class="feature-icon">🛠️</span><span class="feature-text">完善的GM 后台管理，实现节点监控、策划表格与代码热更、运营服务、权限管理等</span></div>
-    <div class="feature-item"><span class="feature-icon">🤖</span><span class="feature-text">消息发送工具和压测机器人工具，模拟真实环境，让开发联调更为便捷</span></div>
-    <div class="feature-item"><span class="feature-icon">🔃</span><span class="feature-text">业务模块化，已实现游戏必需的模块如登录、存库、消息处理、玩家模块、系统模块等</span></div>
-</div>
 
 <h2>架构图</h2>
 <div class="arch-diagram">
@@ -147,7 +148,8 @@ npm run dev</code></pre>
 │   └─ src/main/java/
 │       ├─ core/               # SocketClient / TcpClient / WsClient / KcpClient
 │       ├─ swing/              # MainFrame / SendMsgFrame（消息发送工具）
-│       └─ bot/                # BotManager / BotFrame（压测机器人工具）
+│       ├─ bot/                # BotManager / BotFrame（压测机器人工具）
+│       └─ stress/             # StressManager / StressFrame（压测统计工具）
 ├─ start/                      # 启动脚本
 │   ├─ windows/                # .bat 脚本（多进程/单进程/客户端/机器人）
 │   ├─ linux/                  # .sh 脚本（pm2 管理）
@@ -188,6 +190,36 @@ npm run dev</code></pre>
 <tr><td>game</td><td>game</td><td>业务逻辑（支持多进程或单进程部署）</td><td>org.sunrise.game.game/external/global/gmback/http</td></tr>
 <tr><td>gmback-ui</td><td>-</td><td>GM 后台前端</td><td>/gmback-ui</td></tr>
 <tr><td>gen</td><td>gen</td><td>代码生成（RPC 枚举、DB 实体、Proto）</td><td>org.sunrise.game.gen*</td></tr>
-<tr><td>client</td><td>client</td><td>客户端工具（消息发送器、压测机器人）</td><td>org.sunrise.game.client</td></tr>
+<tr><td>client</td><td>client</td><td>客户端工具（消息发送器、压测机器人、压测统计）</td><td>org.sunrise.game.client</td></tr>
+</tbody>
+</table>
+
+<h2>测试机压测记录</h2>
+<p> Windows 10，Intel i7-8700，6 核 12 线程 @ 3.20GHz，内存 64 GB</p>
+<p>启动 RunAllOne 单进程、客户端连接方式为 TCP。启动服务器后不再关闭，一次运行内连续压测各档位（压测多次求平均）。</p>
+<p>以下测试为客户端进行了完整的登录流程，登录成功后再进行发包。由对外服务接收到消息，转发到游戏服处理。消息包结构为Ping包（<code>C2S_ClientPing</code> / <code>S2C_ClientPing</code>）</p>
+
+<table>
+<thead>
+<tr>
+    <th>在线人数</th>
+    <th>发包总数</th>
+    <th>发送耗时(ms)</th>
+    <th>总耗时(ms)</th>
+    <th>回包窗口(ms)</th>
+    <th>TPS(全程)</th>
+    <th>TPS(回包窗口)</th>
+</tr>
+</thead>
+<tbody>
+<tr><td>100</td><td>10000</td><td>36</td><td>49</td><td>36</td><td>204081.63</td><td>277777.78</td></tr>
+<tr><td>100</td><td>50000</td><td>219</td><td>230</td><td>218</td><td>217391.30</td><td>229357.80</td></tr>
+<tr><td>100</td><td>100000</td><td>410</td><td>423</td><td>407</td><td>236406.62</td><td>245700.25</td></tr>
+<tr><td>300</td><td>100000</td><td>345</td><td>354</td><td>325</td><td>282485.88</td><td>307692.31</td></tr>
+<tr><td>500</td><td>300000</td><td>996</td><td>1010</td><td>970</td><td>297029.70</td><td>309278.35</td></tr>
+<tr><td>1000</td><td>500000</td><td>1668</td><td>1706</td><td>1625</td><td>293083.24</td><td>307692.31</td></tr>
+<tr><td>2000</td><td>1000000</td><td>3352</td><td>3385</td><td>3291</td><td>295420.97</td><td>303859.01</td></tr>
+<tr><td>2000</td><td>1500000</td><td>4852</td><td>4883</td><td>4733</td><td>307188.20</td><td>316923.73</td></tr>
+<tr><td>2000</td><td>2000000</td><td>6498</td><td>6512</td><td>6380</td><td>307125.31</td><td>313479.62</td></tr>
 </tbody>
 </table>

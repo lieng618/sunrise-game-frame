@@ -23,15 +23,40 @@ public class RpcServerMessageManager extends ServerMessageManager {
         super(nodeId);
     }
 
+    /**
+     * 线程心跳
+     */
     @Override
     public void pulse() {
+        long pulseStart = System.currentTimeMillis();
+        int rpcRecvBefore = getRecvMsgQueue().size();
+        long handlerMs = 0L;
+        long senderMs = 0L;
+        int handlerProcessed = 0;
+        int senderProcessed = 0;
+        int rpcRecvAfter = 0;
         try {
-            pulseHandler();
-            pulseSender();
+            long phaseStart = System.currentTimeMillis();
+            handlerProcessed = pulseHandler();
+            handlerMs = System.currentTimeMillis() - phaseStart;
+
+            phaseStart = System.currentTimeMillis();
+            senderProcessed = pulseSender();
+            senderMs = System.currentTimeMillis() - phaseStart;
+
             pulseListenRpcTimeout();
             ServiceManager.pulse();
+
+            rpcRecvAfter = getRecvMsgQueue().size();
         } catch (Exception e) {
             LogCore.RpcServer.error("DispatchThread pulse, error : ", e);
+        } finally {
+            long totalMs = System.currentTimeMillis() - pulseStart;
+            if (totalMs >= 100) {
+                LogCore.RpcServer.warn(
+                        "本次pulse 总耗时 {} ms, 消息处理耗时 {} ms, 消息发送耗时 {} ms, 消息接收队列起始总数 {}, 本次处理消息数 {}, 本次发送到远端的消息数 {}, 心跳结束时消息接收队列总数 {}",
+                        totalMs, handlerMs, senderMs, rpcRecvBefore, handlerProcessed, senderProcessed, rpcRecvAfter);
+            }
         }
     }
 

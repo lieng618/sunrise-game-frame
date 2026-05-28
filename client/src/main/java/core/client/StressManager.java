@@ -48,6 +48,10 @@ public class StressManager {
     private static final AtomicInteger clientCounter = new AtomicInteger(0);
     private static final ExecutorService workerPool = Executors.newFixedThreadPool(16);
     private static final ScheduledExecutorService timeoutScheduler = Executors.newSingleThreadScheduledExecutor();
+    /** 登录后定时 C2S_ClientPing，避免服务端 60s 无心跳踢下线 */
+    private static final ScheduledExecutorService keepaliveScheduler = Executors.newSingleThreadScheduledExecutor();
+    private static final long KEEPALIVE_PING_INITIAL_SEC = 5;
+    private static final long KEEPALIVE_PING_INTERVAL_SEC = 10;
     private static final String uidPrefix = "stress";
     private static final long PACKET_STRESS_TIMEOUT_MINUTES = 30;
     /** 单连接未回包上限，避免写缓冲/服务端队列被打满导致丢包、永远收不齐 */
@@ -56,6 +60,10 @@ public class StressManager {
     private static final long PACKET_SEND_PROGRESS_SEC = 5;
     /** 发送完成后若仍未收齐，超过该时间才补打一条等待日志 */
     private static final long PACKET_PROGRESS_LOG_AFTER_MS = 30_000;
+    /** 收包无进展时重复诊断日志间隔（秒） */
+    private static final long PACKET_STALL_DIAGNOSTIC_SEC = 10;
+    /** 判定收包停滞：连续多少秒 received 不增长 */
+    private static final long PACKET_STALL_THRESHOLD_SEC = 10;
 
     /** 当前发包压测会话（以收到服务器回包为准统计） */
     private static volatile PacketStressSession packetSession;
@@ -117,6 +125,37 @@ public class StressManager {
 
     public static void initialize() {
         MessageUtil.init();
+        keepaliveScheduler.scheduleAtFixedRate(
+                StressManager::pulseKeepalivePing,
+                KEEPALIVE_PING_INITIAL_SEC,
+                KEEPALIVE_PING_INTERVAL_SEC,
+                TimeUnit.SECONDS);
+    }
+
+    /** 对已登录压测客户端发送心跳 */
+    private static void pulseKeepalivePing() {
+        if (!running && clients.isEmpty()) {
+            return;
+        }
+        for (StressClientInfo info : clients.values()) {
+            if (!info.isLoginSuccess() || !info.isConnected()) {
+                continue;
+            }
+            SocketClient client = info.getClient();
+            if (client == null || !client.isActive()) {
+                continue;
+            }
+            try {
+                ByteString pingData = LoginProto.MC2S_ClientPing.newBuilder()
+                        .setTime(System.currentTimeMillis())
+                        .build()
+                        .toByteString();
+                client.sendMsg(TopicProto.TOPIC.TOPIC_TYPE_LOGIN,
+                        LoginProto.FROM_CLIENT.C2S_ClientPing_VALUE, pingData);
+            } catch (Exception e) {
+                LogCore.Stress.error("keepalive ping failed, uid={}", info.getUid(), e);
+            }
+        }
     }
 
     public static boolean isStressClient(String uid) {
@@ -367,7 +406,10 @@ public class StressManager {
         private volatile long lastResponseTime;
         private volatile ScheduledFuture<?> progressFuture;
         private volatile ScheduledFuture<?> sendProgressFuture;
+        private volatile ScheduledFuture<?> stallDiagnosticFuture;
         private volatile boolean slowWaitProgressLogged;
+        private volatile long lastProgressReceived;
+        private volatile long lastProgressChangeTime;
 
         PacketStressSession(PacketMode mode, long expectedTotal, int senderCount, byte[] payloadBytes) {
             this.mode = mode;
@@ -431,6 +473,7 @@ public class StressManager {
 
         byte[] payloadBytes = buildStressPayloadBytes(mode);
         PacketStressSession session = new PacketStressSession(mode, totalPackets, activeSenders, payloadBytes);
+        session.lastProgressChangeTime = System.currentTimeMillis();
         packetSession = session;
 
         String modeName = mode == PacketMode.PING ? "Ping包(S2C_ClientPing)" : "业务包(S2C_ItemList)";
@@ -447,6 +490,8 @@ public class StressManager {
 
     private static void startSendProgressLogging(PacketStressSession session) {
         cancelSendProgressLogging(session);
+        session.lastProgressReceived = session.receivedCount.get();
+        session.lastProgressChangeTime = System.currentTimeMillis();
         session.sendProgressFuture = timeoutScheduler.scheduleAtFixedRate(() -> {
             if (!session.active) {
                 return;
@@ -455,6 +500,16 @@ public class StressManager {
             long received = session.receivedCount.get();
             if (session.sendCompleted && received >= session.expectedTotal) {
                 return;
+            }
+            long now = System.currentTimeMillis();
+            if (received > session.lastProgressReceived) {
+                session.lastProgressReceived = received;
+                session.lastProgressChangeTime = now;
+            } else if (session.sendCompleted
+                    && received < session.expectedTotal
+                    && now - session.lastProgressChangeTime >= PACKET_STALL_THRESHOLD_SEC * 1000L) {
+                logPacketStallDiagnostics(session, "收包连续" + PACKET_STALL_THRESHOLD_SEC + "秒无进展");
+                session.lastProgressChangeTime = now;
             }
             log(String.format(
                     "[发包压测] 进行中: 已发送=%d/%d, 已收到=%d/%d, 在途未回包=%d",
@@ -524,6 +579,15 @@ public class StressManager {
         }
         if (!matchesStressResponsePacket(bytes, topicNum, packetId)) {
             return false;
+        }
+        ClientPacketState state = session.clientStates.get(uid);
+        if (state == null) {
+            return false;
+        }
+        synchronized (state) {
+            if (state.inflight <= 0) {
+                return false;
+            }
         }
         onPacketResponse(client, mode);
         return true;
@@ -723,7 +787,91 @@ public class StressManager {
                 session.sentTotal(), session.expectedTotal, sendElapsed, inflight));
         cancelSendProgressLogging(session);
         schedulePacketProgressIfSlow(session);
+        startStallDiagnosticLogging(session);
         tryCompletePacketStress(session);
+    }
+
+    private static void startStallDiagnosticLogging(PacketStressSession session) {
+        cancelStallDiagnosticLogging(session);
+        session.stallDiagnosticFuture = timeoutScheduler.scheduleAtFixedRate(() -> {
+            if (!session.active || !session.sendCompleted) {
+                return;
+            }
+            if (session.receivedCount.get() >= session.expectedTotal) {
+                return;
+            }
+            long waitMs = session.sendEndTime > 0
+                    ? System.currentTimeMillis() - session.sendEndTime
+                    : 0;
+            if (waitMs < PACKET_STALL_THRESHOLD_SEC * 1000L) {
+                return;
+            }
+            logPacketStallDiagnostics(session, "发送完毕已等待=" + waitMs + "ms仍无收齐");
+        }, PACKET_STALL_DIAGNOSTIC_SEC, PACKET_STALL_DIAGNOSTIC_SEC, TimeUnit.SECONDS);
+    }
+
+    private static void cancelStallDiagnosticLogging(PacketStressSession session) {
+        ScheduledFuture<?> future = session.stallDiagnosticFuture;
+        if (future != null) {
+            future.cancel(false);
+            session.stallDiagnosticFuture = null;
+        }
+    }
+
+    /**
+     * 长时间无回包时输出客户端侧诊断，便于对照服务端 [Dispatch诊断]/[对外服诊断]/[游戏服诊断] 日志。
+     */
+    private static void logPacketStallDiagnostics(PacketStressSession session, String reason) {
+        long sent = session.sentTotal();
+        long received = session.receivedCount.get();
+        long inflight = session.inflightTotal();
+
+        int loginOk = 0;
+        int connected = 0;
+        int disconnected = 0;
+        int notWritable = 0;
+        int highInflightClients = 0;
+        long maxInflight = 0;
+        String maxInflightUid = "";
+
+        for (Map.Entry<String, ClientPacketState> entry : session.clientStates.entrySet()) {
+            String uid = entry.getKey();
+            ClientPacketState state = entry.getValue();
+            StressClientInfo info = clients.get(uid);
+            if (info != null) {
+                if (info.isLoginSuccess()) {
+                    loginOk++;
+                }
+                if (info.isConnected()) {
+                    connected++;
+                } else {
+                    disconnected++;
+                }
+                SocketClient client = info.getClient();
+                if (client != null && client.isActive() && !client.isChannelWritable()) {
+                    notWritable++;
+                }
+            }
+            synchronized (state) {
+                if (state.inflight > maxInflight) {
+                    maxInflight = state.inflight;
+                    maxInflightUid = uid;
+                }
+                if (state.inflight >= MAX_INFLIGHT_PER_CLIENT / 2) {
+                    highInflightClients++;
+                }
+            }
+        }
+
+        log(String.format(
+                "[发包压测][诊断] %s | 已发送=%d 已收到=%d/%d 在途=%d | 参与连接=%d 登录成功=%d 仍连接=%d 已断开=%d 通道不可写=%d",
+                reason, sent, received, session.expectedTotal, inflight,
+                session.clientStates.size(), loginOk, connected, disconnected, notWritable));
+        log(String.format(
+                "[发包压测][诊断] 在途偏高连接数(>=%d)=%d 最大在途=%d uid=%s | 请同时查服务端: RpcServer=[Dispatch诊断] ExternalServer=[对外服诊断] GameServer=[游戏服诊断]",
+                MAX_INFLIGHT_PER_CLIENT / 2, highInflightClients, maxInflight, maxInflightUid));
+        log(String.format(
+                "[发包压测][诊断] 若 GameServer 出现 ping无humanId 或 对外服 待转发总数持续增长，多为未选角或 Dispatch 卡死；请 jstack RpcServerMessageManager 线程"));
     }
 
     private static void schedulePacketProgressIfSlow(PacketStressSession session) {
@@ -784,9 +932,10 @@ public class StressManager {
             return;
         }
         synchronized (state) {
-            if (state.inflight > 0) {
-                state.inflight--;
+            if (state.inflight <= 0) {
+                return;
             }
+            state.inflight--;
         }
 
         scheduleDrain(session, uid, client);
@@ -818,6 +967,7 @@ public class StressManager {
         session.active = false;
         cancelSendProgressLogging(session);
         cancelPacketProgressLogging(session);
+        cancelStallDiagnosticLogging(session);
         if (packetSession == session) {
             packetSession = null;
         }
@@ -833,6 +983,7 @@ public class StressManager {
             log(String.format(
                     "[发包压测] 超时(%d分钟): 已发送=%d, 已收到回包=%d/%d, 在途未回包≈%d, 发送耗时=%d ms（可能因无流控打满链路/服务端队列导致丢包）",
                     PACKET_STRESS_TIMEOUT_MINUTES, sent, received, session.expectedTotal, pending, sendElapsed));
+            logPacketStallDiagnostics(session, "压测超时");
             return;
         }
 
@@ -923,5 +1074,6 @@ public class StressManager {
         stopAll();
         workerPool.shutdown();
         timeoutScheduler.shutdown();
+        keepaliveScheduler.shutdown();
     }
 }

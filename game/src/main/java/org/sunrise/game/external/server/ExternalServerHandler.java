@@ -27,6 +27,7 @@ public class ExternalServerHandler extends SimpleChannelInboundHandler<SocketMes
         if (!clientConnection.dataCheck(data)) {
             return;
         }
+        // 入队后由 ExternalRecvGameMessageService.pulse 转发到游戏服
         clientConnection.getMsgQueue().add(data);
     }
 

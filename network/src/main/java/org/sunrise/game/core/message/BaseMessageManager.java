@@ -18,7 +18,13 @@ public abstract class BaseMessageManager {
     private final String nodeId;
     private AtomicBoolean running = new AtomicBoolean(false);
     private DispatchThread dispatchThread;
+    /**
+     * 入站队列
+     **/
     private ConcurrentLinkedQueue<Object> recvMsgQueue = new ConcurrentLinkedQueue<>();
+    /**
+     * 出站队列
+     **/
     private ConcurrentLinkedQueue<Object> sendMsgQueue = new ConcurrentLinkedQueue<>();
 
     protected BaseMessageManager(String nodeId) {
@@ -27,28 +33,38 @@ public abstract class BaseMessageManager {
 
     /**
      * 一次心跳处理接收到的所有数据
+     *
+     * @return 本次实际 poll 并处理的条数
      */
-    public void pulseHandler() {
+    public int pulseHandler() {
+        int processed = 0;
         while (!recvMsgQueue.isEmpty()) {
             Object data = recvMsgQueue.poll();
             if (data == null) {
                 continue;
             }
+            processed++;
             pulseHandlerOne(data);
         }
+        return processed;
     }
 
     /**
      * 一次心跳处理要发送到对端的所有数据
+     *
+     * @return 本次实际发送条数
      */
-    public void pulseSender() {
+    public int pulseSender() {
+        int sent = 0;
         while (!sendMsgQueue.isEmpty()) {
             Object data = sendMsgQueue.poll();
             if (data == null) {
                 continue;
             }
+            sent++;
             pulseSenderOne(data);
         }
+        return sent;
     }
 
     /**

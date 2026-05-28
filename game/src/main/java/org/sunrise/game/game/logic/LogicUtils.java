@@ -1,5 +1,6 @@
 package org.sunrise.game.game.logic;
 
+import com.google.protobuf.ByteString;
 import org.sunrise.game.game.annotation.MsgHandlerClass;
 import org.sunrise.game.game.annotation.MsgHandlerMethod;
 import org.sunrise.game.game.human.HumanObject;
@@ -72,7 +73,7 @@ public class LogicUtils {
         LogCore.GameServer.info("LogicUtils init end, loaded {} methods, took {} ms", totalMethodCount, System.currentTimeMillis() - totalStartTime);
     }
 
-    public static void handler(HumanObject humanObject, int packetType, int packetId, Object data) {
+    public static void handler(HumanObject humanObject, int packetType, int packetId, ByteString packetData) {
         Method method = idToMethodMap.get(packetType * 10000 + packetId);
         if (method == null) {
             LogCore.GameServer.warn("No handler found for packetType: {}, packetId: {}", packetType, packetId);
@@ -80,19 +81,18 @@ public class LogicUtils {
         }
         long startTime = System.currentTimeMillis();
         try {
-            var parseMethod = ProtoParserUtils.getProtoParserClass(packetType, packetId);
-            Object parseData = null;
-            if (parseMethod != null) {
-                parseData = parseMethod.invoke(null, data);
-            }
-            // 检查方法的参数类型
             Class<?>[] parameterTypes = method.getParameterTypes();
 
             if (parameterTypes.length == 1 && parameterTypes[0] == HumanObject.class) {
-                // 传递 humanObject
+                LogCore.GameServer.debug("recv msg, humanId = {}, packetType = {}, packetId = {}", humanObject.getHumanId(), packetType, packetId);
                 method.invoke(null, humanObject);
             } else if (parameterTypes.length == 2 && parameterTypes[0] == HumanObject.class) {
-                // 传递 humanObject 和 data
+                Object parseData = null;
+                var parseMethod = ProtoParserUtils.getProtoParserClass(packetType, packetId);
+                if (parseMethod != null && packetData != null && !packetData.isEmpty()) {
+                    parseData = parseMethod.invoke(null, packetData);
+                }
+                LogCore.GameServer.debug("recv msg, humanId = {}, packetType = {}, packetId = {}, msgData = {{}}", humanObject.getHumanId(), packetType, packetId, parseData == null ? "" : parseData.toString().replace("\n", ""));
                 method.invoke(null, humanObject, parseData);
             } else {
                 LogCore.GameServer.warn("Handler method has unsupported parameter types for packetType: {}, packetId: {}", packetType, packetId);

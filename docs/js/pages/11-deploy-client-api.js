@@ -230,9 +230,9 @@ server {
 </code></pre>
 `);
 
-registerPage('client-tools', '客户端工具', '消息发送工具、压测机器人', () => `
+registerPage('client-tools', '客户端工具', '消息发送工具、压测机器人、压测统计', () => `
 <h1>客户端工具</h1>
-<p class="page-desc">项目提供消息发送工具和压测机器人两种客户端工具</p>
+<p class="page-desc">项目提供消息发送工具、压测机器人和压测统计工具三种客户端工具</p>
 
 <h2>消息发送工具</h2>
 <p>基于 Swing 的 GUI 工具，支持多标签页，每标签页一个玩家连接。自动读取 proto 信息构建发送 UI。</p>
@@ -292,6 +292,22 @@ registerPage('client-tools', '客户端工具', '消息发送工具、压测机�
 <tr><td>loginSuccess</td><td>登录成功数</td></tr>
 <tr><td>loginFailed</td><td>登录失败数</td></tr>
 <tr><td>disconnected</td><td>已断开数</td></tr>
+</tbody>
+</table>
+
+<h2>压测统计工具</h2>
+<p>独立 GUI（<code>sunrise-stress.jar</code>）：分阶段统计「取地址 / 登录选角」耗时，并以<strong>服务器回包</strong>为准测量发包 TPS；内置客户端/服务端诊断日志对照。详见 <a href="#/stress-testing">压测统计文档</a>。</p>
+
+<h3>启动方式</h3>
+<pre><code class="language-bash">start\\windows\\stress.bat</code></pre>
+
+<h3>核心类</h3>
+<table>
+<thead><tr><th>类名</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>StressStartUp</td><td>启动入口</td></tr>
+<tr><td>StressManager</td><td>分阶段登录、发包会话、TPS 与流控（在途上限 64）</td></tr>
+<tr><td>StressFrame</td><td>压测 UI（实时统计 + 发包压测 + 日志）</td></tr>
 </tbody>
 </table>
 

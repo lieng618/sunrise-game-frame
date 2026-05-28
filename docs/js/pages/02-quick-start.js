@@ -29,6 +29,7 @@ mvn clean package</code></pre>
 <tr><td>sunrise-runallone.jar</td><td>RunAllOneServerStartUp</td><td>单进程合服</td><td>runallone-config.properties</td></tr>
 <tr><td>sunrise-client.jar</td><td>ClientStartUp</td><td>消息发送客户端（Swing GUI）</td><td>client-config.properties</td></tr>
 <tr><td>sunrise-bot.jar</td><td>BotStartUp</td><td>压测机器人（Swing GUI）</td><td>client-config.properties</td></tr>
+<tr><td>sunrise-stress.jar</td><td>StressStartUp</td><td>压测统计（分阶段耗时 / 发包 TPS）</td><td>client-config.properties</td></tr>
 </tbody>
 </table>
 
@@ -132,6 +133,9 @@ sh start/linux/server_run_allone.sh</code></pre>
 <h3>压测机器人</h3>
 <p>支持批量创建客户端、一键登录、一键发消息包，统计连接/登录状态。</p>
 <pre><code class="language-bash">start\\windows\\bot.bat</code></pre>
+<h3>压测统计工具</h3>
+<p>分阶段登录耗时、以服务器回包为准的发包 TPS，含客户端与服务端诊断。详见 <a href="#/stress-testing">压测统计</a>。</p>
+<pre><code class="language-bash">start\\windows\\stress.bat</code></pre>
 
 <h2>6. 访问 GM 后台</h2>
 <p>GM 后台分为<strong>后端 API</strong>与<strong>前端页面</strong>两部分：</p>

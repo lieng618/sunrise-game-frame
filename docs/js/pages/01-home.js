@@ -21,7 +21,7 @@ registerPage('home', '项目概览', 'Sunrise Game Frame 分布式游戏服务�
     <div class="feature-item"><span class="feature-icon">🔒</span><span class="feature-text">RPC服与游戏服单线程处理业务，无需加锁，无需考虑线程安全问题</span></div>
     <div class="feature-item"><span class="feature-icon">🔌</span><span class="feature-text">对外服同时支持TCP / WebSocket / KCP 三种协议</span></div>
     <div class="feature-item"><span class="feature-icon">🛠️</span><span class="feature-text">GM 后台（gmback API + gmback-ui SPA）：节点监控、配置/代码热更、运营工具等</span></div>
-    <div class="feature-item"><span class="feature-icon">🤖</span><span class="feature-text">消息发送工具和压测机器人工具，模拟真实环境，让开发联调更为便捷</span></div>
+    <div class="feature-item"><span class="feature-icon">🤖</span><span class="feature-text">消息发送工具、压测机器人与压测统计工具，便于联调与性能基准</span></div>
     <div class="feature-item"><span class="feature-icon">🔃</span><span class="feature-text">业务模块化，已实现游戏必需的模块如登录、存库、消息处理、玩家模块、系统模块等</span></div>
 </div>
 
@@ -64,7 +64,8 @@ registerPage('home', '项目概览', 'Sunrise Game Frame 分布式游戏服务�
 │   └─ src/main/java/
 │       ├─ core/               # SocketClient / TcpClient / WsClient / KcpClient
 │       ├─ swing/              # MainFrame / SendMsgFrame（消息发送工具）
-│       └─ bot/                # BotManager / BotFrame（压测机器人工具）
+│       ├─ bot/                # BotManager / BotFrame（压测机器人）
+│       └─ stress/             # StressManager / StressFrame（压测统计与 TPS）
 ├─ start/                      # 启动脚本
 │   ├─ windows/                # .bat 脚本（多进程/单进程/客户端/机器人）
 │   ├─ linux/                  # .sh 脚本（pm2 管理）

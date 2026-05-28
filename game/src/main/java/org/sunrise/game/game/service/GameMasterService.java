@@ -49,10 +49,13 @@ public class GameMasterService extends BaseService {
     }
 
     /**
-     * 处理玩家发来的协议
+     * 处理 rpcLock 期间积压的玩家协议
      */
     private void pulseHandlerHumanMsg() {
         for (HumanObject humanObject : HumanObjectManger.getHumanObjects()) {
+            if (humanObject.getMsgQueue().isEmpty()) {
+                continue;
+            }
             while (!humanObject.getMsgQueue().isEmpty()) {
                 if (humanObject.isRpcLock()) {
                     break;

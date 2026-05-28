@@ -59,7 +59,7 @@ public class RpcFunction {
     public static RpcFunction newInstance(String designatedNodeId) {
         // 指定的服务节点无效，则创建默认调用器，随机寻找一个节点发送
         if (!RpcNodeManager.isServerNodeActive(designatedNodeId)) {
-            LogCore.RpcClient.warn("rpc newInstance SendDesignated, designatedNodeId is empty, create default");
+            LogCore.RpcClient.debug("rpc newInstance SendDesignated, designatedNodeId is empty, create default");
             return new RpcFunction();
         }
         RpcFunction rpcFunction = new RpcFunction(RpcCallType.SendDesignated);

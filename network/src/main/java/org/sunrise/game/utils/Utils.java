@@ -40,7 +40,6 @@ public class Utils {
     public static final String SUCCESS = "SUCCESS";
     public static final String FAILED = "FAILED";
 
-    public static final int MSG_COUNT_MAX = 300;// 每分钟从客户端接收的最大消息数
     public static final int MSG_BYTE_LEN_MAX = 64 * 1024;// 从客户端接收的消息最大长度
     public static final int MAX_BODY_SIZE = 1024 * 1024; // 默认数据包大小
 
