@@ -72,10 +72,7 @@ public class LoginMsgHandler {
                     return;
                 }
                 LoginProto.MC2S_SelectHuman msg = (LoginProto.MC2S_SelectHuman) data;
-                // 检测服务器id和位置是否有效
-                if (msg.getServerId() <= 0) {
-                    return;
-                }
+                // 检测位置是否有效
                 // 假设开放0 1 2三个位置
                 if (msg.getPos() < 0 || msg.getPos() > 2) {
                     return;

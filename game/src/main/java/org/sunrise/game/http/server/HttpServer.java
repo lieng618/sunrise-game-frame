@@ -119,6 +119,7 @@ public class HttpServer {
                     JSONObject oneResponse = new JSONObject();
                     oneResponse.put("address", addressEntry.getValue());
                     oneResponse.put("type", entry.getKey());
+                    oneResponse.put("id", addressEntry.getKey());
                     finalAddress.add(oneResponse);
                 }
             }
