@@ -22,6 +22,7 @@ public class LogCore {
     public static final Logger GameServer = LoggerFactory.getLogger("GameServer");
     public static final Logger GmBackServer = LoggerFactory.getLogger("GmBackServer");
     public static final Logger HttpServer = LoggerFactory.getLogger("HttpServer");
+    public static final Logger GlobalServer = LoggerFactory.getLogger("GlobalServer");
 
     public static final Logger Bot = LoggerFactory.getLogger("Bot");
     public static final Logger Stress = LoggerFactory.getLogger("Stress");

@@ -9,6 +9,7 @@ import org.sunrise.game.game.logic.ToolsUtils;
 import org.sunrise.game.genProto.gen.HumanProto;
 import org.sunrise.game.genProto.gen.TopicProto;
 import org.sunrise.game.genRpc.gen.CallEnum;
+import org.sunrise.game.global.service.rank.RankType;
 import org.sunrise.game.rpc.function.RpcFunction;
 
 @HumanModule
@@ -101,6 +102,12 @@ public class DataModule extends BaseModule {
         builder.setLevel(newLevel);
         getHuman().sendMsg(TopicProto.TOPIC.TOPIC_TYPE_HUMAN_VALUE,
                 HumanProto.FROM_SERVER.S2C_HumanInfoChange_VALUE, builder);
+
+        RpcFunction.newInstance()
+                .call(CallEnum.GlobalRankService_updateRank,
+                        "rankType", RankType.LEVEL,
+                        "humanId", getHumanId(),
+                        "score", level);
     }
 
     /**

@@ -56,6 +56,14 @@ public class CallEnum {
     public static final int GlobalPlayerInfoService_getPlayerInfos = 25;
     /** {@code org.sunrise.game.global.service.playerinfo.GlobalPlayerInfoService#updatePlayerInfo(String,String,int,String,int,int)} */
     public static final int GlobalPlayerInfoService_updatePlayerInfo = 26;
+    /** {@code org.sunrise.game.global.service.rank.GlobalRankService#getMyRank(int,String)} */
+    public static final int GlobalRankService_getMyRank = 32;
+    /** {@code org.sunrise.game.global.service.rank.GlobalRankService#getRankList(int,int,int)} */
+    public static final int GlobalRankService_getRankList = 33;
+    /** {@code org.sunrise.game.global.service.rank.GlobalRankService#removeFromRank(int,String)} */
+    public static final int GlobalRankService_removeFromRank = 34;
+    /** {@code org.sunrise.game.global.service.rank.GlobalRankService#updateRank(int,String,long)} */
+    public static final int GlobalRankService_updateRank = 35;
     /** {@code org.sunrise.game.gmback.service.GmBackRecvMessageService#recvMessage(String,String)} */
     public static final int GmBackRecvMessageService_recvMessage = 27;
     /** {@code org.sunrise.game.http.service.HttpRecvMessageService#setAnnouncements(String)} */

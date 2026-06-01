@@ -15,6 +15,7 @@ enum TOPIC
   TOPIC_TYPE_MAIL = 8 ;
   TOPIC_TYPE_ACTIVITY = 9 ;
   TOPIC_TYPE_ATTRIBUTE = 10 ;
+  TOPIC_TYPE_RANK = 11 ;
 }
 
 message MBasePacketData

@@ -1,0 +1,62 @@
+syntax = "proto3";
+option java_outer_classname = "RankProto";
+package org.sunrise.game.genProto.gen;
+
+// 排行榜类型，与 RankType 枚举 id 保持一致
+enum RANK_TYPE {
+  RANK_TYPE_NONE = 0;
+  RANK_TYPE_FIGHT_POWER = 1;  // 战力榜
+  RANK_TYPE_LEVEL = 2;        // 等级榜
+  RANK_TYPE_SCORE = 3;        // 通用分数榜
+}
+
+enum FROM_CLIENT {
+  C2S_GetRankList = 0;  // 获取排行榜列表
+  C2S_GetMyRank = 1;    // 获取我的排名
+}
+
+enum FROM_SERVER {
+  S2C_GetRankList = 0;  // 排行榜列表响应
+  S2C_GetMyRank = 1;    // 我的排名响应
+}
+
+// 榜内玩家展示信息（来自全局玩家信息系统）
+message STRankPlayerInfo {
+  string human_id = 1;
+  string name = 2;
+  int32 level = 3;
+  string head_icon = 4;
+  int32 sex = 5;
+  int32 fight_power = 6;
+}
+
+// 单条排行记录
+message STRankEntry {
+  int32 rank = 1;               // 名次，从 1 开始
+  STRankPlayerInfo player = 2;
+  int64 score = 3;              // 排行分数
+}
+
+// 获取排行榜
+message MC2S_GetRankList {
+  int32 rank_type = 1;
+  int32 page = 2;       // 页码，从 1 开始
+  int32 page_size = 3;  // 每页条数，默认 20，最大 100
+}
+
+message MS2C_GetRankList {
+  int32 rank_type = 1;
+  repeated STRankEntry entries = 2;
+  int32 total_count = 3;  // 榜上总人数
+}
+
+// 获取我的排名
+message MC2S_GetMyRank {
+  int32 rank_type = 1;
+}
+
+message MS2C_GetMyRank {
+  int32 rank_type = 1;
+  int32 rank = 2;           // 名次，0 表示未上榜
+  STRankEntry my_entry = 3; // 未上榜时仅 rank=0，无 my_entry
+}
