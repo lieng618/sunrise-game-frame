@@ -4,6 +4,8 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
 import com.google.protobuf.Message;
 import lombok.Data;
+import org.sunrise.game.game.logic.system.GameSystemUtils;
+import org.sunrise.game.game.logic.system.ResetSystem;
 import org.sunrise.game.game.modules.BaseModule;
 import org.sunrise.game.game.modules.DataModule;
 import org.sunrise.game.game.modules.ModuleUtils;
@@ -94,6 +96,16 @@ public class HumanObject {
                 }));
                 module.load();
             }
+        }
+    }
+
+    /**
+     * 从 DB 加载后补偿离线期间错过的跨周、跨天刷新
+     */
+    public void checkAndRefresh() {
+        ResetSystem resetSystem = GameSystemUtils.getSystem(ResetSystem.class);
+        if (resetSystem != null) {
+            resetSystem.checkAndRefreshHuman(this);
         }
     }
 

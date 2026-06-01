@@ -249,6 +249,7 @@ public class LoginMsgHandler {
                     HumanObject humanObject = HumanObjectManger.getHumanObject(entityHumanInfo.getHumanId());
                     humanObject.getConnectObject().onSelectHuman();
                     humanObject.load(entityHumanInfo.getRoleData());
+                    humanObject.checkAndRefresh();
                     humanObject.sendHumanData();
                 } else {
                     // human_list和human_info表数据不匹配

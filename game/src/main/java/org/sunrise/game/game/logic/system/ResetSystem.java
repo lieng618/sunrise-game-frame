@@ -42,46 +42,63 @@ public class ResetSystem extends BaseSystem {
     }
 
     /**
-     * 检测跨天刷新
+     * 玩家数据就绪后检查跨周/跨天刷新（登录加载、重连时调用，补偿离线期间未执行的刷新）
      */
-    private void pulseHandlerDailyRefresh() {
+    public void checkAndRefreshHuman(HumanObject humanObject) {
         if (!isInitEnd()) {
             return;
         }
+        tryRefreshWeek(humanObject);
+        tryRefreshDaily(humanObject);
+    }
+
+    /**
+     * 检测跨天刷新（仅处理当前在线玩家；离线玩家登录时由 {@link #checkAndRefreshHuman} 补偿）
+     */
+    private void pulseHandlerDailyRefresh() {
         long cur = System.currentTimeMillis();
         if (cur < nextDailyRefreshTime) {
             return;
         }
         for (HumanObject humanObject : HumanObjectManger.getHumanObjects()) {
-            if (humanObject.getModule(DataModule.class).getLastDailyRefreshTime() < cur) {
-                for (Map.Entry<String, BaseModule> entry : humanObject.getModules().entrySet()) {
-                    entry.getValue().dailyReset();
-                }
-                humanObject.getModule(DataModule.class).setLastDailyRefreshTime(nextDailyRefreshTime);
-            }
+            tryRefreshDaily(humanObject);
         }
         nextDailyRefreshTime = ToolsUtils.getDayTimeMillisByOffset(1);
     }
 
     /**
-     * 检测跨周刷新
+     * 检测跨周刷新（仅处理当前在线玩家；离线玩家登录时由 {@link #checkAndRefreshHuman} 补偿）
      */
     private void pulseHandlerWeekRefresh() {
-        if (!isInitEnd()) {
-            return;
-        }
         long cur = System.currentTimeMillis();
         if (cur < nextWeekRefreshTime) {
             return;
         }
         for (HumanObject humanObject : HumanObjectManger.getHumanObjects()) {
-            if (humanObject.getModule(DataModule.class).getLastWeekRefreshTime() < cur) {
-                for (Map.Entry<String, BaseModule> entry : humanObject.getModules().entrySet()) {
-                    entry.getValue().weekReset();
-                }
-                humanObject.getModule(DataModule.class).setLastWeekRefreshTime(nextWeekRefreshTime);
-            }
+            tryRefreshWeek(humanObject);
         }
         nextWeekRefreshTime = ToolsUtils.getWeekZeroTimeMillisByOffset(7);
+    }
+
+    private void tryRefreshDaily(HumanObject humanObject) {
+        DataModule dataModule = humanObject.getModule(DataModule.class);
+        if (dataModule.getLastDailyRefreshTime() >= nextDailyRefreshTime) {
+            return;
+        }
+        for (Map.Entry<String, BaseModule> entry : humanObject.getModules().entrySet()) {
+            entry.getValue().dailyReset();
+        }
+        dataModule.setLastDailyRefreshTime(nextDailyRefreshTime);
+    }
+
+    private void tryRefreshWeek(HumanObject humanObject) {
+        DataModule dataModule = humanObject.getModule(DataModule.class);
+        if (dataModule.getLastWeekRefreshTime() >= nextWeekRefreshTime) {
+            return;
+        }
+        for (Map.Entry<String, BaseModule> entry : humanObject.getModules().entrySet()) {
+            entry.getValue().weekReset();
+        }
+        dataModule.setLastWeekRefreshTime(nextWeekRefreshTime);
     }
 }
