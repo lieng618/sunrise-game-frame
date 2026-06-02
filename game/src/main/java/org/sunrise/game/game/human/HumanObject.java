@@ -23,7 +23,6 @@ public class HumanObject {
     private ConnectObject connectObject;
     private String humanId;
     private int serverId; //连接的逻辑服务器id
-    private Map<String, String> roleData = new HashMap<>(); //玩家数据: 模块名-json串
     private boolean isCalling; //调用了rpc，正在等待返回
     private long lastPingTime = System.currentTimeMillis(); //上次ping发来的时间
     private long lastSaveDbTime = System.currentTimeMillis(); //上次保存数据的时间
@@ -87,13 +86,15 @@ public class HumanObject {
     }
 
     public void load(byte[] data) {
-        roleData = JSON.parseObject(data, new TypeReference<Map<String, String>>() {
+        Map<String, Map<String, String>> saved = JSON.parseObject(data, new TypeReference<Map<String, Map<String, String>>>() {
         }.getType());
-        for (Map.Entry<String, String> entry : roleData.entrySet()) {
+        if (saved == null) {
+            return;
+        }
+        for (Map.Entry<String, Map<String, String>> entry : saved.entrySet()) {
             BaseModule module = modules.get(entry.getKey());
-            if (module != null) {
-                module.setDataMap(JSON.parseObject(entry.getValue(), new TypeReference<HashMap<String, String>>() {
-                }));
+            if (module != null && entry.getValue() != null) {
+                module.setDataMap(entry.getValue());
                 module.load();
             }
         }
@@ -109,15 +110,15 @@ public class HumanObject {
         }
     }
 
-    public Map<String, String> save() {
-        roleData.clear();
+    public Map<String, Map<String, String>> save() {
+        Map<String, Map<String, String>> saved = new HashMap<>();
         for (Map.Entry<String, BaseModule> entry : modules.entrySet()) {
             entry.getValue().save();
             if (!entry.getValue().getDataMap().isEmpty()) {
-                roleData.put(entry.getKey(), JSON.toJSONString(entry.getValue().getDataMap()));
+                saved.put(entry.getKey(), entry.getValue().getDataMap());
             }
         }
-        return roleData;
+        return saved;
     }
 
     public void pulse() {

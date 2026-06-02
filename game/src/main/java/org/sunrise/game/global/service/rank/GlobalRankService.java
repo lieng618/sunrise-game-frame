@@ -5,6 +5,10 @@ import com.alibaba.fastjson2.TypeReference;
 import org.sunrise.game.game.logic.playerinfo.PlayerInfo;
 import org.sunrise.game.genProto.gen.RankProto;
 import org.sunrise.game.genRpc.gen.CallEnum;
+import org.sunrise.game.global.service.rank.board.BoardManager;
+import org.sunrise.game.global.service.rank.board.CustomRankBoard;
+import org.sunrise.game.global.service.rank.board.RankBoard;
+import org.sunrise.game.global.service.rank.board.SimpleRankBoard;
 import org.sunrise.game.log.LogCore;
 import org.sunrise.game.rpc.annotation.RpcMethod;
 import org.sunrise.game.rpc.annotation.RpcService;
@@ -18,7 +22,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeSet;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -63,7 +66,7 @@ public class GlobalRankService extends BaseService {
     @Override
     public void load() {
         // key: rankType id，value: 该榜全部上榜条目
-        getDbData("boards", new TypeReference<Map<Integer, List<RankEntry>>>() {
+        getDbData("boards", new TypeReference<Map<Integer, List<SimpleRankEntry>>>() {
         }, boardManager::importAll);
     }
 
@@ -117,10 +120,10 @@ public class GlobalRankService extends BaseService {
             int safePage = Math.max(page, 1);
             int safePageSize = normalizePageSize(pageSize);
 
-            List<RankEntry> allEntries = board.getTop(board.getRankType().getMaxSize());
+            List<SimpleRankEntry> allEntries = board.getTop(board.getRankType().getMaxSize());
             int totalCount = allEntries.size();
             int fromIndex = (safePage - 1) * safePageSize;
-            final List<RankEntry> pageEntries;
+            final List<SimpleRankEntry> pageEntries;
             if (fromIndex < totalCount) {
                 int toIndex = Math.min(fromIndex + safePageSize, totalCount);
                 pageEntries = new ArrayList<>(allEntries.subList(fromIndex, toIndex));
@@ -130,7 +133,7 @@ public class GlobalRankService extends BaseService {
 
             final int startRank = fromIndex + 1;
             List<String> humanIds = pageEntries.stream()
-                    .map(RankEntry::getHumanId)
+                    .map(SimpleRankEntry::getHumanId)
                     .distinct()
                     .collect(Collectors.toList());
             fetchPlayerInfos(humanIds, playerInfos -> {
@@ -155,7 +158,7 @@ public class GlobalRankService extends BaseService {
         try {
             RankBoard board = boardManager.requireBoard(rankType);
             int rank = board.getRank(humanId);
-            RankEntry entry = board.getEntry(humanId);
+            SimpleRankEntry entry = board.getEntry(humanId);
             if (entry == null) {
                 RankProto.MS2C_GetMyRank response = buildMyRank(rankType, rank, null, Map.of());
                 returns(fromCall, "protoData", response.toByteArray());
@@ -204,19 +207,19 @@ public class GlobalRankService extends BaseService {
 
     // ==================== Protobuf 组装 ====================
 
-    private static RankProto.MS2C_GetRankList buildRankListPage(int rankType, List<RankEntry> entries, int totalCount,
+    private static RankProto.MS2C_GetRankList buildRankListPage(int rankType, List<SimpleRankEntry> entries, int totalCount,
                                                                 int startRank, Map<String, PlayerInfo> playerInfos) {
         RankProto.MS2C_GetRankList.Builder builder = RankProto.MS2C_GetRankList.newBuilder()
                 .setRankType(rankType)
                 .setTotalCount(totalCount);
         int rank = startRank;
-        for (RankEntry entry : entries) {
+        for (SimpleRankEntry entry : entries) {
             builder.addEntries(buildRankEntry(rank++, entry, playerInfos));
         }
         return builder.build();
     }
 
-    private static RankProto.MS2C_GetMyRank buildMyRank(int rankType, int rank, RankEntry entry,
+    private static RankProto.MS2C_GetMyRank buildMyRank(int rankType, int rank, SimpleRankEntry entry,
                                                         Map<String, PlayerInfo> playerInfos) {
         RankProto.MS2C_GetMyRank.Builder builder = RankProto.MS2C_GetMyRank.newBuilder()
                 .setRankType(rankType)
@@ -227,16 +230,16 @@ public class GlobalRankService extends BaseService {
         return builder.build();
     }
 
-    private static RankProto.STRankEntry buildRankEntry(int rank, RankEntry entry, Map<String, PlayerInfo> playerInfos) {
+    private static RankProto.STRankEntry buildRankEntry(int rank, SimpleRankEntry entry, Map<String, PlayerInfo> playerInfos) {
         RankProto.STRankEntry.Builder builder = RankProto.STRankEntry.newBuilder()
                 .setRank(rank)
-                .setScore(entry.score);
-        PlayerInfo playerInfo = playerInfos.get(entry.humanId);
+                .setScore(entry.getScore());
+        PlayerInfo playerInfo = playerInfos.get(entry.getHumanId());
         if (playerInfo != null) {
             builder.setPlayer(toRankPlayerInfo(playerInfo));
         } else {
             // 玩家信息尚未同步到 Global，仅返回 humanId
-            builder.setPlayer(RankProto.STRankPlayerInfo.newBuilder().setHumanId(entry.humanId).build());
+            builder.setPlayer(RankProto.STRankPlayerInfo.newBuilder().setHumanId(entry.getHumanId()).build());
         }
         return builder.build();
     }
@@ -252,274 +255,5 @@ public class GlobalRankService extends BaseService {
             builder.setHeadIcon(info.getHeadIcon());
         }
         return builder.build();
-    }
-
-    // ==================== 特殊榜扩展点 ====================
-
-    /**
-     * 非单分数比大小的特殊榜继承此类，并在 {@link GlobalRankService#init()} 中注册
-     */
-    public abstract static class CustomRankBoard implements RankBoard {
-        protected final RankType rankType;
-
-        protected CustomRankBoard(RankType rankType) {
-            if (!rankType.isCustom()) {
-                throw new IllegalArgumentException("CustomRankBoard requires custom rank type: " + rankType);
-            }
-            this.rankType = rankType;
-        }
-
-        @Override
-        public RankType getRankType() {
-            return rankType;
-        }
-    }
-
-    // ==================== 内部实现 ====================
-
-    /**
-     * 单个榜的读写接口
-     */
-    private interface RankBoard {
-        RankType getRankType();
-
-        void update(String humanId, long score);
-
-        void remove(String humanId);
-
-        List<RankEntry> getTop(int limit);
-
-        int getRank(String humanId);
-
-        RankEntry getEntry(String humanId);
-
-        List<RankEntry> exportEntries();
-
-        void importEntries(List<RankEntry> entries);
-    }
-
-    /**
-     * 榜内一条记录，同时作为 TreeSet 排序元素
-     */
-    private static class RankEntry implements Comparable<RankEntry> {
-        private String humanId;
-        private long score;
-        /**
-         * 分数相同时，先达成者排在前面
-         */
-        private long updateTime;
-        private RankComparator comparator;
-
-        RankEntry() {
-        }
-
-        RankEntry(String humanId, long score, long updateTime) {
-            this.humanId = humanId;
-            this.score = score;
-            this.updateTime = updateTime;
-        }
-
-        String getHumanId() {
-            return humanId;
-        }
-
-        void bindComparator(RankComparator comparator) {
-            this.comparator = comparator;
-        }
-
-        @Override
-        public int compareTo(RankEntry other) {
-            return comparator.compare(this, other);
-        }
-    }
-
-    /**
-     * 排序规则：分数 → 达成时间 → humanId（保证 TreeSet 元素唯一）
-     */
-    private static class RankComparator {
-        private final boolean descending;
-
-        RankComparator(boolean descending) {
-            this.descending = descending;
-        }
-
-        int compare(RankEntry a, RankEntry b) {
-            int cmp = Long.compare(a.score, b.score);
-            if (descending) {
-                cmp = -cmp;
-            }
-            if (cmp != 0) {
-                return cmp;
-            }
-            cmp = Long.compare(a.updateTime, b.updateTime);
-            if (cmp != 0) {
-                return cmp;
-            }
-            return a.humanId.compareTo(b.humanId);
-        }
-    }
-
-    /**
-     * 常规单分数榜：TreeSet 维护有序 TopN，entryMap 支持 O(1) 按 humanId 更新/删除
-     */
-    private static class SimpleRankBoard implements RankBoard {
-        private final RankType rankType;
-        private final RankComparator comparator;
-        private final Map<String, RankEntry> entryMap = new HashMap<>();
-        /**
-         * 按 RankComparator 排序，first=第一名，last=最后一名
-         */
-        private final TreeSet<RankEntry> sortedEntries;
-
-        SimpleRankBoard(RankType rankType) {
-            if (rankType.isCustom()) {
-                throw new IllegalArgumentException("SimpleRankBoard does not support custom rank type: " + rankType);
-            }
-            this.rankType = rankType;
-            this.comparator = new RankComparator(rankType.isDescending());
-            this.sortedEntries = new TreeSet<>();
-        }
-
-        @Override
-        public RankType getRankType() {
-            return rankType;
-        }
-
-        @Override
-        public void update(String humanId, long score) {
-            remove(humanId);
-            RankEntry entry = new RankEntry(humanId, score, System.currentTimeMillis());
-            entry.bindComparator(comparator);
-            entryMap.put(humanId, entry);
-            sortedEntries.add(entry);
-            trimToMaxSize();
-        }
-
-        @Override
-        public void remove(String humanId) {
-            RankEntry old = entryMap.remove(humanId);
-            if (old != null) {
-                sortedEntries.remove(old);
-            }
-        }
-
-        @Override
-        public List<RankEntry> getTop(int limit) {
-            List<RankEntry> result = new ArrayList<>(Math.min(limit, sortedEntries.size()));
-            int count = 0;
-            for (RankEntry entry : sortedEntries) {
-                result.add(entry);
-                if (++count >= limit) {
-                    break;
-                }
-            }
-            return result;
-        }
-
-        @Override
-        public int getRank(String humanId) {
-            if (!entryMap.containsKey(humanId)) {
-                return 0;
-            }
-            int rank = 1;
-            for (RankEntry entry : sortedEntries) {
-                if (entry.humanId.equals(humanId)) {
-                    return rank;
-                }
-                rank++;
-            }
-            return 0;
-        }
-
-        @Override
-        public RankEntry getEntry(String humanId) {
-            return entryMap.get(humanId);
-        }
-
-        @Override
-        public List<RankEntry> exportEntries() {
-            return new ArrayList<>(sortedEntries);
-        }
-
-        @Override
-        public void importEntries(List<RankEntry> entries) {
-            entryMap.clear();
-            sortedEntries.clear();
-            if (entries == null) {
-                return;
-            }
-            for (RankEntry entry : entries) {
-                entry.bindComparator(comparator);
-                entryMap.put(entry.humanId, entry);
-                sortedEntries.add(entry);
-            }
-            trimToMaxSize();
-        }
-
-        /**
-         * 超出 RankType.maxSize 时淘汰榜末
-         */
-        private void trimToMaxSize() {
-            while (sortedEntries.size() > rankType.getMaxSize()) {
-                RankEntry last = sortedEntries.last();
-                sortedEntries.remove(last);
-                entryMap.remove(last.humanId);
-            }
-        }
-    }
-
-    /**
-     * 管理所有 rankType 对应的榜实例及持久化导入导出
-     */
-    private static class BoardManager {
-        private final Map<Integer, RankBoard> boards = new HashMap<>();
-
-        void registerDefaultBoards() {
-            for (RankType type : RankType.values()) {
-                if (!type.isCustom()) {
-                    register(type, new SimpleRankBoard(type));
-                }
-            }
-        }
-
-        void register(RankType type, RankBoard board) {
-            if (board.getRankType() != type) {
-                throw new IllegalArgumentException("board rank type mismatch");
-            }
-            boards.put(type.getId(), board);
-        }
-
-        RankBoard getBoard(int rankTypeId) {
-            return boards.get(rankTypeId);
-        }
-
-        RankBoard requireBoard(int rankTypeId) {
-            RankType type = RankType.require(rankTypeId);
-            RankBoard board = boards.get(rankTypeId);
-            if (board == null) {
-                throw new IllegalStateException("rank board not registered: " + type);
-            }
-            return board;
-        }
-
-        Map<Integer, List<RankEntry>> exportAll() {
-            Map<Integer, List<RankEntry>> data = new HashMap<>();
-            for (Map.Entry<Integer, RankBoard> entry : boards.entrySet()) {
-                data.put(entry.getKey(), entry.getValue().exportEntries());
-            }
-            return data;
-        }
-
-        void importAll(Map<Integer, List<RankEntry>> data) {
-            if (data == null) {
-                return;
-            }
-            for (Map.Entry<Integer, List<RankEntry>> entry : data.entrySet()) {
-                RankBoard board = boards.get(entry.getKey());
-                if (board != null) {
-                    board.importEntries(entry.getValue());
-                }
-            }
-        }
     }
 }

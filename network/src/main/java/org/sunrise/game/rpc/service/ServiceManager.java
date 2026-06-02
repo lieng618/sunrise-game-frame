@@ -64,14 +64,19 @@ public class ServiceManager {
     public static void load() {
         for (Map.Entry<String, BaseService> entry : services.entrySet()) {
             DbManager.getDbService().queryGetOneByParamsAsync((result -> {
-                if (result != null) {
-                    EntityServerData serverData = new EntityServerData(result);
-                    entry.getValue().setDataMap(JSON.parseObject(serverData.getData(), new TypeReference<Map<String, String>>() {}.getType()));
-                    entry.getValue().load();
-                } else {
-                    DbManager.getDbService().executeAsync("insert into `server_data` (server_id,name,data) values (?,?,?)", RpcNodeManager.getRpcServerId(), entry.getKey(), JSON.toJSONBytes(entry.getValue().getDataMap()));
+                try {
+                    if (result != null) {
+                        EntityServerData serverData = new EntityServerData(result);
+                        entry.getValue().setDataMap(JSON.parseObject(serverData.getData(), new TypeReference<Map<String, String>>() {}.getType()));
+                        entry.getValue().load();
+                    } else {
+                        DbManager.getDbService().executeAsync("insert into `server_data` (server_id,name,data) values (?,?,?)", RpcNodeManager.getRpcServerId(), entry.getKey(), JSON.toJSONBytes(entry.getValue().getDataMap()));
+                    }
+                } catch (Exception e) {
+                    LogCore.RpcUtils.warn("Load service data failed, name = {}, error = {}", entry.getKey(), e.getMessage(), e);
+                } finally {
+                    entry.getValue().setInitEnd(true);
                 }
-                entry.getValue().setInitEnd(true);
             }), "select * from `server_data` where `server_id` = ? and `name` = ?", RpcNodeManager.getRpcServerId(), entry.getKey());
         }
     }
@@ -122,8 +127,8 @@ public class ServiceManager {
 
         if (lastPulsePerMinTime + 60 * 1000L <= cur) {
             lastPulsePerMinTime = cur;
+            save();
             for (Map.Entry<String, BaseService> entry : services.entrySet()) {
-                entry.getValue().save();
                 entry.getValue().pulsePerMin();
             }
         }

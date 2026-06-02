@@ -105,7 +105,7 @@ public class DataModule extends BaseModule {
 
         RpcFunction.newInstance()
                 .call(CallEnum.GlobalRankService_updateRank,
-                        "rankType", RankType.LEVEL,
+                        "rankType", RankType.LEVEL.getId(),
                         "humanId", getHumanId(),
                         "score", level);
     }

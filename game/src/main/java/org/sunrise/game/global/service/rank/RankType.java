@@ -1,5 +1,7 @@
 package org.sunrise.game.global.service.rank;
 
+import lombok.Getter;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -7,8 +9,9 @@ import java.util.Map;
  * 排行榜类型，与 rank.proto 中 RANK_TYPE 枚举 id 保持一致。
  * <p>
  * custom=false 的榜由 {@link GlobalRankService} 自动创建；
- * custom=true 的榜需继承 {@link GlobalRankService.CustomRankBoard} 并在 init() 中注册。
+ * custom=true 的榜需继承 {@link org.sunrise.game.global.service.rank.board.CustomRankBoard} 并在 init() 中注册。
  */
+@Getter
 public enum RankType {
     FIGHT_POWER(1, 100, true, false),
     LEVEL(2, 100, true, false),
@@ -33,22 +36,6 @@ public enum RankType {
         this.maxSize = maxSize;
         this.descending = descending;
         this.custom = custom;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public int getMaxSize() {
-        return maxSize;
-    }
-
-    public boolean isDescending() {
-        return descending;
-    }
-
-    public boolean isCustom() {
-        return custom;
     }
 
     public static RankType of(int id) {
