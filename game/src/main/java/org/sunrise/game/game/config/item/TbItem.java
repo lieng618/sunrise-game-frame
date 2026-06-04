@@ -19,6 +19,7 @@ public final class TbItem extends AbstractBean {
         id = _buf.get("id").getAsInt();
         name = _buf.get("name").getAsString();
         desc = _buf.get("desc").getAsString();
+        icon = _buf.get("icon").getAsString();
         price = _buf.get("price").getAsInt();
         upgradeToItemId = _buf.get("upgrade_to_item_id").getAsInt();
         batchUseable = _buf.get("batch_useable").getAsBoolean();
@@ -40,6 +41,10 @@ public final class TbItem extends AbstractBean {
      * 描述
      */
     public final String desc;
+    /**
+     * 图标ID
+     */
+    public final String icon;
     /**
      * 价格
      */
@@ -64,6 +69,7 @@ public final class TbItem extends AbstractBean {
         + "id:" + id + ","
         + "name:" + name + ","
         + "desc:" + desc + ","
+        + "icon:" + icon + ","
         + "price:" + price + ","
         + "upgradeToItemId:" + upgradeToItemId + ","
         + "batchUseable:" + batchUseable + ","

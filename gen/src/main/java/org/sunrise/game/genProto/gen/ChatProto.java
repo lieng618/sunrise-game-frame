@@ -1488,6 +1488,26 @@ public final class ChatProto {
      * @return The time.
      */
     long getTime();
+
+    /**
+     * <pre>
+     * 玩家名字
+     * </pre>
+     *
+     * <code>string name = 4;</code>
+     * @return The name.
+     */
+    java.lang.String getName();
+    /**
+     * <pre>
+     * 玩家名字
+     * </pre>
+     *
+     * <code>string name = 4;</code>
+     * @return The bytes for name.
+     */
+    com.google.protobuf.ByteString
+        getNameBytes();
   }
   /**
    * Protobuf type {@code org.sunrise.game.genProto.gen.MS2C_Chat}
@@ -1513,6 +1533,7 @@ public final class ChatProto {
     private MS2C_Chat() {
       id_ = "";
       msg_ = "";
+      name_ = "";
     }
 
     public static final com.google.protobuf.Descriptors.Descriptor
@@ -1637,6 +1658,53 @@ public final class ChatProto {
       return time_;
     }
 
+    public static final int NAME_FIELD_NUMBER = 4;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object name_ = "";
+    /**
+     * <pre>
+     * 玩家名字
+     * </pre>
+     *
+     * <code>string name = 4;</code>
+     * @return The name.
+     */
+    @java.lang.Override
+    public java.lang.String getName() {
+      java.lang.Object ref = name_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        name_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * 玩家名字
+     * </pre>
+     *
+     * <code>string name = 4;</code>
+     * @return The bytes for name.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getNameBytes() {
+      java.lang.Object ref = name_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        name_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -1660,6 +1728,9 @@ public final class ChatProto {
       if (time_ != 0L) {
         output.writeInt64(3, time_);
       }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(name_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 4, name_);
+      }
       getUnknownFields().writeTo(output);
     }
 
@@ -1678,6 +1749,9 @@ public final class ChatProto {
       if (time_ != 0L) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt64Size(3, time_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(name_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(4, name_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
@@ -1700,6 +1774,8 @@ public final class ChatProto {
           .equals(other.getMsg())) return false;
       if (getTime()
           != other.getTime()) return false;
+      if (!getName()
+          .equals(other.getName())) return false;
       if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
@@ -1718,6 +1794,8 @@ public final class ChatProto {
       hash = (37 * hash) + TIME_FIELD_NUMBER;
       hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
           getTime());
+      hash = (37 * hash) + NAME_FIELD_NUMBER;
+      hash = (53 * hash) + getName().hashCode();
       hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -1852,6 +1930,7 @@ public final class ChatProto {
         id_ = "";
         msg_ = "";
         time_ = 0L;
+        name_ = "";
         return this;
       }
 
@@ -1894,6 +1973,9 @@ public final class ChatProto {
         if (((from_bitField0_ & 0x00000004) != 0)) {
           result.time_ = time_;
         }
+        if (((from_bitField0_ & 0x00000008) != 0)) {
+          result.name_ = name_;
+        }
       }
 
       @java.lang.Override
@@ -1920,6 +2002,11 @@ public final class ChatProto {
         }
         if (other.getTime() != 0L) {
           setTime(other.getTime());
+        }
+        if (!other.getName().isEmpty()) {
+          name_ = other.name_;
+          bitField0_ |= 0x00000008;
+          onChanged();
         }
         this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
@@ -1962,6 +2049,11 @@ public final class ChatProto {
                 bitField0_ |= 0x00000004;
                 break;
               } // case 24
+              case 34: {
+                name_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000008;
+                break;
+              } // case 34
               default: {
                 if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                   done = true; // was an endgroup tag
@@ -2203,6 +2295,98 @@ public final class ChatProto {
       public Builder clearTime() {
         bitField0_ = (bitField0_ & ~0x00000004);
         time_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object name_ = "";
+      /**
+       * <pre>
+       * 玩家名字
+       * </pre>
+       *
+       * <code>string name = 4;</code>
+       * @return The name.
+       */
+      public java.lang.String getName() {
+        java.lang.Object ref = name_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          name_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * 玩家名字
+       * </pre>
+       *
+       * <code>string name = 4;</code>
+       * @return The bytes for name.
+       */
+      public com.google.protobuf.ByteString
+          getNameBytes() {
+        java.lang.Object ref = name_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          name_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * 玩家名字
+       * </pre>
+       *
+       * <code>string name = 4;</code>
+       * @param value The name to set.
+       * @return This builder for chaining.
+       */
+      public Builder setName(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        name_ = value;
+        bitField0_ |= 0x00000008;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * 玩家名字
+       * </pre>
+       *
+       * <code>string name = 4;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearName() {
+        name_ = getDefaultInstance().getName();
+        bitField0_ = (bitField0_ & ~0x00000008);
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * 玩家名字
+       * </pre>
+       *
+       * <code>string name = 4;</code>
+       * @param value The bytes for name to set.
+       * @return This builder for chaining.
+       */
+      public Builder setNameBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        name_ = value;
+        bitField0_ |= 0x00000008;
         onChanged();
         return this;
       }
@@ -4243,16 +4427,16 @@ public final class ChatProto {
     java.lang.String[] descriptorData = {
       "\n\nchat.proto\022\035org.sunrise.game.genProto." +
       "gen\"\030\n\tMC2S_Chat\022\013\n\003msg\030\001 \001(\t\"\030\n\010MC2S_CD" +
-      "K\022\014\n\004code\030\001 \001(\t\"2\n\tMS2C_Chat\022\n\n\002id\030\001 \001(\t" +
-      "\022\013\n\003msg\030\002 \001(\t\022\014\n\004time\030\003 \001(\003\" \n\017MC2S_GetH" +
-      "istory\022\r\n\005count\030\001 \001(\005\"I\n\014MS2C_History\0229\n" +
-      "\007history\030\001 \003(\0132(.org.sunrise.game.genPro" +
-      "to.gen.MS2C_Chat\"$\n\tMS2C_Tips\022\n\n\002id\030\001 \001(" +
-      "\005\022\013\n\003msg\030\002 \001(\t*J\n\013FROM_CLIENT\022\014\n\010C2S_Cha" +
-      "t\020\000\022\014\n\010C2S_Horn\020\001\022\022\n\016C2S_GetHistory\020\002\022\013\n" +
-      "\007C2S_CDK\020\003*H\n\013FROM_SERVER\022\014\n\010S2C_Chat\020\000\022" +
-      "\014\n\010S2C_Horn\020\001\022\017\n\013S2C_History\020\002\022\014\n\010S2C_Ti" +
-      "ps\020\003B\013B\tChatProtob\006proto3"
+      "K\022\014\n\004code\030\001 \001(\t\"@\n\tMS2C_Chat\022\n\n\002id\030\001 \001(\t" +
+      "\022\013\n\003msg\030\002 \001(\t\022\014\n\004time\030\003 \001(\003\022\014\n\004name\030\004 \001(" +
+      "\t\" \n\017MC2S_GetHistory\022\r\n\005count\030\001 \001(\005\"I\n\014M" +
+      "S2C_History\0229\n\007history\030\001 \003(\0132(.org.sunri" +
+      "se.game.genProto.gen.MS2C_Chat\"$\n\tMS2C_T" +
+      "ips\022\n\n\002id\030\001 \001(\005\022\013\n\003msg\030\002 \001(\t*J\n\013FROM_CLI" +
+      "ENT\022\014\n\010C2S_Chat\020\000\022\014\n\010C2S_Horn\020\001\022\022\n\016C2S_G" +
+      "etHistory\020\002\022\013\n\007C2S_CDK\020\003*H\n\013FROM_SERVER\022" +
+      "\014\n\010S2C_Chat\020\000\022\014\n\010S2C_Horn\020\001\022\017\n\013S2C_Histo" +
+      "ry\020\002\022\014\n\010S2C_Tips\020\003B\013B\tChatProtob\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -4275,7 +4459,7 @@ public final class ChatProto {
     internal_static_org_sunrise_game_genProto_gen_MS2C_Chat_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_org_sunrise_game_genProto_gen_MS2C_Chat_descriptor,
-        new java.lang.String[] { "Id", "Msg", "Time", });
+        new java.lang.String[] { "Id", "Msg", "Time", "Name", });
     internal_static_org_sunrise_game_genProto_gen_MC2S_GetHistory_descriptor =
       getDescriptor().getMessageTypes().get(3);
     internal_static_org_sunrise_game_genProto_gen_MC2S_GetHistory_fieldAccessorTable = new

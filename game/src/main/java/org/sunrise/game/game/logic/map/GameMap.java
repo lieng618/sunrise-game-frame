@@ -1,96 +1,107 @@
 package org.sunrise.game.game.logic.map;
 
 import com.google.protobuf.Message;
-import org.sunrise.game.game.config.Tables;
-import org.sunrise.game.game.config.map.TbMap;
+import lombok.Getter;
 import org.sunrise.game.game.human.HumanObject;
-import org.sunrise.game.game.modules.DataModule;
-import org.sunrise.game.game.modules.MapModule;
+import org.sunrise.game.game.human.HumanObjectManger;
+import org.sunrise.game.game.logic.unit.GameUnit;
+import org.sunrise.game.game.logic.unit.UnitType;
+import org.sunrise.game.game.logic.unit.UnitUtils;
 import org.sunrise.game.genProto.gen.MapProto;
 import org.sunrise.game.genProto.gen.TopicProto;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class GameMap {
 
+    @Getter
     private final int mapId;
-    private final Map<String, HumanObject> humanObjectMap = new ConcurrentHashMap<>();
+    private final Map<String, GameUnit> units = new HashMap<>();
 
     public GameMap(int mapId) {
         this.mapId = mapId;
     }
 
-    // 玩家进入地图
-    public void humanObjectEnter(HumanObject humanObject) {
-        // 已经在此地图中
-        if (humanObjectMap.containsKey(humanObject.getHumanId())) {
-            return;
-        }
-        humanObjectMap.put(humanObject.getHumanId(), humanObject);
-        // 把自己的信息同步给其他人
-        var syncBuilder = MapProto.MS2C_Sync.newBuilder();
-
-        MapModule module = humanObject.getModule(MapModule.class);
-        if (module.getMapId() != 0) {
-            // 切换地图
-            // 放到目标地图的进入坐标
-            TbMap tbMap = Tables.ConfigMap.get(mapId);
-            module.setMapPostX(tbMap.enterX);
-            module.setMapPostY(tbMap.enterY);
-            module.setMapPostZ(tbMap.enterZ);
-        }
-        module.setMapId(mapId);
-
-        MapProto.STRoleInfo roleInfo = MapProto.STRoleInfo.newBuilder()
-                .setHumanId(humanObject.getHumanId())
-                .setName(humanObject.getModule(DataModule.class).getName())
-                .setMapPostX(module.getMapPostX())
-                .setMapPostY(module.getMapPostY())
-                .setMapPostZ(module.getMapPostZ())
-                .build();
-        syncBuilder.addRoles(roleInfo);
-        broadcastToAll(TopicProto.TOPIC.TOPIC_TYPE_MAP_VALUE, MapProto.FROM_SERVER.S2C_Enter_VALUE, syncBuilder);
-//        List<MailData.MailAttachment> attachments = new ArrayList<>();
-//        attachments.add(new MailData.MailAttachment(mapId, 10)); // 物品ID 1001，数量10
-//        attachments.add(new MailData.MailAttachment(1009, 100)); // 物品ID 1001，数量10
-//        RpcFunction rpcFunction = RpcFunction.newInstance();
-//        rpcFunction.call(CallEnum.GlobalMailService_sendMail, "humanId", humanObject.getHumanId(), "templateId", 1, "attachmentsJson", JSON.toJSONString(attachments), "senderName", "test");
+    public GameUnit getUnit(String unitId) {
+        return units.get(unitId);
     }
 
-    // 玩家离开地图
-    public void humanObjectLeave(String humanId) {
-        HumanObject humanObject = humanObjectMap.get(humanId);
-        if (humanObject == null) {
-            return;
-        }
-        var leaveMessage = MapProto.MS2C_Leave.newBuilder().setHumanId(humanObject.getHumanId());
-        broadcastToAll(TopicProto.TOPIC.TOPIC_TYPE_MAP_VALUE, MapProto.FROM_SERVER.S2C_Leave_VALUE, leaveMessage);
-        humanObjectMap.remove(humanId);
+    public Collection<GameUnit> getUnits() {
+        return units.values();
     }
 
-    // 广播给地图中所有玩家
+    public void enterUnit(GameUnit unit) {
+        if (units.containsKey(unit.getUnitId())) {
+            return;
+        }
+        unit.setMapId(mapId);
+        units.put(unit.getUnitId(), unit);
+        broadcastUnitEnter(unit);
+    }
+
+    public void leaveUnit(String unitId) {
+        if (!units.containsKey(unitId)) {
+            return;
+        }
+        units.remove(unitId);
+        broadcastUnitLeave(unitId);
+    }
+
+    public void broadcastUnitPosition(GameUnit unit) {
+        var builder = MapProto.MS2C_UnitPositionUpdate.newBuilder()
+                .setPosition(UnitUtils.toUnitPosition(unit));
+        broadcastToAll(TopicProto.TOPIC.TOPIC_TYPE_MAP_VALUE,
+                MapProto.FROM_SERVER.S2C_UnitPositionUpdate_VALUE, builder);
+    }
+
+    public void broadcastUnitAttributeUpdate(String unitId, Map<Integer, Double> changed) {
+        if (changed == null || changed.isEmpty()) {
+            return;
+        }
+        var builder = MapProto.MS2C_UnitAttributeUpdate.newBuilder()
+                .setAttributes(UnitUtils.toUnitAttributes(unitId, changed));
+        broadcastToAll(TopicProto.TOPIC.TOPIC_TYPE_MAP_VALUE,
+                MapProto.FROM_SERVER.S2C_UnitAttributeUpdate_VALUE, builder);
+    }
+
+    public void broadcastUnitEnter(GameUnit unit) {
+        var builder = MapProto.MS2C_UnitEnter.newBuilder()
+                .setUnit(UnitUtils.toUnitInfo(unit))
+                .setPosition(UnitUtils.toUnitPosition(unit))
+                .setAttributes(UnitUtils.toUnitAttributes(unit));
+        broadcastToAll(TopicProto.TOPIC.TOPIC_TYPE_MAP_VALUE,
+                MapProto.FROM_SERVER.S2C_UnitEnter_VALUE, builder);
+    }
+
+    public void broadcastUnitLeave(String unitId) {
+        var builder = MapProto.MS2C_UnitLeave.newBuilder().setUnitId(unitId);
+        broadcastToAll(TopicProto.TOPIC.TOPIC_TYPE_MAP_VALUE,
+                MapProto.FROM_SERVER.S2C_UnitLeave_VALUE, builder);
+    }
+
+    /** 向指定玩家同步当前地图所有单位的信息、位置、属性 */
+    public void syncScene(HumanObject humanObject) {
+        var builder = MapProto.MS2C_SceneSync.newBuilder();
+        for (GameUnit unit : units.values()) {
+            builder.addUnits(UnitUtils.toUnitInfo(unit));
+            builder.addPositions(UnitUtils.toUnitPosition(unit));
+            builder.addUnitAttributes(UnitUtils.toUnitAttributes(unit));
+        }
+        humanObject.sendMsg(TopicProto.TOPIC.TOPIC_TYPE_MAP_VALUE,
+                MapProto.FROM_SERVER.S2C_SceneSync_VALUE, builder);
+    }
+
     public void broadcastToAll(int packetType, int packetId, Message.Builder builder) {
-        for (HumanObject humanObject : humanObjectMap.values()) {
-            humanObject.sendMsg(packetType, packetId, builder);
+        for (GameUnit unit : units.values()) {
+            if (unit.getUnitType() != UnitType.PLAYER) {
+                continue;
+            }
+            HumanObject humanObject = HumanObjectManger.getHumanObject(unit.getUnitId());
+            if (humanObject != null) {
+                humanObject.sendMsg(packetType, packetId, builder);
+            }
         }
-    }
-
-    // 广播地图中的玩家信息
-    public void sync(HumanObject humanObject) {
-        var syncBuilder = MapProto.MS2C_Sync.newBuilder();
-        for (HumanObject ho : humanObjectMap.values()) {
-            MapModule module = ho.getModule(MapModule.class);
-            MapProto.STRoleInfo roleInfo = MapProto.STRoleInfo.newBuilder()
-                    .setHumanId(ho.getHumanId())
-                    .setName(ho.getModule(DataModule.class).getName())
-                    .setMapPostX(module.getMapPostX())
-                    .setMapPostY(module.getMapPostY())
-                    .setMapPostZ(module.getMapPostZ())
-                    .setOrientation(module.getOrientation())
-                    .build();
-            syncBuilder.addRoles(roleInfo);
-        }
-        humanObject.sendMsg(TopicProto.TOPIC.TOPIC_TYPE_MAP_VALUE, MapProto.FROM_SERVER.S2C_Sync_VALUE, syncBuilder);
     }
 }

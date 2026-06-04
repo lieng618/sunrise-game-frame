@@ -8,7 +8,7 @@ import org.sunrise.game.game.human.HumanObjectManger;
 import org.sunrise.game.game.logic.LogicUtils;
 import org.sunrise.game.game.logic.ToolsUtils;
 import org.sunrise.game.game.logic.system.GameSystemUtils;
-import org.sunrise.game.game.modules.MapModule;
+import org.sunrise.game.game.modules.PlayerUnitModule;
 import org.sunrise.game.genProto.gen.TopicProto;
 import org.sunrise.game.log.LogCore;
 import org.sunrise.game.rpc.annotation.RpcService;
@@ -106,7 +106,7 @@ public class GameMasterService extends BaseService {
                 String uid = humanObject.getConnectObject().getUid();
 
                 DbManager.getDbService().executeAsync("update `human_info` set `role_data` = ? where `human_id` = ?", JSON.toJSONBytes(humanObject.save()), humanId);
-                humanObject.getModule(MapModule.class).leaveMap();
+                humanObject.getModule(PlayerUnitModule.class).leaveMap();
                 humanObject.kick("kick");
 
                 HumanObjectManger.removeConnectObject(connectId);

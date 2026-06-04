@@ -4,6 +4,7 @@ import org.sunrise.game.config.ConfigReader;
 import org.sunrise.game.game.logic.ConfigUtils;
 import org.sunrise.game.game.logic.LogicUtils;
 import org.sunrise.game.game.logic.ProtoParserUtils;
+import org.sunrise.game.game.logic.map.MapNavUtils;
 import org.sunrise.game.game.logic.system.GameSystemUtils;
 import org.sunrise.game.game.modules.ModuleUtils;
 import org.sunrise.game.genRpc.gen.CallEnum;
@@ -37,6 +38,8 @@ public class RunAllOneServerStartUp {
 
         // 加载配置文件
         ConfigUtils.load();
+        // 加载地图数据
+        MapNavUtils.load();
         // 协议解析初始化
         ProtoParserUtils.init();
         // 协议处理函数初始化

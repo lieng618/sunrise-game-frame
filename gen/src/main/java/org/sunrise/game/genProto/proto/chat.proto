@@ -28,6 +28,7 @@ message MS2C_Chat {
   string id = 1;     // 玩家id
   string msg = 2;    // 消息内容
   int64 time = 3;    // 时间戳（毫秒级）
+  string name = 4;   // 玩家名字
 }
 
 message MC2S_GetHistory {

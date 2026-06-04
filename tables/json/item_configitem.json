@@ -3,6 +3,7 @@
     "id": 10000,
     "name": "发型",
     "desc": "初始发型",
+    "icon": "4201101",
     "price": 100,
     "upgrade_to_item_id": 10001,
     "batch_useable": false
@@ -11,6 +12,7 @@
     "id": 10001,
     "name": "外套",
     "desc": "初始外套",
+    "icon": "4201102",
     "price": 100,
     "upgrade_to_item_id": 10002,
     "batch_useable": false
@@ -19,6 +21,7 @@
     "id": 10002,
     "name": "上衣",
     "desc": "初始上衣",
+    "icon": "4201103",
     "price": 100,
     "upgrade_to_item_id": 10003,
     "batch_useable": true
@@ -27,6 +30,7 @@
     "id": 10003,
     "name": "裙子",
     "desc": "初始下装",
+    "icon": "4201104",
     "price": 100,
     "upgrade_to_item_id": 10004,
     "batch_useable": true
@@ -35,6 +39,7 @@
     "id": 10004,
     "name": "袜子",
     "desc": "初始袜子",
+    "icon": "4201201",
     "price": 100,
     "upgrade_to_item_id": 10005,
     "batch_useable": false
@@ -43,6 +48,7 @@
     "id": 10005,
     "name": "鞋子",
     "desc": "初始鞋子",
+    "icon": "4201202",
     "price": 100,
     "upgrade_to_item_id": 10006,
     "batch_useable": true
@@ -51,6 +57,7 @@
     "id": 10006,
     "name": "发饰",
     "desc": "初始发饰",
+    "icon": "4201203",
     "price": 100,
     "upgrade_to_item_id": 10007,
     "batch_useable": false
@@ -59,6 +66,7 @@
     "id": 10007,
     "name": "中秋节发饰",
     "desc": "中秋节发饰",
+    "icon": "4201204",
     "price": 200,
     "upgrade_to_item_id": 10008,
     "batch_useable": false
@@ -67,6 +75,7 @@
     "id": 10008,
     "name": "中秋节鞋子",
     "desc": "中秋节鞋子",
+    "icon": "4201205",
     "price": 300,
     "upgrade_to_item_id": 10009,
     "batch_useable": false
@@ -75,6 +84,7 @@
     "id": 10009,
     "name": "礼包",
     "desc": "中秋节礼包",
+    "icon": "4201206",
     "price": 100,
     "upgrade_to_item_id": 10000,
     "batch_useable": true

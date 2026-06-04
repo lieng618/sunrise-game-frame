@@ -37,9 +37,9 @@ public class GlobalChatService extends BaseService {
     }
 
     @RpcMethod
-    public void chat(String humanId, String message) {
+    public void chat(String humanId, String name, String message) {
         long time = System.currentTimeMillis();
-        messages.add(new ChatData(humanId, time, message));
+        messages.add(new ChatData(humanId, name, time, message));
 
         if (messages.size() > MAX_MESSAGES) {
             messages.removeFirst();
@@ -47,7 +47,7 @@ public class GlobalChatService extends BaseService {
 
         RpcFunction.newInstance(RpcFunction.RpcCallType.SendAll)
                 .call(CallEnum.GameRpcListenService_sendToAllHuman, "packetType", TopicProto.TOPIC.TOPIC_TYPE_CHAT_VALUE, "packetId", ChatProto.FROM_SERVER.S2C_Chat_VALUE,
-                        "protoData", ChatProto.MS2C_Chat.newBuilder().setId(humanId).setMsg(message).setTime(time).build().toByteArray());
+                        "protoData", ChatProto.MS2C_Chat.newBuilder().setId(humanId).setName(name).setMsg(message).setTime(time).build().toByteArray());
     }
 
     @RpcMethod
@@ -56,6 +56,7 @@ public class GlobalChatService extends BaseService {
         for (ChatData message : messages) {
             ChatProto.MS2C_Chat.Builder chatBuilder = ChatProto.MS2C_Chat.newBuilder();
             chatBuilder.setId(message.getHumanId());
+            chatBuilder.setName(message.getName());
             chatBuilder.setMsg(message.getMessage());
             chatBuilder.setTime(message.getSendTime());
             historyBuilder.addHistory(chatBuilder);

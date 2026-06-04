@@ -57,12 +57,12 @@ public class TaskEventManager {
             }
 
             // 参数数量必须匹配
-            if (paramsList.size() != task.params.size()) {
+            if (paramsList.size() != task.taskParams.size()) {
                 continue;
             }
 
             // 检查参数是否匹配（根据任务类型有不同的匹配规则）
-            if (!checkParamsMatch(subtype, paramsList, task.params)) {
+            if (!checkParamsMatch(subtype, paramsList, task.taskParams)) {
                 continue;
             }
 

@@ -45,5 +45,9 @@ public final class ConfigParam {
      * gm指令开启状态
      */
      public int getGMCmdStatus() { return _data.GMCmdStatus; }
+    /**
+     * 新角色默认头像
+     */
+     public int getDefaultHeadIcon() { return _data.DefaultHeadIcon; }
 
 }

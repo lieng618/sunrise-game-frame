@@ -7,11 +7,13 @@ import lombok.Setter;
 @Setter
 public class ChatData {
     private String humanId;
+    private String name;
     private long sendTime;
     private String message;
 
-    public ChatData(String humanId, long sendTime, String message) {
+    public ChatData(String humanId, String name, long sendTime, String message) {
         this.humanId = humanId;
+        this.name = name;
         this.sendTime = sendTime;
         this.message = message;
     }

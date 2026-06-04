@@ -182,44 +182,52 @@ public final class MapProto {
       implements com.google.protobuf.ProtocolMessageEnum {
     /**
      * <pre>
-     * 进入地图
+     * 进图全量同步（单位信息 + 位置 + 属性）
      * </pre>
      *
-     * <code>S2C_Enter = 0;</code>
+     * <code>S2C_SceneSync = 0;</code>
      */
-    S2C_Enter(0),
+    S2C_SceneSync(0),
     /**
      * <pre>
-     * 移动
+     * 单位进入
      * </pre>
      *
-     * <code>S2C_Move = 1;</code>
+     * <code>S2C_UnitEnter = 1;</code>
      */
-    S2C_Move(1),
+    S2C_UnitEnter(1),
     /**
      * <pre>
-     * 同步所有人信息
+     * 单位离开
      * </pre>
      *
-     * <code>S2C_Sync = 2;</code>
+     * <code>S2C_UnitLeave = 2;</code>
      */
-    S2C_Sync(2),
+    S2C_UnitLeave(2),
     /**
      * <pre>
-     * 离开地图
+     * 位置变化
      * </pre>
      *
-     * <code>S2C_Leave = 3;</code>
+     * <code>S2C_UnitPositionUpdate = 3;</code>
      */
-    S2C_Leave(3),
+    S2C_UnitPositionUpdate(3),
+    /**
+     * <pre>
+     * 属性变化
+     * </pre>
+     *
+     * <code>S2C_UnitAttributeUpdate = 4;</code>
+     */
+    S2C_UnitAttributeUpdate(4),
     /**
      * <pre>
      * 上次所在地图
      * </pre>
      *
-     * <code>S2C_LastMap = 4;</code>
+     * <code>S2C_LastMap = 5;</code>
      */
-    S2C_LastMap(4),
+    S2C_LastMap(5),
     UNRECOGNIZED(-1),
     ;
 
@@ -234,44 +242,52 @@ public final class MapProto {
     }
     /**
      * <pre>
-     * 进入地图
+     * 进图全量同步（单位信息 + 位置 + 属性）
      * </pre>
      *
-     * <code>S2C_Enter = 0;</code>
+     * <code>S2C_SceneSync = 0;</code>
      */
-    public static final int S2C_Enter_VALUE = 0;
+    public static final int S2C_SceneSync_VALUE = 0;
     /**
      * <pre>
-     * 移动
+     * 单位进入
      * </pre>
      *
-     * <code>S2C_Move = 1;</code>
+     * <code>S2C_UnitEnter = 1;</code>
      */
-    public static final int S2C_Move_VALUE = 1;
+    public static final int S2C_UnitEnter_VALUE = 1;
     /**
      * <pre>
-     * 同步所有人信息
+     * 单位离开
      * </pre>
      *
-     * <code>S2C_Sync = 2;</code>
+     * <code>S2C_UnitLeave = 2;</code>
      */
-    public static final int S2C_Sync_VALUE = 2;
+    public static final int S2C_UnitLeave_VALUE = 2;
     /**
      * <pre>
-     * 离开地图
+     * 位置变化
      * </pre>
      *
-     * <code>S2C_Leave = 3;</code>
+     * <code>S2C_UnitPositionUpdate = 3;</code>
      */
-    public static final int S2C_Leave_VALUE = 3;
+    public static final int S2C_UnitPositionUpdate_VALUE = 3;
+    /**
+     * <pre>
+     * 属性变化
+     * </pre>
+     *
+     * <code>S2C_UnitAttributeUpdate = 4;</code>
+     */
+    public static final int S2C_UnitAttributeUpdate_VALUE = 4;
     /**
      * <pre>
      * 上次所在地图
      * </pre>
      *
-     * <code>S2C_LastMap = 4;</code>
+     * <code>S2C_LastMap = 5;</code>
      */
-    public static final int S2C_LastMap_VALUE = 4;
+    public static final int S2C_LastMap_VALUE = 5;
 
 
     public final int getNumber() {
@@ -298,11 +314,12 @@ public final class MapProto {
      */
     public static FROM_SERVER forNumber(int value) {
       switch (value) {
-        case 0: return S2C_Enter;
-        case 1: return S2C_Move;
-        case 2: return S2C_Sync;
-        case 3: return S2C_Leave;
-        case 4: return S2C_LastMap;
+        case 0: return S2C_SceneSync;
+        case 1: return S2C_UnitEnter;
+        case 2: return S2C_UnitLeave;
+        case 3: return S2C_UnitPositionUpdate;
+        case 4: return S2C_UnitAttributeUpdate;
+        case 5: return S2C_LastMap;
         default: return null;
       }
     }
@@ -359,81 +376,53 @@ public final class MapProto {
     // @@protoc_insertion_point(enum_scope:org.sunrise.game.genProto.gen.FROM_SERVER)
   }
 
-  public interface STRoleInfoOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:org.sunrise.game.genProto.gen.STRoleInfo)
+  public interface STUnitInfoOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:org.sunrise.game.genProto.gen.STUnitInfo)
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>float mapPostX = 1;</code>
-     * @return The mapPostX.
+     * <code>string unit_id = 1;</code>
+     * @return The unitId.
      */
-    float getMapPostX();
-
+    java.lang.String getUnitId();
     /**
-     * <code>float mapPostY = 2;</code>
-     * @return The mapPostY.
-     */
-    float getMapPostY();
-
-    /**
-     * <code>float mapPostZ = 3;</code>
-     * @return The mapPostZ.
-     */
-    float getMapPostZ();
-
-    /**
-     * <pre>
-     * 角色id
-     * </pre>
-     *
-     * <code>string human_id = 4;</code>
-     * @return The humanId.
-     */
-    java.lang.String getHumanId();
-    /**
-     * <pre>
-     * 角色id
-     * </pre>
-     *
-     * <code>string human_id = 4;</code>
-     * @return The bytes for humanId.
+     * <code>string unit_id = 1;</code>
+     * @return The bytes for unitId.
      */
     com.google.protobuf.ByteString
-        getHumanIdBytes();
+        getUnitIdBytes();
 
     /**
-     * <pre>
-     * 角色名字
-     * </pre>
-     *
-     * <code>string name = 5;</code>
+     * <code>uint32 unit_type = 2;</code>
+     * @return The unitType.
+     */
+    int getUnitType();
+
+    /**
+     * <code>uint32 config_id = 3;</code>
+     * @return The configId.
+     */
+    int getConfigId();
+
+    /**
+     * <code>string name = 4;</code>
      * @return The name.
      */
     java.lang.String getName();
     /**
-     * <pre>
-     * 角色名字
-     * </pre>
-     *
-     * <code>string name = 5;</code>
+     * <code>string name = 4;</code>
      * @return The bytes for name.
      */
     com.google.protobuf.ByteString
         getNameBytes();
-
-    /**
-     * <code>float Orientation = 6;</code>
-     * @return The orientation.
-     */
-    float getOrientation();
   }
   /**
-   * Protobuf type {@code org.sunrise.game.genProto.gen.STRoleInfo}
+   * Protobuf type {@code org.sunrise.game.genProto.gen.STUnitInfo}
    */
-  public static final class STRoleInfo extends
+  public static final class STUnitInfo extends
       com.google.protobuf.GeneratedMessage implements
-      // @@protoc_insertion_point(message_implements:org.sunrise.game.genProto.gen.STRoleInfo)
-      STRoleInfoOrBuilder {
+      // @@protoc_insertion_point(message_implements:org.sunrise.game.genProto.gen.STUnitInfo)
+      STUnitInfoOrBuilder {
   private static final long serialVersionUID = 0L;
     static {
       com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
@@ -442,119 +431,96 @@ public final class MapProto {
         /* minor= */ 28,
         /* patch= */ 2,
         /* suffix= */ "",
-        STRoleInfo.class.getName());
+        STUnitInfo.class.getName());
     }
-    // Use STRoleInfo.newBuilder() to construct.
-    private STRoleInfo(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+    // Use STUnitInfo.newBuilder() to construct.
+    private STUnitInfo(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
     }
-    private STRoleInfo() {
-      humanId_ = "";
+    private STUnitInfo() {
+      unitId_ = "";
       name_ = "";
     }
 
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_STRoleInfo_descriptor;
+      return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_STUnitInfo_descriptor;
     }
 
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_STRoleInfo_fieldAccessorTable
+      return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_STUnitInfo_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
-              org.sunrise.game.genProto.gen.MapProto.STRoleInfo.class, org.sunrise.game.genProto.gen.MapProto.STRoleInfo.Builder.class);
+              org.sunrise.game.genProto.gen.MapProto.STUnitInfo.class, org.sunrise.game.genProto.gen.MapProto.STUnitInfo.Builder.class);
     }
 
-    public static final int MAPPOSTX_FIELD_NUMBER = 1;
-    private float mapPostX_ = 0F;
-    /**
-     * <code>float mapPostX = 1;</code>
-     * @return The mapPostX.
-     */
-    @java.lang.Override
-    public float getMapPostX() {
-      return mapPostX_;
-    }
-
-    public static final int MAPPOSTY_FIELD_NUMBER = 2;
-    private float mapPostY_ = 0F;
-    /**
-     * <code>float mapPostY = 2;</code>
-     * @return The mapPostY.
-     */
-    @java.lang.Override
-    public float getMapPostY() {
-      return mapPostY_;
-    }
-
-    public static final int MAPPOSTZ_FIELD_NUMBER = 3;
-    private float mapPostZ_ = 0F;
-    /**
-     * <code>float mapPostZ = 3;</code>
-     * @return The mapPostZ.
-     */
-    @java.lang.Override
-    public float getMapPostZ() {
-      return mapPostZ_;
-    }
-
-    public static final int HUMAN_ID_FIELD_NUMBER = 4;
+    public static final int UNIT_ID_FIELD_NUMBER = 1;
     @SuppressWarnings("serial")
-    private volatile java.lang.Object humanId_ = "";
+    private volatile java.lang.Object unitId_ = "";
     /**
-     * <pre>
-     * 角色id
-     * </pre>
-     *
-     * <code>string human_id = 4;</code>
-     * @return The humanId.
+     * <code>string unit_id = 1;</code>
+     * @return The unitId.
      */
     @java.lang.Override
-    public java.lang.String getHumanId() {
-      java.lang.Object ref = humanId_;
+    public java.lang.String getUnitId() {
+      java.lang.Object ref = unitId_;
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
         com.google.protobuf.ByteString bs = 
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
-        humanId_ = s;
+        unitId_ = s;
         return s;
       }
     }
     /**
-     * <pre>
-     * 角色id
-     * </pre>
-     *
-     * <code>string human_id = 4;</code>
-     * @return The bytes for humanId.
+     * <code>string unit_id = 1;</code>
+     * @return The bytes for unitId.
      */
     @java.lang.Override
     public com.google.protobuf.ByteString
-        getHumanIdBytes() {
-      java.lang.Object ref = humanId_;
+        getUnitIdBytes() {
+      java.lang.Object ref = unitId_;
       if (ref instanceof java.lang.String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
-        humanId_ = b;
+        unitId_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
       }
     }
 
-    public static final int NAME_FIELD_NUMBER = 5;
+    public static final int UNIT_TYPE_FIELD_NUMBER = 2;
+    private int unitType_ = 0;
+    /**
+     * <code>uint32 unit_type = 2;</code>
+     * @return The unitType.
+     */
+    @java.lang.Override
+    public int getUnitType() {
+      return unitType_;
+    }
+
+    public static final int CONFIG_ID_FIELD_NUMBER = 3;
+    private int configId_ = 0;
+    /**
+     * <code>uint32 config_id = 3;</code>
+     * @return The configId.
+     */
+    @java.lang.Override
+    public int getConfigId() {
+      return configId_;
+    }
+
+    public static final int NAME_FIELD_NUMBER = 4;
     @SuppressWarnings("serial")
     private volatile java.lang.Object name_ = "";
     /**
-     * <pre>
-     * 角色名字
-     * </pre>
-     *
-     * <code>string name = 5;</code>
+     * <code>string name = 4;</code>
      * @return The name.
      */
     @java.lang.Override
@@ -571,11 +537,7 @@ public final class MapProto {
       }
     }
     /**
-     * <pre>
-     * 角色名字
-     * </pre>
-     *
-     * <code>string name = 5;</code>
+     * <code>string name = 4;</code>
      * @return The bytes for name.
      */
     @java.lang.Override
@@ -593,10 +555,783 @@ public final class MapProto {
       }
     }
 
-    public static final int ORIENTATION_FIELD_NUMBER = 6;
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(unitId_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 1, unitId_);
+      }
+      if (unitType_ != 0) {
+        output.writeUInt32(2, unitType_);
+      }
+      if (configId_ != 0) {
+        output.writeUInt32(3, configId_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(name_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 4, name_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(unitId_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(1, unitId_);
+      }
+      if (unitType_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeUInt32Size(2, unitType_);
+      }
+      if (configId_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeUInt32Size(3, configId_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(name_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(4, name_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof org.sunrise.game.genProto.gen.MapProto.STUnitInfo)) {
+        return super.equals(obj);
+      }
+      org.sunrise.game.genProto.gen.MapProto.STUnitInfo other = (org.sunrise.game.genProto.gen.MapProto.STUnitInfo) obj;
+
+      if (!getUnitId()
+          .equals(other.getUnitId())) return false;
+      if (getUnitType()
+          != other.getUnitType()) return false;
+      if (getConfigId()
+          != other.getConfigId()) return false;
+      if (!getName()
+          .equals(other.getName())) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + UNIT_ID_FIELD_NUMBER;
+      hash = (53 * hash) + getUnitId().hashCode();
+      hash = (37 * hash) + UNIT_TYPE_FIELD_NUMBER;
+      hash = (53 * hash) + getUnitType();
+      hash = (37 * hash) + CONFIG_ID_FIELD_NUMBER;
+      hash = (53 * hash) + getConfigId();
+      hash = (37 * hash) + NAME_FIELD_NUMBER;
+      hash = (53 * hash) + getName().hashCode();
+      hash = (29 * hash) + getUnknownFields().hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static org.sunrise.game.genProto.gen.MapProto.STUnitInfo parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.sunrise.game.genProto.gen.MapProto.STUnitInfo parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.sunrise.game.genProto.gen.MapProto.STUnitInfo parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.sunrise.game.genProto.gen.MapProto.STUnitInfo parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.sunrise.game.genProto.gen.MapProto.STUnitInfo parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.sunrise.game.genProto.gen.MapProto.STUnitInfo parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.sunrise.game.genProto.gen.MapProto.STUnitInfo parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static org.sunrise.game.genProto.gen.MapProto.STUnitInfo parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static org.sunrise.game.genProto.gen.MapProto.STUnitInfo parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static org.sunrise.game.genProto.gen.MapProto.STUnitInfo parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static org.sunrise.game.genProto.gen.MapProto.STUnitInfo parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static org.sunrise.game.genProto.gen.MapProto.STUnitInfo parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(org.sunrise.game.genProto.gen.MapProto.STUnitInfo prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code org.sunrise.game.genProto.gen.STUnitInfo}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:org.sunrise.game.genProto.gen.STUnitInfo)
+        org.sunrise.game.genProto.gen.MapProto.STUnitInfoOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_STUnitInfo_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_STUnitInfo_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                org.sunrise.game.genProto.gen.MapProto.STUnitInfo.class, org.sunrise.game.genProto.gen.MapProto.STUnitInfo.Builder.class);
+      }
+
+      // Construct using org.sunrise.game.genProto.gen.MapProto.STUnitInfo.newBuilder()
+      private Builder() {
+
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        bitField0_ = 0;
+        unitId_ = "";
+        unitType_ = 0;
+        configId_ = 0;
+        name_ = "";
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_STUnitInfo_descriptor;
+      }
+
+      @java.lang.Override
+      public org.sunrise.game.genProto.gen.MapProto.STUnitInfo getDefaultInstanceForType() {
+        return org.sunrise.game.genProto.gen.MapProto.STUnitInfo.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public org.sunrise.game.genProto.gen.MapProto.STUnitInfo build() {
+        org.sunrise.game.genProto.gen.MapProto.STUnitInfo result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public org.sunrise.game.genProto.gen.MapProto.STUnitInfo buildPartial() {
+        org.sunrise.game.genProto.gen.MapProto.STUnitInfo result = new org.sunrise.game.genProto.gen.MapProto.STUnitInfo(this);
+        if (bitField0_ != 0) { buildPartial0(result); }
+        onBuilt();
+        return result;
+      }
+
+      private void buildPartial0(org.sunrise.game.genProto.gen.MapProto.STUnitInfo result) {
+        int from_bitField0_ = bitField0_;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.unitId_ = unitId_;
+        }
+        if (((from_bitField0_ & 0x00000002) != 0)) {
+          result.unitType_ = unitType_;
+        }
+        if (((from_bitField0_ & 0x00000004) != 0)) {
+          result.configId_ = configId_;
+        }
+        if (((from_bitField0_ & 0x00000008) != 0)) {
+          result.name_ = name_;
+        }
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof org.sunrise.game.genProto.gen.MapProto.STUnitInfo) {
+          return mergeFrom((org.sunrise.game.genProto.gen.MapProto.STUnitInfo)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(org.sunrise.game.genProto.gen.MapProto.STUnitInfo other) {
+        if (other == org.sunrise.game.genProto.gen.MapProto.STUnitInfo.getDefaultInstance()) return this;
+        if (!other.getUnitId().isEmpty()) {
+          unitId_ = other.unitId_;
+          bitField0_ |= 0x00000001;
+          onChanged();
+        }
+        if (other.getUnitType() != 0) {
+          setUnitType(other.getUnitType());
+        }
+        if (other.getConfigId() != 0) {
+          setConfigId(other.getConfigId());
+        }
+        if (!other.getName().isEmpty()) {
+          name_ = other.name_;
+          bitField0_ |= 0x00000008;
+          onChanged();
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
+        try {
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 10: {
+                unitId_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000001;
+                break;
+              } // case 10
+              case 16: {
+                unitType_ = input.readUInt32();
+                bitField0_ |= 0x00000002;
+                break;
+              } // case 16
+              case 24: {
+                configId_ = input.readUInt32();
+                bitField0_ |= 0x00000004;
+                break;
+              } // case 24
+              case 34: {
+                name_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000008;
+                break;
+              } // case 34
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.unwrapIOException();
+        } finally {
+          onChanged();
+        } // finally
+        return this;
+      }
+      private int bitField0_;
+
+      private java.lang.Object unitId_ = "";
+      /**
+       * <code>string unit_id = 1;</code>
+       * @return The unitId.
+       */
+      public java.lang.String getUnitId() {
+        java.lang.Object ref = unitId_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          unitId_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string unit_id = 1;</code>
+       * @return The bytes for unitId.
+       */
+      public com.google.protobuf.ByteString
+          getUnitIdBytes() {
+        java.lang.Object ref = unitId_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          unitId_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string unit_id = 1;</code>
+       * @param value The unitId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setUnitId(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        unitId_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string unit_id = 1;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearUnitId() {
+        unitId_ = getDefaultInstance().getUnitId();
+        bitField0_ = (bitField0_ & ~0x00000001);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string unit_id = 1;</code>
+       * @param value The bytes for unitId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setUnitIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        unitId_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+
+      private int unitType_ ;
+      /**
+       * <code>uint32 unit_type = 2;</code>
+       * @return The unitType.
+       */
+      @java.lang.Override
+      public int getUnitType() {
+        return unitType_;
+      }
+      /**
+       * <code>uint32 unit_type = 2;</code>
+       * @param value The unitType to set.
+       * @return This builder for chaining.
+       */
+      public Builder setUnitType(int value) {
+
+        unitType_ = value;
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>uint32 unit_type = 2;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearUnitType() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        unitType_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private int configId_ ;
+      /**
+       * <code>uint32 config_id = 3;</code>
+       * @return The configId.
+       */
+      @java.lang.Override
+      public int getConfigId() {
+        return configId_;
+      }
+      /**
+       * <code>uint32 config_id = 3;</code>
+       * @param value The configId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setConfigId(int value) {
+
+        configId_ = value;
+        bitField0_ |= 0x00000004;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>uint32 config_id = 3;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearConfigId() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        configId_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object name_ = "";
+      /**
+       * <code>string name = 4;</code>
+       * @return The name.
+       */
+      public java.lang.String getName() {
+        java.lang.Object ref = name_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          name_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string name = 4;</code>
+       * @return The bytes for name.
+       */
+      public com.google.protobuf.ByteString
+          getNameBytes() {
+        java.lang.Object ref = name_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          name_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string name = 4;</code>
+       * @param value The name to set.
+       * @return This builder for chaining.
+       */
+      public Builder setName(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        name_ = value;
+        bitField0_ |= 0x00000008;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string name = 4;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearName() {
+        name_ = getDefaultInstance().getName();
+        bitField0_ = (bitField0_ & ~0x00000008);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string name = 4;</code>
+       * @param value The bytes for name to set.
+       * @return This builder for chaining.
+       */
+      public Builder setNameBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        name_ = value;
+        bitField0_ |= 0x00000008;
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:org.sunrise.game.genProto.gen.STUnitInfo)
+    }
+
+    // @@protoc_insertion_point(class_scope:org.sunrise.game.genProto.gen.STUnitInfo)
+    private static final org.sunrise.game.genProto.gen.MapProto.STUnitInfo DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new org.sunrise.game.genProto.gen.MapProto.STUnitInfo();
+    }
+
+    public static org.sunrise.game.genProto.gen.MapProto.STUnitInfo getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<STUnitInfo>
+        PARSER = new com.google.protobuf.AbstractParser<STUnitInfo>() {
+      @java.lang.Override
+      public STUnitInfo parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
+      }
+    };
+
+    public static com.google.protobuf.Parser<STUnitInfo> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<STUnitInfo> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public org.sunrise.game.genProto.gen.MapProto.STUnitInfo getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface STUnitPositionOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:org.sunrise.game.genProto.gen.STUnitPosition)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>string unit_id = 1;</code>
+     * @return The unitId.
+     */
+    java.lang.String getUnitId();
+    /**
+     * <code>string unit_id = 1;</code>
+     * @return The bytes for unitId.
+     */
+    com.google.protobuf.ByteString
+        getUnitIdBytes();
+
+    /**
+     * <code>float pos_x = 2;</code>
+     * @return The posX.
+     */
+    float getPosX();
+
+    /**
+     * <code>float pos_y = 3;</code>
+     * @return The posY.
+     */
+    float getPosY();
+
+    /**
+     * <code>float pos_z = 4;</code>
+     * @return The posZ.
+     */
+    float getPosZ();
+
+    /**
+     * <code>float orientation = 5;</code>
+     * @return The orientation.
+     */
+    float getOrientation();
+  }
+  /**
+   * Protobuf type {@code org.sunrise.game.genProto.gen.STUnitPosition}
+   */
+  public static final class STUnitPosition extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:org.sunrise.game.genProto.gen.STUnitPosition)
+      STUnitPositionOrBuilder {
+  private static final long serialVersionUID = 0L;
+    static {
+      com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
+        com.google.protobuf.RuntimeVersion.RuntimeDomain.PUBLIC,
+        /* major= */ 4,
+        /* minor= */ 28,
+        /* patch= */ 2,
+        /* suffix= */ "",
+        STUnitPosition.class.getName());
+    }
+    // Use STUnitPosition.newBuilder() to construct.
+    private STUnitPosition(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+    }
+    private STUnitPosition() {
+      unitId_ = "";
+    }
+
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_STUnitPosition_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_STUnitPosition_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              org.sunrise.game.genProto.gen.MapProto.STUnitPosition.class, org.sunrise.game.genProto.gen.MapProto.STUnitPosition.Builder.class);
+    }
+
+    public static final int UNIT_ID_FIELD_NUMBER = 1;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object unitId_ = "";
+    /**
+     * <code>string unit_id = 1;</code>
+     * @return The unitId.
+     */
+    @java.lang.Override
+    public java.lang.String getUnitId() {
+      java.lang.Object ref = unitId_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        unitId_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string unit_id = 1;</code>
+     * @return The bytes for unitId.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getUnitIdBytes() {
+      java.lang.Object ref = unitId_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        unitId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int POS_X_FIELD_NUMBER = 2;
+    private float posX_ = 0F;
+    /**
+     * <code>float pos_x = 2;</code>
+     * @return The posX.
+     */
+    @java.lang.Override
+    public float getPosX() {
+      return posX_;
+    }
+
+    public static final int POS_Y_FIELD_NUMBER = 3;
+    private float posY_ = 0F;
+    /**
+     * <code>float pos_y = 3;</code>
+     * @return The posY.
+     */
+    @java.lang.Override
+    public float getPosY() {
+      return posY_;
+    }
+
+    public static final int POS_Z_FIELD_NUMBER = 4;
+    private float posZ_ = 0F;
+    /**
+     * <code>float pos_z = 4;</code>
+     * @return The posZ.
+     */
+    @java.lang.Override
+    public float getPosZ() {
+      return posZ_;
+    }
+
+    public static final int ORIENTATION_FIELD_NUMBER = 5;
     private float orientation_ = 0F;
     /**
-     * <code>float Orientation = 6;</code>
+     * <code>float orientation = 5;</code>
      * @return The orientation.
      */
     @java.lang.Override
@@ -618,23 +1353,20 @@ public final class MapProto {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (java.lang.Float.floatToRawIntBits(mapPostX_) != 0) {
-        output.writeFloat(1, mapPostX_);
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(unitId_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 1, unitId_);
       }
-      if (java.lang.Float.floatToRawIntBits(mapPostY_) != 0) {
-        output.writeFloat(2, mapPostY_);
+      if (java.lang.Float.floatToRawIntBits(posX_) != 0) {
+        output.writeFloat(2, posX_);
       }
-      if (java.lang.Float.floatToRawIntBits(mapPostZ_) != 0) {
-        output.writeFloat(3, mapPostZ_);
+      if (java.lang.Float.floatToRawIntBits(posY_) != 0) {
+        output.writeFloat(3, posY_);
       }
-      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(humanId_)) {
-        com.google.protobuf.GeneratedMessage.writeString(output, 4, humanId_);
-      }
-      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(name_)) {
-        com.google.protobuf.GeneratedMessage.writeString(output, 5, name_);
+      if (java.lang.Float.floatToRawIntBits(posZ_) != 0) {
+        output.writeFloat(4, posZ_);
       }
       if (java.lang.Float.floatToRawIntBits(orientation_) != 0) {
-        output.writeFloat(6, orientation_);
+        output.writeFloat(5, orientation_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -645,27 +1377,24 @@ public final class MapProto {
       if (size != -1) return size;
 
       size = 0;
-      if (java.lang.Float.floatToRawIntBits(mapPostX_) != 0) {
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(unitId_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(1, unitId_);
+      }
+      if (java.lang.Float.floatToRawIntBits(posX_) != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(1, mapPostX_);
+          .computeFloatSize(2, posX_);
       }
-      if (java.lang.Float.floatToRawIntBits(mapPostY_) != 0) {
+      if (java.lang.Float.floatToRawIntBits(posY_) != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(2, mapPostY_);
+          .computeFloatSize(3, posY_);
       }
-      if (java.lang.Float.floatToRawIntBits(mapPostZ_) != 0) {
+      if (java.lang.Float.floatToRawIntBits(posZ_) != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(3, mapPostZ_);
-      }
-      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(humanId_)) {
-        size += com.google.protobuf.GeneratedMessage.computeStringSize(4, humanId_);
-      }
-      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(name_)) {
-        size += com.google.protobuf.GeneratedMessage.computeStringSize(5, name_);
+          .computeFloatSize(4, posZ_);
       }
       if (java.lang.Float.floatToRawIntBits(orientation_) != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(6, orientation_);
+          .computeFloatSize(5, orientation_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
@@ -677,24 +1406,22 @@ public final class MapProto {
       if (obj == this) {
        return true;
       }
-      if (!(obj instanceof org.sunrise.game.genProto.gen.MapProto.STRoleInfo)) {
+      if (!(obj instanceof org.sunrise.game.genProto.gen.MapProto.STUnitPosition)) {
         return super.equals(obj);
       }
-      org.sunrise.game.genProto.gen.MapProto.STRoleInfo other = (org.sunrise.game.genProto.gen.MapProto.STRoleInfo) obj;
+      org.sunrise.game.genProto.gen.MapProto.STUnitPosition other = (org.sunrise.game.genProto.gen.MapProto.STUnitPosition) obj;
 
-      if (java.lang.Float.floatToIntBits(getMapPostX())
+      if (!getUnitId()
+          .equals(other.getUnitId())) return false;
+      if (java.lang.Float.floatToIntBits(getPosX())
           != java.lang.Float.floatToIntBits(
-              other.getMapPostX())) return false;
-      if (java.lang.Float.floatToIntBits(getMapPostY())
+              other.getPosX())) return false;
+      if (java.lang.Float.floatToIntBits(getPosY())
           != java.lang.Float.floatToIntBits(
-              other.getMapPostY())) return false;
-      if (java.lang.Float.floatToIntBits(getMapPostZ())
+              other.getPosY())) return false;
+      if (java.lang.Float.floatToIntBits(getPosZ())
           != java.lang.Float.floatToIntBits(
-              other.getMapPostZ())) return false;
-      if (!getHumanId()
-          .equals(other.getHumanId())) return false;
-      if (!getName()
-          .equals(other.getName())) return false;
+              other.getPosZ())) return false;
       if (java.lang.Float.floatToIntBits(getOrientation())
           != java.lang.Float.floatToIntBits(
               other.getOrientation())) return false;
@@ -709,19 +1436,17 @@ public final class MapProto {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
-      hash = (37 * hash) + MAPPOSTX_FIELD_NUMBER;
+      hash = (37 * hash) + UNIT_ID_FIELD_NUMBER;
+      hash = (53 * hash) + getUnitId().hashCode();
+      hash = (37 * hash) + POS_X_FIELD_NUMBER;
       hash = (53 * hash) + java.lang.Float.floatToIntBits(
-          getMapPostX());
-      hash = (37 * hash) + MAPPOSTY_FIELD_NUMBER;
+          getPosX());
+      hash = (37 * hash) + POS_Y_FIELD_NUMBER;
       hash = (53 * hash) + java.lang.Float.floatToIntBits(
-          getMapPostY());
-      hash = (37 * hash) + MAPPOSTZ_FIELD_NUMBER;
+          getPosY());
+      hash = (37 * hash) + POS_Z_FIELD_NUMBER;
       hash = (53 * hash) + java.lang.Float.floatToIntBits(
-          getMapPostZ());
-      hash = (37 * hash) + HUMAN_ID_FIELD_NUMBER;
-      hash = (53 * hash) + getHumanId().hashCode();
-      hash = (37 * hash) + NAME_FIELD_NUMBER;
-      hash = (53 * hash) + getName().hashCode();
+          getPosZ());
       hash = (37 * hash) + ORIENTATION_FIELD_NUMBER;
       hash = (53 * hash) + java.lang.Float.floatToIntBits(
           getOrientation());
@@ -730,44 +1455,44 @@ public final class MapProto {
       return hash;
     }
 
-    public static org.sunrise.game.genProto.gen.MapProto.STRoleInfo parseFrom(
+    public static org.sunrise.game.genProto.gen.MapProto.STUnitPosition parseFrom(
         java.nio.ByteBuffer data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static org.sunrise.game.genProto.gen.MapProto.STRoleInfo parseFrom(
+    public static org.sunrise.game.genProto.gen.MapProto.STUnitPosition parseFrom(
         java.nio.ByteBuffer data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static org.sunrise.game.genProto.gen.MapProto.STRoleInfo parseFrom(
+    public static org.sunrise.game.genProto.gen.MapProto.STUnitPosition parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static org.sunrise.game.genProto.gen.MapProto.STRoleInfo parseFrom(
+    public static org.sunrise.game.genProto.gen.MapProto.STUnitPosition parseFrom(
         com.google.protobuf.ByteString data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static org.sunrise.game.genProto.gen.MapProto.STRoleInfo parseFrom(byte[] data)
+    public static org.sunrise.game.genProto.gen.MapProto.STUnitPosition parseFrom(byte[] data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static org.sunrise.game.genProto.gen.MapProto.STRoleInfo parseFrom(
+    public static org.sunrise.game.genProto.gen.MapProto.STUnitPosition parseFrom(
         byte[] data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static org.sunrise.game.genProto.gen.MapProto.STRoleInfo parseFrom(java.io.InputStream input)
+    public static org.sunrise.game.genProto.gen.MapProto.STUnitPosition parseFrom(java.io.InputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessage
           .parseWithIOException(PARSER, input);
     }
-    public static org.sunrise.game.genProto.gen.MapProto.STRoleInfo parseFrom(
+    public static org.sunrise.game.genProto.gen.MapProto.STUnitPosition parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -775,26 +1500,26 @@ public final class MapProto {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    public static org.sunrise.game.genProto.gen.MapProto.STRoleInfo parseDelimitedFrom(java.io.InputStream input)
+    public static org.sunrise.game.genProto.gen.MapProto.STUnitPosition parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessage
           .parseDelimitedWithIOException(PARSER, input);
     }
 
-    public static org.sunrise.game.genProto.gen.MapProto.STRoleInfo parseDelimitedFrom(
+    public static org.sunrise.game.genProto.gen.MapProto.STUnitPosition parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessage
           .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
-    public static org.sunrise.game.genProto.gen.MapProto.STRoleInfo parseFrom(
+    public static org.sunrise.game.genProto.gen.MapProto.STUnitPosition parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessage
           .parseWithIOException(PARSER, input);
     }
-    public static org.sunrise.game.genProto.gen.MapProto.STRoleInfo parseFrom(
+    public static org.sunrise.game.genProto.gen.MapProto.STUnitPosition parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -807,7 +1532,7 @@ public final class MapProto {
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
     }
-    public static Builder newBuilder(org.sunrise.game.genProto.gen.MapProto.STRoleInfo prototype) {
+    public static Builder newBuilder(org.sunrise.game.genProto.gen.MapProto.STUnitPosition prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
     @java.lang.Override
@@ -823,26 +1548,26 @@ public final class MapProto {
       return builder;
     }
     /**
-     * Protobuf type {@code org.sunrise.game.genProto.gen.STRoleInfo}
+     * Protobuf type {@code org.sunrise.game.genProto.gen.STUnitPosition}
      */
     public static final class Builder extends
         com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:org.sunrise.game.genProto.gen.STRoleInfo)
-        org.sunrise.game.genProto.gen.MapProto.STRoleInfoOrBuilder {
+        // @@protoc_insertion_point(builder_implements:org.sunrise.game.genProto.gen.STUnitPosition)
+        org.sunrise.game.genProto.gen.MapProto.STUnitPositionOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
-        return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_STRoleInfo_descriptor;
+        return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_STUnitPosition_descriptor;
       }
 
       @java.lang.Override
       protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
           internalGetFieldAccessorTable() {
-        return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_STRoleInfo_fieldAccessorTable
+        return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_STUnitPosition_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
-                org.sunrise.game.genProto.gen.MapProto.STRoleInfo.class, org.sunrise.game.genProto.gen.MapProto.STRoleInfo.Builder.class);
+                org.sunrise.game.genProto.gen.MapProto.STUnitPosition.class, org.sunrise.game.genProto.gen.MapProto.STUnitPosition.Builder.class);
       }
 
-      // Construct using org.sunrise.game.genProto.gen.MapProto.STRoleInfo.newBuilder()
+      // Construct using org.sunrise.game.genProto.gen.MapProto.STUnitPosition.newBuilder()
       private Builder() {
 
       }
@@ -856,11 +1581,10 @@ public final class MapProto {
       public Builder clear() {
         super.clear();
         bitField0_ = 0;
-        mapPostX_ = 0F;
-        mapPostY_ = 0F;
-        mapPostZ_ = 0F;
-        humanId_ = "";
-        name_ = "";
+        unitId_ = "";
+        posX_ = 0F;
+        posY_ = 0F;
+        posZ_ = 0F;
         orientation_ = 0F;
         return this;
       }
@@ -868,17 +1592,17 @@ public final class MapProto {
       @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
-        return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_STRoleInfo_descriptor;
+        return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_STUnitPosition_descriptor;
       }
 
       @java.lang.Override
-      public org.sunrise.game.genProto.gen.MapProto.STRoleInfo getDefaultInstanceForType() {
-        return org.sunrise.game.genProto.gen.MapProto.STRoleInfo.getDefaultInstance();
+      public org.sunrise.game.genProto.gen.MapProto.STUnitPosition getDefaultInstanceForType() {
+        return org.sunrise.game.genProto.gen.MapProto.STUnitPosition.getDefaultInstance();
       }
 
       @java.lang.Override
-      public org.sunrise.game.genProto.gen.MapProto.STRoleInfo build() {
-        org.sunrise.game.genProto.gen.MapProto.STRoleInfo result = buildPartial();
+      public org.sunrise.game.genProto.gen.MapProto.STUnitPosition build() {
+        org.sunrise.game.genProto.gen.MapProto.STUnitPosition result = buildPartial();
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(result);
         }
@@ -886,65 +1610,57 @@ public final class MapProto {
       }
 
       @java.lang.Override
-      public org.sunrise.game.genProto.gen.MapProto.STRoleInfo buildPartial() {
-        org.sunrise.game.genProto.gen.MapProto.STRoleInfo result = new org.sunrise.game.genProto.gen.MapProto.STRoleInfo(this);
+      public org.sunrise.game.genProto.gen.MapProto.STUnitPosition buildPartial() {
+        org.sunrise.game.genProto.gen.MapProto.STUnitPosition result = new org.sunrise.game.genProto.gen.MapProto.STUnitPosition(this);
         if (bitField0_ != 0) { buildPartial0(result); }
         onBuilt();
         return result;
       }
 
-      private void buildPartial0(org.sunrise.game.genProto.gen.MapProto.STRoleInfo result) {
+      private void buildPartial0(org.sunrise.game.genProto.gen.MapProto.STUnitPosition result) {
         int from_bitField0_ = bitField0_;
         if (((from_bitField0_ & 0x00000001) != 0)) {
-          result.mapPostX_ = mapPostX_;
+          result.unitId_ = unitId_;
         }
         if (((from_bitField0_ & 0x00000002) != 0)) {
-          result.mapPostY_ = mapPostY_;
+          result.posX_ = posX_;
         }
         if (((from_bitField0_ & 0x00000004) != 0)) {
-          result.mapPostZ_ = mapPostZ_;
+          result.posY_ = posY_;
         }
         if (((from_bitField0_ & 0x00000008) != 0)) {
-          result.humanId_ = humanId_;
+          result.posZ_ = posZ_;
         }
         if (((from_bitField0_ & 0x00000010) != 0)) {
-          result.name_ = name_;
-        }
-        if (((from_bitField0_ & 0x00000020) != 0)) {
           result.orientation_ = orientation_;
         }
       }
 
       @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof org.sunrise.game.genProto.gen.MapProto.STRoleInfo) {
-          return mergeFrom((org.sunrise.game.genProto.gen.MapProto.STRoleInfo)other);
+        if (other instanceof org.sunrise.game.genProto.gen.MapProto.STUnitPosition) {
+          return mergeFrom((org.sunrise.game.genProto.gen.MapProto.STUnitPosition)other);
         } else {
           super.mergeFrom(other);
           return this;
         }
       }
 
-      public Builder mergeFrom(org.sunrise.game.genProto.gen.MapProto.STRoleInfo other) {
-        if (other == org.sunrise.game.genProto.gen.MapProto.STRoleInfo.getDefaultInstance()) return this;
-        if (other.getMapPostX() != 0F) {
-          setMapPostX(other.getMapPostX());
-        }
-        if (other.getMapPostY() != 0F) {
-          setMapPostY(other.getMapPostY());
-        }
-        if (other.getMapPostZ() != 0F) {
-          setMapPostZ(other.getMapPostZ());
-        }
-        if (!other.getHumanId().isEmpty()) {
-          humanId_ = other.humanId_;
-          bitField0_ |= 0x00000008;
+      public Builder mergeFrom(org.sunrise.game.genProto.gen.MapProto.STUnitPosition other) {
+        if (other == org.sunrise.game.genProto.gen.MapProto.STUnitPosition.getDefaultInstance()) return this;
+        if (!other.getUnitId().isEmpty()) {
+          unitId_ = other.unitId_;
+          bitField0_ |= 0x00000001;
           onChanged();
         }
-        if (!other.getName().isEmpty()) {
-          name_ = other.name_;
-          bitField0_ |= 0x00000010;
-          onChanged();
+        if (other.getPosX() != 0F) {
+          setPosX(other.getPosX());
+        }
+        if (other.getPosY() != 0F) {
+          setPosY(other.getPosY());
+        }
+        if (other.getPosZ() != 0F) {
+          setPosZ(other.getPosZ());
         }
         if (other.getOrientation() != 0F) {
           setOrientation(other.getOrientation());
@@ -975,36 +1691,31 @@ public final class MapProto {
               case 0:
                 done = true;
                 break;
-              case 13: {
-                mapPostX_ = input.readFloat();
+              case 10: {
+                unitId_ = input.readStringRequireUtf8();
                 bitField0_ |= 0x00000001;
                 break;
-              } // case 13
+              } // case 10
               case 21: {
-                mapPostY_ = input.readFloat();
+                posX_ = input.readFloat();
                 bitField0_ |= 0x00000002;
                 break;
               } // case 21
               case 29: {
-                mapPostZ_ = input.readFloat();
+                posY_ = input.readFloat();
                 bitField0_ |= 0x00000004;
                 break;
               } // case 29
-              case 34: {
-                humanId_ = input.readStringRequireUtf8();
+              case 37: {
+                posZ_ = input.readFloat();
                 bitField0_ |= 0x00000008;
                 break;
-              } // case 34
-              case 42: {
-                name_ = input.readStringRequireUtf8();
+              } // case 37
+              case 45: {
+                orientation_ = input.readFloat();
                 bitField0_ |= 0x00000010;
                 break;
-              } // case 42
-              case 53: {
-                orientation_ = input.readFloat();
-                bitField0_ |= 0x00000020;
-                break;
-              } // case 53
+              } // case 45
               default: {
                 if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                   done = true; // was an endgroup tag
@@ -1022,289 +1733,177 @@ public final class MapProto {
       }
       private int bitField0_;
 
-      private float mapPostX_ ;
+      private java.lang.Object unitId_ = "";
       /**
-       * <code>float mapPostX = 1;</code>
-       * @return The mapPostX.
+       * <code>string unit_id = 1;</code>
+       * @return The unitId.
        */
-      @java.lang.Override
-      public float getMapPostX() {
-        return mapPostX_;
+      public java.lang.String getUnitId() {
+        java.lang.Object ref = unitId_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          unitId_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
       }
       /**
-       * <code>float mapPostX = 1;</code>
-       * @param value The mapPostX to set.
+       * <code>string unit_id = 1;</code>
+       * @return The bytes for unitId.
+       */
+      public com.google.protobuf.ByteString
+          getUnitIdBytes() {
+        java.lang.Object ref = unitId_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          unitId_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string unit_id = 1;</code>
+       * @param value The unitId to set.
        * @return This builder for chaining.
        */
-      public Builder setMapPostX(float value) {
-
-        mapPostX_ = value;
+      public Builder setUnitId(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        unitId_ = value;
         bitField0_ |= 0x00000001;
         onChanged();
         return this;
       }
       /**
-       * <code>float mapPostX = 1;</code>
+       * <code>string unit_id = 1;</code>
        * @return This builder for chaining.
        */
-      public Builder clearMapPostX() {
+      public Builder clearUnitId() {
+        unitId_ = getDefaultInstance().getUnitId();
         bitField0_ = (bitField0_ & ~0x00000001);
-        mapPostX_ = 0F;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string unit_id = 1;</code>
+       * @param value The bytes for unitId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setUnitIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        unitId_ = value;
+        bitField0_ |= 0x00000001;
         onChanged();
         return this;
       }
 
-      private float mapPostY_ ;
+      private float posX_ ;
       /**
-       * <code>float mapPostY = 2;</code>
-       * @return The mapPostY.
+       * <code>float pos_x = 2;</code>
+       * @return The posX.
        */
       @java.lang.Override
-      public float getMapPostY() {
-        return mapPostY_;
+      public float getPosX() {
+        return posX_;
       }
       /**
-       * <code>float mapPostY = 2;</code>
-       * @param value The mapPostY to set.
+       * <code>float pos_x = 2;</code>
+       * @param value The posX to set.
        * @return This builder for chaining.
        */
-      public Builder setMapPostY(float value) {
+      public Builder setPosX(float value) {
 
-        mapPostY_ = value;
+        posX_ = value;
         bitField0_ |= 0x00000002;
         onChanged();
         return this;
       }
       /**
-       * <code>float mapPostY = 2;</code>
+       * <code>float pos_x = 2;</code>
        * @return This builder for chaining.
        */
-      public Builder clearMapPostY() {
+      public Builder clearPosX() {
         bitField0_ = (bitField0_ & ~0x00000002);
-        mapPostY_ = 0F;
+        posX_ = 0F;
         onChanged();
         return this;
       }
 
-      private float mapPostZ_ ;
+      private float posY_ ;
       /**
-       * <code>float mapPostZ = 3;</code>
-       * @return The mapPostZ.
+       * <code>float pos_y = 3;</code>
+       * @return The posY.
        */
       @java.lang.Override
-      public float getMapPostZ() {
-        return mapPostZ_;
+      public float getPosY() {
+        return posY_;
       }
       /**
-       * <code>float mapPostZ = 3;</code>
-       * @param value The mapPostZ to set.
+       * <code>float pos_y = 3;</code>
+       * @param value The posY to set.
        * @return This builder for chaining.
        */
-      public Builder setMapPostZ(float value) {
+      public Builder setPosY(float value) {
 
-        mapPostZ_ = value;
+        posY_ = value;
         bitField0_ |= 0x00000004;
         onChanged();
         return this;
       }
       /**
-       * <code>float mapPostZ = 3;</code>
+       * <code>float pos_y = 3;</code>
        * @return This builder for chaining.
        */
-      public Builder clearMapPostZ() {
+      public Builder clearPosY() {
         bitField0_ = (bitField0_ & ~0x00000004);
-        mapPostZ_ = 0F;
+        posY_ = 0F;
         onChanged();
         return this;
       }
 
-      private java.lang.Object humanId_ = "";
+      private float posZ_ ;
       /**
-       * <pre>
-       * 角色id
-       * </pre>
-       *
-       * <code>string human_id = 4;</code>
-       * @return The humanId.
+       * <code>float pos_z = 4;</code>
+       * @return The posZ.
        */
-      public java.lang.String getHumanId() {
-        java.lang.Object ref = humanId_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          humanId_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
+      @java.lang.Override
+      public float getPosZ() {
+        return posZ_;
       }
       /**
-       * <pre>
-       * 角色id
-       * </pre>
-       *
-       * <code>string human_id = 4;</code>
-       * @return The bytes for humanId.
-       */
-      public com.google.protobuf.ByteString
-          getHumanIdBytes() {
-        java.lang.Object ref = humanId_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          humanId_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <pre>
-       * 角色id
-       * </pre>
-       *
-       * <code>string human_id = 4;</code>
-       * @param value The humanId to set.
+       * <code>float pos_z = 4;</code>
+       * @param value The posZ to set.
        * @return This builder for chaining.
        */
-      public Builder setHumanId(
-          java.lang.String value) {
-        if (value == null) { throw new NullPointerException(); }
-        humanId_ = value;
+      public Builder setPosZ(float value) {
+
+        posZ_ = value;
         bitField0_ |= 0x00000008;
         onChanged();
         return this;
       }
       /**
-       * <pre>
-       * 角色id
-       * </pre>
-       *
-       * <code>string human_id = 4;</code>
+       * <code>float pos_z = 4;</code>
        * @return This builder for chaining.
        */
-      public Builder clearHumanId() {
-        humanId_ = getDefaultInstance().getHumanId();
+      public Builder clearPosZ() {
         bitField0_ = (bitField0_ & ~0x00000008);
-        onChanged();
-        return this;
-      }
-      /**
-       * <pre>
-       * 角色id
-       * </pre>
-       *
-       * <code>string human_id = 4;</code>
-       * @param value The bytes for humanId to set.
-       * @return This builder for chaining.
-       */
-      public Builder setHumanIdBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) { throw new NullPointerException(); }
-        checkByteStringIsUtf8(value);
-        humanId_ = value;
-        bitField0_ |= 0x00000008;
-        onChanged();
-        return this;
-      }
-
-      private java.lang.Object name_ = "";
-      /**
-       * <pre>
-       * 角色名字
-       * </pre>
-       *
-       * <code>string name = 5;</code>
-       * @return The name.
-       */
-      public java.lang.String getName() {
-        java.lang.Object ref = name_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          name_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
-      }
-      /**
-       * <pre>
-       * 角色名字
-       * </pre>
-       *
-       * <code>string name = 5;</code>
-       * @return The bytes for name.
-       */
-      public com.google.protobuf.ByteString
-          getNameBytes() {
-        java.lang.Object ref = name_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          name_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <pre>
-       * 角色名字
-       * </pre>
-       *
-       * <code>string name = 5;</code>
-       * @param value The name to set.
-       * @return This builder for chaining.
-       */
-      public Builder setName(
-          java.lang.String value) {
-        if (value == null) { throw new NullPointerException(); }
-        name_ = value;
-        bitField0_ |= 0x00000010;
-        onChanged();
-        return this;
-      }
-      /**
-       * <pre>
-       * 角色名字
-       * </pre>
-       *
-       * <code>string name = 5;</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearName() {
-        name_ = getDefaultInstance().getName();
-        bitField0_ = (bitField0_ & ~0x00000010);
-        onChanged();
-        return this;
-      }
-      /**
-       * <pre>
-       * 角色名字
-       * </pre>
-       *
-       * <code>string name = 5;</code>
-       * @param value The bytes for name to set.
-       * @return This builder for chaining.
-       */
-      public Builder setNameBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) { throw new NullPointerException(); }
-        checkByteStringIsUtf8(value);
-        name_ = value;
-        bitField0_ |= 0x00000010;
+        posZ_ = 0F;
         onChanged();
         return this;
       }
 
       private float orientation_ ;
       /**
-       * <code>float Orientation = 6;</code>
+       * <code>float orientation = 5;</code>
        * @return The orientation.
        */
       @java.lang.Override
@@ -1312,45 +1911,45 @@ public final class MapProto {
         return orientation_;
       }
       /**
-       * <code>float Orientation = 6;</code>
+       * <code>float orientation = 5;</code>
        * @param value The orientation to set.
        * @return This builder for chaining.
        */
       public Builder setOrientation(float value) {
 
         orientation_ = value;
-        bitField0_ |= 0x00000020;
+        bitField0_ |= 0x00000010;
         onChanged();
         return this;
       }
       /**
-       * <code>float Orientation = 6;</code>
+       * <code>float orientation = 5;</code>
        * @return This builder for chaining.
        */
       public Builder clearOrientation() {
-        bitField0_ = (bitField0_ & ~0x00000020);
+        bitField0_ = (bitField0_ & ~0x00000010);
         orientation_ = 0F;
         onChanged();
         return this;
       }
 
-      // @@protoc_insertion_point(builder_scope:org.sunrise.game.genProto.gen.STRoleInfo)
+      // @@protoc_insertion_point(builder_scope:org.sunrise.game.genProto.gen.STUnitPosition)
     }
 
-    // @@protoc_insertion_point(class_scope:org.sunrise.game.genProto.gen.STRoleInfo)
-    private static final org.sunrise.game.genProto.gen.MapProto.STRoleInfo DEFAULT_INSTANCE;
+    // @@protoc_insertion_point(class_scope:org.sunrise.game.genProto.gen.STUnitPosition)
+    private static final org.sunrise.game.genProto.gen.MapProto.STUnitPosition DEFAULT_INSTANCE;
     static {
-      DEFAULT_INSTANCE = new org.sunrise.game.genProto.gen.MapProto.STRoleInfo();
+      DEFAULT_INSTANCE = new org.sunrise.game.genProto.gen.MapProto.STUnitPosition();
     }
 
-    public static org.sunrise.game.genProto.gen.MapProto.STRoleInfo getDefaultInstance() {
+    public static org.sunrise.game.genProto.gen.MapProto.STUnitPosition getDefaultInstance() {
       return DEFAULT_INSTANCE;
     }
 
-    private static final com.google.protobuf.Parser<STRoleInfo>
-        PARSER = new com.google.protobuf.AbstractParser<STRoleInfo>() {
+    private static final com.google.protobuf.Parser<STUnitPosition>
+        PARSER = new com.google.protobuf.AbstractParser<STUnitPosition>() {
       @java.lang.Override
-      public STRoleInfo parsePartialFrom(
+      public STUnitPosition parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
@@ -1369,17 +1968,1420 @@ public final class MapProto {
       }
     };
 
-    public static com.google.protobuf.Parser<STRoleInfo> parser() {
+    public static com.google.protobuf.Parser<STUnitPosition> parser() {
       return PARSER;
     }
 
     @java.lang.Override
-    public com.google.protobuf.Parser<STRoleInfo> getParserForType() {
+    public com.google.protobuf.Parser<STUnitPosition> getParserForType() {
       return PARSER;
     }
 
     @java.lang.Override
-    public org.sunrise.game.genProto.gen.MapProto.STRoleInfo getDefaultInstanceForType() {
+    public org.sunrise.game.genProto.gen.MapProto.STUnitPosition getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface STAttributeValueOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:org.sunrise.game.genProto.gen.STAttributeValue)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>uint32 attribute_type = 1;</code>
+     * @return The attributeType.
+     */
+    int getAttributeType();
+
+    /**
+     * <code>uint64 final_value = 2;</code>
+     * @return The finalValue.
+     */
+    long getFinalValue();
+  }
+  /**
+   * Protobuf type {@code org.sunrise.game.genProto.gen.STAttributeValue}
+   */
+  public static final class STAttributeValue extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:org.sunrise.game.genProto.gen.STAttributeValue)
+      STAttributeValueOrBuilder {
+  private static final long serialVersionUID = 0L;
+    static {
+      com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
+        com.google.protobuf.RuntimeVersion.RuntimeDomain.PUBLIC,
+        /* major= */ 4,
+        /* minor= */ 28,
+        /* patch= */ 2,
+        /* suffix= */ "",
+        STAttributeValue.class.getName());
+    }
+    // Use STAttributeValue.newBuilder() to construct.
+    private STAttributeValue(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+    }
+    private STAttributeValue() {
+    }
+
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_STAttributeValue_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_STAttributeValue_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              org.sunrise.game.genProto.gen.MapProto.STAttributeValue.class, org.sunrise.game.genProto.gen.MapProto.STAttributeValue.Builder.class);
+    }
+
+    public static final int ATTRIBUTE_TYPE_FIELD_NUMBER = 1;
+    private int attributeType_ = 0;
+    /**
+     * <code>uint32 attribute_type = 1;</code>
+     * @return The attributeType.
+     */
+    @java.lang.Override
+    public int getAttributeType() {
+      return attributeType_;
+    }
+
+    public static final int FINAL_VALUE_FIELD_NUMBER = 2;
+    private long finalValue_ = 0L;
+    /**
+     * <code>uint64 final_value = 2;</code>
+     * @return The finalValue.
+     */
+    @java.lang.Override
+    public long getFinalValue() {
+      return finalValue_;
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (attributeType_ != 0) {
+        output.writeUInt32(1, attributeType_);
+      }
+      if (finalValue_ != 0L) {
+        output.writeUInt64(2, finalValue_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (attributeType_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeUInt32Size(1, attributeType_);
+      }
+      if (finalValue_ != 0L) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeUInt64Size(2, finalValue_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof org.sunrise.game.genProto.gen.MapProto.STAttributeValue)) {
+        return super.equals(obj);
+      }
+      org.sunrise.game.genProto.gen.MapProto.STAttributeValue other = (org.sunrise.game.genProto.gen.MapProto.STAttributeValue) obj;
+
+      if (getAttributeType()
+          != other.getAttributeType()) return false;
+      if (getFinalValue()
+          != other.getFinalValue()) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + ATTRIBUTE_TYPE_FIELD_NUMBER;
+      hash = (53 * hash) + getAttributeType();
+      hash = (37 * hash) + FINAL_VALUE_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          getFinalValue());
+      hash = (29 * hash) + getUnknownFields().hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static org.sunrise.game.genProto.gen.MapProto.STAttributeValue parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.sunrise.game.genProto.gen.MapProto.STAttributeValue parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.sunrise.game.genProto.gen.MapProto.STAttributeValue parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.sunrise.game.genProto.gen.MapProto.STAttributeValue parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.sunrise.game.genProto.gen.MapProto.STAttributeValue parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.sunrise.game.genProto.gen.MapProto.STAttributeValue parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.sunrise.game.genProto.gen.MapProto.STAttributeValue parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static org.sunrise.game.genProto.gen.MapProto.STAttributeValue parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static org.sunrise.game.genProto.gen.MapProto.STAttributeValue parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static org.sunrise.game.genProto.gen.MapProto.STAttributeValue parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static org.sunrise.game.genProto.gen.MapProto.STAttributeValue parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static org.sunrise.game.genProto.gen.MapProto.STAttributeValue parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(org.sunrise.game.genProto.gen.MapProto.STAttributeValue prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code org.sunrise.game.genProto.gen.STAttributeValue}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:org.sunrise.game.genProto.gen.STAttributeValue)
+        org.sunrise.game.genProto.gen.MapProto.STAttributeValueOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_STAttributeValue_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_STAttributeValue_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                org.sunrise.game.genProto.gen.MapProto.STAttributeValue.class, org.sunrise.game.genProto.gen.MapProto.STAttributeValue.Builder.class);
+      }
+
+      // Construct using org.sunrise.game.genProto.gen.MapProto.STAttributeValue.newBuilder()
+      private Builder() {
+
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        bitField0_ = 0;
+        attributeType_ = 0;
+        finalValue_ = 0L;
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_STAttributeValue_descriptor;
+      }
+
+      @java.lang.Override
+      public org.sunrise.game.genProto.gen.MapProto.STAttributeValue getDefaultInstanceForType() {
+        return org.sunrise.game.genProto.gen.MapProto.STAttributeValue.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public org.sunrise.game.genProto.gen.MapProto.STAttributeValue build() {
+        org.sunrise.game.genProto.gen.MapProto.STAttributeValue result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public org.sunrise.game.genProto.gen.MapProto.STAttributeValue buildPartial() {
+        org.sunrise.game.genProto.gen.MapProto.STAttributeValue result = new org.sunrise.game.genProto.gen.MapProto.STAttributeValue(this);
+        if (bitField0_ != 0) { buildPartial0(result); }
+        onBuilt();
+        return result;
+      }
+
+      private void buildPartial0(org.sunrise.game.genProto.gen.MapProto.STAttributeValue result) {
+        int from_bitField0_ = bitField0_;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.attributeType_ = attributeType_;
+        }
+        if (((from_bitField0_ & 0x00000002) != 0)) {
+          result.finalValue_ = finalValue_;
+        }
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof org.sunrise.game.genProto.gen.MapProto.STAttributeValue) {
+          return mergeFrom((org.sunrise.game.genProto.gen.MapProto.STAttributeValue)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(org.sunrise.game.genProto.gen.MapProto.STAttributeValue other) {
+        if (other == org.sunrise.game.genProto.gen.MapProto.STAttributeValue.getDefaultInstance()) return this;
+        if (other.getAttributeType() != 0) {
+          setAttributeType(other.getAttributeType());
+        }
+        if (other.getFinalValue() != 0L) {
+          setFinalValue(other.getFinalValue());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
+        try {
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 8: {
+                attributeType_ = input.readUInt32();
+                bitField0_ |= 0x00000001;
+                break;
+              } // case 8
+              case 16: {
+                finalValue_ = input.readUInt64();
+                bitField0_ |= 0x00000002;
+                break;
+              } // case 16
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.unwrapIOException();
+        } finally {
+          onChanged();
+        } // finally
+        return this;
+      }
+      private int bitField0_;
+
+      private int attributeType_ ;
+      /**
+       * <code>uint32 attribute_type = 1;</code>
+       * @return The attributeType.
+       */
+      @java.lang.Override
+      public int getAttributeType() {
+        return attributeType_;
+      }
+      /**
+       * <code>uint32 attribute_type = 1;</code>
+       * @param value The attributeType to set.
+       * @return This builder for chaining.
+       */
+      public Builder setAttributeType(int value) {
+
+        attributeType_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>uint32 attribute_type = 1;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearAttributeType() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        attributeType_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private long finalValue_ ;
+      /**
+       * <code>uint64 final_value = 2;</code>
+       * @return The finalValue.
+       */
+      @java.lang.Override
+      public long getFinalValue() {
+        return finalValue_;
+      }
+      /**
+       * <code>uint64 final_value = 2;</code>
+       * @param value The finalValue to set.
+       * @return This builder for chaining.
+       */
+      public Builder setFinalValue(long value) {
+
+        finalValue_ = value;
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>uint64 final_value = 2;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearFinalValue() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        finalValue_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:org.sunrise.game.genProto.gen.STAttributeValue)
+    }
+
+    // @@protoc_insertion_point(class_scope:org.sunrise.game.genProto.gen.STAttributeValue)
+    private static final org.sunrise.game.genProto.gen.MapProto.STAttributeValue DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new org.sunrise.game.genProto.gen.MapProto.STAttributeValue();
+    }
+
+    public static org.sunrise.game.genProto.gen.MapProto.STAttributeValue getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<STAttributeValue>
+        PARSER = new com.google.protobuf.AbstractParser<STAttributeValue>() {
+      @java.lang.Override
+      public STAttributeValue parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
+      }
+    };
+
+    public static com.google.protobuf.Parser<STAttributeValue> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<STAttributeValue> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public org.sunrise.game.genProto.gen.MapProto.STAttributeValue getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface STUnitAttributesOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:org.sunrise.game.genProto.gen.STUnitAttributes)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>string unit_id = 1;</code>
+     * @return The unitId.
+     */
+    java.lang.String getUnitId();
+    /**
+     * <code>string unit_id = 1;</code>
+     * @return The bytes for unitId.
+     */
+    com.google.protobuf.ByteString
+        getUnitIdBytes();
+
+    /**
+     * <code>repeated .org.sunrise.game.genProto.gen.STAttributeValue attributes = 2;</code>
+     */
+    java.util.List<org.sunrise.game.genProto.gen.MapProto.STAttributeValue> 
+        getAttributesList();
+    /**
+     * <code>repeated .org.sunrise.game.genProto.gen.STAttributeValue attributes = 2;</code>
+     */
+    org.sunrise.game.genProto.gen.MapProto.STAttributeValue getAttributes(int index);
+    /**
+     * <code>repeated .org.sunrise.game.genProto.gen.STAttributeValue attributes = 2;</code>
+     */
+    int getAttributesCount();
+    /**
+     * <code>repeated .org.sunrise.game.genProto.gen.STAttributeValue attributes = 2;</code>
+     */
+    java.util.List<? extends org.sunrise.game.genProto.gen.MapProto.STAttributeValueOrBuilder> 
+        getAttributesOrBuilderList();
+    /**
+     * <code>repeated .org.sunrise.game.genProto.gen.STAttributeValue attributes = 2;</code>
+     */
+    org.sunrise.game.genProto.gen.MapProto.STAttributeValueOrBuilder getAttributesOrBuilder(
+        int index);
+  }
+  /**
+   * <pre>
+   * 单个单位的全部属性
+   * </pre>
+   *
+   * Protobuf type {@code org.sunrise.game.genProto.gen.STUnitAttributes}
+   */
+  public static final class STUnitAttributes extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:org.sunrise.game.genProto.gen.STUnitAttributes)
+      STUnitAttributesOrBuilder {
+  private static final long serialVersionUID = 0L;
+    static {
+      com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
+        com.google.protobuf.RuntimeVersion.RuntimeDomain.PUBLIC,
+        /* major= */ 4,
+        /* minor= */ 28,
+        /* patch= */ 2,
+        /* suffix= */ "",
+        STUnitAttributes.class.getName());
+    }
+    // Use STUnitAttributes.newBuilder() to construct.
+    private STUnitAttributes(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+    }
+    private STUnitAttributes() {
+      unitId_ = "";
+      attributes_ = java.util.Collections.emptyList();
+    }
+
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_STUnitAttributes_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_STUnitAttributes_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              org.sunrise.game.genProto.gen.MapProto.STUnitAttributes.class, org.sunrise.game.genProto.gen.MapProto.STUnitAttributes.Builder.class);
+    }
+
+    public static final int UNIT_ID_FIELD_NUMBER = 1;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object unitId_ = "";
+    /**
+     * <code>string unit_id = 1;</code>
+     * @return The unitId.
+     */
+    @java.lang.Override
+    public java.lang.String getUnitId() {
+      java.lang.Object ref = unitId_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        unitId_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string unit_id = 1;</code>
+     * @return The bytes for unitId.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getUnitIdBytes() {
+      java.lang.Object ref = unitId_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        unitId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int ATTRIBUTES_FIELD_NUMBER = 2;
+    @SuppressWarnings("serial")
+    private java.util.List<org.sunrise.game.genProto.gen.MapProto.STAttributeValue> attributes_;
+    /**
+     * <code>repeated .org.sunrise.game.genProto.gen.STAttributeValue attributes = 2;</code>
+     */
+    @java.lang.Override
+    public java.util.List<org.sunrise.game.genProto.gen.MapProto.STAttributeValue> getAttributesList() {
+      return attributes_;
+    }
+    /**
+     * <code>repeated .org.sunrise.game.genProto.gen.STAttributeValue attributes = 2;</code>
+     */
+    @java.lang.Override
+    public java.util.List<? extends org.sunrise.game.genProto.gen.MapProto.STAttributeValueOrBuilder> 
+        getAttributesOrBuilderList() {
+      return attributes_;
+    }
+    /**
+     * <code>repeated .org.sunrise.game.genProto.gen.STAttributeValue attributes = 2;</code>
+     */
+    @java.lang.Override
+    public int getAttributesCount() {
+      return attributes_.size();
+    }
+    /**
+     * <code>repeated .org.sunrise.game.genProto.gen.STAttributeValue attributes = 2;</code>
+     */
+    @java.lang.Override
+    public org.sunrise.game.genProto.gen.MapProto.STAttributeValue getAttributes(int index) {
+      return attributes_.get(index);
+    }
+    /**
+     * <code>repeated .org.sunrise.game.genProto.gen.STAttributeValue attributes = 2;</code>
+     */
+    @java.lang.Override
+    public org.sunrise.game.genProto.gen.MapProto.STAttributeValueOrBuilder getAttributesOrBuilder(
+        int index) {
+      return attributes_.get(index);
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(unitId_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 1, unitId_);
+      }
+      for (int i = 0; i < attributes_.size(); i++) {
+        output.writeMessage(2, attributes_.get(i));
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(unitId_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(1, unitId_);
+      }
+      for (int i = 0; i < attributes_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(2, attributes_.get(i));
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof org.sunrise.game.genProto.gen.MapProto.STUnitAttributes)) {
+        return super.equals(obj);
+      }
+      org.sunrise.game.genProto.gen.MapProto.STUnitAttributes other = (org.sunrise.game.genProto.gen.MapProto.STUnitAttributes) obj;
+
+      if (!getUnitId()
+          .equals(other.getUnitId())) return false;
+      if (!getAttributesList()
+          .equals(other.getAttributesList())) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + UNIT_ID_FIELD_NUMBER;
+      hash = (53 * hash) + getUnitId().hashCode();
+      if (getAttributesCount() > 0) {
+        hash = (37 * hash) + ATTRIBUTES_FIELD_NUMBER;
+        hash = (53 * hash) + getAttributesList().hashCode();
+      }
+      hash = (29 * hash) + getUnknownFields().hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static org.sunrise.game.genProto.gen.MapProto.STUnitAttributes parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.sunrise.game.genProto.gen.MapProto.STUnitAttributes parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.sunrise.game.genProto.gen.MapProto.STUnitAttributes parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.sunrise.game.genProto.gen.MapProto.STUnitAttributes parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.sunrise.game.genProto.gen.MapProto.STUnitAttributes parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.sunrise.game.genProto.gen.MapProto.STUnitAttributes parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.sunrise.game.genProto.gen.MapProto.STUnitAttributes parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static org.sunrise.game.genProto.gen.MapProto.STUnitAttributes parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static org.sunrise.game.genProto.gen.MapProto.STUnitAttributes parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static org.sunrise.game.genProto.gen.MapProto.STUnitAttributes parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static org.sunrise.game.genProto.gen.MapProto.STUnitAttributes parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static org.sunrise.game.genProto.gen.MapProto.STUnitAttributes parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(org.sunrise.game.genProto.gen.MapProto.STUnitAttributes prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * <pre>
+     * 单个单位的全部属性
+     * </pre>
+     *
+     * Protobuf type {@code org.sunrise.game.genProto.gen.STUnitAttributes}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:org.sunrise.game.genProto.gen.STUnitAttributes)
+        org.sunrise.game.genProto.gen.MapProto.STUnitAttributesOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_STUnitAttributes_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_STUnitAttributes_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                org.sunrise.game.genProto.gen.MapProto.STUnitAttributes.class, org.sunrise.game.genProto.gen.MapProto.STUnitAttributes.Builder.class);
+      }
+
+      // Construct using org.sunrise.game.genProto.gen.MapProto.STUnitAttributes.newBuilder()
+      private Builder() {
+
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        bitField0_ = 0;
+        unitId_ = "";
+        if (attributesBuilder_ == null) {
+          attributes_ = java.util.Collections.emptyList();
+        } else {
+          attributes_ = null;
+          attributesBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000002);
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_STUnitAttributes_descriptor;
+      }
+
+      @java.lang.Override
+      public org.sunrise.game.genProto.gen.MapProto.STUnitAttributes getDefaultInstanceForType() {
+        return org.sunrise.game.genProto.gen.MapProto.STUnitAttributes.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public org.sunrise.game.genProto.gen.MapProto.STUnitAttributes build() {
+        org.sunrise.game.genProto.gen.MapProto.STUnitAttributes result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public org.sunrise.game.genProto.gen.MapProto.STUnitAttributes buildPartial() {
+        org.sunrise.game.genProto.gen.MapProto.STUnitAttributes result = new org.sunrise.game.genProto.gen.MapProto.STUnitAttributes(this);
+        buildPartialRepeatedFields(result);
+        if (bitField0_ != 0) { buildPartial0(result); }
+        onBuilt();
+        return result;
+      }
+
+      private void buildPartialRepeatedFields(org.sunrise.game.genProto.gen.MapProto.STUnitAttributes result) {
+        if (attributesBuilder_ == null) {
+          if (((bitField0_ & 0x00000002) != 0)) {
+            attributes_ = java.util.Collections.unmodifiableList(attributes_);
+            bitField0_ = (bitField0_ & ~0x00000002);
+          }
+          result.attributes_ = attributes_;
+        } else {
+          result.attributes_ = attributesBuilder_.build();
+        }
+      }
+
+      private void buildPartial0(org.sunrise.game.genProto.gen.MapProto.STUnitAttributes result) {
+        int from_bitField0_ = bitField0_;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.unitId_ = unitId_;
+        }
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof org.sunrise.game.genProto.gen.MapProto.STUnitAttributes) {
+          return mergeFrom((org.sunrise.game.genProto.gen.MapProto.STUnitAttributes)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(org.sunrise.game.genProto.gen.MapProto.STUnitAttributes other) {
+        if (other == org.sunrise.game.genProto.gen.MapProto.STUnitAttributes.getDefaultInstance()) return this;
+        if (!other.getUnitId().isEmpty()) {
+          unitId_ = other.unitId_;
+          bitField0_ |= 0x00000001;
+          onChanged();
+        }
+        if (attributesBuilder_ == null) {
+          if (!other.attributes_.isEmpty()) {
+            if (attributes_.isEmpty()) {
+              attributes_ = other.attributes_;
+              bitField0_ = (bitField0_ & ~0x00000002);
+            } else {
+              ensureAttributesIsMutable();
+              attributes_.addAll(other.attributes_);
+            }
+            onChanged();
+          }
+        } else {
+          if (!other.attributes_.isEmpty()) {
+            if (attributesBuilder_.isEmpty()) {
+              attributesBuilder_.dispose();
+              attributesBuilder_ = null;
+              attributes_ = other.attributes_;
+              bitField0_ = (bitField0_ & ~0x00000002);
+              attributesBuilder_ = 
+                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                   getAttributesFieldBuilder() : null;
+            } else {
+              attributesBuilder_.addAllMessages(other.attributes_);
+            }
+          }
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
+        try {
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 10: {
+                unitId_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000001;
+                break;
+              } // case 10
+              case 18: {
+                org.sunrise.game.genProto.gen.MapProto.STAttributeValue m =
+                    input.readMessage(
+                        org.sunrise.game.genProto.gen.MapProto.STAttributeValue.parser(),
+                        extensionRegistry);
+                if (attributesBuilder_ == null) {
+                  ensureAttributesIsMutable();
+                  attributes_.add(m);
+                } else {
+                  attributesBuilder_.addMessage(m);
+                }
+                break;
+              } // case 18
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.unwrapIOException();
+        } finally {
+          onChanged();
+        } // finally
+        return this;
+      }
+      private int bitField0_;
+
+      private java.lang.Object unitId_ = "";
+      /**
+       * <code>string unit_id = 1;</code>
+       * @return The unitId.
+       */
+      public java.lang.String getUnitId() {
+        java.lang.Object ref = unitId_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          unitId_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string unit_id = 1;</code>
+       * @return The bytes for unitId.
+       */
+      public com.google.protobuf.ByteString
+          getUnitIdBytes() {
+        java.lang.Object ref = unitId_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          unitId_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string unit_id = 1;</code>
+       * @param value The unitId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setUnitId(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        unitId_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string unit_id = 1;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearUnitId() {
+        unitId_ = getDefaultInstance().getUnitId();
+        bitField0_ = (bitField0_ & ~0x00000001);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string unit_id = 1;</code>
+       * @param value The bytes for unitId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setUnitIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        unitId_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+
+      private java.util.List<org.sunrise.game.genProto.gen.MapProto.STAttributeValue> attributes_ =
+        java.util.Collections.emptyList();
+      private void ensureAttributesIsMutable() {
+        if (!((bitField0_ & 0x00000002) != 0)) {
+          attributes_ = new java.util.ArrayList<org.sunrise.game.genProto.gen.MapProto.STAttributeValue>(attributes_);
+          bitField0_ |= 0x00000002;
+         }
+      }
+
+      private com.google.protobuf.RepeatedFieldBuilder<
+          org.sunrise.game.genProto.gen.MapProto.STAttributeValue, org.sunrise.game.genProto.gen.MapProto.STAttributeValue.Builder, org.sunrise.game.genProto.gen.MapProto.STAttributeValueOrBuilder> attributesBuilder_;
+
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STAttributeValue attributes = 2;</code>
+       */
+      public java.util.List<org.sunrise.game.genProto.gen.MapProto.STAttributeValue> getAttributesList() {
+        if (attributesBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(attributes_);
+        } else {
+          return attributesBuilder_.getMessageList();
+        }
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STAttributeValue attributes = 2;</code>
+       */
+      public int getAttributesCount() {
+        if (attributesBuilder_ == null) {
+          return attributes_.size();
+        } else {
+          return attributesBuilder_.getCount();
+        }
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STAttributeValue attributes = 2;</code>
+       */
+      public org.sunrise.game.genProto.gen.MapProto.STAttributeValue getAttributes(int index) {
+        if (attributesBuilder_ == null) {
+          return attributes_.get(index);
+        } else {
+          return attributesBuilder_.getMessage(index);
+        }
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STAttributeValue attributes = 2;</code>
+       */
+      public Builder setAttributes(
+          int index, org.sunrise.game.genProto.gen.MapProto.STAttributeValue value) {
+        if (attributesBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureAttributesIsMutable();
+          attributes_.set(index, value);
+          onChanged();
+        } else {
+          attributesBuilder_.setMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STAttributeValue attributes = 2;</code>
+       */
+      public Builder setAttributes(
+          int index, org.sunrise.game.genProto.gen.MapProto.STAttributeValue.Builder builderForValue) {
+        if (attributesBuilder_ == null) {
+          ensureAttributesIsMutable();
+          attributes_.set(index, builderForValue.build());
+          onChanged();
+        } else {
+          attributesBuilder_.setMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STAttributeValue attributes = 2;</code>
+       */
+      public Builder addAttributes(org.sunrise.game.genProto.gen.MapProto.STAttributeValue value) {
+        if (attributesBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureAttributesIsMutable();
+          attributes_.add(value);
+          onChanged();
+        } else {
+          attributesBuilder_.addMessage(value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STAttributeValue attributes = 2;</code>
+       */
+      public Builder addAttributes(
+          int index, org.sunrise.game.genProto.gen.MapProto.STAttributeValue value) {
+        if (attributesBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureAttributesIsMutable();
+          attributes_.add(index, value);
+          onChanged();
+        } else {
+          attributesBuilder_.addMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STAttributeValue attributes = 2;</code>
+       */
+      public Builder addAttributes(
+          org.sunrise.game.genProto.gen.MapProto.STAttributeValue.Builder builderForValue) {
+        if (attributesBuilder_ == null) {
+          ensureAttributesIsMutable();
+          attributes_.add(builderForValue.build());
+          onChanged();
+        } else {
+          attributesBuilder_.addMessage(builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STAttributeValue attributes = 2;</code>
+       */
+      public Builder addAttributes(
+          int index, org.sunrise.game.genProto.gen.MapProto.STAttributeValue.Builder builderForValue) {
+        if (attributesBuilder_ == null) {
+          ensureAttributesIsMutable();
+          attributes_.add(index, builderForValue.build());
+          onChanged();
+        } else {
+          attributesBuilder_.addMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STAttributeValue attributes = 2;</code>
+       */
+      public Builder addAllAttributes(
+          java.lang.Iterable<? extends org.sunrise.game.genProto.gen.MapProto.STAttributeValue> values) {
+        if (attributesBuilder_ == null) {
+          ensureAttributesIsMutable();
+          com.google.protobuf.AbstractMessageLite.Builder.addAll(
+              values, attributes_);
+          onChanged();
+        } else {
+          attributesBuilder_.addAllMessages(values);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STAttributeValue attributes = 2;</code>
+       */
+      public Builder clearAttributes() {
+        if (attributesBuilder_ == null) {
+          attributes_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000002);
+          onChanged();
+        } else {
+          attributesBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STAttributeValue attributes = 2;</code>
+       */
+      public Builder removeAttributes(int index) {
+        if (attributesBuilder_ == null) {
+          ensureAttributesIsMutable();
+          attributes_.remove(index);
+          onChanged();
+        } else {
+          attributesBuilder_.remove(index);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STAttributeValue attributes = 2;</code>
+       */
+      public org.sunrise.game.genProto.gen.MapProto.STAttributeValue.Builder getAttributesBuilder(
+          int index) {
+        return getAttributesFieldBuilder().getBuilder(index);
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STAttributeValue attributes = 2;</code>
+       */
+      public org.sunrise.game.genProto.gen.MapProto.STAttributeValueOrBuilder getAttributesOrBuilder(
+          int index) {
+        if (attributesBuilder_ == null) {
+          return attributes_.get(index);  } else {
+          return attributesBuilder_.getMessageOrBuilder(index);
+        }
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STAttributeValue attributes = 2;</code>
+       */
+      public java.util.List<? extends org.sunrise.game.genProto.gen.MapProto.STAttributeValueOrBuilder> 
+           getAttributesOrBuilderList() {
+        if (attributesBuilder_ != null) {
+          return attributesBuilder_.getMessageOrBuilderList();
+        } else {
+          return java.util.Collections.unmodifiableList(attributes_);
+        }
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STAttributeValue attributes = 2;</code>
+       */
+      public org.sunrise.game.genProto.gen.MapProto.STAttributeValue.Builder addAttributesBuilder() {
+        return getAttributesFieldBuilder().addBuilder(
+            org.sunrise.game.genProto.gen.MapProto.STAttributeValue.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STAttributeValue attributes = 2;</code>
+       */
+      public org.sunrise.game.genProto.gen.MapProto.STAttributeValue.Builder addAttributesBuilder(
+          int index) {
+        return getAttributesFieldBuilder().addBuilder(
+            index, org.sunrise.game.genProto.gen.MapProto.STAttributeValue.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STAttributeValue attributes = 2;</code>
+       */
+      public java.util.List<org.sunrise.game.genProto.gen.MapProto.STAttributeValue.Builder> 
+           getAttributesBuilderList() {
+        return getAttributesFieldBuilder().getBuilderList();
+      }
+      private com.google.protobuf.RepeatedFieldBuilder<
+          org.sunrise.game.genProto.gen.MapProto.STAttributeValue, org.sunrise.game.genProto.gen.MapProto.STAttributeValue.Builder, org.sunrise.game.genProto.gen.MapProto.STAttributeValueOrBuilder> 
+          getAttributesFieldBuilder() {
+        if (attributesBuilder_ == null) {
+          attributesBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+              org.sunrise.game.genProto.gen.MapProto.STAttributeValue, org.sunrise.game.genProto.gen.MapProto.STAttributeValue.Builder, org.sunrise.game.genProto.gen.MapProto.STAttributeValueOrBuilder>(
+                  attributes_,
+                  ((bitField0_ & 0x00000002) != 0),
+                  getParentForChildren(),
+                  isClean());
+          attributes_ = null;
+        }
+        return attributesBuilder_;
+      }
+
+      // @@protoc_insertion_point(builder_scope:org.sunrise.game.genProto.gen.STUnitAttributes)
+    }
+
+    // @@protoc_insertion_point(class_scope:org.sunrise.game.genProto.gen.STUnitAttributes)
+    private static final org.sunrise.game.genProto.gen.MapProto.STUnitAttributes DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new org.sunrise.game.genProto.gen.MapProto.STUnitAttributes();
+    }
+
+    public static org.sunrise.game.genProto.gen.MapProto.STUnitAttributes getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<STUnitAttributes>
+        PARSER = new com.google.protobuf.AbstractParser<STUnitAttributes>() {
+      @java.lang.Override
+      public STUnitAttributes parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
+      }
+    };
+
+    public static com.google.protobuf.Parser<STUnitAttributes> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<STUnitAttributes> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public org.sunrise.game.genProto.gen.MapProto.STUnitAttributes getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
 
@@ -2951,48 +4953,89 @@ public final class MapProto {
 
   }
 
-  public interface MS2C_EnterOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:org.sunrise.game.genProto.gen.MS2C_Enter)
+  public interface MS2C_SceneSyncOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:org.sunrise.game.genProto.gen.MS2C_SceneSync)
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <pre>
-     * 新进入的玩家信息
-     * </pre>
-     *
-     * <code>.org.sunrise.game.genProto.gen.STRoleInfo new_player = 1;</code>
-     * @return Whether the newPlayer field is set.
+     * <code>repeated .org.sunrise.game.genProto.gen.STUnitInfo units = 1;</code>
      */
-    boolean hasNewPlayer();
+    java.util.List<org.sunrise.game.genProto.gen.MapProto.STUnitInfo> 
+        getUnitsList();
     /**
-     * <pre>
-     * 新进入的玩家信息
-     * </pre>
-     *
-     * <code>.org.sunrise.game.genProto.gen.STRoleInfo new_player = 1;</code>
-     * @return The newPlayer.
+     * <code>repeated .org.sunrise.game.genProto.gen.STUnitInfo units = 1;</code>
      */
-    org.sunrise.game.genProto.gen.MapProto.STRoleInfo getNewPlayer();
+    org.sunrise.game.genProto.gen.MapProto.STUnitInfo getUnits(int index);
     /**
-     * <pre>
-     * 新进入的玩家信息
-     * </pre>
-     *
-     * <code>.org.sunrise.game.genProto.gen.STRoleInfo new_player = 1;</code>
+     * <code>repeated .org.sunrise.game.genProto.gen.STUnitInfo units = 1;</code>
      */
-    org.sunrise.game.genProto.gen.MapProto.STRoleInfoOrBuilder getNewPlayerOrBuilder();
+    int getUnitsCount();
+    /**
+     * <code>repeated .org.sunrise.game.genProto.gen.STUnitInfo units = 1;</code>
+     */
+    java.util.List<? extends org.sunrise.game.genProto.gen.MapProto.STUnitInfoOrBuilder> 
+        getUnitsOrBuilderList();
+    /**
+     * <code>repeated .org.sunrise.game.genProto.gen.STUnitInfo units = 1;</code>
+     */
+    org.sunrise.game.genProto.gen.MapProto.STUnitInfoOrBuilder getUnitsOrBuilder(
+        int index);
+
+    /**
+     * <code>repeated .org.sunrise.game.genProto.gen.STUnitPosition positions = 2;</code>
+     */
+    java.util.List<org.sunrise.game.genProto.gen.MapProto.STUnitPosition> 
+        getPositionsList();
+    /**
+     * <code>repeated .org.sunrise.game.genProto.gen.STUnitPosition positions = 2;</code>
+     */
+    org.sunrise.game.genProto.gen.MapProto.STUnitPosition getPositions(int index);
+    /**
+     * <code>repeated .org.sunrise.game.genProto.gen.STUnitPosition positions = 2;</code>
+     */
+    int getPositionsCount();
+    /**
+     * <code>repeated .org.sunrise.game.genProto.gen.STUnitPosition positions = 2;</code>
+     */
+    java.util.List<? extends org.sunrise.game.genProto.gen.MapProto.STUnitPositionOrBuilder> 
+        getPositionsOrBuilderList();
+    /**
+     * <code>repeated .org.sunrise.game.genProto.gen.STUnitPosition positions = 2;</code>
+     */
+    org.sunrise.game.genProto.gen.MapProto.STUnitPositionOrBuilder getPositionsOrBuilder(
+        int index);
+
+    /**
+     * <code>repeated .org.sunrise.game.genProto.gen.STUnitAttributes unit_attributes = 3;</code>
+     */
+    java.util.List<org.sunrise.game.genProto.gen.MapProto.STUnitAttributes> 
+        getUnitAttributesList();
+    /**
+     * <code>repeated .org.sunrise.game.genProto.gen.STUnitAttributes unit_attributes = 3;</code>
+     */
+    org.sunrise.game.genProto.gen.MapProto.STUnitAttributes getUnitAttributes(int index);
+    /**
+     * <code>repeated .org.sunrise.game.genProto.gen.STUnitAttributes unit_attributes = 3;</code>
+     */
+    int getUnitAttributesCount();
+    /**
+     * <code>repeated .org.sunrise.game.genProto.gen.STUnitAttributes unit_attributes = 3;</code>
+     */
+    java.util.List<? extends org.sunrise.game.genProto.gen.MapProto.STUnitAttributesOrBuilder> 
+        getUnitAttributesOrBuilderList();
+    /**
+     * <code>repeated .org.sunrise.game.genProto.gen.STUnitAttributes unit_attributes = 3;</code>
+     */
+    org.sunrise.game.genProto.gen.MapProto.STUnitAttributesOrBuilder getUnitAttributesOrBuilder(
+        int index);
   }
   /**
-   * <pre>
-   * 新玩家进入地图，通知在地图中的玩家
-   * </pre>
-   *
-   * Protobuf type {@code org.sunrise.game.genProto.gen.MS2C_Enter}
+   * Protobuf type {@code org.sunrise.game.genProto.gen.MS2C_SceneSync}
    */
-  public static final class MS2C_Enter extends
+  public static final class MS2C_SceneSync extends
       com.google.protobuf.GeneratedMessage implements
-      // @@protoc_insertion_point(message_implements:org.sunrise.game.genProto.gen.MS2C_Enter)
-      MS2C_EnterOrBuilder {
+      // @@protoc_insertion_point(message_implements:org.sunrise.game.genProto.gen.MS2C_SceneSync)
+      MS2C_SceneSyncOrBuilder {
   private static final long serialVersionUID = 0L;
     static {
       com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
@@ -3001,65 +5044,1566 @@ public final class MapProto {
         /* minor= */ 28,
         /* patch= */ 2,
         /* suffix= */ "",
-        MS2C_Enter.class.getName());
+        MS2C_SceneSync.class.getName());
     }
-    // Use MS2C_Enter.newBuilder() to construct.
-    private MS2C_Enter(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+    // Use MS2C_SceneSync.newBuilder() to construct.
+    private MS2C_SceneSync(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
     }
-    private MS2C_Enter() {
+    private MS2C_SceneSync() {
+      units_ = java.util.Collections.emptyList();
+      positions_ = java.util.Collections.emptyList();
+      unitAttributes_ = java.util.Collections.emptyList();
     }
 
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_MS2C_Enter_descriptor;
+      return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_MS2C_SceneSync_descriptor;
     }
 
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_MS2C_Enter_fieldAccessorTable
+      return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_MS2C_SceneSync_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
-              org.sunrise.game.genProto.gen.MapProto.MS2C_Enter.class, org.sunrise.game.genProto.gen.MapProto.MS2C_Enter.Builder.class);
+              org.sunrise.game.genProto.gen.MapProto.MS2C_SceneSync.class, org.sunrise.game.genProto.gen.MapProto.MS2C_SceneSync.Builder.class);
+    }
+
+    public static final int UNITS_FIELD_NUMBER = 1;
+    @SuppressWarnings("serial")
+    private java.util.List<org.sunrise.game.genProto.gen.MapProto.STUnitInfo> units_;
+    /**
+     * <code>repeated .org.sunrise.game.genProto.gen.STUnitInfo units = 1;</code>
+     */
+    @java.lang.Override
+    public java.util.List<org.sunrise.game.genProto.gen.MapProto.STUnitInfo> getUnitsList() {
+      return units_;
+    }
+    /**
+     * <code>repeated .org.sunrise.game.genProto.gen.STUnitInfo units = 1;</code>
+     */
+    @java.lang.Override
+    public java.util.List<? extends org.sunrise.game.genProto.gen.MapProto.STUnitInfoOrBuilder> 
+        getUnitsOrBuilderList() {
+      return units_;
+    }
+    /**
+     * <code>repeated .org.sunrise.game.genProto.gen.STUnitInfo units = 1;</code>
+     */
+    @java.lang.Override
+    public int getUnitsCount() {
+      return units_.size();
+    }
+    /**
+     * <code>repeated .org.sunrise.game.genProto.gen.STUnitInfo units = 1;</code>
+     */
+    @java.lang.Override
+    public org.sunrise.game.genProto.gen.MapProto.STUnitInfo getUnits(int index) {
+      return units_.get(index);
+    }
+    /**
+     * <code>repeated .org.sunrise.game.genProto.gen.STUnitInfo units = 1;</code>
+     */
+    @java.lang.Override
+    public org.sunrise.game.genProto.gen.MapProto.STUnitInfoOrBuilder getUnitsOrBuilder(
+        int index) {
+      return units_.get(index);
+    }
+
+    public static final int POSITIONS_FIELD_NUMBER = 2;
+    @SuppressWarnings("serial")
+    private java.util.List<org.sunrise.game.genProto.gen.MapProto.STUnitPosition> positions_;
+    /**
+     * <code>repeated .org.sunrise.game.genProto.gen.STUnitPosition positions = 2;</code>
+     */
+    @java.lang.Override
+    public java.util.List<org.sunrise.game.genProto.gen.MapProto.STUnitPosition> getPositionsList() {
+      return positions_;
+    }
+    /**
+     * <code>repeated .org.sunrise.game.genProto.gen.STUnitPosition positions = 2;</code>
+     */
+    @java.lang.Override
+    public java.util.List<? extends org.sunrise.game.genProto.gen.MapProto.STUnitPositionOrBuilder> 
+        getPositionsOrBuilderList() {
+      return positions_;
+    }
+    /**
+     * <code>repeated .org.sunrise.game.genProto.gen.STUnitPosition positions = 2;</code>
+     */
+    @java.lang.Override
+    public int getPositionsCount() {
+      return positions_.size();
+    }
+    /**
+     * <code>repeated .org.sunrise.game.genProto.gen.STUnitPosition positions = 2;</code>
+     */
+    @java.lang.Override
+    public org.sunrise.game.genProto.gen.MapProto.STUnitPosition getPositions(int index) {
+      return positions_.get(index);
+    }
+    /**
+     * <code>repeated .org.sunrise.game.genProto.gen.STUnitPosition positions = 2;</code>
+     */
+    @java.lang.Override
+    public org.sunrise.game.genProto.gen.MapProto.STUnitPositionOrBuilder getPositionsOrBuilder(
+        int index) {
+      return positions_.get(index);
+    }
+
+    public static final int UNIT_ATTRIBUTES_FIELD_NUMBER = 3;
+    @SuppressWarnings("serial")
+    private java.util.List<org.sunrise.game.genProto.gen.MapProto.STUnitAttributes> unitAttributes_;
+    /**
+     * <code>repeated .org.sunrise.game.genProto.gen.STUnitAttributes unit_attributes = 3;</code>
+     */
+    @java.lang.Override
+    public java.util.List<org.sunrise.game.genProto.gen.MapProto.STUnitAttributes> getUnitAttributesList() {
+      return unitAttributes_;
+    }
+    /**
+     * <code>repeated .org.sunrise.game.genProto.gen.STUnitAttributes unit_attributes = 3;</code>
+     */
+    @java.lang.Override
+    public java.util.List<? extends org.sunrise.game.genProto.gen.MapProto.STUnitAttributesOrBuilder> 
+        getUnitAttributesOrBuilderList() {
+      return unitAttributes_;
+    }
+    /**
+     * <code>repeated .org.sunrise.game.genProto.gen.STUnitAttributes unit_attributes = 3;</code>
+     */
+    @java.lang.Override
+    public int getUnitAttributesCount() {
+      return unitAttributes_.size();
+    }
+    /**
+     * <code>repeated .org.sunrise.game.genProto.gen.STUnitAttributes unit_attributes = 3;</code>
+     */
+    @java.lang.Override
+    public org.sunrise.game.genProto.gen.MapProto.STUnitAttributes getUnitAttributes(int index) {
+      return unitAttributes_.get(index);
+    }
+    /**
+     * <code>repeated .org.sunrise.game.genProto.gen.STUnitAttributes unit_attributes = 3;</code>
+     */
+    @java.lang.Override
+    public org.sunrise.game.genProto.gen.MapProto.STUnitAttributesOrBuilder getUnitAttributesOrBuilder(
+        int index) {
+      return unitAttributes_.get(index);
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      for (int i = 0; i < units_.size(); i++) {
+        output.writeMessage(1, units_.get(i));
+      }
+      for (int i = 0; i < positions_.size(); i++) {
+        output.writeMessage(2, positions_.get(i));
+      }
+      for (int i = 0; i < unitAttributes_.size(); i++) {
+        output.writeMessage(3, unitAttributes_.get(i));
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      for (int i = 0; i < units_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(1, units_.get(i));
+      }
+      for (int i = 0; i < positions_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(2, positions_.get(i));
+      }
+      for (int i = 0; i < unitAttributes_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(3, unitAttributes_.get(i));
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof org.sunrise.game.genProto.gen.MapProto.MS2C_SceneSync)) {
+        return super.equals(obj);
+      }
+      org.sunrise.game.genProto.gen.MapProto.MS2C_SceneSync other = (org.sunrise.game.genProto.gen.MapProto.MS2C_SceneSync) obj;
+
+      if (!getUnitsList()
+          .equals(other.getUnitsList())) return false;
+      if (!getPositionsList()
+          .equals(other.getPositionsList())) return false;
+      if (!getUnitAttributesList()
+          .equals(other.getUnitAttributesList())) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (getUnitsCount() > 0) {
+        hash = (37 * hash) + UNITS_FIELD_NUMBER;
+        hash = (53 * hash) + getUnitsList().hashCode();
+      }
+      if (getPositionsCount() > 0) {
+        hash = (37 * hash) + POSITIONS_FIELD_NUMBER;
+        hash = (53 * hash) + getPositionsList().hashCode();
+      }
+      if (getUnitAttributesCount() > 0) {
+        hash = (37 * hash) + UNIT_ATTRIBUTES_FIELD_NUMBER;
+        hash = (53 * hash) + getUnitAttributesList().hashCode();
+      }
+      hash = (29 * hash) + getUnknownFields().hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_SceneSync parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_SceneSync parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_SceneSync parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_SceneSync parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_SceneSync parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_SceneSync parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_SceneSync parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_SceneSync parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_SceneSync parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_SceneSync parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_SceneSync parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_SceneSync parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(org.sunrise.game.genProto.gen.MapProto.MS2C_SceneSync prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code org.sunrise.game.genProto.gen.MS2C_SceneSync}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:org.sunrise.game.genProto.gen.MS2C_SceneSync)
+        org.sunrise.game.genProto.gen.MapProto.MS2C_SceneSyncOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_MS2C_SceneSync_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_MS2C_SceneSync_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                org.sunrise.game.genProto.gen.MapProto.MS2C_SceneSync.class, org.sunrise.game.genProto.gen.MapProto.MS2C_SceneSync.Builder.class);
+      }
+
+      // Construct using org.sunrise.game.genProto.gen.MapProto.MS2C_SceneSync.newBuilder()
+      private Builder() {
+
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        bitField0_ = 0;
+        if (unitsBuilder_ == null) {
+          units_ = java.util.Collections.emptyList();
+        } else {
+          units_ = null;
+          unitsBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000001);
+        if (positionsBuilder_ == null) {
+          positions_ = java.util.Collections.emptyList();
+        } else {
+          positions_ = null;
+          positionsBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000002);
+        if (unitAttributesBuilder_ == null) {
+          unitAttributes_ = java.util.Collections.emptyList();
+        } else {
+          unitAttributes_ = null;
+          unitAttributesBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000004);
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_MS2C_SceneSync_descriptor;
+      }
+
+      @java.lang.Override
+      public org.sunrise.game.genProto.gen.MapProto.MS2C_SceneSync getDefaultInstanceForType() {
+        return org.sunrise.game.genProto.gen.MapProto.MS2C_SceneSync.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public org.sunrise.game.genProto.gen.MapProto.MS2C_SceneSync build() {
+        org.sunrise.game.genProto.gen.MapProto.MS2C_SceneSync result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public org.sunrise.game.genProto.gen.MapProto.MS2C_SceneSync buildPartial() {
+        org.sunrise.game.genProto.gen.MapProto.MS2C_SceneSync result = new org.sunrise.game.genProto.gen.MapProto.MS2C_SceneSync(this);
+        buildPartialRepeatedFields(result);
+        if (bitField0_ != 0) { buildPartial0(result); }
+        onBuilt();
+        return result;
+      }
+
+      private void buildPartialRepeatedFields(org.sunrise.game.genProto.gen.MapProto.MS2C_SceneSync result) {
+        if (unitsBuilder_ == null) {
+          if (((bitField0_ & 0x00000001) != 0)) {
+            units_ = java.util.Collections.unmodifiableList(units_);
+            bitField0_ = (bitField0_ & ~0x00000001);
+          }
+          result.units_ = units_;
+        } else {
+          result.units_ = unitsBuilder_.build();
+        }
+        if (positionsBuilder_ == null) {
+          if (((bitField0_ & 0x00000002) != 0)) {
+            positions_ = java.util.Collections.unmodifiableList(positions_);
+            bitField0_ = (bitField0_ & ~0x00000002);
+          }
+          result.positions_ = positions_;
+        } else {
+          result.positions_ = positionsBuilder_.build();
+        }
+        if (unitAttributesBuilder_ == null) {
+          if (((bitField0_ & 0x00000004) != 0)) {
+            unitAttributes_ = java.util.Collections.unmodifiableList(unitAttributes_);
+            bitField0_ = (bitField0_ & ~0x00000004);
+          }
+          result.unitAttributes_ = unitAttributes_;
+        } else {
+          result.unitAttributes_ = unitAttributesBuilder_.build();
+        }
+      }
+
+      private void buildPartial0(org.sunrise.game.genProto.gen.MapProto.MS2C_SceneSync result) {
+        int from_bitField0_ = bitField0_;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof org.sunrise.game.genProto.gen.MapProto.MS2C_SceneSync) {
+          return mergeFrom((org.sunrise.game.genProto.gen.MapProto.MS2C_SceneSync)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(org.sunrise.game.genProto.gen.MapProto.MS2C_SceneSync other) {
+        if (other == org.sunrise.game.genProto.gen.MapProto.MS2C_SceneSync.getDefaultInstance()) return this;
+        if (unitsBuilder_ == null) {
+          if (!other.units_.isEmpty()) {
+            if (units_.isEmpty()) {
+              units_ = other.units_;
+              bitField0_ = (bitField0_ & ~0x00000001);
+            } else {
+              ensureUnitsIsMutable();
+              units_.addAll(other.units_);
+            }
+            onChanged();
+          }
+        } else {
+          if (!other.units_.isEmpty()) {
+            if (unitsBuilder_.isEmpty()) {
+              unitsBuilder_.dispose();
+              unitsBuilder_ = null;
+              units_ = other.units_;
+              bitField0_ = (bitField0_ & ~0x00000001);
+              unitsBuilder_ = 
+                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                   getUnitsFieldBuilder() : null;
+            } else {
+              unitsBuilder_.addAllMessages(other.units_);
+            }
+          }
+        }
+        if (positionsBuilder_ == null) {
+          if (!other.positions_.isEmpty()) {
+            if (positions_.isEmpty()) {
+              positions_ = other.positions_;
+              bitField0_ = (bitField0_ & ~0x00000002);
+            } else {
+              ensurePositionsIsMutable();
+              positions_.addAll(other.positions_);
+            }
+            onChanged();
+          }
+        } else {
+          if (!other.positions_.isEmpty()) {
+            if (positionsBuilder_.isEmpty()) {
+              positionsBuilder_.dispose();
+              positionsBuilder_ = null;
+              positions_ = other.positions_;
+              bitField0_ = (bitField0_ & ~0x00000002);
+              positionsBuilder_ = 
+                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                   getPositionsFieldBuilder() : null;
+            } else {
+              positionsBuilder_.addAllMessages(other.positions_);
+            }
+          }
+        }
+        if (unitAttributesBuilder_ == null) {
+          if (!other.unitAttributes_.isEmpty()) {
+            if (unitAttributes_.isEmpty()) {
+              unitAttributes_ = other.unitAttributes_;
+              bitField0_ = (bitField0_ & ~0x00000004);
+            } else {
+              ensureUnitAttributesIsMutable();
+              unitAttributes_.addAll(other.unitAttributes_);
+            }
+            onChanged();
+          }
+        } else {
+          if (!other.unitAttributes_.isEmpty()) {
+            if (unitAttributesBuilder_.isEmpty()) {
+              unitAttributesBuilder_.dispose();
+              unitAttributesBuilder_ = null;
+              unitAttributes_ = other.unitAttributes_;
+              bitField0_ = (bitField0_ & ~0x00000004);
+              unitAttributesBuilder_ = 
+                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                   getUnitAttributesFieldBuilder() : null;
+            } else {
+              unitAttributesBuilder_.addAllMessages(other.unitAttributes_);
+            }
+          }
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
+        try {
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 10: {
+                org.sunrise.game.genProto.gen.MapProto.STUnitInfo m =
+                    input.readMessage(
+                        org.sunrise.game.genProto.gen.MapProto.STUnitInfo.parser(),
+                        extensionRegistry);
+                if (unitsBuilder_ == null) {
+                  ensureUnitsIsMutable();
+                  units_.add(m);
+                } else {
+                  unitsBuilder_.addMessage(m);
+                }
+                break;
+              } // case 10
+              case 18: {
+                org.sunrise.game.genProto.gen.MapProto.STUnitPosition m =
+                    input.readMessage(
+                        org.sunrise.game.genProto.gen.MapProto.STUnitPosition.parser(),
+                        extensionRegistry);
+                if (positionsBuilder_ == null) {
+                  ensurePositionsIsMutable();
+                  positions_.add(m);
+                } else {
+                  positionsBuilder_.addMessage(m);
+                }
+                break;
+              } // case 18
+              case 26: {
+                org.sunrise.game.genProto.gen.MapProto.STUnitAttributes m =
+                    input.readMessage(
+                        org.sunrise.game.genProto.gen.MapProto.STUnitAttributes.parser(),
+                        extensionRegistry);
+                if (unitAttributesBuilder_ == null) {
+                  ensureUnitAttributesIsMutable();
+                  unitAttributes_.add(m);
+                } else {
+                  unitAttributesBuilder_.addMessage(m);
+                }
+                break;
+              } // case 26
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.unwrapIOException();
+        } finally {
+          onChanged();
+        } // finally
+        return this;
+      }
+      private int bitField0_;
+
+      private java.util.List<org.sunrise.game.genProto.gen.MapProto.STUnitInfo> units_ =
+        java.util.Collections.emptyList();
+      private void ensureUnitsIsMutable() {
+        if (!((bitField0_ & 0x00000001) != 0)) {
+          units_ = new java.util.ArrayList<org.sunrise.game.genProto.gen.MapProto.STUnitInfo>(units_);
+          bitField0_ |= 0x00000001;
+         }
+      }
+
+      private com.google.protobuf.RepeatedFieldBuilder<
+          org.sunrise.game.genProto.gen.MapProto.STUnitInfo, org.sunrise.game.genProto.gen.MapProto.STUnitInfo.Builder, org.sunrise.game.genProto.gen.MapProto.STUnitInfoOrBuilder> unitsBuilder_;
+
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STUnitInfo units = 1;</code>
+       */
+      public java.util.List<org.sunrise.game.genProto.gen.MapProto.STUnitInfo> getUnitsList() {
+        if (unitsBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(units_);
+        } else {
+          return unitsBuilder_.getMessageList();
+        }
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STUnitInfo units = 1;</code>
+       */
+      public int getUnitsCount() {
+        if (unitsBuilder_ == null) {
+          return units_.size();
+        } else {
+          return unitsBuilder_.getCount();
+        }
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STUnitInfo units = 1;</code>
+       */
+      public org.sunrise.game.genProto.gen.MapProto.STUnitInfo getUnits(int index) {
+        if (unitsBuilder_ == null) {
+          return units_.get(index);
+        } else {
+          return unitsBuilder_.getMessage(index);
+        }
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STUnitInfo units = 1;</code>
+       */
+      public Builder setUnits(
+          int index, org.sunrise.game.genProto.gen.MapProto.STUnitInfo value) {
+        if (unitsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureUnitsIsMutable();
+          units_.set(index, value);
+          onChanged();
+        } else {
+          unitsBuilder_.setMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STUnitInfo units = 1;</code>
+       */
+      public Builder setUnits(
+          int index, org.sunrise.game.genProto.gen.MapProto.STUnitInfo.Builder builderForValue) {
+        if (unitsBuilder_ == null) {
+          ensureUnitsIsMutable();
+          units_.set(index, builderForValue.build());
+          onChanged();
+        } else {
+          unitsBuilder_.setMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STUnitInfo units = 1;</code>
+       */
+      public Builder addUnits(org.sunrise.game.genProto.gen.MapProto.STUnitInfo value) {
+        if (unitsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureUnitsIsMutable();
+          units_.add(value);
+          onChanged();
+        } else {
+          unitsBuilder_.addMessage(value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STUnitInfo units = 1;</code>
+       */
+      public Builder addUnits(
+          int index, org.sunrise.game.genProto.gen.MapProto.STUnitInfo value) {
+        if (unitsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureUnitsIsMutable();
+          units_.add(index, value);
+          onChanged();
+        } else {
+          unitsBuilder_.addMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STUnitInfo units = 1;</code>
+       */
+      public Builder addUnits(
+          org.sunrise.game.genProto.gen.MapProto.STUnitInfo.Builder builderForValue) {
+        if (unitsBuilder_ == null) {
+          ensureUnitsIsMutable();
+          units_.add(builderForValue.build());
+          onChanged();
+        } else {
+          unitsBuilder_.addMessage(builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STUnitInfo units = 1;</code>
+       */
+      public Builder addUnits(
+          int index, org.sunrise.game.genProto.gen.MapProto.STUnitInfo.Builder builderForValue) {
+        if (unitsBuilder_ == null) {
+          ensureUnitsIsMutable();
+          units_.add(index, builderForValue.build());
+          onChanged();
+        } else {
+          unitsBuilder_.addMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STUnitInfo units = 1;</code>
+       */
+      public Builder addAllUnits(
+          java.lang.Iterable<? extends org.sunrise.game.genProto.gen.MapProto.STUnitInfo> values) {
+        if (unitsBuilder_ == null) {
+          ensureUnitsIsMutable();
+          com.google.protobuf.AbstractMessageLite.Builder.addAll(
+              values, units_);
+          onChanged();
+        } else {
+          unitsBuilder_.addAllMessages(values);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STUnitInfo units = 1;</code>
+       */
+      public Builder clearUnits() {
+        if (unitsBuilder_ == null) {
+          units_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000001);
+          onChanged();
+        } else {
+          unitsBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STUnitInfo units = 1;</code>
+       */
+      public Builder removeUnits(int index) {
+        if (unitsBuilder_ == null) {
+          ensureUnitsIsMutable();
+          units_.remove(index);
+          onChanged();
+        } else {
+          unitsBuilder_.remove(index);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STUnitInfo units = 1;</code>
+       */
+      public org.sunrise.game.genProto.gen.MapProto.STUnitInfo.Builder getUnitsBuilder(
+          int index) {
+        return getUnitsFieldBuilder().getBuilder(index);
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STUnitInfo units = 1;</code>
+       */
+      public org.sunrise.game.genProto.gen.MapProto.STUnitInfoOrBuilder getUnitsOrBuilder(
+          int index) {
+        if (unitsBuilder_ == null) {
+          return units_.get(index);  } else {
+          return unitsBuilder_.getMessageOrBuilder(index);
+        }
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STUnitInfo units = 1;</code>
+       */
+      public java.util.List<? extends org.sunrise.game.genProto.gen.MapProto.STUnitInfoOrBuilder> 
+           getUnitsOrBuilderList() {
+        if (unitsBuilder_ != null) {
+          return unitsBuilder_.getMessageOrBuilderList();
+        } else {
+          return java.util.Collections.unmodifiableList(units_);
+        }
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STUnitInfo units = 1;</code>
+       */
+      public org.sunrise.game.genProto.gen.MapProto.STUnitInfo.Builder addUnitsBuilder() {
+        return getUnitsFieldBuilder().addBuilder(
+            org.sunrise.game.genProto.gen.MapProto.STUnitInfo.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STUnitInfo units = 1;</code>
+       */
+      public org.sunrise.game.genProto.gen.MapProto.STUnitInfo.Builder addUnitsBuilder(
+          int index) {
+        return getUnitsFieldBuilder().addBuilder(
+            index, org.sunrise.game.genProto.gen.MapProto.STUnitInfo.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STUnitInfo units = 1;</code>
+       */
+      public java.util.List<org.sunrise.game.genProto.gen.MapProto.STUnitInfo.Builder> 
+           getUnitsBuilderList() {
+        return getUnitsFieldBuilder().getBuilderList();
+      }
+      private com.google.protobuf.RepeatedFieldBuilder<
+          org.sunrise.game.genProto.gen.MapProto.STUnitInfo, org.sunrise.game.genProto.gen.MapProto.STUnitInfo.Builder, org.sunrise.game.genProto.gen.MapProto.STUnitInfoOrBuilder> 
+          getUnitsFieldBuilder() {
+        if (unitsBuilder_ == null) {
+          unitsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+              org.sunrise.game.genProto.gen.MapProto.STUnitInfo, org.sunrise.game.genProto.gen.MapProto.STUnitInfo.Builder, org.sunrise.game.genProto.gen.MapProto.STUnitInfoOrBuilder>(
+                  units_,
+                  ((bitField0_ & 0x00000001) != 0),
+                  getParentForChildren(),
+                  isClean());
+          units_ = null;
+        }
+        return unitsBuilder_;
+      }
+
+      private java.util.List<org.sunrise.game.genProto.gen.MapProto.STUnitPosition> positions_ =
+        java.util.Collections.emptyList();
+      private void ensurePositionsIsMutable() {
+        if (!((bitField0_ & 0x00000002) != 0)) {
+          positions_ = new java.util.ArrayList<org.sunrise.game.genProto.gen.MapProto.STUnitPosition>(positions_);
+          bitField0_ |= 0x00000002;
+         }
+      }
+
+      private com.google.protobuf.RepeatedFieldBuilder<
+          org.sunrise.game.genProto.gen.MapProto.STUnitPosition, org.sunrise.game.genProto.gen.MapProto.STUnitPosition.Builder, org.sunrise.game.genProto.gen.MapProto.STUnitPositionOrBuilder> positionsBuilder_;
+
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STUnitPosition positions = 2;</code>
+       */
+      public java.util.List<org.sunrise.game.genProto.gen.MapProto.STUnitPosition> getPositionsList() {
+        if (positionsBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(positions_);
+        } else {
+          return positionsBuilder_.getMessageList();
+        }
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STUnitPosition positions = 2;</code>
+       */
+      public int getPositionsCount() {
+        if (positionsBuilder_ == null) {
+          return positions_.size();
+        } else {
+          return positionsBuilder_.getCount();
+        }
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STUnitPosition positions = 2;</code>
+       */
+      public org.sunrise.game.genProto.gen.MapProto.STUnitPosition getPositions(int index) {
+        if (positionsBuilder_ == null) {
+          return positions_.get(index);
+        } else {
+          return positionsBuilder_.getMessage(index);
+        }
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STUnitPosition positions = 2;</code>
+       */
+      public Builder setPositions(
+          int index, org.sunrise.game.genProto.gen.MapProto.STUnitPosition value) {
+        if (positionsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensurePositionsIsMutable();
+          positions_.set(index, value);
+          onChanged();
+        } else {
+          positionsBuilder_.setMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STUnitPosition positions = 2;</code>
+       */
+      public Builder setPositions(
+          int index, org.sunrise.game.genProto.gen.MapProto.STUnitPosition.Builder builderForValue) {
+        if (positionsBuilder_ == null) {
+          ensurePositionsIsMutable();
+          positions_.set(index, builderForValue.build());
+          onChanged();
+        } else {
+          positionsBuilder_.setMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STUnitPosition positions = 2;</code>
+       */
+      public Builder addPositions(org.sunrise.game.genProto.gen.MapProto.STUnitPosition value) {
+        if (positionsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensurePositionsIsMutable();
+          positions_.add(value);
+          onChanged();
+        } else {
+          positionsBuilder_.addMessage(value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STUnitPosition positions = 2;</code>
+       */
+      public Builder addPositions(
+          int index, org.sunrise.game.genProto.gen.MapProto.STUnitPosition value) {
+        if (positionsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensurePositionsIsMutable();
+          positions_.add(index, value);
+          onChanged();
+        } else {
+          positionsBuilder_.addMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STUnitPosition positions = 2;</code>
+       */
+      public Builder addPositions(
+          org.sunrise.game.genProto.gen.MapProto.STUnitPosition.Builder builderForValue) {
+        if (positionsBuilder_ == null) {
+          ensurePositionsIsMutable();
+          positions_.add(builderForValue.build());
+          onChanged();
+        } else {
+          positionsBuilder_.addMessage(builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STUnitPosition positions = 2;</code>
+       */
+      public Builder addPositions(
+          int index, org.sunrise.game.genProto.gen.MapProto.STUnitPosition.Builder builderForValue) {
+        if (positionsBuilder_ == null) {
+          ensurePositionsIsMutable();
+          positions_.add(index, builderForValue.build());
+          onChanged();
+        } else {
+          positionsBuilder_.addMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STUnitPosition positions = 2;</code>
+       */
+      public Builder addAllPositions(
+          java.lang.Iterable<? extends org.sunrise.game.genProto.gen.MapProto.STUnitPosition> values) {
+        if (positionsBuilder_ == null) {
+          ensurePositionsIsMutable();
+          com.google.protobuf.AbstractMessageLite.Builder.addAll(
+              values, positions_);
+          onChanged();
+        } else {
+          positionsBuilder_.addAllMessages(values);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STUnitPosition positions = 2;</code>
+       */
+      public Builder clearPositions() {
+        if (positionsBuilder_ == null) {
+          positions_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000002);
+          onChanged();
+        } else {
+          positionsBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STUnitPosition positions = 2;</code>
+       */
+      public Builder removePositions(int index) {
+        if (positionsBuilder_ == null) {
+          ensurePositionsIsMutable();
+          positions_.remove(index);
+          onChanged();
+        } else {
+          positionsBuilder_.remove(index);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STUnitPosition positions = 2;</code>
+       */
+      public org.sunrise.game.genProto.gen.MapProto.STUnitPosition.Builder getPositionsBuilder(
+          int index) {
+        return getPositionsFieldBuilder().getBuilder(index);
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STUnitPosition positions = 2;</code>
+       */
+      public org.sunrise.game.genProto.gen.MapProto.STUnitPositionOrBuilder getPositionsOrBuilder(
+          int index) {
+        if (positionsBuilder_ == null) {
+          return positions_.get(index);  } else {
+          return positionsBuilder_.getMessageOrBuilder(index);
+        }
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STUnitPosition positions = 2;</code>
+       */
+      public java.util.List<? extends org.sunrise.game.genProto.gen.MapProto.STUnitPositionOrBuilder> 
+           getPositionsOrBuilderList() {
+        if (positionsBuilder_ != null) {
+          return positionsBuilder_.getMessageOrBuilderList();
+        } else {
+          return java.util.Collections.unmodifiableList(positions_);
+        }
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STUnitPosition positions = 2;</code>
+       */
+      public org.sunrise.game.genProto.gen.MapProto.STUnitPosition.Builder addPositionsBuilder() {
+        return getPositionsFieldBuilder().addBuilder(
+            org.sunrise.game.genProto.gen.MapProto.STUnitPosition.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STUnitPosition positions = 2;</code>
+       */
+      public org.sunrise.game.genProto.gen.MapProto.STUnitPosition.Builder addPositionsBuilder(
+          int index) {
+        return getPositionsFieldBuilder().addBuilder(
+            index, org.sunrise.game.genProto.gen.MapProto.STUnitPosition.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STUnitPosition positions = 2;</code>
+       */
+      public java.util.List<org.sunrise.game.genProto.gen.MapProto.STUnitPosition.Builder> 
+           getPositionsBuilderList() {
+        return getPositionsFieldBuilder().getBuilderList();
+      }
+      private com.google.protobuf.RepeatedFieldBuilder<
+          org.sunrise.game.genProto.gen.MapProto.STUnitPosition, org.sunrise.game.genProto.gen.MapProto.STUnitPosition.Builder, org.sunrise.game.genProto.gen.MapProto.STUnitPositionOrBuilder> 
+          getPositionsFieldBuilder() {
+        if (positionsBuilder_ == null) {
+          positionsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+              org.sunrise.game.genProto.gen.MapProto.STUnitPosition, org.sunrise.game.genProto.gen.MapProto.STUnitPosition.Builder, org.sunrise.game.genProto.gen.MapProto.STUnitPositionOrBuilder>(
+                  positions_,
+                  ((bitField0_ & 0x00000002) != 0),
+                  getParentForChildren(),
+                  isClean());
+          positions_ = null;
+        }
+        return positionsBuilder_;
+      }
+
+      private java.util.List<org.sunrise.game.genProto.gen.MapProto.STUnitAttributes> unitAttributes_ =
+        java.util.Collections.emptyList();
+      private void ensureUnitAttributesIsMutable() {
+        if (!((bitField0_ & 0x00000004) != 0)) {
+          unitAttributes_ = new java.util.ArrayList<org.sunrise.game.genProto.gen.MapProto.STUnitAttributes>(unitAttributes_);
+          bitField0_ |= 0x00000004;
+         }
+      }
+
+      private com.google.protobuf.RepeatedFieldBuilder<
+          org.sunrise.game.genProto.gen.MapProto.STUnitAttributes, org.sunrise.game.genProto.gen.MapProto.STUnitAttributes.Builder, org.sunrise.game.genProto.gen.MapProto.STUnitAttributesOrBuilder> unitAttributesBuilder_;
+
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STUnitAttributes unit_attributes = 3;</code>
+       */
+      public java.util.List<org.sunrise.game.genProto.gen.MapProto.STUnitAttributes> getUnitAttributesList() {
+        if (unitAttributesBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(unitAttributes_);
+        } else {
+          return unitAttributesBuilder_.getMessageList();
+        }
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STUnitAttributes unit_attributes = 3;</code>
+       */
+      public int getUnitAttributesCount() {
+        if (unitAttributesBuilder_ == null) {
+          return unitAttributes_.size();
+        } else {
+          return unitAttributesBuilder_.getCount();
+        }
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STUnitAttributes unit_attributes = 3;</code>
+       */
+      public org.sunrise.game.genProto.gen.MapProto.STUnitAttributes getUnitAttributes(int index) {
+        if (unitAttributesBuilder_ == null) {
+          return unitAttributes_.get(index);
+        } else {
+          return unitAttributesBuilder_.getMessage(index);
+        }
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STUnitAttributes unit_attributes = 3;</code>
+       */
+      public Builder setUnitAttributes(
+          int index, org.sunrise.game.genProto.gen.MapProto.STUnitAttributes value) {
+        if (unitAttributesBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureUnitAttributesIsMutable();
+          unitAttributes_.set(index, value);
+          onChanged();
+        } else {
+          unitAttributesBuilder_.setMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STUnitAttributes unit_attributes = 3;</code>
+       */
+      public Builder setUnitAttributes(
+          int index, org.sunrise.game.genProto.gen.MapProto.STUnitAttributes.Builder builderForValue) {
+        if (unitAttributesBuilder_ == null) {
+          ensureUnitAttributesIsMutable();
+          unitAttributes_.set(index, builderForValue.build());
+          onChanged();
+        } else {
+          unitAttributesBuilder_.setMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STUnitAttributes unit_attributes = 3;</code>
+       */
+      public Builder addUnitAttributes(org.sunrise.game.genProto.gen.MapProto.STUnitAttributes value) {
+        if (unitAttributesBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureUnitAttributesIsMutable();
+          unitAttributes_.add(value);
+          onChanged();
+        } else {
+          unitAttributesBuilder_.addMessage(value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STUnitAttributes unit_attributes = 3;</code>
+       */
+      public Builder addUnitAttributes(
+          int index, org.sunrise.game.genProto.gen.MapProto.STUnitAttributes value) {
+        if (unitAttributesBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureUnitAttributesIsMutable();
+          unitAttributes_.add(index, value);
+          onChanged();
+        } else {
+          unitAttributesBuilder_.addMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STUnitAttributes unit_attributes = 3;</code>
+       */
+      public Builder addUnitAttributes(
+          org.sunrise.game.genProto.gen.MapProto.STUnitAttributes.Builder builderForValue) {
+        if (unitAttributesBuilder_ == null) {
+          ensureUnitAttributesIsMutable();
+          unitAttributes_.add(builderForValue.build());
+          onChanged();
+        } else {
+          unitAttributesBuilder_.addMessage(builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STUnitAttributes unit_attributes = 3;</code>
+       */
+      public Builder addUnitAttributes(
+          int index, org.sunrise.game.genProto.gen.MapProto.STUnitAttributes.Builder builderForValue) {
+        if (unitAttributesBuilder_ == null) {
+          ensureUnitAttributesIsMutable();
+          unitAttributes_.add(index, builderForValue.build());
+          onChanged();
+        } else {
+          unitAttributesBuilder_.addMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STUnitAttributes unit_attributes = 3;</code>
+       */
+      public Builder addAllUnitAttributes(
+          java.lang.Iterable<? extends org.sunrise.game.genProto.gen.MapProto.STUnitAttributes> values) {
+        if (unitAttributesBuilder_ == null) {
+          ensureUnitAttributesIsMutable();
+          com.google.protobuf.AbstractMessageLite.Builder.addAll(
+              values, unitAttributes_);
+          onChanged();
+        } else {
+          unitAttributesBuilder_.addAllMessages(values);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STUnitAttributes unit_attributes = 3;</code>
+       */
+      public Builder clearUnitAttributes() {
+        if (unitAttributesBuilder_ == null) {
+          unitAttributes_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000004);
+          onChanged();
+        } else {
+          unitAttributesBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STUnitAttributes unit_attributes = 3;</code>
+       */
+      public Builder removeUnitAttributes(int index) {
+        if (unitAttributesBuilder_ == null) {
+          ensureUnitAttributesIsMutable();
+          unitAttributes_.remove(index);
+          onChanged();
+        } else {
+          unitAttributesBuilder_.remove(index);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STUnitAttributes unit_attributes = 3;</code>
+       */
+      public org.sunrise.game.genProto.gen.MapProto.STUnitAttributes.Builder getUnitAttributesBuilder(
+          int index) {
+        return getUnitAttributesFieldBuilder().getBuilder(index);
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STUnitAttributes unit_attributes = 3;</code>
+       */
+      public org.sunrise.game.genProto.gen.MapProto.STUnitAttributesOrBuilder getUnitAttributesOrBuilder(
+          int index) {
+        if (unitAttributesBuilder_ == null) {
+          return unitAttributes_.get(index);  } else {
+          return unitAttributesBuilder_.getMessageOrBuilder(index);
+        }
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STUnitAttributes unit_attributes = 3;</code>
+       */
+      public java.util.List<? extends org.sunrise.game.genProto.gen.MapProto.STUnitAttributesOrBuilder> 
+           getUnitAttributesOrBuilderList() {
+        if (unitAttributesBuilder_ != null) {
+          return unitAttributesBuilder_.getMessageOrBuilderList();
+        } else {
+          return java.util.Collections.unmodifiableList(unitAttributes_);
+        }
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STUnitAttributes unit_attributes = 3;</code>
+       */
+      public org.sunrise.game.genProto.gen.MapProto.STUnitAttributes.Builder addUnitAttributesBuilder() {
+        return getUnitAttributesFieldBuilder().addBuilder(
+            org.sunrise.game.genProto.gen.MapProto.STUnitAttributes.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STUnitAttributes unit_attributes = 3;</code>
+       */
+      public org.sunrise.game.genProto.gen.MapProto.STUnitAttributes.Builder addUnitAttributesBuilder(
+          int index) {
+        return getUnitAttributesFieldBuilder().addBuilder(
+            index, org.sunrise.game.genProto.gen.MapProto.STUnitAttributes.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .org.sunrise.game.genProto.gen.STUnitAttributes unit_attributes = 3;</code>
+       */
+      public java.util.List<org.sunrise.game.genProto.gen.MapProto.STUnitAttributes.Builder> 
+           getUnitAttributesBuilderList() {
+        return getUnitAttributesFieldBuilder().getBuilderList();
+      }
+      private com.google.protobuf.RepeatedFieldBuilder<
+          org.sunrise.game.genProto.gen.MapProto.STUnitAttributes, org.sunrise.game.genProto.gen.MapProto.STUnitAttributes.Builder, org.sunrise.game.genProto.gen.MapProto.STUnitAttributesOrBuilder> 
+          getUnitAttributesFieldBuilder() {
+        if (unitAttributesBuilder_ == null) {
+          unitAttributesBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+              org.sunrise.game.genProto.gen.MapProto.STUnitAttributes, org.sunrise.game.genProto.gen.MapProto.STUnitAttributes.Builder, org.sunrise.game.genProto.gen.MapProto.STUnitAttributesOrBuilder>(
+                  unitAttributes_,
+                  ((bitField0_ & 0x00000004) != 0),
+                  getParentForChildren(),
+                  isClean());
+          unitAttributes_ = null;
+        }
+        return unitAttributesBuilder_;
+      }
+
+      // @@protoc_insertion_point(builder_scope:org.sunrise.game.genProto.gen.MS2C_SceneSync)
+    }
+
+    // @@protoc_insertion_point(class_scope:org.sunrise.game.genProto.gen.MS2C_SceneSync)
+    private static final org.sunrise.game.genProto.gen.MapProto.MS2C_SceneSync DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new org.sunrise.game.genProto.gen.MapProto.MS2C_SceneSync();
+    }
+
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_SceneSync getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<MS2C_SceneSync>
+        PARSER = new com.google.protobuf.AbstractParser<MS2C_SceneSync>() {
+      @java.lang.Override
+      public MS2C_SceneSync parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
+      }
+    };
+
+    public static com.google.protobuf.Parser<MS2C_SceneSync> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<MS2C_SceneSync> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public org.sunrise.game.genProto.gen.MapProto.MS2C_SceneSync getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface MS2C_UnitEnterOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:org.sunrise.game.genProto.gen.MS2C_UnitEnter)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>.org.sunrise.game.genProto.gen.STUnitInfo unit = 1;</code>
+     * @return Whether the unit field is set.
+     */
+    boolean hasUnit();
+    /**
+     * <code>.org.sunrise.game.genProto.gen.STUnitInfo unit = 1;</code>
+     * @return The unit.
+     */
+    org.sunrise.game.genProto.gen.MapProto.STUnitInfo getUnit();
+    /**
+     * <code>.org.sunrise.game.genProto.gen.STUnitInfo unit = 1;</code>
+     */
+    org.sunrise.game.genProto.gen.MapProto.STUnitInfoOrBuilder getUnitOrBuilder();
+
+    /**
+     * <code>.org.sunrise.game.genProto.gen.STUnitPosition position = 2;</code>
+     * @return Whether the position field is set.
+     */
+    boolean hasPosition();
+    /**
+     * <code>.org.sunrise.game.genProto.gen.STUnitPosition position = 2;</code>
+     * @return The position.
+     */
+    org.sunrise.game.genProto.gen.MapProto.STUnitPosition getPosition();
+    /**
+     * <code>.org.sunrise.game.genProto.gen.STUnitPosition position = 2;</code>
+     */
+    org.sunrise.game.genProto.gen.MapProto.STUnitPositionOrBuilder getPositionOrBuilder();
+
+    /**
+     * <code>.org.sunrise.game.genProto.gen.STUnitAttributes attributes = 3;</code>
+     * @return Whether the attributes field is set.
+     */
+    boolean hasAttributes();
+    /**
+     * <code>.org.sunrise.game.genProto.gen.STUnitAttributes attributes = 3;</code>
+     * @return The attributes.
+     */
+    org.sunrise.game.genProto.gen.MapProto.STUnitAttributes getAttributes();
+    /**
+     * <code>.org.sunrise.game.genProto.gen.STUnitAttributes attributes = 3;</code>
+     */
+    org.sunrise.game.genProto.gen.MapProto.STUnitAttributesOrBuilder getAttributesOrBuilder();
+  }
+  /**
+   * Protobuf type {@code org.sunrise.game.genProto.gen.MS2C_UnitEnter}
+   */
+  public static final class MS2C_UnitEnter extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:org.sunrise.game.genProto.gen.MS2C_UnitEnter)
+      MS2C_UnitEnterOrBuilder {
+  private static final long serialVersionUID = 0L;
+    static {
+      com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
+        com.google.protobuf.RuntimeVersion.RuntimeDomain.PUBLIC,
+        /* major= */ 4,
+        /* minor= */ 28,
+        /* patch= */ 2,
+        /* suffix= */ "",
+        MS2C_UnitEnter.class.getName());
+    }
+    // Use MS2C_UnitEnter.newBuilder() to construct.
+    private MS2C_UnitEnter(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+    }
+    private MS2C_UnitEnter() {
+    }
+
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_MS2C_UnitEnter_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_MS2C_UnitEnter_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              org.sunrise.game.genProto.gen.MapProto.MS2C_UnitEnter.class, org.sunrise.game.genProto.gen.MapProto.MS2C_UnitEnter.Builder.class);
     }
 
     private int bitField0_;
-    public static final int NEW_PLAYER_FIELD_NUMBER = 1;
-    private org.sunrise.game.genProto.gen.MapProto.STRoleInfo newPlayer_;
+    public static final int UNIT_FIELD_NUMBER = 1;
+    private org.sunrise.game.genProto.gen.MapProto.STUnitInfo unit_;
     /**
-     * <pre>
-     * 新进入的玩家信息
-     * </pre>
-     *
-     * <code>.org.sunrise.game.genProto.gen.STRoleInfo new_player = 1;</code>
-     * @return Whether the newPlayer field is set.
+     * <code>.org.sunrise.game.genProto.gen.STUnitInfo unit = 1;</code>
+     * @return Whether the unit field is set.
      */
     @java.lang.Override
-    public boolean hasNewPlayer() {
+    public boolean hasUnit() {
       return ((bitField0_ & 0x00000001) != 0);
     }
     /**
-     * <pre>
-     * 新进入的玩家信息
-     * </pre>
-     *
-     * <code>.org.sunrise.game.genProto.gen.STRoleInfo new_player = 1;</code>
-     * @return The newPlayer.
+     * <code>.org.sunrise.game.genProto.gen.STUnitInfo unit = 1;</code>
+     * @return The unit.
      */
     @java.lang.Override
-    public org.sunrise.game.genProto.gen.MapProto.STRoleInfo getNewPlayer() {
-      return newPlayer_ == null ? org.sunrise.game.genProto.gen.MapProto.STRoleInfo.getDefaultInstance() : newPlayer_;
+    public org.sunrise.game.genProto.gen.MapProto.STUnitInfo getUnit() {
+      return unit_ == null ? org.sunrise.game.genProto.gen.MapProto.STUnitInfo.getDefaultInstance() : unit_;
     }
     /**
-     * <pre>
-     * 新进入的玩家信息
-     * </pre>
-     *
-     * <code>.org.sunrise.game.genProto.gen.STRoleInfo new_player = 1;</code>
+     * <code>.org.sunrise.game.genProto.gen.STUnitInfo unit = 1;</code>
      */
     @java.lang.Override
-    public org.sunrise.game.genProto.gen.MapProto.STRoleInfoOrBuilder getNewPlayerOrBuilder() {
-      return newPlayer_ == null ? org.sunrise.game.genProto.gen.MapProto.STRoleInfo.getDefaultInstance() : newPlayer_;
+    public org.sunrise.game.genProto.gen.MapProto.STUnitInfoOrBuilder getUnitOrBuilder() {
+      return unit_ == null ? org.sunrise.game.genProto.gen.MapProto.STUnitInfo.getDefaultInstance() : unit_;
+    }
+
+    public static final int POSITION_FIELD_NUMBER = 2;
+    private org.sunrise.game.genProto.gen.MapProto.STUnitPosition position_;
+    /**
+     * <code>.org.sunrise.game.genProto.gen.STUnitPosition position = 2;</code>
+     * @return Whether the position field is set.
+     */
+    @java.lang.Override
+    public boolean hasPosition() {
+      return ((bitField0_ & 0x00000002) != 0);
+    }
+    /**
+     * <code>.org.sunrise.game.genProto.gen.STUnitPosition position = 2;</code>
+     * @return The position.
+     */
+    @java.lang.Override
+    public org.sunrise.game.genProto.gen.MapProto.STUnitPosition getPosition() {
+      return position_ == null ? org.sunrise.game.genProto.gen.MapProto.STUnitPosition.getDefaultInstance() : position_;
+    }
+    /**
+     * <code>.org.sunrise.game.genProto.gen.STUnitPosition position = 2;</code>
+     */
+    @java.lang.Override
+    public org.sunrise.game.genProto.gen.MapProto.STUnitPositionOrBuilder getPositionOrBuilder() {
+      return position_ == null ? org.sunrise.game.genProto.gen.MapProto.STUnitPosition.getDefaultInstance() : position_;
+    }
+
+    public static final int ATTRIBUTES_FIELD_NUMBER = 3;
+    private org.sunrise.game.genProto.gen.MapProto.STUnitAttributes attributes_;
+    /**
+     * <code>.org.sunrise.game.genProto.gen.STUnitAttributes attributes = 3;</code>
+     * @return Whether the attributes field is set.
+     */
+    @java.lang.Override
+    public boolean hasAttributes() {
+      return ((bitField0_ & 0x00000004) != 0);
+    }
+    /**
+     * <code>.org.sunrise.game.genProto.gen.STUnitAttributes attributes = 3;</code>
+     * @return The attributes.
+     */
+    @java.lang.Override
+    public org.sunrise.game.genProto.gen.MapProto.STUnitAttributes getAttributes() {
+      return attributes_ == null ? org.sunrise.game.genProto.gen.MapProto.STUnitAttributes.getDefaultInstance() : attributes_;
+    }
+    /**
+     * <code>.org.sunrise.game.genProto.gen.STUnitAttributes attributes = 3;</code>
+     */
+    @java.lang.Override
+    public org.sunrise.game.genProto.gen.MapProto.STUnitAttributesOrBuilder getAttributesOrBuilder() {
+      return attributes_ == null ? org.sunrise.game.genProto.gen.MapProto.STUnitAttributes.getDefaultInstance() : attributes_;
     }
 
     private byte memoizedIsInitialized = -1;
@@ -3077,7 +6621,13 @@ public final class MapProto {
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) != 0)) {
-        output.writeMessage(1, getNewPlayer());
+        output.writeMessage(1, getUnit());
+      }
+      if (((bitField0_ & 0x00000002) != 0)) {
+        output.writeMessage(2, getPosition());
+      }
+      if (((bitField0_ & 0x00000004) != 0)) {
+        output.writeMessage(3, getAttributes());
       }
       getUnknownFields().writeTo(output);
     }
@@ -3090,7 +6640,15 @@ public final class MapProto {
       size = 0;
       if (((bitField0_ & 0x00000001) != 0)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(1, getNewPlayer());
+          .computeMessageSize(1, getUnit());
+      }
+      if (((bitField0_ & 0x00000002) != 0)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(2, getPosition());
+      }
+      if (((bitField0_ & 0x00000004) != 0)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(3, getAttributes());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
@@ -3102,15 +6660,25 @@ public final class MapProto {
       if (obj == this) {
        return true;
       }
-      if (!(obj instanceof org.sunrise.game.genProto.gen.MapProto.MS2C_Enter)) {
+      if (!(obj instanceof org.sunrise.game.genProto.gen.MapProto.MS2C_UnitEnter)) {
         return super.equals(obj);
       }
-      org.sunrise.game.genProto.gen.MapProto.MS2C_Enter other = (org.sunrise.game.genProto.gen.MapProto.MS2C_Enter) obj;
+      org.sunrise.game.genProto.gen.MapProto.MS2C_UnitEnter other = (org.sunrise.game.genProto.gen.MapProto.MS2C_UnitEnter) obj;
 
-      if (hasNewPlayer() != other.hasNewPlayer()) return false;
-      if (hasNewPlayer()) {
-        if (!getNewPlayer()
-            .equals(other.getNewPlayer())) return false;
+      if (hasUnit() != other.hasUnit()) return false;
+      if (hasUnit()) {
+        if (!getUnit()
+            .equals(other.getUnit())) return false;
+      }
+      if (hasPosition() != other.hasPosition()) return false;
+      if (hasPosition()) {
+        if (!getPosition()
+            .equals(other.getPosition())) return false;
+      }
+      if (hasAttributes() != other.hasAttributes()) return false;
+      if (hasAttributes()) {
+        if (!getAttributes()
+            .equals(other.getAttributes())) return false;
       }
       if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
@@ -3123,53 +6691,61 @@ public final class MapProto {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
-      if (hasNewPlayer()) {
-        hash = (37 * hash) + NEW_PLAYER_FIELD_NUMBER;
-        hash = (53 * hash) + getNewPlayer().hashCode();
+      if (hasUnit()) {
+        hash = (37 * hash) + UNIT_FIELD_NUMBER;
+        hash = (53 * hash) + getUnit().hashCode();
+      }
+      if (hasPosition()) {
+        hash = (37 * hash) + POSITION_FIELD_NUMBER;
+        hash = (53 * hash) + getPosition().hashCode();
+      }
+      if (hasAttributes()) {
+        hash = (37 * hash) + ATTRIBUTES_FIELD_NUMBER;
+        hash = (53 * hash) + getAttributes().hashCode();
       }
       hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
       return hash;
     }
 
-    public static org.sunrise.game.genProto.gen.MapProto.MS2C_Enter parseFrom(
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_UnitEnter parseFrom(
         java.nio.ByteBuffer data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static org.sunrise.game.genProto.gen.MapProto.MS2C_Enter parseFrom(
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_UnitEnter parseFrom(
         java.nio.ByteBuffer data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static org.sunrise.game.genProto.gen.MapProto.MS2C_Enter parseFrom(
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_UnitEnter parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static org.sunrise.game.genProto.gen.MapProto.MS2C_Enter parseFrom(
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_UnitEnter parseFrom(
         com.google.protobuf.ByteString data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static org.sunrise.game.genProto.gen.MapProto.MS2C_Enter parseFrom(byte[] data)
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_UnitEnter parseFrom(byte[] data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static org.sunrise.game.genProto.gen.MapProto.MS2C_Enter parseFrom(
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_UnitEnter parseFrom(
         byte[] data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static org.sunrise.game.genProto.gen.MapProto.MS2C_Enter parseFrom(java.io.InputStream input)
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_UnitEnter parseFrom(java.io.InputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessage
           .parseWithIOException(PARSER, input);
     }
-    public static org.sunrise.game.genProto.gen.MapProto.MS2C_Enter parseFrom(
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_UnitEnter parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -3177,26 +6753,26 @@ public final class MapProto {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    public static org.sunrise.game.genProto.gen.MapProto.MS2C_Enter parseDelimitedFrom(java.io.InputStream input)
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_UnitEnter parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessage
           .parseDelimitedWithIOException(PARSER, input);
     }
 
-    public static org.sunrise.game.genProto.gen.MapProto.MS2C_Enter parseDelimitedFrom(
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_UnitEnter parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessage
           .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
-    public static org.sunrise.game.genProto.gen.MapProto.MS2C_Enter parseFrom(
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_UnitEnter parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessage
           .parseWithIOException(PARSER, input);
     }
-    public static org.sunrise.game.genProto.gen.MapProto.MS2C_Enter parseFrom(
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_UnitEnter parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -3209,7 +6785,7 @@ public final class MapProto {
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
     }
-    public static Builder newBuilder(org.sunrise.game.genProto.gen.MapProto.MS2C_Enter prototype) {
+    public static Builder newBuilder(org.sunrise.game.genProto.gen.MapProto.MS2C_UnitEnter prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
     @java.lang.Override
@@ -3225,30 +6801,26 @@ public final class MapProto {
       return builder;
     }
     /**
-     * <pre>
-     * 新玩家进入地图，通知在地图中的玩家
-     * </pre>
-     *
-     * Protobuf type {@code org.sunrise.game.genProto.gen.MS2C_Enter}
+     * Protobuf type {@code org.sunrise.game.genProto.gen.MS2C_UnitEnter}
      */
     public static final class Builder extends
         com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:org.sunrise.game.genProto.gen.MS2C_Enter)
-        org.sunrise.game.genProto.gen.MapProto.MS2C_EnterOrBuilder {
+        // @@protoc_insertion_point(builder_implements:org.sunrise.game.genProto.gen.MS2C_UnitEnter)
+        org.sunrise.game.genProto.gen.MapProto.MS2C_UnitEnterOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
-        return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_MS2C_Enter_descriptor;
+        return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_MS2C_UnitEnter_descriptor;
       }
 
       @java.lang.Override
       protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
           internalGetFieldAccessorTable() {
-        return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_MS2C_Enter_fieldAccessorTable
+        return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_MS2C_UnitEnter_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
-                org.sunrise.game.genProto.gen.MapProto.MS2C_Enter.class, org.sunrise.game.genProto.gen.MapProto.MS2C_Enter.Builder.class);
+                org.sunrise.game.genProto.gen.MapProto.MS2C_UnitEnter.class, org.sunrise.game.genProto.gen.MapProto.MS2C_UnitEnter.Builder.class);
       }
 
-      // Construct using org.sunrise.game.genProto.gen.MapProto.MS2C_Enter.newBuilder()
+      // Construct using org.sunrise.game.genProto.gen.MapProto.MS2C_UnitEnter.newBuilder()
       private Builder() {
         maybeForceBuilderInitialization();
       }
@@ -3261,17 +6833,29 @@ public final class MapProto {
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessage
                 .alwaysUseFieldBuilders) {
-          getNewPlayerFieldBuilder();
+          getUnitFieldBuilder();
+          getPositionFieldBuilder();
+          getAttributesFieldBuilder();
         }
       }
       @java.lang.Override
       public Builder clear() {
         super.clear();
         bitField0_ = 0;
-        newPlayer_ = null;
-        if (newPlayerBuilder_ != null) {
-          newPlayerBuilder_.dispose();
-          newPlayerBuilder_ = null;
+        unit_ = null;
+        if (unitBuilder_ != null) {
+          unitBuilder_.dispose();
+          unitBuilder_ = null;
+        }
+        position_ = null;
+        if (positionBuilder_ != null) {
+          positionBuilder_.dispose();
+          positionBuilder_ = null;
+        }
+        attributes_ = null;
+        if (attributesBuilder_ != null) {
+          attributesBuilder_.dispose();
+          attributesBuilder_ = null;
         }
         return this;
       }
@@ -3279,17 +6863,17 @@ public final class MapProto {
       @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
-        return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_MS2C_Enter_descriptor;
+        return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_MS2C_UnitEnter_descriptor;
       }
 
       @java.lang.Override
-      public org.sunrise.game.genProto.gen.MapProto.MS2C_Enter getDefaultInstanceForType() {
-        return org.sunrise.game.genProto.gen.MapProto.MS2C_Enter.getDefaultInstance();
+      public org.sunrise.game.genProto.gen.MapProto.MS2C_UnitEnter getDefaultInstanceForType() {
+        return org.sunrise.game.genProto.gen.MapProto.MS2C_UnitEnter.getDefaultInstance();
       }
 
       @java.lang.Override
-      public org.sunrise.game.genProto.gen.MapProto.MS2C_Enter build() {
-        org.sunrise.game.genProto.gen.MapProto.MS2C_Enter result = buildPartial();
+      public org.sunrise.game.genProto.gen.MapProto.MS2C_UnitEnter build() {
+        org.sunrise.game.genProto.gen.MapProto.MS2C_UnitEnter result = buildPartial();
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(result);
         }
@@ -3297,39 +6881,57 @@ public final class MapProto {
       }
 
       @java.lang.Override
-      public org.sunrise.game.genProto.gen.MapProto.MS2C_Enter buildPartial() {
-        org.sunrise.game.genProto.gen.MapProto.MS2C_Enter result = new org.sunrise.game.genProto.gen.MapProto.MS2C_Enter(this);
+      public org.sunrise.game.genProto.gen.MapProto.MS2C_UnitEnter buildPartial() {
+        org.sunrise.game.genProto.gen.MapProto.MS2C_UnitEnter result = new org.sunrise.game.genProto.gen.MapProto.MS2C_UnitEnter(this);
         if (bitField0_ != 0) { buildPartial0(result); }
         onBuilt();
         return result;
       }
 
-      private void buildPartial0(org.sunrise.game.genProto.gen.MapProto.MS2C_Enter result) {
+      private void buildPartial0(org.sunrise.game.genProto.gen.MapProto.MS2C_UnitEnter result) {
         int from_bitField0_ = bitField0_;
         int to_bitField0_ = 0;
         if (((from_bitField0_ & 0x00000001) != 0)) {
-          result.newPlayer_ = newPlayerBuilder_ == null
-              ? newPlayer_
-              : newPlayerBuilder_.build();
+          result.unit_ = unitBuilder_ == null
+              ? unit_
+              : unitBuilder_.build();
           to_bitField0_ |= 0x00000001;
+        }
+        if (((from_bitField0_ & 0x00000002) != 0)) {
+          result.position_ = positionBuilder_ == null
+              ? position_
+              : positionBuilder_.build();
+          to_bitField0_ |= 0x00000002;
+        }
+        if (((from_bitField0_ & 0x00000004) != 0)) {
+          result.attributes_ = attributesBuilder_ == null
+              ? attributes_
+              : attributesBuilder_.build();
+          to_bitField0_ |= 0x00000004;
         }
         result.bitField0_ |= to_bitField0_;
       }
 
       @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof org.sunrise.game.genProto.gen.MapProto.MS2C_Enter) {
-          return mergeFrom((org.sunrise.game.genProto.gen.MapProto.MS2C_Enter)other);
+        if (other instanceof org.sunrise.game.genProto.gen.MapProto.MS2C_UnitEnter) {
+          return mergeFrom((org.sunrise.game.genProto.gen.MapProto.MS2C_UnitEnter)other);
         } else {
           super.mergeFrom(other);
           return this;
         }
       }
 
-      public Builder mergeFrom(org.sunrise.game.genProto.gen.MapProto.MS2C_Enter other) {
-        if (other == org.sunrise.game.genProto.gen.MapProto.MS2C_Enter.getDefaultInstance()) return this;
-        if (other.hasNewPlayer()) {
-          mergeNewPlayer(other.getNewPlayer());
+      public Builder mergeFrom(org.sunrise.game.genProto.gen.MapProto.MS2C_UnitEnter other) {
+        if (other == org.sunrise.game.genProto.gen.MapProto.MS2C_UnitEnter.getDefaultInstance()) return this;
+        if (other.hasUnit()) {
+          mergeUnit(other.getUnit());
+        }
+        if (other.hasPosition()) {
+          mergePosition(other.getPosition());
+        }
+        if (other.hasAttributes()) {
+          mergeAttributes(other.getAttributes());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
@@ -3359,7 +6961,1343 @@ public final class MapProto {
                 break;
               case 10: {
                 input.readMessage(
-                    getNewPlayerFieldBuilder().getBuilder(),
+                    getUnitFieldBuilder().getBuilder(),
+                    extensionRegistry);
+                bitField0_ |= 0x00000001;
+                break;
+              } // case 10
+              case 18: {
+                input.readMessage(
+                    getPositionFieldBuilder().getBuilder(),
+                    extensionRegistry);
+                bitField0_ |= 0x00000002;
+                break;
+              } // case 18
+              case 26: {
+                input.readMessage(
+                    getAttributesFieldBuilder().getBuilder(),
+                    extensionRegistry);
+                bitField0_ |= 0x00000004;
+                break;
+              } // case 26
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.unwrapIOException();
+        } finally {
+          onChanged();
+        } // finally
+        return this;
+      }
+      private int bitField0_;
+
+      private org.sunrise.game.genProto.gen.MapProto.STUnitInfo unit_;
+      private com.google.protobuf.SingleFieldBuilder<
+          org.sunrise.game.genProto.gen.MapProto.STUnitInfo, org.sunrise.game.genProto.gen.MapProto.STUnitInfo.Builder, org.sunrise.game.genProto.gen.MapProto.STUnitInfoOrBuilder> unitBuilder_;
+      /**
+       * <code>.org.sunrise.game.genProto.gen.STUnitInfo unit = 1;</code>
+       * @return Whether the unit field is set.
+       */
+      public boolean hasUnit() {
+        return ((bitField0_ & 0x00000001) != 0);
+      }
+      /**
+       * <code>.org.sunrise.game.genProto.gen.STUnitInfo unit = 1;</code>
+       * @return The unit.
+       */
+      public org.sunrise.game.genProto.gen.MapProto.STUnitInfo getUnit() {
+        if (unitBuilder_ == null) {
+          return unit_ == null ? org.sunrise.game.genProto.gen.MapProto.STUnitInfo.getDefaultInstance() : unit_;
+        } else {
+          return unitBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>.org.sunrise.game.genProto.gen.STUnitInfo unit = 1;</code>
+       */
+      public Builder setUnit(org.sunrise.game.genProto.gen.MapProto.STUnitInfo value) {
+        if (unitBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          unit_ = value;
+        } else {
+          unitBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.org.sunrise.game.genProto.gen.STUnitInfo unit = 1;</code>
+       */
+      public Builder setUnit(
+          org.sunrise.game.genProto.gen.MapProto.STUnitInfo.Builder builderForValue) {
+        if (unitBuilder_ == null) {
+          unit_ = builderForValue.build();
+        } else {
+          unitBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.org.sunrise.game.genProto.gen.STUnitInfo unit = 1;</code>
+       */
+      public Builder mergeUnit(org.sunrise.game.genProto.gen.MapProto.STUnitInfo value) {
+        if (unitBuilder_ == null) {
+          if (((bitField0_ & 0x00000001) != 0) &&
+            unit_ != null &&
+            unit_ != org.sunrise.game.genProto.gen.MapProto.STUnitInfo.getDefaultInstance()) {
+            getUnitBuilder().mergeFrom(value);
+          } else {
+            unit_ = value;
+          }
+        } else {
+          unitBuilder_.mergeFrom(value);
+        }
+        if (unit_ != null) {
+          bitField0_ |= 0x00000001;
+          onChanged();
+        }
+        return this;
+      }
+      /**
+       * <code>.org.sunrise.game.genProto.gen.STUnitInfo unit = 1;</code>
+       */
+      public Builder clearUnit() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        unit_ = null;
+        if (unitBuilder_ != null) {
+          unitBuilder_.dispose();
+          unitBuilder_ = null;
+        }
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.org.sunrise.game.genProto.gen.STUnitInfo unit = 1;</code>
+       */
+      public org.sunrise.game.genProto.gen.MapProto.STUnitInfo.Builder getUnitBuilder() {
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return getUnitFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.org.sunrise.game.genProto.gen.STUnitInfo unit = 1;</code>
+       */
+      public org.sunrise.game.genProto.gen.MapProto.STUnitInfoOrBuilder getUnitOrBuilder() {
+        if (unitBuilder_ != null) {
+          return unitBuilder_.getMessageOrBuilder();
+        } else {
+          return unit_ == null ?
+              org.sunrise.game.genProto.gen.MapProto.STUnitInfo.getDefaultInstance() : unit_;
+        }
+      }
+      /**
+       * <code>.org.sunrise.game.genProto.gen.STUnitInfo unit = 1;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilder<
+          org.sunrise.game.genProto.gen.MapProto.STUnitInfo, org.sunrise.game.genProto.gen.MapProto.STUnitInfo.Builder, org.sunrise.game.genProto.gen.MapProto.STUnitInfoOrBuilder> 
+          getUnitFieldBuilder() {
+        if (unitBuilder_ == null) {
+          unitBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              org.sunrise.game.genProto.gen.MapProto.STUnitInfo, org.sunrise.game.genProto.gen.MapProto.STUnitInfo.Builder, org.sunrise.game.genProto.gen.MapProto.STUnitInfoOrBuilder>(
+                  getUnit(),
+                  getParentForChildren(),
+                  isClean());
+          unit_ = null;
+        }
+        return unitBuilder_;
+      }
+
+      private org.sunrise.game.genProto.gen.MapProto.STUnitPosition position_;
+      private com.google.protobuf.SingleFieldBuilder<
+          org.sunrise.game.genProto.gen.MapProto.STUnitPosition, org.sunrise.game.genProto.gen.MapProto.STUnitPosition.Builder, org.sunrise.game.genProto.gen.MapProto.STUnitPositionOrBuilder> positionBuilder_;
+      /**
+       * <code>.org.sunrise.game.genProto.gen.STUnitPosition position = 2;</code>
+       * @return Whether the position field is set.
+       */
+      public boolean hasPosition() {
+        return ((bitField0_ & 0x00000002) != 0);
+      }
+      /**
+       * <code>.org.sunrise.game.genProto.gen.STUnitPosition position = 2;</code>
+       * @return The position.
+       */
+      public org.sunrise.game.genProto.gen.MapProto.STUnitPosition getPosition() {
+        if (positionBuilder_ == null) {
+          return position_ == null ? org.sunrise.game.genProto.gen.MapProto.STUnitPosition.getDefaultInstance() : position_;
+        } else {
+          return positionBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>.org.sunrise.game.genProto.gen.STUnitPosition position = 2;</code>
+       */
+      public Builder setPosition(org.sunrise.game.genProto.gen.MapProto.STUnitPosition value) {
+        if (positionBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          position_ = value;
+        } else {
+          positionBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.org.sunrise.game.genProto.gen.STUnitPosition position = 2;</code>
+       */
+      public Builder setPosition(
+          org.sunrise.game.genProto.gen.MapProto.STUnitPosition.Builder builderForValue) {
+        if (positionBuilder_ == null) {
+          position_ = builderForValue.build();
+        } else {
+          positionBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.org.sunrise.game.genProto.gen.STUnitPosition position = 2;</code>
+       */
+      public Builder mergePosition(org.sunrise.game.genProto.gen.MapProto.STUnitPosition value) {
+        if (positionBuilder_ == null) {
+          if (((bitField0_ & 0x00000002) != 0) &&
+            position_ != null &&
+            position_ != org.sunrise.game.genProto.gen.MapProto.STUnitPosition.getDefaultInstance()) {
+            getPositionBuilder().mergeFrom(value);
+          } else {
+            position_ = value;
+          }
+        } else {
+          positionBuilder_.mergeFrom(value);
+        }
+        if (position_ != null) {
+          bitField0_ |= 0x00000002;
+          onChanged();
+        }
+        return this;
+      }
+      /**
+       * <code>.org.sunrise.game.genProto.gen.STUnitPosition position = 2;</code>
+       */
+      public Builder clearPosition() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        position_ = null;
+        if (positionBuilder_ != null) {
+          positionBuilder_.dispose();
+          positionBuilder_ = null;
+        }
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.org.sunrise.game.genProto.gen.STUnitPosition position = 2;</code>
+       */
+      public org.sunrise.game.genProto.gen.MapProto.STUnitPosition.Builder getPositionBuilder() {
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return getPositionFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.org.sunrise.game.genProto.gen.STUnitPosition position = 2;</code>
+       */
+      public org.sunrise.game.genProto.gen.MapProto.STUnitPositionOrBuilder getPositionOrBuilder() {
+        if (positionBuilder_ != null) {
+          return positionBuilder_.getMessageOrBuilder();
+        } else {
+          return position_ == null ?
+              org.sunrise.game.genProto.gen.MapProto.STUnitPosition.getDefaultInstance() : position_;
+        }
+      }
+      /**
+       * <code>.org.sunrise.game.genProto.gen.STUnitPosition position = 2;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilder<
+          org.sunrise.game.genProto.gen.MapProto.STUnitPosition, org.sunrise.game.genProto.gen.MapProto.STUnitPosition.Builder, org.sunrise.game.genProto.gen.MapProto.STUnitPositionOrBuilder> 
+          getPositionFieldBuilder() {
+        if (positionBuilder_ == null) {
+          positionBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              org.sunrise.game.genProto.gen.MapProto.STUnitPosition, org.sunrise.game.genProto.gen.MapProto.STUnitPosition.Builder, org.sunrise.game.genProto.gen.MapProto.STUnitPositionOrBuilder>(
+                  getPosition(),
+                  getParentForChildren(),
+                  isClean());
+          position_ = null;
+        }
+        return positionBuilder_;
+      }
+
+      private org.sunrise.game.genProto.gen.MapProto.STUnitAttributes attributes_;
+      private com.google.protobuf.SingleFieldBuilder<
+          org.sunrise.game.genProto.gen.MapProto.STUnitAttributes, org.sunrise.game.genProto.gen.MapProto.STUnitAttributes.Builder, org.sunrise.game.genProto.gen.MapProto.STUnitAttributesOrBuilder> attributesBuilder_;
+      /**
+       * <code>.org.sunrise.game.genProto.gen.STUnitAttributes attributes = 3;</code>
+       * @return Whether the attributes field is set.
+       */
+      public boolean hasAttributes() {
+        return ((bitField0_ & 0x00000004) != 0);
+      }
+      /**
+       * <code>.org.sunrise.game.genProto.gen.STUnitAttributes attributes = 3;</code>
+       * @return The attributes.
+       */
+      public org.sunrise.game.genProto.gen.MapProto.STUnitAttributes getAttributes() {
+        if (attributesBuilder_ == null) {
+          return attributes_ == null ? org.sunrise.game.genProto.gen.MapProto.STUnitAttributes.getDefaultInstance() : attributes_;
+        } else {
+          return attributesBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>.org.sunrise.game.genProto.gen.STUnitAttributes attributes = 3;</code>
+       */
+      public Builder setAttributes(org.sunrise.game.genProto.gen.MapProto.STUnitAttributes value) {
+        if (attributesBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          attributes_ = value;
+        } else {
+          attributesBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00000004;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.org.sunrise.game.genProto.gen.STUnitAttributes attributes = 3;</code>
+       */
+      public Builder setAttributes(
+          org.sunrise.game.genProto.gen.MapProto.STUnitAttributes.Builder builderForValue) {
+        if (attributesBuilder_ == null) {
+          attributes_ = builderForValue.build();
+        } else {
+          attributesBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000004;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.org.sunrise.game.genProto.gen.STUnitAttributes attributes = 3;</code>
+       */
+      public Builder mergeAttributes(org.sunrise.game.genProto.gen.MapProto.STUnitAttributes value) {
+        if (attributesBuilder_ == null) {
+          if (((bitField0_ & 0x00000004) != 0) &&
+            attributes_ != null &&
+            attributes_ != org.sunrise.game.genProto.gen.MapProto.STUnitAttributes.getDefaultInstance()) {
+            getAttributesBuilder().mergeFrom(value);
+          } else {
+            attributes_ = value;
+          }
+        } else {
+          attributesBuilder_.mergeFrom(value);
+        }
+        if (attributes_ != null) {
+          bitField0_ |= 0x00000004;
+          onChanged();
+        }
+        return this;
+      }
+      /**
+       * <code>.org.sunrise.game.genProto.gen.STUnitAttributes attributes = 3;</code>
+       */
+      public Builder clearAttributes() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        attributes_ = null;
+        if (attributesBuilder_ != null) {
+          attributesBuilder_.dispose();
+          attributesBuilder_ = null;
+        }
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.org.sunrise.game.genProto.gen.STUnitAttributes attributes = 3;</code>
+       */
+      public org.sunrise.game.genProto.gen.MapProto.STUnitAttributes.Builder getAttributesBuilder() {
+        bitField0_ |= 0x00000004;
+        onChanged();
+        return getAttributesFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.org.sunrise.game.genProto.gen.STUnitAttributes attributes = 3;</code>
+       */
+      public org.sunrise.game.genProto.gen.MapProto.STUnitAttributesOrBuilder getAttributesOrBuilder() {
+        if (attributesBuilder_ != null) {
+          return attributesBuilder_.getMessageOrBuilder();
+        } else {
+          return attributes_ == null ?
+              org.sunrise.game.genProto.gen.MapProto.STUnitAttributes.getDefaultInstance() : attributes_;
+        }
+      }
+      /**
+       * <code>.org.sunrise.game.genProto.gen.STUnitAttributes attributes = 3;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilder<
+          org.sunrise.game.genProto.gen.MapProto.STUnitAttributes, org.sunrise.game.genProto.gen.MapProto.STUnitAttributes.Builder, org.sunrise.game.genProto.gen.MapProto.STUnitAttributesOrBuilder> 
+          getAttributesFieldBuilder() {
+        if (attributesBuilder_ == null) {
+          attributesBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              org.sunrise.game.genProto.gen.MapProto.STUnitAttributes, org.sunrise.game.genProto.gen.MapProto.STUnitAttributes.Builder, org.sunrise.game.genProto.gen.MapProto.STUnitAttributesOrBuilder>(
+                  getAttributes(),
+                  getParentForChildren(),
+                  isClean());
+          attributes_ = null;
+        }
+        return attributesBuilder_;
+      }
+
+      // @@protoc_insertion_point(builder_scope:org.sunrise.game.genProto.gen.MS2C_UnitEnter)
+    }
+
+    // @@protoc_insertion_point(class_scope:org.sunrise.game.genProto.gen.MS2C_UnitEnter)
+    private static final org.sunrise.game.genProto.gen.MapProto.MS2C_UnitEnter DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new org.sunrise.game.genProto.gen.MapProto.MS2C_UnitEnter();
+    }
+
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_UnitEnter getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<MS2C_UnitEnter>
+        PARSER = new com.google.protobuf.AbstractParser<MS2C_UnitEnter>() {
+      @java.lang.Override
+      public MS2C_UnitEnter parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
+      }
+    };
+
+    public static com.google.protobuf.Parser<MS2C_UnitEnter> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<MS2C_UnitEnter> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public org.sunrise.game.genProto.gen.MapProto.MS2C_UnitEnter getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface MS2C_UnitLeaveOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:org.sunrise.game.genProto.gen.MS2C_UnitLeave)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>string unit_id = 1;</code>
+     * @return The unitId.
+     */
+    java.lang.String getUnitId();
+    /**
+     * <code>string unit_id = 1;</code>
+     * @return The bytes for unitId.
+     */
+    com.google.protobuf.ByteString
+        getUnitIdBytes();
+  }
+  /**
+   * Protobuf type {@code org.sunrise.game.genProto.gen.MS2C_UnitLeave}
+   */
+  public static final class MS2C_UnitLeave extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:org.sunrise.game.genProto.gen.MS2C_UnitLeave)
+      MS2C_UnitLeaveOrBuilder {
+  private static final long serialVersionUID = 0L;
+    static {
+      com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
+        com.google.protobuf.RuntimeVersion.RuntimeDomain.PUBLIC,
+        /* major= */ 4,
+        /* minor= */ 28,
+        /* patch= */ 2,
+        /* suffix= */ "",
+        MS2C_UnitLeave.class.getName());
+    }
+    // Use MS2C_UnitLeave.newBuilder() to construct.
+    private MS2C_UnitLeave(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+    }
+    private MS2C_UnitLeave() {
+      unitId_ = "";
+    }
+
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_MS2C_UnitLeave_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_MS2C_UnitLeave_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              org.sunrise.game.genProto.gen.MapProto.MS2C_UnitLeave.class, org.sunrise.game.genProto.gen.MapProto.MS2C_UnitLeave.Builder.class);
+    }
+
+    public static final int UNIT_ID_FIELD_NUMBER = 1;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object unitId_ = "";
+    /**
+     * <code>string unit_id = 1;</code>
+     * @return The unitId.
+     */
+    @java.lang.Override
+    public java.lang.String getUnitId() {
+      java.lang.Object ref = unitId_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        unitId_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string unit_id = 1;</code>
+     * @return The bytes for unitId.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getUnitIdBytes() {
+      java.lang.Object ref = unitId_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        unitId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(unitId_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 1, unitId_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(unitId_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(1, unitId_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof org.sunrise.game.genProto.gen.MapProto.MS2C_UnitLeave)) {
+        return super.equals(obj);
+      }
+      org.sunrise.game.genProto.gen.MapProto.MS2C_UnitLeave other = (org.sunrise.game.genProto.gen.MapProto.MS2C_UnitLeave) obj;
+
+      if (!getUnitId()
+          .equals(other.getUnitId())) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + UNIT_ID_FIELD_NUMBER;
+      hash = (53 * hash) + getUnitId().hashCode();
+      hash = (29 * hash) + getUnknownFields().hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_UnitLeave parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_UnitLeave parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_UnitLeave parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_UnitLeave parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_UnitLeave parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_UnitLeave parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_UnitLeave parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_UnitLeave parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_UnitLeave parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_UnitLeave parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_UnitLeave parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_UnitLeave parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(org.sunrise.game.genProto.gen.MapProto.MS2C_UnitLeave prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code org.sunrise.game.genProto.gen.MS2C_UnitLeave}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:org.sunrise.game.genProto.gen.MS2C_UnitLeave)
+        org.sunrise.game.genProto.gen.MapProto.MS2C_UnitLeaveOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_MS2C_UnitLeave_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_MS2C_UnitLeave_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                org.sunrise.game.genProto.gen.MapProto.MS2C_UnitLeave.class, org.sunrise.game.genProto.gen.MapProto.MS2C_UnitLeave.Builder.class);
+      }
+
+      // Construct using org.sunrise.game.genProto.gen.MapProto.MS2C_UnitLeave.newBuilder()
+      private Builder() {
+
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        bitField0_ = 0;
+        unitId_ = "";
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_MS2C_UnitLeave_descriptor;
+      }
+
+      @java.lang.Override
+      public org.sunrise.game.genProto.gen.MapProto.MS2C_UnitLeave getDefaultInstanceForType() {
+        return org.sunrise.game.genProto.gen.MapProto.MS2C_UnitLeave.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public org.sunrise.game.genProto.gen.MapProto.MS2C_UnitLeave build() {
+        org.sunrise.game.genProto.gen.MapProto.MS2C_UnitLeave result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public org.sunrise.game.genProto.gen.MapProto.MS2C_UnitLeave buildPartial() {
+        org.sunrise.game.genProto.gen.MapProto.MS2C_UnitLeave result = new org.sunrise.game.genProto.gen.MapProto.MS2C_UnitLeave(this);
+        if (bitField0_ != 0) { buildPartial0(result); }
+        onBuilt();
+        return result;
+      }
+
+      private void buildPartial0(org.sunrise.game.genProto.gen.MapProto.MS2C_UnitLeave result) {
+        int from_bitField0_ = bitField0_;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.unitId_ = unitId_;
+        }
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof org.sunrise.game.genProto.gen.MapProto.MS2C_UnitLeave) {
+          return mergeFrom((org.sunrise.game.genProto.gen.MapProto.MS2C_UnitLeave)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(org.sunrise.game.genProto.gen.MapProto.MS2C_UnitLeave other) {
+        if (other == org.sunrise.game.genProto.gen.MapProto.MS2C_UnitLeave.getDefaultInstance()) return this;
+        if (!other.getUnitId().isEmpty()) {
+          unitId_ = other.unitId_;
+          bitField0_ |= 0x00000001;
+          onChanged();
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
+        try {
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 10: {
+                unitId_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000001;
+                break;
+              } // case 10
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.unwrapIOException();
+        } finally {
+          onChanged();
+        } // finally
+        return this;
+      }
+      private int bitField0_;
+
+      private java.lang.Object unitId_ = "";
+      /**
+       * <code>string unit_id = 1;</code>
+       * @return The unitId.
+       */
+      public java.lang.String getUnitId() {
+        java.lang.Object ref = unitId_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          unitId_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string unit_id = 1;</code>
+       * @return The bytes for unitId.
+       */
+      public com.google.protobuf.ByteString
+          getUnitIdBytes() {
+        java.lang.Object ref = unitId_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          unitId_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string unit_id = 1;</code>
+       * @param value The unitId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setUnitId(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        unitId_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string unit_id = 1;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearUnitId() {
+        unitId_ = getDefaultInstance().getUnitId();
+        bitField0_ = (bitField0_ & ~0x00000001);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string unit_id = 1;</code>
+       * @param value The bytes for unitId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setUnitIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        unitId_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:org.sunrise.game.genProto.gen.MS2C_UnitLeave)
+    }
+
+    // @@protoc_insertion_point(class_scope:org.sunrise.game.genProto.gen.MS2C_UnitLeave)
+    private static final org.sunrise.game.genProto.gen.MapProto.MS2C_UnitLeave DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new org.sunrise.game.genProto.gen.MapProto.MS2C_UnitLeave();
+    }
+
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_UnitLeave getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<MS2C_UnitLeave>
+        PARSER = new com.google.protobuf.AbstractParser<MS2C_UnitLeave>() {
+      @java.lang.Override
+      public MS2C_UnitLeave parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
+      }
+    };
+
+    public static com.google.protobuf.Parser<MS2C_UnitLeave> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<MS2C_UnitLeave> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public org.sunrise.game.genProto.gen.MapProto.MS2C_UnitLeave getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface MS2C_UnitPositionUpdateOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:org.sunrise.game.genProto.gen.MS2C_UnitPositionUpdate)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>.org.sunrise.game.genProto.gen.STUnitPosition position = 1;</code>
+     * @return Whether the position field is set.
+     */
+    boolean hasPosition();
+    /**
+     * <code>.org.sunrise.game.genProto.gen.STUnitPosition position = 1;</code>
+     * @return The position.
+     */
+    org.sunrise.game.genProto.gen.MapProto.STUnitPosition getPosition();
+    /**
+     * <code>.org.sunrise.game.genProto.gen.STUnitPosition position = 1;</code>
+     */
+    org.sunrise.game.genProto.gen.MapProto.STUnitPositionOrBuilder getPositionOrBuilder();
+  }
+  /**
+   * Protobuf type {@code org.sunrise.game.genProto.gen.MS2C_UnitPositionUpdate}
+   */
+  public static final class MS2C_UnitPositionUpdate extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:org.sunrise.game.genProto.gen.MS2C_UnitPositionUpdate)
+      MS2C_UnitPositionUpdateOrBuilder {
+  private static final long serialVersionUID = 0L;
+    static {
+      com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
+        com.google.protobuf.RuntimeVersion.RuntimeDomain.PUBLIC,
+        /* major= */ 4,
+        /* minor= */ 28,
+        /* patch= */ 2,
+        /* suffix= */ "",
+        MS2C_UnitPositionUpdate.class.getName());
+    }
+    // Use MS2C_UnitPositionUpdate.newBuilder() to construct.
+    private MS2C_UnitPositionUpdate(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+    }
+    private MS2C_UnitPositionUpdate() {
+    }
+
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_MS2C_UnitPositionUpdate_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_MS2C_UnitPositionUpdate_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              org.sunrise.game.genProto.gen.MapProto.MS2C_UnitPositionUpdate.class, org.sunrise.game.genProto.gen.MapProto.MS2C_UnitPositionUpdate.Builder.class);
+    }
+
+    private int bitField0_;
+    public static final int POSITION_FIELD_NUMBER = 1;
+    private org.sunrise.game.genProto.gen.MapProto.STUnitPosition position_;
+    /**
+     * <code>.org.sunrise.game.genProto.gen.STUnitPosition position = 1;</code>
+     * @return Whether the position field is set.
+     */
+    @java.lang.Override
+    public boolean hasPosition() {
+      return ((bitField0_ & 0x00000001) != 0);
+    }
+    /**
+     * <code>.org.sunrise.game.genProto.gen.STUnitPosition position = 1;</code>
+     * @return The position.
+     */
+    @java.lang.Override
+    public org.sunrise.game.genProto.gen.MapProto.STUnitPosition getPosition() {
+      return position_ == null ? org.sunrise.game.genProto.gen.MapProto.STUnitPosition.getDefaultInstance() : position_;
+    }
+    /**
+     * <code>.org.sunrise.game.genProto.gen.STUnitPosition position = 1;</code>
+     */
+    @java.lang.Override
+    public org.sunrise.game.genProto.gen.MapProto.STUnitPositionOrBuilder getPositionOrBuilder() {
+      return position_ == null ? org.sunrise.game.genProto.gen.MapProto.STUnitPosition.getDefaultInstance() : position_;
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (((bitField0_ & 0x00000001) != 0)) {
+        output.writeMessage(1, getPosition());
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (((bitField0_ & 0x00000001) != 0)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(1, getPosition());
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof org.sunrise.game.genProto.gen.MapProto.MS2C_UnitPositionUpdate)) {
+        return super.equals(obj);
+      }
+      org.sunrise.game.genProto.gen.MapProto.MS2C_UnitPositionUpdate other = (org.sunrise.game.genProto.gen.MapProto.MS2C_UnitPositionUpdate) obj;
+
+      if (hasPosition() != other.hasPosition()) return false;
+      if (hasPosition()) {
+        if (!getPosition()
+            .equals(other.getPosition())) return false;
+      }
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasPosition()) {
+        hash = (37 * hash) + POSITION_FIELD_NUMBER;
+        hash = (53 * hash) + getPosition().hashCode();
+      }
+      hash = (29 * hash) + getUnknownFields().hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_UnitPositionUpdate parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_UnitPositionUpdate parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_UnitPositionUpdate parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_UnitPositionUpdate parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_UnitPositionUpdate parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_UnitPositionUpdate parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_UnitPositionUpdate parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_UnitPositionUpdate parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_UnitPositionUpdate parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_UnitPositionUpdate parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_UnitPositionUpdate parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_UnitPositionUpdate parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(org.sunrise.game.genProto.gen.MapProto.MS2C_UnitPositionUpdate prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code org.sunrise.game.genProto.gen.MS2C_UnitPositionUpdate}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:org.sunrise.game.genProto.gen.MS2C_UnitPositionUpdate)
+        org.sunrise.game.genProto.gen.MapProto.MS2C_UnitPositionUpdateOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_MS2C_UnitPositionUpdate_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_MS2C_UnitPositionUpdate_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                org.sunrise.game.genProto.gen.MapProto.MS2C_UnitPositionUpdate.class, org.sunrise.game.genProto.gen.MapProto.MS2C_UnitPositionUpdate.Builder.class);
+      }
+
+      // Construct using org.sunrise.game.genProto.gen.MapProto.MS2C_UnitPositionUpdate.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage
+                .alwaysUseFieldBuilders) {
+          getPositionFieldBuilder();
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        bitField0_ = 0;
+        position_ = null;
+        if (positionBuilder_ != null) {
+          positionBuilder_.dispose();
+          positionBuilder_ = null;
+        }
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_MS2C_UnitPositionUpdate_descriptor;
+      }
+
+      @java.lang.Override
+      public org.sunrise.game.genProto.gen.MapProto.MS2C_UnitPositionUpdate getDefaultInstanceForType() {
+        return org.sunrise.game.genProto.gen.MapProto.MS2C_UnitPositionUpdate.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public org.sunrise.game.genProto.gen.MapProto.MS2C_UnitPositionUpdate build() {
+        org.sunrise.game.genProto.gen.MapProto.MS2C_UnitPositionUpdate result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public org.sunrise.game.genProto.gen.MapProto.MS2C_UnitPositionUpdate buildPartial() {
+        org.sunrise.game.genProto.gen.MapProto.MS2C_UnitPositionUpdate result = new org.sunrise.game.genProto.gen.MapProto.MS2C_UnitPositionUpdate(this);
+        if (bitField0_ != 0) { buildPartial0(result); }
+        onBuilt();
+        return result;
+      }
+
+      private void buildPartial0(org.sunrise.game.genProto.gen.MapProto.MS2C_UnitPositionUpdate result) {
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.position_ = positionBuilder_ == null
+              ? position_
+              : positionBuilder_.build();
+          to_bitField0_ |= 0x00000001;
+        }
+        result.bitField0_ |= to_bitField0_;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof org.sunrise.game.genProto.gen.MapProto.MS2C_UnitPositionUpdate) {
+          return mergeFrom((org.sunrise.game.genProto.gen.MapProto.MS2C_UnitPositionUpdate)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(org.sunrise.game.genProto.gen.MapProto.MS2C_UnitPositionUpdate other) {
+        if (other == org.sunrise.game.genProto.gen.MapProto.MS2C_UnitPositionUpdate.getDefaultInstance()) return this;
+        if (other.hasPosition()) {
+          mergePosition(other.getPosition());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
+        try {
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 10: {
+                input.readMessage(
+                    getPositionFieldBuilder().getBuilder(),
                     extensionRegistry);
                 bitField0_ |= 0x00000001;
                 break;
@@ -3381,180 +8319,144 @@ public final class MapProto {
       }
       private int bitField0_;
 
-      private org.sunrise.game.genProto.gen.MapProto.STRoleInfo newPlayer_;
+      private org.sunrise.game.genProto.gen.MapProto.STUnitPosition position_;
       private com.google.protobuf.SingleFieldBuilder<
-          org.sunrise.game.genProto.gen.MapProto.STRoleInfo, org.sunrise.game.genProto.gen.MapProto.STRoleInfo.Builder, org.sunrise.game.genProto.gen.MapProto.STRoleInfoOrBuilder> newPlayerBuilder_;
+          org.sunrise.game.genProto.gen.MapProto.STUnitPosition, org.sunrise.game.genProto.gen.MapProto.STUnitPosition.Builder, org.sunrise.game.genProto.gen.MapProto.STUnitPositionOrBuilder> positionBuilder_;
       /**
-       * <pre>
-       * 新进入的玩家信息
-       * </pre>
-       *
-       * <code>.org.sunrise.game.genProto.gen.STRoleInfo new_player = 1;</code>
-       * @return Whether the newPlayer field is set.
+       * <code>.org.sunrise.game.genProto.gen.STUnitPosition position = 1;</code>
+       * @return Whether the position field is set.
        */
-      public boolean hasNewPlayer() {
+      public boolean hasPosition() {
         return ((bitField0_ & 0x00000001) != 0);
       }
       /**
-       * <pre>
-       * 新进入的玩家信息
-       * </pre>
-       *
-       * <code>.org.sunrise.game.genProto.gen.STRoleInfo new_player = 1;</code>
-       * @return The newPlayer.
+       * <code>.org.sunrise.game.genProto.gen.STUnitPosition position = 1;</code>
+       * @return The position.
        */
-      public org.sunrise.game.genProto.gen.MapProto.STRoleInfo getNewPlayer() {
-        if (newPlayerBuilder_ == null) {
-          return newPlayer_ == null ? org.sunrise.game.genProto.gen.MapProto.STRoleInfo.getDefaultInstance() : newPlayer_;
+      public org.sunrise.game.genProto.gen.MapProto.STUnitPosition getPosition() {
+        if (positionBuilder_ == null) {
+          return position_ == null ? org.sunrise.game.genProto.gen.MapProto.STUnitPosition.getDefaultInstance() : position_;
         } else {
-          return newPlayerBuilder_.getMessage();
+          return positionBuilder_.getMessage();
         }
       }
       /**
-       * <pre>
-       * 新进入的玩家信息
-       * </pre>
-       *
-       * <code>.org.sunrise.game.genProto.gen.STRoleInfo new_player = 1;</code>
+       * <code>.org.sunrise.game.genProto.gen.STUnitPosition position = 1;</code>
        */
-      public Builder setNewPlayer(org.sunrise.game.genProto.gen.MapProto.STRoleInfo value) {
-        if (newPlayerBuilder_ == null) {
+      public Builder setPosition(org.sunrise.game.genProto.gen.MapProto.STUnitPosition value) {
+        if (positionBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
-          newPlayer_ = value;
+          position_ = value;
         } else {
-          newPlayerBuilder_.setMessage(value);
+          positionBuilder_.setMessage(value);
         }
         bitField0_ |= 0x00000001;
         onChanged();
         return this;
       }
       /**
-       * <pre>
-       * 新进入的玩家信息
-       * </pre>
-       *
-       * <code>.org.sunrise.game.genProto.gen.STRoleInfo new_player = 1;</code>
+       * <code>.org.sunrise.game.genProto.gen.STUnitPosition position = 1;</code>
        */
-      public Builder setNewPlayer(
-          org.sunrise.game.genProto.gen.MapProto.STRoleInfo.Builder builderForValue) {
-        if (newPlayerBuilder_ == null) {
-          newPlayer_ = builderForValue.build();
+      public Builder setPosition(
+          org.sunrise.game.genProto.gen.MapProto.STUnitPosition.Builder builderForValue) {
+        if (positionBuilder_ == null) {
+          position_ = builderForValue.build();
         } else {
-          newPlayerBuilder_.setMessage(builderForValue.build());
+          positionBuilder_.setMessage(builderForValue.build());
         }
         bitField0_ |= 0x00000001;
         onChanged();
         return this;
       }
       /**
-       * <pre>
-       * 新进入的玩家信息
-       * </pre>
-       *
-       * <code>.org.sunrise.game.genProto.gen.STRoleInfo new_player = 1;</code>
+       * <code>.org.sunrise.game.genProto.gen.STUnitPosition position = 1;</code>
        */
-      public Builder mergeNewPlayer(org.sunrise.game.genProto.gen.MapProto.STRoleInfo value) {
-        if (newPlayerBuilder_ == null) {
+      public Builder mergePosition(org.sunrise.game.genProto.gen.MapProto.STUnitPosition value) {
+        if (positionBuilder_ == null) {
           if (((bitField0_ & 0x00000001) != 0) &&
-            newPlayer_ != null &&
-            newPlayer_ != org.sunrise.game.genProto.gen.MapProto.STRoleInfo.getDefaultInstance()) {
-            getNewPlayerBuilder().mergeFrom(value);
+            position_ != null &&
+            position_ != org.sunrise.game.genProto.gen.MapProto.STUnitPosition.getDefaultInstance()) {
+            getPositionBuilder().mergeFrom(value);
           } else {
-            newPlayer_ = value;
+            position_ = value;
           }
         } else {
-          newPlayerBuilder_.mergeFrom(value);
+          positionBuilder_.mergeFrom(value);
         }
-        if (newPlayer_ != null) {
+        if (position_ != null) {
           bitField0_ |= 0x00000001;
           onChanged();
         }
         return this;
       }
       /**
-       * <pre>
-       * 新进入的玩家信息
-       * </pre>
-       *
-       * <code>.org.sunrise.game.genProto.gen.STRoleInfo new_player = 1;</code>
+       * <code>.org.sunrise.game.genProto.gen.STUnitPosition position = 1;</code>
        */
-      public Builder clearNewPlayer() {
+      public Builder clearPosition() {
         bitField0_ = (bitField0_ & ~0x00000001);
-        newPlayer_ = null;
-        if (newPlayerBuilder_ != null) {
-          newPlayerBuilder_.dispose();
-          newPlayerBuilder_ = null;
+        position_ = null;
+        if (positionBuilder_ != null) {
+          positionBuilder_.dispose();
+          positionBuilder_ = null;
         }
         onChanged();
         return this;
       }
       /**
-       * <pre>
-       * 新进入的玩家信息
-       * </pre>
-       *
-       * <code>.org.sunrise.game.genProto.gen.STRoleInfo new_player = 1;</code>
+       * <code>.org.sunrise.game.genProto.gen.STUnitPosition position = 1;</code>
        */
-      public org.sunrise.game.genProto.gen.MapProto.STRoleInfo.Builder getNewPlayerBuilder() {
+      public org.sunrise.game.genProto.gen.MapProto.STUnitPosition.Builder getPositionBuilder() {
         bitField0_ |= 0x00000001;
         onChanged();
-        return getNewPlayerFieldBuilder().getBuilder();
+        return getPositionFieldBuilder().getBuilder();
       }
       /**
-       * <pre>
-       * 新进入的玩家信息
-       * </pre>
-       *
-       * <code>.org.sunrise.game.genProto.gen.STRoleInfo new_player = 1;</code>
+       * <code>.org.sunrise.game.genProto.gen.STUnitPosition position = 1;</code>
        */
-      public org.sunrise.game.genProto.gen.MapProto.STRoleInfoOrBuilder getNewPlayerOrBuilder() {
-        if (newPlayerBuilder_ != null) {
-          return newPlayerBuilder_.getMessageOrBuilder();
+      public org.sunrise.game.genProto.gen.MapProto.STUnitPositionOrBuilder getPositionOrBuilder() {
+        if (positionBuilder_ != null) {
+          return positionBuilder_.getMessageOrBuilder();
         } else {
-          return newPlayer_ == null ?
-              org.sunrise.game.genProto.gen.MapProto.STRoleInfo.getDefaultInstance() : newPlayer_;
+          return position_ == null ?
+              org.sunrise.game.genProto.gen.MapProto.STUnitPosition.getDefaultInstance() : position_;
         }
       }
       /**
-       * <pre>
-       * 新进入的玩家信息
-       * </pre>
-       *
-       * <code>.org.sunrise.game.genProto.gen.STRoleInfo new_player = 1;</code>
+       * <code>.org.sunrise.game.genProto.gen.STUnitPosition position = 1;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
-          org.sunrise.game.genProto.gen.MapProto.STRoleInfo, org.sunrise.game.genProto.gen.MapProto.STRoleInfo.Builder, org.sunrise.game.genProto.gen.MapProto.STRoleInfoOrBuilder> 
-          getNewPlayerFieldBuilder() {
-        if (newPlayerBuilder_ == null) {
-          newPlayerBuilder_ = new com.google.protobuf.SingleFieldBuilder<
-              org.sunrise.game.genProto.gen.MapProto.STRoleInfo, org.sunrise.game.genProto.gen.MapProto.STRoleInfo.Builder, org.sunrise.game.genProto.gen.MapProto.STRoleInfoOrBuilder>(
-                  getNewPlayer(),
+          org.sunrise.game.genProto.gen.MapProto.STUnitPosition, org.sunrise.game.genProto.gen.MapProto.STUnitPosition.Builder, org.sunrise.game.genProto.gen.MapProto.STUnitPositionOrBuilder> 
+          getPositionFieldBuilder() {
+        if (positionBuilder_ == null) {
+          positionBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              org.sunrise.game.genProto.gen.MapProto.STUnitPosition, org.sunrise.game.genProto.gen.MapProto.STUnitPosition.Builder, org.sunrise.game.genProto.gen.MapProto.STUnitPositionOrBuilder>(
+                  getPosition(),
                   getParentForChildren(),
                   isClean());
-          newPlayer_ = null;
+          position_ = null;
         }
-        return newPlayerBuilder_;
+        return positionBuilder_;
       }
 
-      // @@protoc_insertion_point(builder_scope:org.sunrise.game.genProto.gen.MS2C_Enter)
+      // @@protoc_insertion_point(builder_scope:org.sunrise.game.genProto.gen.MS2C_UnitPositionUpdate)
     }
 
-    // @@protoc_insertion_point(class_scope:org.sunrise.game.genProto.gen.MS2C_Enter)
-    private static final org.sunrise.game.genProto.gen.MapProto.MS2C_Enter DEFAULT_INSTANCE;
+    // @@protoc_insertion_point(class_scope:org.sunrise.game.genProto.gen.MS2C_UnitPositionUpdate)
+    private static final org.sunrise.game.genProto.gen.MapProto.MS2C_UnitPositionUpdate DEFAULT_INSTANCE;
     static {
-      DEFAULT_INSTANCE = new org.sunrise.game.genProto.gen.MapProto.MS2C_Enter();
+      DEFAULT_INSTANCE = new org.sunrise.game.genProto.gen.MapProto.MS2C_UnitPositionUpdate();
     }
 
-    public static org.sunrise.game.genProto.gen.MapProto.MS2C_Enter getDefaultInstance() {
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_UnitPositionUpdate getDefaultInstance() {
       return DEFAULT_INSTANCE;
     }
 
-    private static final com.google.protobuf.Parser<MS2C_Enter>
-        PARSER = new com.google.protobuf.AbstractParser<MS2C_Enter>() {
+    private static final com.google.protobuf.Parser<MS2C_UnitPositionUpdate>
+        PARSER = new com.google.protobuf.AbstractParser<MS2C_UnitPositionUpdate>() {
       @java.lang.Override
-      public MS2C_Enter parsePartialFrom(
+      public MS2C_UnitPositionUpdate parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
@@ -3573,63 +8475,48 @@ public final class MapProto {
       }
     };
 
-    public static com.google.protobuf.Parser<MS2C_Enter> parser() {
+    public static com.google.protobuf.Parser<MS2C_UnitPositionUpdate> parser() {
       return PARSER;
     }
 
     @java.lang.Override
-    public com.google.protobuf.Parser<MS2C_Enter> getParserForType() {
+    public com.google.protobuf.Parser<MS2C_UnitPositionUpdate> getParserForType() {
       return PARSER;
     }
 
     @java.lang.Override
-    public org.sunrise.game.genProto.gen.MapProto.MS2C_Enter getDefaultInstanceForType() {
+    public org.sunrise.game.genProto.gen.MapProto.MS2C_UnitPositionUpdate getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
 
   }
 
-  public interface MS2C_MoveOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:org.sunrise.game.genProto.gen.MS2C_Move)
+  public interface MS2C_UnitAttributeUpdateOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:org.sunrise.game.genProto.gen.MS2C_UnitAttributeUpdate)
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>float mapPostX = 1;</code>
-     * @return The mapPostX.
+     * <code>.org.sunrise.game.genProto.gen.STUnitAttributes attributes = 1;</code>
+     * @return Whether the attributes field is set.
      */
-    float getMapPostX();
-
+    boolean hasAttributes();
     /**
-     * <code>float mapPostY = 2;</code>
-     * @return The mapPostY.
+     * <code>.org.sunrise.game.genProto.gen.STUnitAttributes attributes = 1;</code>
+     * @return The attributes.
      */
-    float getMapPostY();
-
+    org.sunrise.game.genProto.gen.MapProto.STUnitAttributes getAttributes();
     /**
-     * <code>float mapPostZ = 3;</code>
-     * @return The mapPostZ.
+     * <code>.org.sunrise.game.genProto.gen.STUnitAttributes attributes = 1;</code>
      */
-    float getMapPostZ();
-
-    /**
-     * <code>string human_id = 4;</code>
-     * @return The humanId.
-     */
-    java.lang.String getHumanId();
-    /**
-     * <code>string human_id = 4;</code>
-     * @return The bytes for humanId.
-     */
-    com.google.protobuf.ByteString
-        getHumanIdBytes();
+    org.sunrise.game.genProto.gen.MapProto.STUnitAttributesOrBuilder getAttributesOrBuilder();
   }
   /**
-   * Protobuf type {@code org.sunrise.game.genProto.gen.MS2C_Move}
+   * Protobuf type {@code org.sunrise.game.genProto.gen.MS2C_UnitAttributeUpdate}
    */
-  public static final class MS2C_Move extends
+  public static final class MS2C_UnitAttributeUpdate extends
       com.google.protobuf.GeneratedMessage implements
-      // @@protoc_insertion_point(message_implements:org.sunrise.game.genProto.gen.MS2C_Move)
-      MS2C_MoveOrBuilder {
+      // @@protoc_insertion_point(message_implements:org.sunrise.game.genProto.gen.MS2C_UnitAttributeUpdate)
+      MS2C_UnitAttributeUpdateOrBuilder {
   private static final long serialVersionUID = 0L;
     static {
       com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
@@ -3638,99 +8525,53 @@ public final class MapProto {
         /* minor= */ 28,
         /* patch= */ 2,
         /* suffix= */ "",
-        MS2C_Move.class.getName());
+        MS2C_UnitAttributeUpdate.class.getName());
     }
-    // Use MS2C_Move.newBuilder() to construct.
-    private MS2C_Move(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+    // Use MS2C_UnitAttributeUpdate.newBuilder() to construct.
+    private MS2C_UnitAttributeUpdate(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
     }
-    private MS2C_Move() {
-      humanId_ = "";
+    private MS2C_UnitAttributeUpdate() {
     }
 
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_MS2C_Move_descriptor;
+      return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_MS2C_UnitAttributeUpdate_descriptor;
     }
 
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_MS2C_Move_fieldAccessorTable
+      return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_MS2C_UnitAttributeUpdate_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
-              org.sunrise.game.genProto.gen.MapProto.MS2C_Move.class, org.sunrise.game.genProto.gen.MapProto.MS2C_Move.Builder.class);
+              org.sunrise.game.genProto.gen.MapProto.MS2C_UnitAttributeUpdate.class, org.sunrise.game.genProto.gen.MapProto.MS2C_UnitAttributeUpdate.Builder.class);
     }
 
-    public static final int MAPPOSTX_FIELD_NUMBER = 1;
-    private float mapPostX_ = 0F;
+    private int bitField0_;
+    public static final int ATTRIBUTES_FIELD_NUMBER = 1;
+    private org.sunrise.game.genProto.gen.MapProto.STUnitAttributes attributes_;
     /**
-     * <code>float mapPostX = 1;</code>
-     * @return The mapPostX.
+     * <code>.org.sunrise.game.genProto.gen.STUnitAttributes attributes = 1;</code>
+     * @return Whether the attributes field is set.
      */
     @java.lang.Override
-    public float getMapPostX() {
-      return mapPostX_;
-    }
-
-    public static final int MAPPOSTY_FIELD_NUMBER = 2;
-    private float mapPostY_ = 0F;
-    /**
-     * <code>float mapPostY = 2;</code>
-     * @return The mapPostY.
-     */
-    @java.lang.Override
-    public float getMapPostY() {
-      return mapPostY_;
-    }
-
-    public static final int MAPPOSTZ_FIELD_NUMBER = 3;
-    private float mapPostZ_ = 0F;
-    /**
-     * <code>float mapPostZ = 3;</code>
-     * @return The mapPostZ.
-     */
-    @java.lang.Override
-    public float getMapPostZ() {
-      return mapPostZ_;
-    }
-
-    public static final int HUMAN_ID_FIELD_NUMBER = 4;
-    @SuppressWarnings("serial")
-    private volatile java.lang.Object humanId_ = "";
-    /**
-     * <code>string human_id = 4;</code>
-     * @return The humanId.
-     */
-    @java.lang.Override
-    public java.lang.String getHumanId() {
-      java.lang.Object ref = humanId_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        humanId_ = s;
-        return s;
-      }
+    public boolean hasAttributes() {
+      return ((bitField0_ & 0x00000001) != 0);
     }
     /**
-     * <code>string human_id = 4;</code>
-     * @return The bytes for humanId.
+     * <code>.org.sunrise.game.genProto.gen.STUnitAttributes attributes = 1;</code>
+     * @return The attributes.
      */
     @java.lang.Override
-    public com.google.protobuf.ByteString
-        getHumanIdBytes() {
-      java.lang.Object ref = humanId_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        humanId_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
+    public org.sunrise.game.genProto.gen.MapProto.STUnitAttributes getAttributes() {
+      return attributes_ == null ? org.sunrise.game.genProto.gen.MapProto.STUnitAttributes.getDefaultInstance() : attributes_;
+    }
+    /**
+     * <code>.org.sunrise.game.genProto.gen.STUnitAttributes attributes = 1;</code>
+     */
+    @java.lang.Override
+    public org.sunrise.game.genProto.gen.MapProto.STUnitAttributesOrBuilder getAttributesOrBuilder() {
+      return attributes_ == null ? org.sunrise.game.genProto.gen.MapProto.STUnitAttributes.getDefaultInstance() : attributes_;
     }
 
     private byte memoizedIsInitialized = -1;
@@ -3747,17 +8588,8 @@ public final class MapProto {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (java.lang.Float.floatToRawIntBits(mapPostX_) != 0) {
-        output.writeFloat(1, mapPostX_);
-      }
-      if (java.lang.Float.floatToRawIntBits(mapPostY_) != 0) {
-        output.writeFloat(2, mapPostY_);
-      }
-      if (java.lang.Float.floatToRawIntBits(mapPostZ_) != 0) {
-        output.writeFloat(3, mapPostZ_);
-      }
-      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(humanId_)) {
-        com.google.protobuf.GeneratedMessage.writeString(output, 4, humanId_);
+      if (((bitField0_ & 0x00000001) != 0)) {
+        output.writeMessage(1, getAttributes());
       }
       getUnknownFields().writeTo(output);
     }
@@ -3768,20 +8600,9 @@ public final class MapProto {
       if (size != -1) return size;
 
       size = 0;
-      if (java.lang.Float.floatToRawIntBits(mapPostX_) != 0) {
+      if (((bitField0_ & 0x00000001) != 0)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(1, mapPostX_);
-      }
-      if (java.lang.Float.floatToRawIntBits(mapPostY_) != 0) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(2, mapPostY_);
-      }
-      if (java.lang.Float.floatToRawIntBits(mapPostZ_) != 0) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(3, mapPostZ_);
-      }
-      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(humanId_)) {
-        size += com.google.protobuf.GeneratedMessage.computeStringSize(4, humanId_);
+          .computeMessageSize(1, getAttributes());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
@@ -3793,22 +8614,16 @@ public final class MapProto {
       if (obj == this) {
        return true;
       }
-      if (!(obj instanceof org.sunrise.game.genProto.gen.MapProto.MS2C_Move)) {
+      if (!(obj instanceof org.sunrise.game.genProto.gen.MapProto.MS2C_UnitAttributeUpdate)) {
         return super.equals(obj);
       }
-      org.sunrise.game.genProto.gen.MapProto.MS2C_Move other = (org.sunrise.game.genProto.gen.MapProto.MS2C_Move) obj;
+      org.sunrise.game.genProto.gen.MapProto.MS2C_UnitAttributeUpdate other = (org.sunrise.game.genProto.gen.MapProto.MS2C_UnitAttributeUpdate) obj;
 
-      if (java.lang.Float.floatToIntBits(getMapPostX())
-          != java.lang.Float.floatToIntBits(
-              other.getMapPostX())) return false;
-      if (java.lang.Float.floatToIntBits(getMapPostY())
-          != java.lang.Float.floatToIntBits(
-              other.getMapPostY())) return false;
-      if (java.lang.Float.floatToIntBits(getMapPostZ())
-          != java.lang.Float.floatToIntBits(
-              other.getMapPostZ())) return false;
-      if (!getHumanId()
-          .equals(other.getHumanId())) return false;
+      if (hasAttributes() != other.hasAttributes()) return false;
+      if (hasAttributes()) {
+        if (!getAttributes()
+            .equals(other.getAttributes())) return false;
+      }
       if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
@@ -3820,60 +8635,53 @@ public final class MapProto {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
-      hash = (37 * hash) + MAPPOSTX_FIELD_NUMBER;
-      hash = (53 * hash) + java.lang.Float.floatToIntBits(
-          getMapPostX());
-      hash = (37 * hash) + MAPPOSTY_FIELD_NUMBER;
-      hash = (53 * hash) + java.lang.Float.floatToIntBits(
-          getMapPostY());
-      hash = (37 * hash) + MAPPOSTZ_FIELD_NUMBER;
-      hash = (53 * hash) + java.lang.Float.floatToIntBits(
-          getMapPostZ());
-      hash = (37 * hash) + HUMAN_ID_FIELD_NUMBER;
-      hash = (53 * hash) + getHumanId().hashCode();
+      if (hasAttributes()) {
+        hash = (37 * hash) + ATTRIBUTES_FIELD_NUMBER;
+        hash = (53 * hash) + getAttributes().hashCode();
+      }
       hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
       return hash;
     }
 
-    public static org.sunrise.game.genProto.gen.MapProto.MS2C_Move parseFrom(
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_UnitAttributeUpdate parseFrom(
         java.nio.ByteBuffer data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static org.sunrise.game.genProto.gen.MapProto.MS2C_Move parseFrom(
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_UnitAttributeUpdate parseFrom(
         java.nio.ByteBuffer data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static org.sunrise.game.genProto.gen.MapProto.MS2C_Move parseFrom(
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_UnitAttributeUpdate parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static org.sunrise.game.genProto.gen.MapProto.MS2C_Move parseFrom(
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_UnitAttributeUpdate parseFrom(
         com.google.protobuf.ByteString data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static org.sunrise.game.genProto.gen.MapProto.MS2C_Move parseFrom(byte[] data)
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_UnitAttributeUpdate parseFrom(byte[] data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static org.sunrise.game.genProto.gen.MapProto.MS2C_Move parseFrom(
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_UnitAttributeUpdate parseFrom(
         byte[] data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static org.sunrise.game.genProto.gen.MapProto.MS2C_Move parseFrom(java.io.InputStream input)
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_UnitAttributeUpdate parseFrom(java.io.InputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessage
           .parseWithIOException(PARSER, input);
     }
-    public static org.sunrise.game.genProto.gen.MapProto.MS2C_Move parseFrom(
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_UnitAttributeUpdate parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -3881,26 +8689,26 @@ public final class MapProto {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    public static org.sunrise.game.genProto.gen.MapProto.MS2C_Move parseDelimitedFrom(java.io.InputStream input)
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_UnitAttributeUpdate parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessage
           .parseDelimitedWithIOException(PARSER, input);
     }
 
-    public static org.sunrise.game.genProto.gen.MapProto.MS2C_Move parseDelimitedFrom(
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_UnitAttributeUpdate parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessage
           .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
-    public static org.sunrise.game.genProto.gen.MapProto.MS2C_Move parseFrom(
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_UnitAttributeUpdate parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessage
           .parseWithIOException(PARSER, input);
     }
-    public static org.sunrise.game.genProto.gen.MapProto.MS2C_Move parseFrom(
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_UnitAttributeUpdate parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -3913,7 +8721,7 @@ public final class MapProto {
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
     }
-    public static Builder newBuilder(org.sunrise.game.genProto.gen.MapProto.MS2C_Move prototype) {
+    public static Builder newBuilder(org.sunrise.game.genProto.gen.MapProto.MS2C_UnitAttributeUpdate prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
     @java.lang.Override
@@ -3929,60 +8737,67 @@ public final class MapProto {
       return builder;
     }
     /**
-     * Protobuf type {@code org.sunrise.game.genProto.gen.MS2C_Move}
+     * Protobuf type {@code org.sunrise.game.genProto.gen.MS2C_UnitAttributeUpdate}
      */
     public static final class Builder extends
         com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:org.sunrise.game.genProto.gen.MS2C_Move)
-        org.sunrise.game.genProto.gen.MapProto.MS2C_MoveOrBuilder {
+        // @@protoc_insertion_point(builder_implements:org.sunrise.game.genProto.gen.MS2C_UnitAttributeUpdate)
+        org.sunrise.game.genProto.gen.MapProto.MS2C_UnitAttributeUpdateOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
-        return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_MS2C_Move_descriptor;
+        return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_MS2C_UnitAttributeUpdate_descriptor;
       }
 
       @java.lang.Override
       protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
           internalGetFieldAccessorTable() {
-        return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_MS2C_Move_fieldAccessorTable
+        return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_MS2C_UnitAttributeUpdate_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
-                org.sunrise.game.genProto.gen.MapProto.MS2C_Move.class, org.sunrise.game.genProto.gen.MapProto.MS2C_Move.Builder.class);
+                org.sunrise.game.genProto.gen.MapProto.MS2C_UnitAttributeUpdate.class, org.sunrise.game.genProto.gen.MapProto.MS2C_UnitAttributeUpdate.Builder.class);
       }
 
-      // Construct using org.sunrise.game.genProto.gen.MapProto.MS2C_Move.newBuilder()
+      // Construct using org.sunrise.game.genProto.gen.MapProto.MS2C_UnitAttributeUpdate.newBuilder()
       private Builder() {
-
+        maybeForceBuilderInitialization();
       }
 
       private Builder(
           com.google.protobuf.GeneratedMessage.BuilderParent parent) {
         super(parent);
-
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage
+                .alwaysUseFieldBuilders) {
+          getAttributesFieldBuilder();
+        }
       }
       @java.lang.Override
       public Builder clear() {
         super.clear();
         bitField0_ = 0;
-        mapPostX_ = 0F;
-        mapPostY_ = 0F;
-        mapPostZ_ = 0F;
-        humanId_ = "";
+        attributes_ = null;
+        if (attributesBuilder_ != null) {
+          attributesBuilder_.dispose();
+          attributesBuilder_ = null;
+        }
         return this;
       }
 
       @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
-        return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_MS2C_Move_descriptor;
+        return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_MS2C_UnitAttributeUpdate_descriptor;
       }
 
       @java.lang.Override
-      public org.sunrise.game.genProto.gen.MapProto.MS2C_Move getDefaultInstanceForType() {
-        return org.sunrise.game.genProto.gen.MapProto.MS2C_Move.getDefaultInstance();
+      public org.sunrise.game.genProto.gen.MapProto.MS2C_UnitAttributeUpdate getDefaultInstanceForType() {
+        return org.sunrise.game.genProto.gen.MapProto.MS2C_UnitAttributeUpdate.getDefaultInstance();
       }
 
       @java.lang.Override
-      public org.sunrise.game.genProto.gen.MapProto.MS2C_Move build() {
-        org.sunrise.game.genProto.gen.MapProto.MS2C_Move result = buildPartial();
+      public org.sunrise.game.genProto.gen.MapProto.MS2C_UnitAttributeUpdate build() {
+        org.sunrise.game.genProto.gen.MapProto.MS2C_UnitAttributeUpdate result = buildPartial();
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(result);
         }
@@ -3990,737 +8805,39 @@ public final class MapProto {
       }
 
       @java.lang.Override
-      public org.sunrise.game.genProto.gen.MapProto.MS2C_Move buildPartial() {
-        org.sunrise.game.genProto.gen.MapProto.MS2C_Move result = new org.sunrise.game.genProto.gen.MapProto.MS2C_Move(this);
+      public org.sunrise.game.genProto.gen.MapProto.MS2C_UnitAttributeUpdate buildPartial() {
+        org.sunrise.game.genProto.gen.MapProto.MS2C_UnitAttributeUpdate result = new org.sunrise.game.genProto.gen.MapProto.MS2C_UnitAttributeUpdate(this);
         if (bitField0_ != 0) { buildPartial0(result); }
         onBuilt();
         return result;
       }
 
-      private void buildPartial0(org.sunrise.game.genProto.gen.MapProto.MS2C_Move result) {
+      private void buildPartial0(org.sunrise.game.genProto.gen.MapProto.MS2C_UnitAttributeUpdate result) {
         int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
         if (((from_bitField0_ & 0x00000001) != 0)) {
-          result.mapPostX_ = mapPostX_;
+          result.attributes_ = attributesBuilder_ == null
+              ? attributes_
+              : attributesBuilder_.build();
+          to_bitField0_ |= 0x00000001;
         }
-        if (((from_bitField0_ & 0x00000002) != 0)) {
-          result.mapPostY_ = mapPostY_;
-        }
-        if (((from_bitField0_ & 0x00000004) != 0)) {
-          result.mapPostZ_ = mapPostZ_;
-        }
-        if (((from_bitField0_ & 0x00000008) != 0)) {
-          result.humanId_ = humanId_;
-        }
+        result.bitField0_ |= to_bitField0_;
       }
 
       @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof org.sunrise.game.genProto.gen.MapProto.MS2C_Move) {
-          return mergeFrom((org.sunrise.game.genProto.gen.MapProto.MS2C_Move)other);
+        if (other instanceof org.sunrise.game.genProto.gen.MapProto.MS2C_UnitAttributeUpdate) {
+          return mergeFrom((org.sunrise.game.genProto.gen.MapProto.MS2C_UnitAttributeUpdate)other);
         } else {
           super.mergeFrom(other);
           return this;
         }
       }
 
-      public Builder mergeFrom(org.sunrise.game.genProto.gen.MapProto.MS2C_Move other) {
-        if (other == org.sunrise.game.genProto.gen.MapProto.MS2C_Move.getDefaultInstance()) return this;
-        if (other.getMapPostX() != 0F) {
-          setMapPostX(other.getMapPostX());
-        }
-        if (other.getMapPostY() != 0F) {
-          setMapPostY(other.getMapPostY());
-        }
-        if (other.getMapPostZ() != 0F) {
-          setMapPostZ(other.getMapPostZ());
-        }
-        if (!other.getHumanId().isEmpty()) {
-          humanId_ = other.humanId_;
-          bitField0_ |= 0x00000008;
-          onChanged();
-        }
-        this.mergeUnknownFields(other.getUnknownFields());
-        onChanged();
-        return this;
-      }
-
-      @java.lang.Override
-      public final boolean isInitialized() {
-        return true;
-      }
-
-      @java.lang.Override
-      public Builder mergeFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
-        if (extensionRegistry == null) {
-          throw new java.lang.NullPointerException();
-        }
-        try {
-          boolean done = false;
-          while (!done) {
-            int tag = input.readTag();
-            switch (tag) {
-              case 0:
-                done = true;
-                break;
-              case 13: {
-                mapPostX_ = input.readFloat();
-                bitField0_ |= 0x00000001;
-                break;
-              } // case 13
-              case 21: {
-                mapPostY_ = input.readFloat();
-                bitField0_ |= 0x00000002;
-                break;
-              } // case 21
-              case 29: {
-                mapPostZ_ = input.readFloat();
-                bitField0_ |= 0x00000004;
-                break;
-              } // case 29
-              case 34: {
-                humanId_ = input.readStringRequireUtf8();
-                bitField0_ |= 0x00000008;
-                break;
-              } // case 34
-              default: {
-                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
-                  done = true; // was an endgroup tag
-                }
-                break;
-              } // default:
-            } // switch (tag)
-          } // while (!done)
-        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          throw e.unwrapIOException();
-        } finally {
-          onChanged();
-        } // finally
-        return this;
-      }
-      private int bitField0_;
-
-      private float mapPostX_ ;
-      /**
-       * <code>float mapPostX = 1;</code>
-       * @return The mapPostX.
-       */
-      @java.lang.Override
-      public float getMapPostX() {
-        return mapPostX_;
-      }
-      /**
-       * <code>float mapPostX = 1;</code>
-       * @param value The mapPostX to set.
-       * @return This builder for chaining.
-       */
-      public Builder setMapPostX(float value) {
-
-        mapPostX_ = value;
-        bitField0_ |= 0x00000001;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>float mapPostX = 1;</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearMapPostX() {
-        bitField0_ = (bitField0_ & ~0x00000001);
-        mapPostX_ = 0F;
-        onChanged();
-        return this;
-      }
-
-      private float mapPostY_ ;
-      /**
-       * <code>float mapPostY = 2;</code>
-       * @return The mapPostY.
-       */
-      @java.lang.Override
-      public float getMapPostY() {
-        return mapPostY_;
-      }
-      /**
-       * <code>float mapPostY = 2;</code>
-       * @param value The mapPostY to set.
-       * @return This builder for chaining.
-       */
-      public Builder setMapPostY(float value) {
-
-        mapPostY_ = value;
-        bitField0_ |= 0x00000002;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>float mapPostY = 2;</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearMapPostY() {
-        bitField0_ = (bitField0_ & ~0x00000002);
-        mapPostY_ = 0F;
-        onChanged();
-        return this;
-      }
-
-      private float mapPostZ_ ;
-      /**
-       * <code>float mapPostZ = 3;</code>
-       * @return The mapPostZ.
-       */
-      @java.lang.Override
-      public float getMapPostZ() {
-        return mapPostZ_;
-      }
-      /**
-       * <code>float mapPostZ = 3;</code>
-       * @param value The mapPostZ to set.
-       * @return This builder for chaining.
-       */
-      public Builder setMapPostZ(float value) {
-
-        mapPostZ_ = value;
-        bitField0_ |= 0x00000004;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>float mapPostZ = 3;</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearMapPostZ() {
-        bitField0_ = (bitField0_ & ~0x00000004);
-        mapPostZ_ = 0F;
-        onChanged();
-        return this;
-      }
-
-      private java.lang.Object humanId_ = "";
-      /**
-       * <code>string human_id = 4;</code>
-       * @return The humanId.
-       */
-      public java.lang.String getHumanId() {
-        java.lang.Object ref = humanId_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          humanId_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
-      }
-      /**
-       * <code>string human_id = 4;</code>
-       * @return The bytes for humanId.
-       */
-      public com.google.protobuf.ByteString
-          getHumanIdBytes() {
-        java.lang.Object ref = humanId_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          humanId_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <code>string human_id = 4;</code>
-       * @param value The humanId to set.
-       * @return This builder for chaining.
-       */
-      public Builder setHumanId(
-          java.lang.String value) {
-        if (value == null) { throw new NullPointerException(); }
-        humanId_ = value;
-        bitField0_ |= 0x00000008;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string human_id = 4;</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearHumanId() {
-        humanId_ = getDefaultInstance().getHumanId();
-        bitField0_ = (bitField0_ & ~0x00000008);
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string human_id = 4;</code>
-       * @param value The bytes for humanId to set.
-       * @return This builder for chaining.
-       */
-      public Builder setHumanIdBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) { throw new NullPointerException(); }
-        checkByteStringIsUtf8(value);
-        humanId_ = value;
-        bitField0_ |= 0x00000008;
-        onChanged();
-        return this;
-      }
-
-      // @@protoc_insertion_point(builder_scope:org.sunrise.game.genProto.gen.MS2C_Move)
-    }
-
-    // @@protoc_insertion_point(class_scope:org.sunrise.game.genProto.gen.MS2C_Move)
-    private static final org.sunrise.game.genProto.gen.MapProto.MS2C_Move DEFAULT_INSTANCE;
-    static {
-      DEFAULT_INSTANCE = new org.sunrise.game.genProto.gen.MapProto.MS2C_Move();
-    }
-
-    public static org.sunrise.game.genProto.gen.MapProto.MS2C_Move getDefaultInstance() {
-      return DEFAULT_INSTANCE;
-    }
-
-    private static final com.google.protobuf.Parser<MS2C_Move>
-        PARSER = new com.google.protobuf.AbstractParser<MS2C_Move>() {
-      @java.lang.Override
-      public MS2C_Move parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        Builder builder = newBuilder();
-        try {
-          builder.mergeFrom(input, extensionRegistry);
-        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          throw e.setUnfinishedMessage(builder.buildPartial());
-        } catch (com.google.protobuf.UninitializedMessageException e) {
-          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
-        } catch (java.io.IOException e) {
-          throw new com.google.protobuf.InvalidProtocolBufferException(e)
-              .setUnfinishedMessage(builder.buildPartial());
-        }
-        return builder.buildPartial();
-      }
-    };
-
-    public static com.google.protobuf.Parser<MS2C_Move> parser() {
-      return PARSER;
-    }
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<MS2C_Move> getParserForType() {
-      return PARSER;
-    }
-
-    @java.lang.Override
-    public org.sunrise.game.genProto.gen.MapProto.MS2C_Move getDefaultInstanceForType() {
-      return DEFAULT_INSTANCE;
-    }
-
-  }
-
-  public interface MS2C_SyncOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:org.sunrise.game.genProto.gen.MS2C_Sync)
-      com.google.protobuf.MessageOrBuilder {
-
-    /**
-     * <code>repeated .org.sunrise.game.genProto.gen.STRoleInfo roles = 1;</code>
-     */
-    java.util.List<org.sunrise.game.genProto.gen.MapProto.STRoleInfo> 
-        getRolesList();
-    /**
-     * <code>repeated .org.sunrise.game.genProto.gen.STRoleInfo roles = 1;</code>
-     */
-    org.sunrise.game.genProto.gen.MapProto.STRoleInfo getRoles(int index);
-    /**
-     * <code>repeated .org.sunrise.game.genProto.gen.STRoleInfo roles = 1;</code>
-     */
-    int getRolesCount();
-    /**
-     * <code>repeated .org.sunrise.game.genProto.gen.STRoleInfo roles = 1;</code>
-     */
-    java.util.List<? extends org.sunrise.game.genProto.gen.MapProto.STRoleInfoOrBuilder> 
-        getRolesOrBuilderList();
-    /**
-     * <code>repeated .org.sunrise.game.genProto.gen.STRoleInfo roles = 1;</code>
-     */
-    org.sunrise.game.genProto.gen.MapProto.STRoleInfoOrBuilder getRolesOrBuilder(
-        int index);
-  }
-  /**
-   * <pre>
-   * 进入地图后推送
-   * </pre>
-   *
-   * Protobuf type {@code org.sunrise.game.genProto.gen.MS2C_Sync}
-   */
-  public static final class MS2C_Sync extends
-      com.google.protobuf.GeneratedMessage implements
-      // @@protoc_insertion_point(message_implements:org.sunrise.game.genProto.gen.MS2C_Sync)
-      MS2C_SyncOrBuilder {
-  private static final long serialVersionUID = 0L;
-    static {
-      com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
-        com.google.protobuf.RuntimeVersion.RuntimeDomain.PUBLIC,
-        /* major= */ 4,
-        /* minor= */ 28,
-        /* patch= */ 2,
-        /* suffix= */ "",
-        MS2C_Sync.class.getName());
-    }
-    // Use MS2C_Sync.newBuilder() to construct.
-    private MS2C_Sync(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
-      super(builder);
-    }
-    private MS2C_Sync() {
-      roles_ = java.util.Collections.emptyList();
-    }
-
-    public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
-      return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_MS2C_Sync_descriptor;
-    }
-
-    @java.lang.Override
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-        internalGetFieldAccessorTable() {
-      return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_MS2C_Sync_fieldAccessorTable
-          .ensureFieldAccessorsInitialized(
-              org.sunrise.game.genProto.gen.MapProto.MS2C_Sync.class, org.sunrise.game.genProto.gen.MapProto.MS2C_Sync.Builder.class);
-    }
-
-    public static final int ROLES_FIELD_NUMBER = 1;
-    @SuppressWarnings("serial")
-    private java.util.List<org.sunrise.game.genProto.gen.MapProto.STRoleInfo> roles_;
-    /**
-     * <code>repeated .org.sunrise.game.genProto.gen.STRoleInfo roles = 1;</code>
-     */
-    @java.lang.Override
-    public java.util.List<org.sunrise.game.genProto.gen.MapProto.STRoleInfo> getRolesList() {
-      return roles_;
-    }
-    /**
-     * <code>repeated .org.sunrise.game.genProto.gen.STRoleInfo roles = 1;</code>
-     */
-    @java.lang.Override
-    public java.util.List<? extends org.sunrise.game.genProto.gen.MapProto.STRoleInfoOrBuilder> 
-        getRolesOrBuilderList() {
-      return roles_;
-    }
-    /**
-     * <code>repeated .org.sunrise.game.genProto.gen.STRoleInfo roles = 1;</code>
-     */
-    @java.lang.Override
-    public int getRolesCount() {
-      return roles_.size();
-    }
-    /**
-     * <code>repeated .org.sunrise.game.genProto.gen.STRoleInfo roles = 1;</code>
-     */
-    @java.lang.Override
-    public org.sunrise.game.genProto.gen.MapProto.STRoleInfo getRoles(int index) {
-      return roles_.get(index);
-    }
-    /**
-     * <code>repeated .org.sunrise.game.genProto.gen.STRoleInfo roles = 1;</code>
-     */
-    @java.lang.Override
-    public org.sunrise.game.genProto.gen.MapProto.STRoleInfoOrBuilder getRolesOrBuilder(
-        int index) {
-      return roles_.get(index);
-    }
-
-    private byte memoizedIsInitialized = -1;
-    @java.lang.Override
-    public final boolean isInitialized() {
-      byte isInitialized = memoizedIsInitialized;
-      if (isInitialized == 1) return true;
-      if (isInitialized == 0) return false;
-
-      memoizedIsInitialized = 1;
-      return true;
-    }
-
-    @java.lang.Override
-    public void writeTo(com.google.protobuf.CodedOutputStream output)
-                        throws java.io.IOException {
-      for (int i = 0; i < roles_.size(); i++) {
-        output.writeMessage(1, roles_.get(i));
-      }
-      getUnknownFields().writeTo(output);
-    }
-
-    @java.lang.Override
-    public int getSerializedSize() {
-      int size = memoizedSize;
-      if (size != -1) return size;
-
-      size = 0;
-      for (int i = 0; i < roles_.size(); i++) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(1, roles_.get(i));
-      }
-      size += getUnknownFields().getSerializedSize();
-      memoizedSize = size;
-      return size;
-    }
-
-    @java.lang.Override
-    public boolean equals(final java.lang.Object obj) {
-      if (obj == this) {
-       return true;
-      }
-      if (!(obj instanceof org.sunrise.game.genProto.gen.MapProto.MS2C_Sync)) {
-        return super.equals(obj);
-      }
-      org.sunrise.game.genProto.gen.MapProto.MS2C_Sync other = (org.sunrise.game.genProto.gen.MapProto.MS2C_Sync) obj;
-
-      if (!getRolesList()
-          .equals(other.getRolesList())) return false;
-      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
-      return true;
-    }
-
-    @java.lang.Override
-    public int hashCode() {
-      if (memoizedHashCode != 0) {
-        return memoizedHashCode;
-      }
-      int hash = 41;
-      hash = (19 * hash) + getDescriptor().hashCode();
-      if (getRolesCount() > 0) {
-        hash = (37 * hash) + ROLES_FIELD_NUMBER;
-        hash = (53 * hash) + getRolesList().hashCode();
-      }
-      hash = (29 * hash) + getUnknownFields().hashCode();
-      memoizedHashCode = hash;
-      return hash;
-    }
-
-    public static org.sunrise.game.genProto.gen.MapProto.MS2C_Sync parseFrom(
-        java.nio.ByteBuffer data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static org.sunrise.game.genProto.gen.MapProto.MS2C_Sync parseFrom(
-        java.nio.ByteBuffer data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static org.sunrise.game.genProto.gen.MapProto.MS2C_Sync parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static org.sunrise.game.genProto.gen.MapProto.MS2C_Sync parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static org.sunrise.game.genProto.gen.MapProto.MS2C_Sync parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static org.sunrise.game.genProto.gen.MapProto.MS2C_Sync parseFrom(
-        byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static org.sunrise.game.genProto.gen.MapProto.MS2C_Sync parseFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessage
-          .parseWithIOException(PARSER, input);
-    }
-    public static org.sunrise.game.genProto.gen.MapProto.MS2C_Sync parseFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessage
-          .parseWithIOException(PARSER, input, extensionRegistry);
-    }
-
-    public static org.sunrise.game.genProto.gen.MapProto.MS2C_Sync parseDelimitedFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessage
-          .parseDelimitedWithIOException(PARSER, input);
-    }
-
-    public static org.sunrise.game.genProto.gen.MapProto.MS2C_Sync parseDelimitedFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessage
-          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
-    }
-    public static org.sunrise.game.genProto.gen.MapProto.MS2C_Sync parseFrom(
-        com.google.protobuf.CodedInputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessage
-          .parseWithIOException(PARSER, input);
-    }
-    public static org.sunrise.game.genProto.gen.MapProto.MS2C_Sync parseFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessage
-          .parseWithIOException(PARSER, input, extensionRegistry);
-    }
-
-    @java.lang.Override
-    public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder() {
-      return DEFAULT_INSTANCE.toBuilder();
-    }
-    public static Builder newBuilder(org.sunrise.game.genProto.gen.MapProto.MS2C_Sync prototype) {
-      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
-    }
-    @java.lang.Override
-    public Builder toBuilder() {
-      return this == DEFAULT_INSTANCE
-          ? new Builder() : new Builder().mergeFrom(this);
-    }
-
-    @java.lang.Override
-    protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
-      Builder builder = new Builder(parent);
-      return builder;
-    }
-    /**
-     * <pre>
-     * 进入地图后推送
-     * </pre>
-     *
-     * Protobuf type {@code org.sunrise.game.genProto.gen.MS2C_Sync}
-     */
-    public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:org.sunrise.game.genProto.gen.MS2C_Sync)
-        org.sunrise.game.genProto.gen.MapProto.MS2C_SyncOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
-          getDescriptor() {
-        return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_MS2C_Sync_descriptor;
-      }
-
-      @java.lang.Override
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-          internalGetFieldAccessorTable() {
-        return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_MS2C_Sync_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                org.sunrise.game.genProto.gen.MapProto.MS2C_Sync.class, org.sunrise.game.genProto.gen.MapProto.MS2C_Sync.Builder.class);
-      }
-
-      // Construct using org.sunrise.game.genProto.gen.MapProto.MS2C_Sync.newBuilder()
-      private Builder() {
-
-      }
-
-      private Builder(
-          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
-        super(parent);
-
-      }
-      @java.lang.Override
-      public Builder clear() {
-        super.clear();
-        bitField0_ = 0;
-        if (rolesBuilder_ == null) {
-          roles_ = java.util.Collections.emptyList();
-        } else {
-          roles_ = null;
-          rolesBuilder_.clear();
-        }
-        bitField0_ = (bitField0_ & ~0x00000001);
-        return this;
-      }
-
-      @java.lang.Override
-      public com.google.protobuf.Descriptors.Descriptor
-          getDescriptorForType() {
-        return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_MS2C_Sync_descriptor;
-      }
-
-      @java.lang.Override
-      public org.sunrise.game.genProto.gen.MapProto.MS2C_Sync getDefaultInstanceForType() {
-        return org.sunrise.game.genProto.gen.MapProto.MS2C_Sync.getDefaultInstance();
-      }
-
-      @java.lang.Override
-      public org.sunrise.game.genProto.gen.MapProto.MS2C_Sync build() {
-        org.sunrise.game.genProto.gen.MapProto.MS2C_Sync result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(result);
-        }
-        return result;
-      }
-
-      @java.lang.Override
-      public org.sunrise.game.genProto.gen.MapProto.MS2C_Sync buildPartial() {
-        org.sunrise.game.genProto.gen.MapProto.MS2C_Sync result = new org.sunrise.game.genProto.gen.MapProto.MS2C_Sync(this);
-        buildPartialRepeatedFields(result);
-        if (bitField0_ != 0) { buildPartial0(result); }
-        onBuilt();
-        return result;
-      }
-
-      private void buildPartialRepeatedFields(org.sunrise.game.genProto.gen.MapProto.MS2C_Sync result) {
-        if (rolesBuilder_ == null) {
-          if (((bitField0_ & 0x00000001) != 0)) {
-            roles_ = java.util.Collections.unmodifiableList(roles_);
-            bitField0_ = (bitField0_ & ~0x00000001);
-          }
-          result.roles_ = roles_;
-        } else {
-          result.roles_ = rolesBuilder_.build();
-        }
-      }
-
-      private void buildPartial0(org.sunrise.game.genProto.gen.MapProto.MS2C_Sync result) {
-        int from_bitField0_ = bitField0_;
-      }
-
-      @java.lang.Override
-      public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof org.sunrise.game.genProto.gen.MapProto.MS2C_Sync) {
-          return mergeFrom((org.sunrise.game.genProto.gen.MapProto.MS2C_Sync)other);
-        } else {
-          super.mergeFrom(other);
-          return this;
-        }
-      }
-
-      public Builder mergeFrom(org.sunrise.game.genProto.gen.MapProto.MS2C_Sync other) {
-        if (other == org.sunrise.game.genProto.gen.MapProto.MS2C_Sync.getDefaultInstance()) return this;
-        if (rolesBuilder_ == null) {
-          if (!other.roles_.isEmpty()) {
-            if (roles_.isEmpty()) {
-              roles_ = other.roles_;
-              bitField0_ = (bitField0_ & ~0x00000001);
-            } else {
-              ensureRolesIsMutable();
-              roles_.addAll(other.roles_);
-            }
-            onChanged();
-          }
-        } else {
-          if (!other.roles_.isEmpty()) {
-            if (rolesBuilder_.isEmpty()) {
-              rolesBuilder_.dispose();
-              rolesBuilder_ = null;
-              roles_ = other.roles_;
-              bitField0_ = (bitField0_ & ~0x00000001);
-              rolesBuilder_ = 
-                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
-                   getRolesFieldBuilder() : null;
-            } else {
-              rolesBuilder_.addAllMessages(other.roles_);
-            }
-          }
+      public Builder mergeFrom(org.sunrise.game.genProto.gen.MapProto.MS2C_UnitAttributeUpdate other) {
+        if (other == org.sunrise.game.genProto.gen.MapProto.MS2C_UnitAttributeUpdate.getDefaultInstance()) return this;
+        if (other.hasAttributes()) {
+          mergeAttributes(other.getAttributes());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
@@ -4749,709 +8866,9 @@ public final class MapProto {
                 done = true;
                 break;
               case 10: {
-                org.sunrise.game.genProto.gen.MapProto.STRoleInfo m =
-                    input.readMessage(
-                        org.sunrise.game.genProto.gen.MapProto.STRoleInfo.parser(),
-                        extensionRegistry);
-                if (rolesBuilder_ == null) {
-                  ensureRolesIsMutable();
-                  roles_.add(m);
-                } else {
-                  rolesBuilder_.addMessage(m);
-                }
-                break;
-              } // case 10
-              default: {
-                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
-                  done = true; // was an endgroup tag
-                }
-                break;
-              } // default:
-            } // switch (tag)
-          } // while (!done)
-        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          throw e.unwrapIOException();
-        } finally {
-          onChanged();
-        } // finally
-        return this;
-      }
-      private int bitField0_;
-
-      private java.util.List<org.sunrise.game.genProto.gen.MapProto.STRoleInfo> roles_ =
-        java.util.Collections.emptyList();
-      private void ensureRolesIsMutable() {
-        if (!((bitField0_ & 0x00000001) != 0)) {
-          roles_ = new java.util.ArrayList<org.sunrise.game.genProto.gen.MapProto.STRoleInfo>(roles_);
-          bitField0_ |= 0x00000001;
-         }
-      }
-
-      private com.google.protobuf.RepeatedFieldBuilder<
-          org.sunrise.game.genProto.gen.MapProto.STRoleInfo, org.sunrise.game.genProto.gen.MapProto.STRoleInfo.Builder, org.sunrise.game.genProto.gen.MapProto.STRoleInfoOrBuilder> rolesBuilder_;
-
-      /**
-       * <code>repeated .org.sunrise.game.genProto.gen.STRoleInfo roles = 1;</code>
-       */
-      public java.util.List<org.sunrise.game.genProto.gen.MapProto.STRoleInfo> getRolesList() {
-        if (rolesBuilder_ == null) {
-          return java.util.Collections.unmodifiableList(roles_);
-        } else {
-          return rolesBuilder_.getMessageList();
-        }
-      }
-      /**
-       * <code>repeated .org.sunrise.game.genProto.gen.STRoleInfo roles = 1;</code>
-       */
-      public int getRolesCount() {
-        if (rolesBuilder_ == null) {
-          return roles_.size();
-        } else {
-          return rolesBuilder_.getCount();
-        }
-      }
-      /**
-       * <code>repeated .org.sunrise.game.genProto.gen.STRoleInfo roles = 1;</code>
-       */
-      public org.sunrise.game.genProto.gen.MapProto.STRoleInfo getRoles(int index) {
-        if (rolesBuilder_ == null) {
-          return roles_.get(index);
-        } else {
-          return rolesBuilder_.getMessage(index);
-        }
-      }
-      /**
-       * <code>repeated .org.sunrise.game.genProto.gen.STRoleInfo roles = 1;</code>
-       */
-      public Builder setRoles(
-          int index, org.sunrise.game.genProto.gen.MapProto.STRoleInfo value) {
-        if (rolesBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          ensureRolesIsMutable();
-          roles_.set(index, value);
-          onChanged();
-        } else {
-          rolesBuilder_.setMessage(index, value);
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .org.sunrise.game.genProto.gen.STRoleInfo roles = 1;</code>
-       */
-      public Builder setRoles(
-          int index, org.sunrise.game.genProto.gen.MapProto.STRoleInfo.Builder builderForValue) {
-        if (rolesBuilder_ == null) {
-          ensureRolesIsMutable();
-          roles_.set(index, builderForValue.build());
-          onChanged();
-        } else {
-          rolesBuilder_.setMessage(index, builderForValue.build());
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .org.sunrise.game.genProto.gen.STRoleInfo roles = 1;</code>
-       */
-      public Builder addRoles(org.sunrise.game.genProto.gen.MapProto.STRoleInfo value) {
-        if (rolesBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          ensureRolesIsMutable();
-          roles_.add(value);
-          onChanged();
-        } else {
-          rolesBuilder_.addMessage(value);
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .org.sunrise.game.genProto.gen.STRoleInfo roles = 1;</code>
-       */
-      public Builder addRoles(
-          int index, org.sunrise.game.genProto.gen.MapProto.STRoleInfo value) {
-        if (rolesBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          ensureRolesIsMutable();
-          roles_.add(index, value);
-          onChanged();
-        } else {
-          rolesBuilder_.addMessage(index, value);
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .org.sunrise.game.genProto.gen.STRoleInfo roles = 1;</code>
-       */
-      public Builder addRoles(
-          org.sunrise.game.genProto.gen.MapProto.STRoleInfo.Builder builderForValue) {
-        if (rolesBuilder_ == null) {
-          ensureRolesIsMutable();
-          roles_.add(builderForValue.build());
-          onChanged();
-        } else {
-          rolesBuilder_.addMessage(builderForValue.build());
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .org.sunrise.game.genProto.gen.STRoleInfo roles = 1;</code>
-       */
-      public Builder addRoles(
-          int index, org.sunrise.game.genProto.gen.MapProto.STRoleInfo.Builder builderForValue) {
-        if (rolesBuilder_ == null) {
-          ensureRolesIsMutable();
-          roles_.add(index, builderForValue.build());
-          onChanged();
-        } else {
-          rolesBuilder_.addMessage(index, builderForValue.build());
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .org.sunrise.game.genProto.gen.STRoleInfo roles = 1;</code>
-       */
-      public Builder addAllRoles(
-          java.lang.Iterable<? extends org.sunrise.game.genProto.gen.MapProto.STRoleInfo> values) {
-        if (rolesBuilder_ == null) {
-          ensureRolesIsMutable();
-          com.google.protobuf.AbstractMessageLite.Builder.addAll(
-              values, roles_);
-          onChanged();
-        } else {
-          rolesBuilder_.addAllMessages(values);
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .org.sunrise.game.genProto.gen.STRoleInfo roles = 1;</code>
-       */
-      public Builder clearRoles() {
-        if (rolesBuilder_ == null) {
-          roles_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000001);
-          onChanged();
-        } else {
-          rolesBuilder_.clear();
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .org.sunrise.game.genProto.gen.STRoleInfo roles = 1;</code>
-       */
-      public Builder removeRoles(int index) {
-        if (rolesBuilder_ == null) {
-          ensureRolesIsMutable();
-          roles_.remove(index);
-          onChanged();
-        } else {
-          rolesBuilder_.remove(index);
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .org.sunrise.game.genProto.gen.STRoleInfo roles = 1;</code>
-       */
-      public org.sunrise.game.genProto.gen.MapProto.STRoleInfo.Builder getRolesBuilder(
-          int index) {
-        return getRolesFieldBuilder().getBuilder(index);
-      }
-      /**
-       * <code>repeated .org.sunrise.game.genProto.gen.STRoleInfo roles = 1;</code>
-       */
-      public org.sunrise.game.genProto.gen.MapProto.STRoleInfoOrBuilder getRolesOrBuilder(
-          int index) {
-        if (rolesBuilder_ == null) {
-          return roles_.get(index);  } else {
-          return rolesBuilder_.getMessageOrBuilder(index);
-        }
-      }
-      /**
-       * <code>repeated .org.sunrise.game.genProto.gen.STRoleInfo roles = 1;</code>
-       */
-      public java.util.List<? extends org.sunrise.game.genProto.gen.MapProto.STRoleInfoOrBuilder> 
-           getRolesOrBuilderList() {
-        if (rolesBuilder_ != null) {
-          return rolesBuilder_.getMessageOrBuilderList();
-        } else {
-          return java.util.Collections.unmodifiableList(roles_);
-        }
-      }
-      /**
-       * <code>repeated .org.sunrise.game.genProto.gen.STRoleInfo roles = 1;</code>
-       */
-      public org.sunrise.game.genProto.gen.MapProto.STRoleInfo.Builder addRolesBuilder() {
-        return getRolesFieldBuilder().addBuilder(
-            org.sunrise.game.genProto.gen.MapProto.STRoleInfo.getDefaultInstance());
-      }
-      /**
-       * <code>repeated .org.sunrise.game.genProto.gen.STRoleInfo roles = 1;</code>
-       */
-      public org.sunrise.game.genProto.gen.MapProto.STRoleInfo.Builder addRolesBuilder(
-          int index) {
-        return getRolesFieldBuilder().addBuilder(
-            index, org.sunrise.game.genProto.gen.MapProto.STRoleInfo.getDefaultInstance());
-      }
-      /**
-       * <code>repeated .org.sunrise.game.genProto.gen.STRoleInfo roles = 1;</code>
-       */
-      public java.util.List<org.sunrise.game.genProto.gen.MapProto.STRoleInfo.Builder> 
-           getRolesBuilderList() {
-        return getRolesFieldBuilder().getBuilderList();
-      }
-      private com.google.protobuf.RepeatedFieldBuilder<
-          org.sunrise.game.genProto.gen.MapProto.STRoleInfo, org.sunrise.game.genProto.gen.MapProto.STRoleInfo.Builder, org.sunrise.game.genProto.gen.MapProto.STRoleInfoOrBuilder> 
-          getRolesFieldBuilder() {
-        if (rolesBuilder_ == null) {
-          rolesBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
-              org.sunrise.game.genProto.gen.MapProto.STRoleInfo, org.sunrise.game.genProto.gen.MapProto.STRoleInfo.Builder, org.sunrise.game.genProto.gen.MapProto.STRoleInfoOrBuilder>(
-                  roles_,
-                  ((bitField0_ & 0x00000001) != 0),
-                  getParentForChildren(),
-                  isClean());
-          roles_ = null;
-        }
-        return rolesBuilder_;
-      }
-
-      // @@protoc_insertion_point(builder_scope:org.sunrise.game.genProto.gen.MS2C_Sync)
-    }
-
-    // @@protoc_insertion_point(class_scope:org.sunrise.game.genProto.gen.MS2C_Sync)
-    private static final org.sunrise.game.genProto.gen.MapProto.MS2C_Sync DEFAULT_INSTANCE;
-    static {
-      DEFAULT_INSTANCE = new org.sunrise.game.genProto.gen.MapProto.MS2C_Sync();
-    }
-
-    public static org.sunrise.game.genProto.gen.MapProto.MS2C_Sync getDefaultInstance() {
-      return DEFAULT_INSTANCE;
-    }
-
-    private static final com.google.protobuf.Parser<MS2C_Sync>
-        PARSER = new com.google.protobuf.AbstractParser<MS2C_Sync>() {
-      @java.lang.Override
-      public MS2C_Sync parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        Builder builder = newBuilder();
-        try {
-          builder.mergeFrom(input, extensionRegistry);
-        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          throw e.setUnfinishedMessage(builder.buildPartial());
-        } catch (com.google.protobuf.UninitializedMessageException e) {
-          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
-        } catch (java.io.IOException e) {
-          throw new com.google.protobuf.InvalidProtocolBufferException(e)
-              .setUnfinishedMessage(builder.buildPartial());
-        }
-        return builder.buildPartial();
-      }
-    };
-
-    public static com.google.protobuf.Parser<MS2C_Sync> parser() {
-      return PARSER;
-    }
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<MS2C_Sync> getParserForType() {
-      return PARSER;
-    }
-
-    @java.lang.Override
-    public org.sunrise.game.genProto.gen.MapProto.MS2C_Sync getDefaultInstanceForType() {
-      return DEFAULT_INSTANCE;
-    }
-
-  }
-
-  public interface MS2C_LeaveOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:org.sunrise.game.genProto.gen.MS2C_Leave)
-      com.google.protobuf.MessageOrBuilder {
-
-    /**
-     * <pre>
-     * 离开地图的玩家ID
-     * </pre>
-     *
-     * <code>string human_id = 1;</code>
-     * @return The humanId.
-     */
-    java.lang.String getHumanId();
-    /**
-     * <pre>
-     * 离开地图的玩家ID
-     * </pre>
-     *
-     * <code>string human_id = 1;</code>
-     * @return The bytes for humanId.
-     */
-    com.google.protobuf.ByteString
-        getHumanIdBytes();
-  }
-  /**
-   * Protobuf type {@code org.sunrise.game.genProto.gen.MS2C_Leave}
-   */
-  public static final class MS2C_Leave extends
-      com.google.protobuf.GeneratedMessage implements
-      // @@protoc_insertion_point(message_implements:org.sunrise.game.genProto.gen.MS2C_Leave)
-      MS2C_LeaveOrBuilder {
-  private static final long serialVersionUID = 0L;
-    static {
-      com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
-        com.google.protobuf.RuntimeVersion.RuntimeDomain.PUBLIC,
-        /* major= */ 4,
-        /* minor= */ 28,
-        /* patch= */ 2,
-        /* suffix= */ "",
-        MS2C_Leave.class.getName());
-    }
-    // Use MS2C_Leave.newBuilder() to construct.
-    private MS2C_Leave(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
-      super(builder);
-    }
-    private MS2C_Leave() {
-      humanId_ = "";
-    }
-
-    public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
-      return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_MS2C_Leave_descriptor;
-    }
-
-    @java.lang.Override
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-        internalGetFieldAccessorTable() {
-      return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_MS2C_Leave_fieldAccessorTable
-          .ensureFieldAccessorsInitialized(
-              org.sunrise.game.genProto.gen.MapProto.MS2C_Leave.class, org.sunrise.game.genProto.gen.MapProto.MS2C_Leave.Builder.class);
-    }
-
-    public static final int HUMAN_ID_FIELD_NUMBER = 1;
-    @SuppressWarnings("serial")
-    private volatile java.lang.Object humanId_ = "";
-    /**
-     * <pre>
-     * 离开地图的玩家ID
-     * </pre>
-     *
-     * <code>string human_id = 1;</code>
-     * @return The humanId.
-     */
-    @java.lang.Override
-    public java.lang.String getHumanId() {
-      java.lang.Object ref = humanId_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        humanId_ = s;
-        return s;
-      }
-    }
-    /**
-     * <pre>
-     * 离开地图的玩家ID
-     * </pre>
-     *
-     * <code>string human_id = 1;</code>
-     * @return The bytes for humanId.
-     */
-    @java.lang.Override
-    public com.google.protobuf.ByteString
-        getHumanIdBytes() {
-      java.lang.Object ref = humanId_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        humanId_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-
-    private byte memoizedIsInitialized = -1;
-    @java.lang.Override
-    public final boolean isInitialized() {
-      byte isInitialized = memoizedIsInitialized;
-      if (isInitialized == 1) return true;
-      if (isInitialized == 0) return false;
-
-      memoizedIsInitialized = 1;
-      return true;
-    }
-
-    @java.lang.Override
-    public void writeTo(com.google.protobuf.CodedOutputStream output)
-                        throws java.io.IOException {
-      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(humanId_)) {
-        com.google.protobuf.GeneratedMessage.writeString(output, 1, humanId_);
-      }
-      getUnknownFields().writeTo(output);
-    }
-
-    @java.lang.Override
-    public int getSerializedSize() {
-      int size = memoizedSize;
-      if (size != -1) return size;
-
-      size = 0;
-      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(humanId_)) {
-        size += com.google.protobuf.GeneratedMessage.computeStringSize(1, humanId_);
-      }
-      size += getUnknownFields().getSerializedSize();
-      memoizedSize = size;
-      return size;
-    }
-
-    @java.lang.Override
-    public boolean equals(final java.lang.Object obj) {
-      if (obj == this) {
-       return true;
-      }
-      if (!(obj instanceof org.sunrise.game.genProto.gen.MapProto.MS2C_Leave)) {
-        return super.equals(obj);
-      }
-      org.sunrise.game.genProto.gen.MapProto.MS2C_Leave other = (org.sunrise.game.genProto.gen.MapProto.MS2C_Leave) obj;
-
-      if (!getHumanId()
-          .equals(other.getHumanId())) return false;
-      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
-      return true;
-    }
-
-    @java.lang.Override
-    public int hashCode() {
-      if (memoizedHashCode != 0) {
-        return memoizedHashCode;
-      }
-      int hash = 41;
-      hash = (19 * hash) + getDescriptor().hashCode();
-      hash = (37 * hash) + HUMAN_ID_FIELD_NUMBER;
-      hash = (53 * hash) + getHumanId().hashCode();
-      hash = (29 * hash) + getUnknownFields().hashCode();
-      memoizedHashCode = hash;
-      return hash;
-    }
-
-    public static org.sunrise.game.genProto.gen.MapProto.MS2C_Leave parseFrom(
-        java.nio.ByteBuffer data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static org.sunrise.game.genProto.gen.MapProto.MS2C_Leave parseFrom(
-        java.nio.ByteBuffer data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static org.sunrise.game.genProto.gen.MapProto.MS2C_Leave parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static org.sunrise.game.genProto.gen.MapProto.MS2C_Leave parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static org.sunrise.game.genProto.gen.MapProto.MS2C_Leave parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static org.sunrise.game.genProto.gen.MapProto.MS2C_Leave parseFrom(
-        byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static org.sunrise.game.genProto.gen.MapProto.MS2C_Leave parseFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessage
-          .parseWithIOException(PARSER, input);
-    }
-    public static org.sunrise.game.genProto.gen.MapProto.MS2C_Leave parseFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessage
-          .parseWithIOException(PARSER, input, extensionRegistry);
-    }
-
-    public static org.sunrise.game.genProto.gen.MapProto.MS2C_Leave parseDelimitedFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessage
-          .parseDelimitedWithIOException(PARSER, input);
-    }
-
-    public static org.sunrise.game.genProto.gen.MapProto.MS2C_Leave parseDelimitedFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessage
-          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
-    }
-    public static org.sunrise.game.genProto.gen.MapProto.MS2C_Leave parseFrom(
-        com.google.protobuf.CodedInputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessage
-          .parseWithIOException(PARSER, input);
-    }
-    public static org.sunrise.game.genProto.gen.MapProto.MS2C_Leave parseFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessage
-          .parseWithIOException(PARSER, input, extensionRegistry);
-    }
-
-    @java.lang.Override
-    public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder() {
-      return DEFAULT_INSTANCE.toBuilder();
-    }
-    public static Builder newBuilder(org.sunrise.game.genProto.gen.MapProto.MS2C_Leave prototype) {
-      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
-    }
-    @java.lang.Override
-    public Builder toBuilder() {
-      return this == DEFAULT_INSTANCE
-          ? new Builder() : new Builder().mergeFrom(this);
-    }
-
-    @java.lang.Override
-    protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
-      Builder builder = new Builder(parent);
-      return builder;
-    }
-    /**
-     * Protobuf type {@code org.sunrise.game.genProto.gen.MS2C_Leave}
-     */
-    public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:org.sunrise.game.genProto.gen.MS2C_Leave)
-        org.sunrise.game.genProto.gen.MapProto.MS2C_LeaveOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
-          getDescriptor() {
-        return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_MS2C_Leave_descriptor;
-      }
-
-      @java.lang.Override
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-          internalGetFieldAccessorTable() {
-        return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_MS2C_Leave_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                org.sunrise.game.genProto.gen.MapProto.MS2C_Leave.class, org.sunrise.game.genProto.gen.MapProto.MS2C_Leave.Builder.class);
-      }
-
-      // Construct using org.sunrise.game.genProto.gen.MapProto.MS2C_Leave.newBuilder()
-      private Builder() {
-
-      }
-
-      private Builder(
-          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
-        super(parent);
-
-      }
-      @java.lang.Override
-      public Builder clear() {
-        super.clear();
-        bitField0_ = 0;
-        humanId_ = "";
-        return this;
-      }
-
-      @java.lang.Override
-      public com.google.protobuf.Descriptors.Descriptor
-          getDescriptorForType() {
-        return org.sunrise.game.genProto.gen.MapProto.internal_static_org_sunrise_game_genProto_gen_MS2C_Leave_descriptor;
-      }
-
-      @java.lang.Override
-      public org.sunrise.game.genProto.gen.MapProto.MS2C_Leave getDefaultInstanceForType() {
-        return org.sunrise.game.genProto.gen.MapProto.MS2C_Leave.getDefaultInstance();
-      }
-
-      @java.lang.Override
-      public org.sunrise.game.genProto.gen.MapProto.MS2C_Leave build() {
-        org.sunrise.game.genProto.gen.MapProto.MS2C_Leave result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(result);
-        }
-        return result;
-      }
-
-      @java.lang.Override
-      public org.sunrise.game.genProto.gen.MapProto.MS2C_Leave buildPartial() {
-        org.sunrise.game.genProto.gen.MapProto.MS2C_Leave result = new org.sunrise.game.genProto.gen.MapProto.MS2C_Leave(this);
-        if (bitField0_ != 0) { buildPartial0(result); }
-        onBuilt();
-        return result;
-      }
-
-      private void buildPartial0(org.sunrise.game.genProto.gen.MapProto.MS2C_Leave result) {
-        int from_bitField0_ = bitField0_;
-        if (((from_bitField0_ & 0x00000001) != 0)) {
-          result.humanId_ = humanId_;
-        }
-      }
-
-      @java.lang.Override
-      public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof org.sunrise.game.genProto.gen.MapProto.MS2C_Leave) {
-          return mergeFrom((org.sunrise.game.genProto.gen.MapProto.MS2C_Leave)other);
-        } else {
-          super.mergeFrom(other);
-          return this;
-        }
-      }
-
-      public Builder mergeFrom(org.sunrise.game.genProto.gen.MapProto.MS2C_Leave other) {
-        if (other == org.sunrise.game.genProto.gen.MapProto.MS2C_Leave.getDefaultInstance()) return this;
-        if (!other.getHumanId().isEmpty()) {
-          humanId_ = other.humanId_;
-          bitField0_ |= 0x00000001;
-          onChanged();
-        }
-        this.mergeUnknownFields(other.getUnknownFields());
-        onChanged();
-        return this;
-      }
-
-      @java.lang.Override
-      public final boolean isInitialized() {
-        return true;
-      }
-
-      @java.lang.Override
-      public Builder mergeFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
-        if (extensionRegistry == null) {
-          throw new java.lang.NullPointerException();
-        }
-        try {
-          boolean done = false;
-          while (!done) {
-            int tag = input.readTag();
-            switch (tag) {
-              case 0:
-                done = true;
-                break;
-              case 10: {
-                humanId_ = input.readStringRequireUtf8();
+                input.readMessage(
+                    getAttributesFieldBuilder().getBuilder(),
+                    extensionRegistry);
                 bitField0_ |= 0x00000001;
                 break;
               } // case 10
@@ -5472,115 +8889,144 @@ public final class MapProto {
       }
       private int bitField0_;
 
-      private java.lang.Object humanId_ = "";
+      private org.sunrise.game.genProto.gen.MapProto.STUnitAttributes attributes_;
+      private com.google.protobuf.SingleFieldBuilder<
+          org.sunrise.game.genProto.gen.MapProto.STUnitAttributes, org.sunrise.game.genProto.gen.MapProto.STUnitAttributes.Builder, org.sunrise.game.genProto.gen.MapProto.STUnitAttributesOrBuilder> attributesBuilder_;
       /**
-       * <pre>
-       * 离开地图的玩家ID
-       * </pre>
-       *
-       * <code>string human_id = 1;</code>
-       * @return The humanId.
+       * <code>.org.sunrise.game.genProto.gen.STUnitAttributes attributes = 1;</code>
+       * @return Whether the attributes field is set.
        */
-      public java.lang.String getHumanId() {
-        java.lang.Object ref = humanId_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          humanId_ = s;
-          return s;
+      public boolean hasAttributes() {
+        return ((bitField0_ & 0x00000001) != 0);
+      }
+      /**
+       * <code>.org.sunrise.game.genProto.gen.STUnitAttributes attributes = 1;</code>
+       * @return The attributes.
+       */
+      public org.sunrise.game.genProto.gen.MapProto.STUnitAttributes getAttributes() {
+        if (attributesBuilder_ == null) {
+          return attributes_ == null ? org.sunrise.game.genProto.gen.MapProto.STUnitAttributes.getDefaultInstance() : attributes_;
         } else {
-          return (java.lang.String) ref;
+          return attributesBuilder_.getMessage();
         }
       }
       /**
-       * <pre>
-       * 离开地图的玩家ID
-       * </pre>
-       *
-       * <code>string human_id = 1;</code>
-       * @return The bytes for humanId.
+       * <code>.org.sunrise.game.genProto.gen.STUnitAttributes attributes = 1;</code>
        */
-      public com.google.protobuf.ByteString
-          getHumanIdBytes() {
-        java.lang.Object ref = humanId_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          humanId_ = b;
-          return b;
+      public Builder setAttributes(org.sunrise.game.genProto.gen.MapProto.STUnitAttributes value) {
+        if (attributesBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          attributes_ = value;
         } else {
-          return (com.google.protobuf.ByteString) ref;
+          attributesBuilder_.setMessage(value);
         }
-      }
-      /**
-       * <pre>
-       * 离开地图的玩家ID
-       * </pre>
-       *
-       * <code>string human_id = 1;</code>
-       * @param value The humanId to set.
-       * @return This builder for chaining.
-       */
-      public Builder setHumanId(
-          java.lang.String value) {
-        if (value == null) { throw new NullPointerException(); }
-        humanId_ = value;
         bitField0_ |= 0x00000001;
         onChanged();
         return this;
       }
       /**
-       * <pre>
-       * 离开地图的玩家ID
-       * </pre>
-       *
-       * <code>string human_id = 1;</code>
-       * @return This builder for chaining.
+       * <code>.org.sunrise.game.genProto.gen.STUnitAttributes attributes = 1;</code>
        */
-      public Builder clearHumanId() {
-        humanId_ = getDefaultInstance().getHumanId();
+      public Builder setAttributes(
+          org.sunrise.game.genProto.gen.MapProto.STUnitAttributes.Builder builderForValue) {
+        if (attributesBuilder_ == null) {
+          attributes_ = builderForValue.build();
+        } else {
+          attributesBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.org.sunrise.game.genProto.gen.STUnitAttributes attributes = 1;</code>
+       */
+      public Builder mergeAttributes(org.sunrise.game.genProto.gen.MapProto.STUnitAttributes value) {
+        if (attributesBuilder_ == null) {
+          if (((bitField0_ & 0x00000001) != 0) &&
+            attributes_ != null &&
+            attributes_ != org.sunrise.game.genProto.gen.MapProto.STUnitAttributes.getDefaultInstance()) {
+            getAttributesBuilder().mergeFrom(value);
+          } else {
+            attributes_ = value;
+          }
+        } else {
+          attributesBuilder_.mergeFrom(value);
+        }
+        if (attributes_ != null) {
+          bitField0_ |= 0x00000001;
+          onChanged();
+        }
+        return this;
+      }
+      /**
+       * <code>.org.sunrise.game.genProto.gen.STUnitAttributes attributes = 1;</code>
+       */
+      public Builder clearAttributes() {
         bitField0_ = (bitField0_ & ~0x00000001);
+        attributes_ = null;
+        if (attributesBuilder_ != null) {
+          attributesBuilder_.dispose();
+          attributesBuilder_ = null;
+        }
         onChanged();
         return this;
       }
       /**
-       * <pre>
-       * 离开地图的玩家ID
-       * </pre>
-       *
-       * <code>string human_id = 1;</code>
-       * @param value The bytes for humanId to set.
-       * @return This builder for chaining.
+       * <code>.org.sunrise.game.genProto.gen.STUnitAttributes attributes = 1;</code>
        */
-      public Builder setHumanIdBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) { throw new NullPointerException(); }
-        checkByteStringIsUtf8(value);
-        humanId_ = value;
+      public org.sunrise.game.genProto.gen.MapProto.STUnitAttributes.Builder getAttributesBuilder() {
         bitField0_ |= 0x00000001;
         onChanged();
-        return this;
+        return getAttributesFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.org.sunrise.game.genProto.gen.STUnitAttributes attributes = 1;</code>
+       */
+      public org.sunrise.game.genProto.gen.MapProto.STUnitAttributesOrBuilder getAttributesOrBuilder() {
+        if (attributesBuilder_ != null) {
+          return attributesBuilder_.getMessageOrBuilder();
+        } else {
+          return attributes_ == null ?
+              org.sunrise.game.genProto.gen.MapProto.STUnitAttributes.getDefaultInstance() : attributes_;
+        }
+      }
+      /**
+       * <code>.org.sunrise.game.genProto.gen.STUnitAttributes attributes = 1;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilder<
+          org.sunrise.game.genProto.gen.MapProto.STUnitAttributes, org.sunrise.game.genProto.gen.MapProto.STUnitAttributes.Builder, org.sunrise.game.genProto.gen.MapProto.STUnitAttributesOrBuilder> 
+          getAttributesFieldBuilder() {
+        if (attributesBuilder_ == null) {
+          attributesBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              org.sunrise.game.genProto.gen.MapProto.STUnitAttributes, org.sunrise.game.genProto.gen.MapProto.STUnitAttributes.Builder, org.sunrise.game.genProto.gen.MapProto.STUnitAttributesOrBuilder>(
+                  getAttributes(),
+                  getParentForChildren(),
+                  isClean());
+          attributes_ = null;
+        }
+        return attributesBuilder_;
       }
 
-      // @@protoc_insertion_point(builder_scope:org.sunrise.game.genProto.gen.MS2C_Leave)
+      // @@protoc_insertion_point(builder_scope:org.sunrise.game.genProto.gen.MS2C_UnitAttributeUpdate)
     }
 
-    // @@protoc_insertion_point(class_scope:org.sunrise.game.genProto.gen.MS2C_Leave)
-    private static final org.sunrise.game.genProto.gen.MapProto.MS2C_Leave DEFAULT_INSTANCE;
+    // @@protoc_insertion_point(class_scope:org.sunrise.game.genProto.gen.MS2C_UnitAttributeUpdate)
+    private static final org.sunrise.game.genProto.gen.MapProto.MS2C_UnitAttributeUpdate DEFAULT_INSTANCE;
     static {
-      DEFAULT_INSTANCE = new org.sunrise.game.genProto.gen.MapProto.MS2C_Leave();
+      DEFAULT_INSTANCE = new org.sunrise.game.genProto.gen.MapProto.MS2C_UnitAttributeUpdate();
     }
 
-    public static org.sunrise.game.genProto.gen.MapProto.MS2C_Leave getDefaultInstance() {
+    public static org.sunrise.game.genProto.gen.MapProto.MS2C_UnitAttributeUpdate getDefaultInstance() {
       return DEFAULT_INSTANCE;
     }
 
-    private static final com.google.protobuf.Parser<MS2C_Leave>
-        PARSER = new com.google.protobuf.AbstractParser<MS2C_Leave>() {
+    private static final com.google.protobuf.Parser<MS2C_UnitAttributeUpdate>
+        PARSER = new com.google.protobuf.AbstractParser<MS2C_UnitAttributeUpdate>() {
       @java.lang.Override
-      public MS2C_Leave parsePartialFrom(
+      public MS2C_UnitAttributeUpdate parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
@@ -5599,17 +9045,17 @@ public final class MapProto {
       }
     };
 
-    public static com.google.protobuf.Parser<MS2C_Leave> parser() {
+    public static com.google.protobuf.Parser<MS2C_UnitAttributeUpdate> parser() {
       return PARSER;
     }
 
     @java.lang.Override
-    public com.google.protobuf.Parser<MS2C_Leave> getParserForType() {
+    public com.google.protobuf.Parser<MS2C_UnitAttributeUpdate> getParserForType() {
       return PARSER;
     }
 
     @java.lang.Override
-    public org.sunrise.game.genProto.gen.MapProto.MS2C_Leave getDefaultInstanceForType() {
+    public org.sunrise.game.genProto.gen.MapProto.MS2C_UnitAttributeUpdate getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
 
@@ -5630,10 +9076,6 @@ public final class MapProto {
     int getId();
   }
   /**
-   * <pre>
-   * 上线后，同步离线时所在地图
-   * </pre>
-   *
    * Protobuf type {@code org.sunrise.game.genProto.gen.MS2C_LastMap}
    */
   public static final class MS2C_LastMap extends
@@ -5843,10 +9285,6 @@ public final class MapProto {
       return builder;
     }
     /**
-     * <pre>
-     * 上线后，同步离线时所在地图
-     * </pre>
-     *
      * Protobuf type {@code org.sunrise.game.genProto.gen.MS2C_LastMap}
      */
     public static final class Builder extends
@@ -6078,10 +9516,25 @@ public final class MapProto {
   }
 
   private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_org_sunrise_game_genProto_gen_STRoleInfo_descriptor;
+    internal_static_org_sunrise_game_genProto_gen_STUnitInfo_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_org_sunrise_game_genProto_gen_STRoleInfo_fieldAccessorTable;
+      internal_static_org_sunrise_game_genProto_gen_STUnitInfo_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_org_sunrise_game_genProto_gen_STUnitPosition_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_org_sunrise_game_genProto_gen_STUnitPosition_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_org_sunrise_game_genProto_gen_STAttributeValue_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_org_sunrise_game_genProto_gen_STAttributeValue_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_org_sunrise_game_genProto_gen_STUnitAttributes_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_org_sunrise_game_genProto_gen_STUnitAttributes_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_org_sunrise_game_genProto_gen_MC2S_Enter_descriptor;
   private static final 
@@ -6098,25 +9551,30 @@ public final class MapProto {
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_org_sunrise_game_genProto_gen_MC2S_Leave_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_org_sunrise_game_genProto_gen_MS2C_Enter_descriptor;
+    internal_static_org_sunrise_game_genProto_gen_MS2C_SceneSync_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_org_sunrise_game_genProto_gen_MS2C_Enter_fieldAccessorTable;
+      internal_static_org_sunrise_game_genProto_gen_MS2C_SceneSync_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_org_sunrise_game_genProto_gen_MS2C_Move_descriptor;
+    internal_static_org_sunrise_game_genProto_gen_MS2C_UnitEnter_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_org_sunrise_game_genProto_gen_MS2C_Move_fieldAccessorTable;
+      internal_static_org_sunrise_game_genProto_gen_MS2C_UnitEnter_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_org_sunrise_game_genProto_gen_MS2C_Sync_descriptor;
+    internal_static_org_sunrise_game_genProto_gen_MS2C_UnitLeave_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_org_sunrise_game_genProto_gen_MS2C_Sync_fieldAccessorTable;
+      internal_static_org_sunrise_game_genProto_gen_MS2C_UnitLeave_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_org_sunrise_game_genProto_gen_MS2C_Leave_descriptor;
+    internal_static_org_sunrise_game_genProto_gen_MS2C_UnitPositionUpdate_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_org_sunrise_game_genProto_gen_MS2C_Leave_fieldAccessorTable;
+      internal_static_org_sunrise_game_genProto_gen_MS2C_UnitPositionUpdate_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_org_sunrise_game_genProto_gen_MS2C_UnitAttributeUpdate_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_org_sunrise_game_genProto_gen_MS2C_UnitAttributeUpdate_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_org_sunrise_game_genProto_gen_MS2C_LastMap_descriptor;
   private static final 
@@ -6132,80 +9590,121 @@ public final class MapProto {
   static {
     java.lang.String[] descriptorData = {
       "\n\tmap.proto\022\035org.sunrise.game.genProto.g" +
-      "en\"w\n\nSTRoleInfo\022\020\n\010mapPostX\030\001 \001(\002\022\020\n\010ma" +
-      "pPostY\030\002 \001(\002\022\020\n\010mapPostZ\030\003 \001(\002\022\020\n\010human_" +
-      "id\030\004 \001(\t\022\014\n\004name\030\005 \001(\t\022\023\n\013Orientation\030\006 " +
-      "\001(\002\"\030\n\nMC2S_Enter\022\n\n\002id\030\001 \001(\r\"V\n\tMC2S_Mo" +
-      "ve\022\020\n\010mapPostX\030\001 \001(\002\022\020\n\010mapPostY\030\002 \001(\002\022\020" +
-      "\n\010mapPostZ\030\003 \001(\002\022\023\n\013Orientation\030\004 \001(\002\"\030\n" +
-      "\nMC2S_Leave\022\n\n\002id\030\001 \001(\r\"K\n\nMS2C_Enter\022=\n" +
-      "\nnew_player\030\001 \001(\0132).org.sunrise.game.gen" +
-      "Proto.gen.STRoleInfo\"S\n\tMS2C_Move\022\020\n\010map" +
-      "PostX\030\001 \001(\002\022\020\n\010mapPostY\030\002 \001(\002\022\020\n\010mapPost" +
-      "Z\030\003 \001(\002\022\020\n\010human_id\030\004 \001(\t\"E\n\tMS2C_Sync\0228" +
-      "\n\005roles\030\001 \003(\0132).org.sunrise.game.genProt" +
-      "o.gen.STRoleInfo\"\036\n\nMS2C_Leave\022\020\n\010human_" +
-      "id\030\001 \001(\t\"\032\n\014MS2C_LastMap\022\n\n\002id\030\001 \001(\r*9\n\013" +
-      "FROM_CLIENT\022\r\n\tC2S_Enter\020\000\022\014\n\010C2S_Move\020\001" +
-      "\022\r\n\tC2S_Leave\020\002*X\n\013FROM_SERVER\022\r\n\tS2C_En" +
-      "ter\020\000\022\014\n\010S2C_Move\020\001\022\014\n\010S2C_Sync\020\002\022\r\n\tS2C" +
-      "_Leave\020\003\022\017\n\013S2C_LastMap\020\004B\nB\010MapProtob\006p" +
-      "roto3"
+      "en\"Q\n\nSTUnitInfo\022\017\n\007unit_id\030\001 \001(\t\022\021\n\tuni" +
+      "t_type\030\002 \001(\r\022\021\n\tconfig_id\030\003 \001(\r\022\014\n\004name\030" +
+      "\004 \001(\t\"c\n\016STUnitPosition\022\017\n\007unit_id\030\001 \001(\t" +
+      "\022\r\n\005pos_x\030\002 \001(\002\022\r\n\005pos_y\030\003 \001(\002\022\r\n\005pos_z\030" +
+      "\004 \001(\002\022\023\n\013orientation\030\005 \001(\002\"?\n\020STAttribut" +
+      "eValue\022\026\n\016attribute_type\030\001 \001(\r\022\023\n\013final_" +
+      "value\030\002 \001(\004\"h\n\020STUnitAttributes\022\017\n\007unit_" +
+      "id\030\001 \001(\t\022C\n\nattributes\030\002 \003(\0132/.org.sunri" +
+      "se.game.genProto.gen.STAttributeValue\"\030\n" +
+      "\nMC2S_Enter\022\n\n\002id\030\001 \001(\r\"V\n\tMC2S_Move\022\020\n\010" +
+      "mapPostX\030\001 \001(\002\022\020\n\010mapPostY\030\002 \001(\002\022\020\n\010mapP" +
+      "ostZ\030\003 \001(\002\022\023\n\013Orientation\030\004 \001(\002\"\030\n\nMC2S_" +
+      "Leave\022\n\n\002id\030\001 \001(\r\"\326\001\n\016MS2C_SceneSync\0228\n\005" +
+      "units\030\001 \003(\0132).org.sunrise.game.genProto." +
+      "gen.STUnitInfo\022@\n\tpositions\030\002 \003(\0132-.org." +
+      "sunrise.game.genProto.gen.STUnitPosition" +
+      "\022H\n\017unit_attributes\030\003 \003(\0132/.org.sunrise." +
+      "game.genProto.gen.STUnitAttributes\"\317\001\n\016M" +
+      "S2C_UnitEnter\0227\n\004unit\030\001 \001(\0132).org.sunris" +
+      "e.game.genProto.gen.STUnitInfo\022?\n\010positi" +
+      "on\030\002 \001(\0132-.org.sunrise.game.genProto.gen" +
+      ".STUnitPosition\022C\n\nattributes\030\003 \001(\0132/.or" +
+      "g.sunrise.game.genProto.gen.STUnitAttrib" +
+      "utes\"!\n\016MS2C_UnitLeave\022\017\n\007unit_id\030\001 \001(\t\"" +
+      "Z\n\027MS2C_UnitPositionUpdate\022?\n\010position\030\001" +
+      " \001(\0132-.org.sunrise.game.genProto.gen.STU" +
+      "nitPosition\"_\n\030MS2C_UnitAttributeUpdate\022" +
+      "C\n\nattributes\030\001 \001(\0132/.org.sunrise.game.g" +
+      "enProto.gen.STUnitAttributes\"\032\n\014MS2C_Las" +
+      "tMap\022\n\n\002id\030\001 \001(\r*9\n\013FROM_CLIENT\022\r\n\tC2S_E" +
+      "nter\020\000\022\014\n\010C2S_Move\020\001\022\r\n\tC2S_Leave\020\002*\220\001\n\013" +
+      "FROM_SERVER\022\021\n\rS2C_SceneSync\020\000\022\021\n\rS2C_Un" +
+      "itEnter\020\001\022\021\n\rS2C_UnitLeave\020\002\022\032\n\026S2C_Unit" +
+      "PositionUpdate\020\003\022\033\n\027S2C_UnitAttributeUpd" +
+      "ate\020\004\022\017\n\013S2C_LastMap\020\005B\nB\010MapProtob\006prot" +
+      "o3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
         });
-    internal_static_org_sunrise_game_genProto_gen_STRoleInfo_descriptor =
+    internal_static_org_sunrise_game_genProto_gen_STUnitInfo_descriptor =
       getDescriptor().getMessageTypes().get(0);
-    internal_static_org_sunrise_game_genProto_gen_STRoleInfo_fieldAccessorTable = new
+    internal_static_org_sunrise_game_genProto_gen_STUnitInfo_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_org_sunrise_game_genProto_gen_STRoleInfo_descriptor,
-        new java.lang.String[] { "MapPostX", "MapPostY", "MapPostZ", "HumanId", "Name", "Orientation", });
-    internal_static_org_sunrise_game_genProto_gen_MC2S_Enter_descriptor =
+        internal_static_org_sunrise_game_genProto_gen_STUnitInfo_descriptor,
+        new java.lang.String[] { "UnitId", "UnitType", "ConfigId", "Name", });
+    internal_static_org_sunrise_game_genProto_gen_STUnitPosition_descriptor =
       getDescriptor().getMessageTypes().get(1);
+    internal_static_org_sunrise_game_genProto_gen_STUnitPosition_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_org_sunrise_game_genProto_gen_STUnitPosition_descriptor,
+        new java.lang.String[] { "UnitId", "PosX", "PosY", "PosZ", "Orientation", });
+    internal_static_org_sunrise_game_genProto_gen_STAttributeValue_descriptor =
+      getDescriptor().getMessageTypes().get(2);
+    internal_static_org_sunrise_game_genProto_gen_STAttributeValue_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_org_sunrise_game_genProto_gen_STAttributeValue_descriptor,
+        new java.lang.String[] { "AttributeType", "FinalValue", });
+    internal_static_org_sunrise_game_genProto_gen_STUnitAttributes_descriptor =
+      getDescriptor().getMessageTypes().get(3);
+    internal_static_org_sunrise_game_genProto_gen_STUnitAttributes_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_org_sunrise_game_genProto_gen_STUnitAttributes_descriptor,
+        new java.lang.String[] { "UnitId", "Attributes", });
+    internal_static_org_sunrise_game_genProto_gen_MC2S_Enter_descriptor =
+      getDescriptor().getMessageTypes().get(4);
     internal_static_org_sunrise_game_genProto_gen_MC2S_Enter_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_org_sunrise_game_genProto_gen_MC2S_Enter_descriptor,
         new java.lang.String[] { "Id", });
     internal_static_org_sunrise_game_genProto_gen_MC2S_Move_descriptor =
-      getDescriptor().getMessageTypes().get(2);
+      getDescriptor().getMessageTypes().get(5);
     internal_static_org_sunrise_game_genProto_gen_MC2S_Move_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_org_sunrise_game_genProto_gen_MC2S_Move_descriptor,
         new java.lang.String[] { "MapPostX", "MapPostY", "MapPostZ", "Orientation", });
     internal_static_org_sunrise_game_genProto_gen_MC2S_Leave_descriptor =
-      getDescriptor().getMessageTypes().get(3);
+      getDescriptor().getMessageTypes().get(6);
     internal_static_org_sunrise_game_genProto_gen_MC2S_Leave_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_org_sunrise_game_genProto_gen_MC2S_Leave_descriptor,
         new java.lang.String[] { "Id", });
-    internal_static_org_sunrise_game_genProto_gen_MS2C_Enter_descriptor =
-      getDescriptor().getMessageTypes().get(4);
-    internal_static_org_sunrise_game_genProto_gen_MS2C_Enter_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_org_sunrise_game_genProto_gen_MS2C_Enter_descriptor,
-        new java.lang.String[] { "NewPlayer", });
-    internal_static_org_sunrise_game_genProto_gen_MS2C_Move_descriptor =
-      getDescriptor().getMessageTypes().get(5);
-    internal_static_org_sunrise_game_genProto_gen_MS2C_Move_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_org_sunrise_game_genProto_gen_MS2C_Move_descriptor,
-        new java.lang.String[] { "MapPostX", "MapPostY", "MapPostZ", "HumanId", });
-    internal_static_org_sunrise_game_genProto_gen_MS2C_Sync_descriptor =
-      getDescriptor().getMessageTypes().get(6);
-    internal_static_org_sunrise_game_genProto_gen_MS2C_Sync_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_org_sunrise_game_genProto_gen_MS2C_Sync_descriptor,
-        new java.lang.String[] { "Roles", });
-    internal_static_org_sunrise_game_genProto_gen_MS2C_Leave_descriptor =
+    internal_static_org_sunrise_game_genProto_gen_MS2C_SceneSync_descriptor =
       getDescriptor().getMessageTypes().get(7);
-    internal_static_org_sunrise_game_genProto_gen_MS2C_Leave_fieldAccessorTable = new
+    internal_static_org_sunrise_game_genProto_gen_MS2C_SceneSync_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_org_sunrise_game_genProto_gen_MS2C_Leave_descriptor,
-        new java.lang.String[] { "HumanId", });
-    internal_static_org_sunrise_game_genProto_gen_MS2C_LastMap_descriptor =
+        internal_static_org_sunrise_game_genProto_gen_MS2C_SceneSync_descriptor,
+        new java.lang.String[] { "Units", "Positions", "UnitAttributes", });
+    internal_static_org_sunrise_game_genProto_gen_MS2C_UnitEnter_descriptor =
       getDescriptor().getMessageTypes().get(8);
+    internal_static_org_sunrise_game_genProto_gen_MS2C_UnitEnter_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_org_sunrise_game_genProto_gen_MS2C_UnitEnter_descriptor,
+        new java.lang.String[] { "Unit", "Position", "Attributes", });
+    internal_static_org_sunrise_game_genProto_gen_MS2C_UnitLeave_descriptor =
+      getDescriptor().getMessageTypes().get(9);
+    internal_static_org_sunrise_game_genProto_gen_MS2C_UnitLeave_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_org_sunrise_game_genProto_gen_MS2C_UnitLeave_descriptor,
+        new java.lang.String[] { "UnitId", });
+    internal_static_org_sunrise_game_genProto_gen_MS2C_UnitPositionUpdate_descriptor =
+      getDescriptor().getMessageTypes().get(10);
+    internal_static_org_sunrise_game_genProto_gen_MS2C_UnitPositionUpdate_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_org_sunrise_game_genProto_gen_MS2C_UnitPositionUpdate_descriptor,
+        new java.lang.String[] { "Position", });
+    internal_static_org_sunrise_game_genProto_gen_MS2C_UnitAttributeUpdate_descriptor =
+      getDescriptor().getMessageTypes().get(11);
+    internal_static_org_sunrise_game_genProto_gen_MS2C_UnitAttributeUpdate_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_org_sunrise_game_genProto_gen_MS2C_UnitAttributeUpdate_descriptor,
+        new java.lang.String[] { "Attributes", });
+    internal_static_org_sunrise_game_genProto_gen_MS2C_LastMap_descriptor =
+      getDescriptor().getMessageTypes().get(12);
     internal_static_org_sunrise_game_genProto_gen_MS2C_LastMap_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_org_sunrise_game_genProto_gen_MS2C_LastMap_descriptor,

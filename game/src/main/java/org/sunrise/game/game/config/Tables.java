@@ -33,6 +33,9 @@ public final class Tables
     private final org.sunrise.game.game.config.activity.ConfigActivity _configactivity;
     public static volatile org.sunrise.game.game.config.activity.ConfigActivity ConfigActivity;
     private org.sunrise.game.game.config.activity.ConfigActivity getConfigActivity() { return _configactivity; }
+    private final org.sunrise.game.game.config.monster.ConfigMonster _configmonster;
+    public static volatile org.sunrise.game.game.config.monster.ConfigMonster ConfigMonster;
+    private org.sunrise.game.game.config.monster.ConfigMonster getConfigMonster() { return _configmonster; }
 
     public Tables(IJsonLoader loader) throws java.io.IOException {
         _configitem = new org.sunrise.game.game.config.item.ConfigItem(loader.load("item_configitem"));
@@ -40,6 +43,7 @@ public final class Tables
         _configtask = new org.sunrise.game.game.config.task.ConfigTask(loader.load("task_configtask"));
         _configmap = new org.sunrise.game.game.config.map.ConfigMap(loader.load("map_configmap"));
         _configactivity = new org.sunrise.game.game.config.activity.ConfigActivity(loader.load("activity_configactivity"));
+        _configmonster = new org.sunrise.game.game.config.monster.ConfigMonster(loader.load("monster_configmonster"));
     }
 
     public static void load(Tables tables) {
@@ -49,6 +53,7 @@ public final class Tables
         ConfigTask = tables.getConfigTask(); 
         ConfigMap = tables.getConfigMap(); 
         ConfigActivity = tables.getConfigActivity(); 
+        ConfigMonster = tables.getConfigMonster(); 
     }
 }
 

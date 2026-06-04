@@ -59,7 +59,7 @@ public class MinerModule extends BaseModule {
         level3 = data.getUpgradeCounts().getHookPower();
 
         resetAttribute();
-        getHuman().getModule(AttributeModule.class).markDirty();
+        getHuman().getModule(PlayerUnitModule.class).markDirty();
     }
 
     // 假设此模块有属性

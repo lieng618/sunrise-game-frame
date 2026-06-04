@@ -5,7 +5,7 @@
     "desc": "达到1级",
     "type": 1,
     "next_id": 0,
-    "params": [],
+    "task_params": [],
     "goal": 1
   },
   {
@@ -14,7 +14,7 @@
     "desc": "达到2级",
     "type": 1,
     "next_id": 0,
-    "params": [],
+    "task_params": [],
     "goal": 2
   },
   {
@@ -23,7 +23,7 @@
     "desc": "达到3级",
     "type": 1,
     "next_id": 0,
-    "params": [],
+    "task_params": [],
     "goal": 3
   },
   {
@@ -32,7 +32,7 @@
     "desc": "达到4级",
     "type": 1,
     "next_id": 0,
-    "params": [],
+    "task_params": [],
     "goal": 4
   },
   {
@@ -41,7 +41,7 @@
     "desc": "达到5级",
     "type": 1,
     "next_id": 0,
-    "params": [],
+    "task_params": [],
     "goal": 5
   },
   {
@@ -50,7 +50,7 @@
     "desc": "达到6级",
     "type": 1,
     "next_id": 0,
-    "params": [],
+    "task_params": [],
     "goal": 6
   },
   {
@@ -59,7 +59,7 @@
     "desc": "达到7级",
     "type": 1,
     "next_id": 0,
-    "params": [],
+    "task_params": [],
     "goal": 7
   },
   {
@@ -68,7 +68,7 @@
     "desc": "达到8级",
     "type": 1,
     "next_id": 0,
-    "params": [],
+    "task_params": [],
     "goal": 8
   },
   {
@@ -77,7 +77,7 @@
     "desc": "达到9级",
     "type": 1,
     "next_id": 0,
-    "params": [],
+    "task_params": [],
     "goal": 9
   },
   {
@@ -86,7 +86,7 @@
     "desc": "达到10级",
     "type": 1,
     "next_id": 0,
-    "params": [],
+    "task_params": [],
     "goal": 10
   },
   {
@@ -95,7 +95,7 @@
     "desc": "",
     "type": 5,
     "next_id": 10012,
-    "params": [
+    "task_params": [
       900001
     ],
     "goal": 10
@@ -106,7 +106,7 @@
     "desc": "",
     "type": 5,
     "next_id": 10013,
-    "params": [
+    "task_params": [
       900002
     ],
     "goal": 10
@@ -117,7 +117,7 @@
     "desc": "",
     "type": 5,
     "next_id": 0,
-    "params": [
+    "task_params": [
       900003
     ],
     "goal": 10
@@ -128,7 +128,7 @@
     "desc": "",
     "type": 3,
     "next_id": 10015,
-    "params": [
+    "task_params": [
       10001
     ],
     "goal": 1
@@ -139,7 +139,7 @@
     "desc": "",
     "type": 3,
     "next_id": 10016,
-    "params": [
+    "task_params": [
       10002
     ],
     "goal": 2
@@ -150,7 +150,7 @@
     "desc": "",
     "type": 3,
     "next_id": 0,
-    "params": [
+    "task_params": [
       10003
     ],
     "goal": 3

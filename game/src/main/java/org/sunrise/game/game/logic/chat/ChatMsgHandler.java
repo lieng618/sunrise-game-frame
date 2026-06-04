@@ -10,6 +10,7 @@ import org.sunrise.game.game.logic.gm.GmCommandManager;
 import org.sunrise.game.game.logic.system.CdkSystem;
 import org.sunrise.game.game.logic.system.GameSystemUtils;
 import org.sunrise.game.game.modules.CdkModule;
+import org.sunrise.game.game.modules.DataModule;
 import org.sunrise.game.genProto.gen.ChatProto;
 import org.sunrise.game.genProto.gen.TopicProto;
 import org.sunrise.game.genRpc.gen.CallEnum;
@@ -33,7 +34,7 @@ public class ChatMsgHandler {
             return;
         }
 
-        RpcFunction.newInstance().call(CallEnum.GlobalChatService_chat, "humanId", humanObject.getHumanId(), "message", SensitiveWordHelper.replace(msg));
+        RpcFunction.newInstance().call(CallEnum.GlobalChatService_chat, "humanId", humanObject.getHumanId(), "name",humanObject.getModule(DataModule.class).getName(), "message", SensitiveWordHelper.replace(msg));
     }
 
     @MsgHandlerMethod(packetId = ChatProto.FROM_CLIENT.C2S_Horn_VALUE)

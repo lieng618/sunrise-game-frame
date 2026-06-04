@@ -5,6 +5,7 @@ import com.github.houbb.sensitive.word.core.SensitiveWordHelper;
 import lombok.Getter;
 import lombok.Setter;
 import org.sunrise.game.game.annotation.HumanModule;
+import org.sunrise.game.game.config.Tables;
 import org.sunrise.game.game.logic.ToolsUtils;
 import org.sunrise.game.genProto.gen.HumanProto;
 import org.sunrise.game.genProto.gen.TopicProto;
@@ -33,7 +34,7 @@ public class DataModule extends BaseModule {
     @Override
     public void init() {
         name = "Human";
-        headIcon = "default";
+        headIcon = String.valueOf(Tables.ConfigParam.getDefaultHeadIcon());
         sex = 1;
         lastDailyRefreshTime = ToolsUtils.getTodayZeroTimeMillis();
         lastWeekRefreshTime = ToolsUtils.getWeekZeroTimeMillis();

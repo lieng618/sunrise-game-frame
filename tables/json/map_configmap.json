@@ -5,9 +5,9 @@
     "desc": "",
     "type": 1,
     "Cli_id": 10001,
-    "enter_x": 10,
-    "enter_y": 0,
-    "enter_z": 10
+    "enter_x": 432,
+    "enter_y": 373,
+    "enter_z": 0
   },
   {
     "id": 10002,
@@ -15,9 +15,9 @@
     "desc": "",
     "type": 2,
     "Cli_id": 10002,
-    "enter_x": 11,
-    "enter_y": 0,
-    "enter_z": 11
+    "enter_x": 432,
+    "enter_y": 373,
+    "enter_z": 0
   },
   {
     "id": 10003,
@@ -25,9 +25,9 @@
     "desc": "",
     "type": 3,
     "Cli_id": 10003,
-    "enter_x": 12,
-    "enter_y": 0,
-    "enter_z": 12
+    "enter_x": 432,
+    "enter_y": 373,
+    "enter_z": 0
   },
   {
     "id": 10004,
@@ -35,9 +35,9 @@
     "desc": "",
     "type": 4,
     "Cli_id": 10004,
-    "enter_x": 13,
-    "enter_y": 0,
-    "enter_z": 13
+    "enter_x": 432,
+    "enter_y": 373,
+    "enter_z": 0
   },
   {
     "id": 10005,
@@ -45,9 +45,9 @@
     "desc": "",
     "type": 5,
     "Cli_id": 10005,
-    "enter_x": 14,
-    "enter_y": 0,
-    "enter_z": 14
+    "enter_x": 432,
+    "enter_y": 373,
+    "enter_z": 0
   },
   {
     "id": 10006,
@@ -55,9 +55,9 @@
     "desc": "",
     "type": 6,
     "Cli_id": 10006,
-    "enter_x": 15,
-    "enter_y": 0,
-    "enter_z": 15
+    "enter_x": 432,
+    "enter_y": 373,
+    "enter_z": 0
   },
   {
     "id": 10007,
@@ -65,9 +65,9 @@
     "desc": "",
     "type": 7,
     "Cli_id": 10007,
-    "enter_x": 16,
-    "enter_y": 0,
-    "enter_z": 16
+    "enter_x": 432,
+    "enter_y": 373,
+    "enter_z": 0
   },
   {
     "id": 10008,
@@ -75,9 +75,9 @@
     "desc": "",
     "type": 8,
     "Cli_id": 10008,
-    "enter_x": 17,
-    "enter_y": 0,
-    "enter_z": 17
+    "enter_x": 432,
+    "enter_y": 373,
+    "enter_z": 0
   },
   {
     "id": 10009,
@@ -85,9 +85,9 @@
     "desc": "",
     "type": 9,
     "Cli_id": 10009,
-    "enter_x": 18,
-    "enter_y": 0,
-    "enter_z": 18
+    "enter_x": 432,
+    "enter_y": 373,
+    "enter_z": 0
   },
   {
     "id": 10010,
@@ -95,8 +95,8 @@
     "desc": "",
     "type": 10,
     "Cli_id": 10010,
-    "enter_x": 19,
-    "enter_y": 0,
-    "enter_z": 19
+    "enter_x": 432,
+    "enter_y": 373,
+    "enter_z": 0
   }
 ]

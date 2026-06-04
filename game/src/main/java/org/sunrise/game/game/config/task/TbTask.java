@@ -21,7 +21,7 @@ public final class TbTask extends AbstractBean {
         desc = _buf.get("desc").getAsString();
         type = _buf.get("type").getAsInt();
         nextId = _buf.get("next_id").getAsInt();
-        { com.google.gson.JsonArray _json0_ = _buf.get("params").getAsJsonArray(); params = new java.util.ArrayList<Integer>(_json0_.size()); for(JsonElement _e0 : _json0_) { int _v0;  _v0 = _e0.getAsInt();  params.add(_v0); }   }
+        { com.google.gson.JsonArray _json0_ = _buf.get("task_params").getAsJsonArray(); taskParams = new java.util.ArrayList<Integer>(_json0_.size()); for(JsonElement _e0 : _json0_) { int _v0;  _v0 = _e0.getAsInt();  taskParams.add(_v0); }   }
         goal = _buf.get("goal").getAsInt();
     }
 
@@ -52,7 +52,7 @@ public final class TbTask extends AbstractBean {
     /**
      * 参数
      */
-    public final java.util.ArrayList<Integer> params;
+    public final java.util.ArrayList<Integer> taskParams;
     /**
      * 目标值
      */
@@ -71,7 +71,7 @@ public final class TbTask extends AbstractBean {
         + "desc:" + desc + ","
         + "type:" + type + ","
         + "nextId:" + nextId + ","
-        + "params:" + params + ","
+        + "taskParams:" + taskParams + ","
         + "goal:" + goal + ","
         + "}";
     }
