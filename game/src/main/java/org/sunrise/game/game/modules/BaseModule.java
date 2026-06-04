@@ -62,6 +62,13 @@ public class BaseModule {
     }
 
     /**
+     * 模块心跳 每100毫秒
+     */
+    public void pulsePer100Ms() {
+
+    }
+
+    /**
      * 模块心跳 每秒
      */
     public void pulsePerSec() {

@@ -37,6 +37,12 @@ public class GameMasterService extends BaseService {
     }
 
     @Override
+    public void pulsePer100Ms() {
+        super.pulsePer100Ms();
+        GameSystemUtils.pulsePer100Ms();
+    }
+
+    @Override
     public void pulsePerSec() {
         super.pulsePerSec();
         // 检测玩家掉线，进行数据清理

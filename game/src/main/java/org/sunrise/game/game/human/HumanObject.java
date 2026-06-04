@@ -127,6 +127,12 @@ public class HumanObject {
         }
     }
 
+    public void pulsePer100Ms() {
+        for (Map.Entry<String, BaseModule> entry : modules.entrySet()) {
+            entry.getValue().pulsePer100Ms();
+        }
+    }
+
     public void pulsePerSec() {
         for (Map.Entry<String, BaseModule> entry : modules.entrySet()) {
             entry.getValue().pulsePerSec();

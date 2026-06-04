@@ -66,7 +66,7 @@ public class MapMsgHandler {
         if (gameMap == null) {
             return;
         }
-        PlayerUnit playerUnit = (PlayerUnit) gameMap.getUnit(humanObject.getHumanId());
+        PlayerUnit playerUnit = gameMap.getPlayer(humanObject.getHumanId());
         if (playerUnit == null) {
             return;
         }

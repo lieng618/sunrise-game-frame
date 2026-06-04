@@ -56,6 +56,12 @@ public class BaseService {
     }
 
     /**
+     * 心跳 每100毫秒
+     */
+    public void pulsePer100Ms() {
+    }
+
+    /**
      * 心跳 每5秒
      */
     public void pulsePer5Sec() {

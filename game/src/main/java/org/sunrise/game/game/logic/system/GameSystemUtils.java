@@ -149,6 +149,21 @@ public class GameSystemUtils {
     }
 
     /**
+     * GameSystem 主心跳 每100毫秒
+     */
+    public static void pulsePer100Ms() {
+        for (Map.Entry<String, BaseSystem> entry : systems.entrySet()) {
+            if (entry.getValue().isInitEnd()) {
+                entry.getValue().pulsePer100Ms();
+            }
+        }
+
+        for (HumanObject humanObject : HumanObjectManger.getHumanObjects()) {
+            humanObject.pulsePer100Ms();
+        }
+    }
+
+    /**
      * GameSystem 主心跳 每秒
      */
     public static void pulsePerSec() {

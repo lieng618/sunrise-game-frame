@@ -30,6 +30,8 @@ public final class ToolsUtils {
     public static final long HOUR_MILLIS = 60 * 60 * 1000L;
     public static final long MINUTE_MILLIS = 60 * 1000L;
     public static final long SECOND_MILLIS = 1000L;
+    public static final long PULSE_100MS_MILLIS = 100L;
+    public static final float PULSE_100MS_SEC = PULSE_100MS_MILLIS / 1000f;
 
     // 使用 Object 作为锁对象，确保多线程临界点安全
     private static final Object LOCK = new Object();

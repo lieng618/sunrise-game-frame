@@ -15,6 +15,7 @@ public class ServiceManager {
     private static long initStartTime;
     private static long lastPulsePerMinTime = 0L; //上次系统每分钟心跳的时间
     private static long lastPulsePerSecTime = 0L; //上次系统每秒心跳的时间
+    private static long lastPulsePer100MsTime = 0L; //上次系统每100毫秒心跳的时间
     private static long lastPulsePer5SecTime = 0L; //上次系统每5秒心跳的时间
     private static final Map<String, BaseService> services = new HashMap<>();
 
@@ -110,6 +111,13 @@ public class ServiceManager {
      */
     public static void pulse() {
         long cur = System.currentTimeMillis();
+
+        if (lastPulsePer100MsTime + 100L <= cur) {
+            lastPulsePer100MsTime = cur;
+            for (Map.Entry<String, BaseService> entry : services.entrySet()) {
+                entry.getValue().pulsePer100Ms();
+            }
+        }
 
         if (lastPulsePerSecTime + 1000L <= cur) {
             lastPulsePerSecTime = cur;

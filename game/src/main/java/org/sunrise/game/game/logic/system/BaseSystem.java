@@ -48,6 +48,13 @@ public class BaseSystem {
 
     }
 
+    /**
+     * 心跳 每100毫秒
+     */
+    public void pulsePer100Ms() {
+
+    }
+
     public <T> void getDbData(String key, TypeReference<T> typeReference, Consumer<T> func) {
         String value = dataMap.get(key);
         if (value == null) {

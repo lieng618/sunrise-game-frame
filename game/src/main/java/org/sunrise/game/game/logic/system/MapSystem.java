@@ -9,8 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 地图系统
- * 统一管理所有地图实例
+ * 地图系统：统一管理所有地图实例，并驱动各地图心跳。
  */
 @GameSystem
 public class MapSystem extends BaseSystem {
@@ -19,37 +18,30 @@ public class MapSystem extends BaseSystem {
     @Override
     public void init() {
         maps.clear();
-        // 初始化地图，从配置表读取地图列表
         for (TbMap map : Tables.ConfigMap.getDataList()) {
-            GameMap gameMap = new GameMap(map.id);
-            maps.put(map.id, gameMap);
+            maps.put(map.id, new GameMap(map.id));
         }
     }
 
-    /**
-     * 根据地图ID获取对应的 GameMap
-     */
+    @Override
+    public void pulsePer100Ms() {
+        for (GameMap gameMap : maps.values()) {
+            gameMap.pulsePer100Ms();
+        }
+    }
+
     public GameMap getMap(int mapId) {
         return maps.get(mapId);
     }
 
-    /**
-     * 添加地图
-     */
     public void addMap(int mapId, GameMap gameMap) {
         maps.put(mapId, gameMap);
     }
 
-    /**
-     * 移除地图
-     */
     public void removeMap(int mapId) {
         maps.remove(mapId);
     }
 
-    /**
-     * 获取所有地图
-     */
     public Map<Integer, GameMap> getAllMaps() {
         return maps;
     }

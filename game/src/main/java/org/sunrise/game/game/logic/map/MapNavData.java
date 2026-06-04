@@ -57,4 +57,8 @@ public class MapNavData {
         }
         return cells[tileY * width + tileX] == '1';
     }
+
+    public boolean isWalkable(float worldX, float worldY) {
+        return !isBlocked(worldX, worldY);
+    }
 }
