@@ -113,6 +113,8 @@ public class HttpServer {
                 ctx.result(jsonResponse.toJSONString());
                 return;
             }
+            // 登录成功后，清除该用户的黑名单记录（允许新 token 使用）
+            JwtUtil.clearUserBlacklist(user.uid);
             jsonResponse.put("result", true);
             jsonResponse.put("token", JwtUtil.createToken(user.uid));
             ctx.result(jsonResponse.toJSONString());
@@ -153,7 +155,12 @@ public class HttpServer {
         app.get("/server_status", ctx -> {
             JSONObject jsonResponse = new JSONObject();
             String uid = resolveRequestUid(ctx);
-            if (uid != null && whitelist.contains(uid)) {
+            if (uid == null) {
+                jsonResponse.put("open", false);
+                ctx.result(jsonResponse.toJSONString());
+                return;
+            }
+            if (whitelist.contains(uid)) {
                 jsonResponse.put("open", true);
             } else {
                 jsonResponse.put("open", serverOpen);
@@ -165,8 +172,13 @@ public class HttpServer {
         app.get("/external_address", ctx -> {
             JSONObject jsonResponse = new JSONObject();
             String uid = resolveRequestUid(ctx);
-            if (!serverOpen && (uid == null || !whitelist.contains(uid))) {
-                jsonResponse.put("error", "server_closed");
+            if (uid == null) {
+                jsonResponse.put("error", "expired token");
+                ctx.result(jsonResponse.toJSONString());
+                return;
+            }
+            if (!serverOpen && !whitelist.contains(uid)) {
+                jsonResponse.put("error", "server closed");
                 ctx.result(jsonResponse.toJSONString());
                 return;
             }
