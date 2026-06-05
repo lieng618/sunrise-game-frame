@@ -3,14 +3,11 @@ package org.sunrise.game.gmback.server.controller;
 import com.alibaba.fastjson2.TypeReference;
 import io.javalin.http.Context;
 import lombok.Data;
+import org.sunrise.game.jwt.PasswordUtil;
 import org.sunrise.game.config.ConfigReader;
+import org.sunrise.game.gmback.server.PermissionHelper;
 import org.sunrise.game.jwt.JwtUtil;
 import org.sunrise.game.log.LogCore;
-
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import org.sunrise.game.gmback.server.PermissionHelper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -87,34 +84,6 @@ public class UserController extends BaseController {
         }
     }
 
-    /**
-     * 加密密码
-     */
-    private String encryptPassword(String password) {
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            byte[] hash = md.digest(password.getBytes(StandardCharsets.UTF_8));
-            StringBuilder hexString = new StringBuilder();
-            for (byte b : hash) {
-                String hex = Integer.toHexString(0xff & b);
-                if (hex.length() == 1) {
-                    hexString.append('0');
-                }
-                hexString.append(hex);
-            }
-            return hexString.toString();
-        } catch (NoSuchAlgorithmException e) {
-            LogCore.GmBackServer.error("Password encryption failed", e);
-            return password; // 如果加密失败，返回原密码（不推荐，但作为降级方案）
-        }
-    }
-
-    /**
-     * 验证密码
-     */
-    public boolean verifyPassword(String password, String encryptedPassword) {
-        return encryptPassword(password).equals(encryptedPassword);
-    }
 
     /**
      * 根据用户名查找用户
@@ -180,7 +149,7 @@ public class UserController extends BaseController {
         }
 
         // 加密密码并添加用户，默认无页面权限，需管理员在权限管理中分配
-        String encryptedPassword = encryptPassword(password);
+        String encryptedPassword = PasswordUtil.encryptPassword(password);
         User newUser = new User(username, encryptedPassword);
         newUser.setPermissions(new ArrayList<>());
         users.add(newUser);
@@ -278,7 +247,7 @@ public class UserController extends BaseController {
         }
 
         // 加密新密码并更新
-        String encryptedPassword = encryptPassword(newPassword);
+        String encryptedPassword = PasswordUtil.encryptPassword(newPassword);
         user.setPassword(encryptedPassword);
         save();
 

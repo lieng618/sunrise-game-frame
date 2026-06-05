@@ -32,7 +32,7 @@ registerPage('architecture', '架构总览', '多进程架构、服务职责、�
     <div class="card">
         <div class="card-icon">🔗</div>
         <div class="card-title">HttpServer</div>
-        <div class="card-desc">HTTP 服务（基于 Javalin）。为客户端分配对外服地址（同一 uid 优先分配之前的 external）、接收对外服心跳上报、维护地址池、提供服务器开关和白名单接口</div>
+        <div class="card-desc">HTTP 服务（基于 Javalin）。为客户端分配对外服地址、提供邮箱注册/登录（验证码 + JWT）、服务器开关/白名单/公告；开启 <code>player.auth.enabled</code> 后地址类接口需携带 Token</div>
     </div>
     <div class="card">
         <div class="card-icon">🛡️</div>
@@ -158,7 +158,7 @@ registerPage('architecture', '架构总览', '多进程架构、服务职责、�
 <tr><td>ExternalServer</td><td>10000</td><td>TCP</td><td>客户端 TCP 连接</td></tr>
 <tr><td>ExternalServer</td><td>10001</td><td>WebSocket</td><td>客户端 WS 连接</td></tr>
 <tr><td>ExternalServer</td><td>10002</td><td>KCP</td><td>客户端 KCP 连接</td></tr>
-<tr><td>HttpServer</td><td>8090</td><td>HTTP</td><td>地址分发接口</td></tr>
+<tr><td>HttpServer</td><td>8090</td><td>HTTP</td><td>邮箱注册登录 + 地址分发接口</td></tr>
 <tr><td>GmBackServer</td><td>8010</td><td>HTTP</td><td>GM 后台 REST API（页面见 gmback-ui）</td></tr>
 <tr><td>MySQL</td><td>3306</td><td>TCP</td><td>数据库</td></tr>
 <tr><td>RPC服务</td><td>20000+ 自动分配</td><td>TCP</td><td>RPC 服务端口，所有RPC节点都会占用一个端口</td></tr>

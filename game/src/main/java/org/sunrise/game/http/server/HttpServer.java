@@ -4,12 +4,20 @@ import ch.qos.logback.classic.Level;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import io.javalin.Javalin;
+import io.javalin.http.Context;
 import lombok.Data;
+import lombok.Getter;
+import org.sunrise.game.config.ConfigReader;
+import org.sunrise.game.jwt.JwtUtil;
+import org.sunrise.game.jwt.MailUtil;
+import org.sunrise.game.jwt.PasswordUtil;
 import org.sunrise.game.log.LogCore;
+import org.sunrise.game.utils.IdGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -21,7 +29,15 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @Data
 public class HttpServer {
+    @Data
+    public static class AuthUser {
+        private String uid;
+        private String email;
+        private String passwordHash;
+    }
+
     private final int port;
+    @Getter
     private Javalin app;
     private final Random random = new Random();
     private final AtomicInteger convAllocator = new AtomicInteger(1);
@@ -35,16 +51,108 @@ public class HttpServer {
     // "websocket" - <1001, 127.0.0.1:10001>
     // "kcp" - <1001, 127.0.0.1:10002>
     private final ConcurrentHashMap<String, ConcurrentHashMap<Integer, String>> externalAddress = new ConcurrentHashMap<>();
+    private Map<String, AuthUser> authUsers = new ConcurrentHashMap<>();
 
     public HttpServer(int port) {
         this.port = port;
         app = Javalin.create();
+        app.post("/send_code", ctx -> {
+            JSONObject jsonResponse = new JSONObject();
+            String email = ctx.queryParam("email");
+            String verifyCode = MailUtil.sendVerifyCode(email);
+            if (verifyCode.isEmpty()) {
+                jsonResponse.put("result", false);
+            } else {
+                jsonResponse.put("result", true);
+            }
+            ctx.result(jsonResponse.toJSONString());
+        });
+        app.post("/register", ctx -> {
+            JSONObject jsonResponse = new JSONObject();
+            String email = ctx.queryParam("email");
+            String password = ctx.queryParam("password");
+            String code = ctx.queryParam("code");
+            if (authUsers.containsKey(email)) {
+                jsonResponse.put("result", false);
+                jsonResponse.put("msg", "email already registered");
+                ctx.result(jsonResponse.toJSONString());
+                return;
+            }
+            if (password == null || password.length() < 6) {
+                jsonResponse.put("result", false);
+                jsonResponse.put("msg", "password too short");
+                ctx.result(jsonResponse.toJSONString());
+                return;
+            }
+            if (!MailUtil.verifyCode(email, code)) {
+                jsonResponse.put("result", false);
+                jsonResponse.put("msg", "invalid or expired code");
+                ctx.result(jsonResponse.toJSONString());
+                return;
+            }
+            // 生成uid
+            String uid = String.valueOf(IdGenerator.getId());
+            // 创建账户
+            AuthUser user = new AuthUser();
+            user.setUid(uid);
+            user.setEmail(email);
+            user.setPasswordHash(PasswordUtil.encryptPassword(password));
+            authUsers.put(email, user);
+            MailUtil.removeCode(email);
+            jsonResponse.put("result", true);
+            ctx.result(jsonResponse.toJSONString());
+        });
+        app.post("/login", ctx -> {
+            String email = ctx.queryParam("email");
+            String password = ctx.queryParam("password");
+            JSONObject jsonResponse = new JSONObject();
+            AuthUser user = authUsers.get(email);
+            if (user == null || !PasswordUtil.verifyPassword(password, user.getPasswordHash())) {
+                jsonResponse.put("result", false);
+                jsonResponse.put("msg", "invalid email or password");
+                ctx.result(jsonResponse.toJSONString());
+                return;
+            }
+            jsonResponse.put("result", true);
+            jsonResponse.put("token", JwtUtil.createToken(user.uid));
+            ctx.result(jsonResponse.toJSONString());
+        });
+        app.post("/forgot_password", ctx -> {
+            String email = ctx.queryParam("email");
+            String password = ctx.queryParam("password");
+            String code = ctx.queryParam("code");
+            JSONObject jsonResponse = new JSONObject();
+            AuthUser user = authUsers.get(email);
+            if (user == null) {
+                jsonResponse.put("result", false);
+                jsonResponse.put("msg", "email not registered");
+                ctx.result(jsonResponse.toJSONString());
+                return;
+            }
+            if (password == null || password.length() < 6) {
+                jsonResponse.put("result", false);
+                jsonResponse.put("msg", "password too short");
+                ctx.result(jsonResponse.toJSONString());
+                return;
+            }
+            if (!MailUtil.verifyCode(email, code)) {
+                jsonResponse.put("result", false);
+                jsonResponse.put("msg", "invalid or expired code");
+                ctx.result(jsonResponse.toJSONString());
+                return;
+            }
+            user.setPasswordHash(PasswordUtil.encryptPassword(password));
+            MailUtil.removeCode(email);
+            jsonResponse.put("result", true);
+            JwtUtil.invalidateUserTokens(user.getUid());
+            ctx.result(jsonResponse.toJSONString());
+        });
         // 接口：/server_status
         // 功能：返回服务器开关状态，客户端通过此接口判断是否可以连接
         // 白名单用户始终返回开启
         app.get("/server_status", ctx -> {
             JSONObject jsonResponse = new JSONObject();
-            String uid = ctx.queryParam("uid");
+            String uid = resolveRequestUid(ctx);
             if (uid != null && whitelist.contains(uid)) {
                 jsonResponse.put("open", true);
             } else {
@@ -56,7 +164,7 @@ public class HttpServer {
         // 功能：分配网关节点并返回 ip:port
         app.get("/external_address", ctx -> {
             JSONObject jsonResponse = new JSONObject();
-            String uid = ctx.queryParam("uid");
+            String uid = resolveRequestUid(ctx);
             if (!serverOpen && (uid == null || !whitelist.contains(uid))) {
                 jsonResponse.put("error", "server_closed");
                 ctx.result(jsonResponse.toJSONString());
@@ -141,6 +249,26 @@ public class HttpServer {
             ctx.contentType("application/json;charset=utf-8");
             ctx.result(result.toJSONString());
         });
+    }
+
+    /**
+     * 若服务器开启校验，客户端必须发token（通过/login获取），根据token解析uid
+     * 若服务器未开启校验，客户端的token有效则可以解析uid，无效也可以使用参数发来的uid
+     */
+    private String resolveRequestUid(Context ctx) {
+        String token = ctx.header("Authorization");
+        String queryUid = ctx.queryParam("uid");
+        Properties properties = ConfigReader.getProp();
+        if (Boolean.parseBoolean(properties.getProperty("player.auth.enabled", "false"))) {
+            return JwtUtil.verifyToken(token);
+        }
+        if (token != null && !token.isBlank()) {
+            String uid = JwtUtil.verifyToken(token);
+            if (uid != null) {
+                return uid;
+            }
+        }
+        return queryUid;
     }
 
     public void start() {

@@ -1422,7 +1422,7 @@ public final class LoginProto {
 
     /**
      * <pre>
-     * 用户UID
+     * 用户UID（测试模式或未开启鉴权时使用）
      * </pre>
      *
      * <code>string uid = 1;</code>
@@ -1431,7 +1431,7 @@ public final class LoginProto {
     java.lang.String getUid();
     /**
      * <pre>
-     * 用户UID
+     * 用户UID（测试模式或未开启鉴权时使用）
      * </pre>
      *
      * <code>string uid = 1;</code>
@@ -1439,6 +1439,26 @@ public final class LoginProto {
      */
     com.google.protobuf.ByteString
         getUidBytes();
+
+    /**
+     * <pre>
+     * 访问令牌（生产环境优先使用）
+     * </pre>
+     *
+     * <code>string token = 2;</code>
+     * @return The token.
+     */
+    java.lang.String getToken();
+    /**
+     * <pre>
+     * 访问令牌（生产环境优先使用）
+     * </pre>
+     *
+     * <code>string token = 2;</code>
+     * @return The bytes for token.
+     */
+    com.google.protobuf.ByteString
+        getTokenBytes();
   }
   /**
    * Protobuf type {@code org.sunrise.game.genProto.gen.MC2S_Login}
@@ -1463,6 +1483,7 @@ public final class LoginProto {
     }
     private MC2S_Login() {
       uid_ = "";
+      token_ = "";
     }
 
     public static final com.google.protobuf.Descriptors.Descriptor
@@ -1483,7 +1504,7 @@ public final class LoginProto {
     private volatile java.lang.Object uid_ = "";
     /**
      * <pre>
-     * 用户UID
+     * 用户UID（测试模式或未开启鉴权时使用）
      * </pre>
      *
      * <code>string uid = 1;</code>
@@ -1504,7 +1525,7 @@ public final class LoginProto {
     }
     /**
      * <pre>
-     * 用户UID
+     * 用户UID（测试模式或未开启鉴权时使用）
      * </pre>
      *
      * <code>string uid = 1;</code>
@@ -1519,6 +1540,53 @@ public final class LoginProto {
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         uid_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int TOKEN_FIELD_NUMBER = 2;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object token_ = "";
+    /**
+     * <pre>
+     * 访问令牌（生产环境优先使用）
+     * </pre>
+     *
+     * <code>string token = 2;</code>
+     * @return The token.
+     */
+    @java.lang.Override
+    public java.lang.String getToken() {
+      java.lang.Object ref = token_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        token_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * 访问令牌（生产环境优先使用）
+     * </pre>
+     *
+     * <code>string token = 2;</code>
+     * @return The bytes for token.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getTokenBytes() {
+      java.lang.Object ref = token_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        token_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
@@ -1542,6 +1610,9 @@ public final class LoginProto {
       if (!com.google.protobuf.GeneratedMessage.isStringEmpty(uid_)) {
         com.google.protobuf.GeneratedMessage.writeString(output, 1, uid_);
       }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(token_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 2, token_);
+      }
       getUnknownFields().writeTo(output);
     }
 
@@ -1553,6 +1624,9 @@ public final class LoginProto {
       size = 0;
       if (!com.google.protobuf.GeneratedMessage.isStringEmpty(uid_)) {
         size += com.google.protobuf.GeneratedMessage.computeStringSize(1, uid_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(token_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(2, token_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
@@ -1571,6 +1645,8 @@ public final class LoginProto {
 
       if (!getUid()
           .equals(other.getUid())) return false;
+      if (!getToken()
+          .equals(other.getToken())) return false;
       if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
@@ -1584,6 +1660,8 @@ public final class LoginProto {
       hash = (19 * hash) + getDescriptor().hashCode();
       hash = (37 * hash) + UID_FIELD_NUMBER;
       hash = (53 * hash) + getUid().hashCode();
+      hash = (37 * hash) + TOKEN_FIELD_NUMBER;
+      hash = (53 * hash) + getToken().hashCode();
       hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -1716,6 +1794,7 @@ public final class LoginProto {
         super.clear();
         bitField0_ = 0;
         uid_ = "";
+        token_ = "";
         return this;
       }
 
@@ -1752,6 +1831,9 @@ public final class LoginProto {
         if (((from_bitField0_ & 0x00000001) != 0)) {
           result.uid_ = uid_;
         }
+        if (((from_bitField0_ & 0x00000002) != 0)) {
+          result.token_ = token_;
+        }
       }
 
       @java.lang.Override
@@ -1769,6 +1851,11 @@ public final class LoginProto {
         if (!other.getUid().isEmpty()) {
           uid_ = other.uid_;
           bitField0_ |= 0x00000001;
+          onChanged();
+        }
+        if (!other.getToken().isEmpty()) {
+          token_ = other.token_;
+          bitField0_ |= 0x00000002;
           onChanged();
         }
         this.mergeUnknownFields(other.getUnknownFields());
@@ -1802,6 +1889,11 @@ public final class LoginProto {
                 bitField0_ |= 0x00000001;
                 break;
               } // case 10
+              case 18: {
+                token_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000002;
+                break;
+              } // case 18
               default: {
                 if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                   done = true; // was an endgroup tag
@@ -1822,7 +1914,7 @@ public final class LoginProto {
       private java.lang.Object uid_ = "";
       /**
        * <pre>
-       * 用户UID
+       * 用户UID（测试模式或未开启鉴权时使用）
        * </pre>
        *
        * <code>string uid = 1;</code>
@@ -1842,7 +1934,7 @@ public final class LoginProto {
       }
       /**
        * <pre>
-       * 用户UID
+       * 用户UID（测试模式或未开启鉴权时使用）
        * </pre>
        *
        * <code>string uid = 1;</code>
@@ -1863,7 +1955,7 @@ public final class LoginProto {
       }
       /**
        * <pre>
-       * 用户UID
+       * 用户UID（测试模式或未开启鉴权时使用）
        * </pre>
        *
        * <code>string uid = 1;</code>
@@ -1880,7 +1972,7 @@ public final class LoginProto {
       }
       /**
        * <pre>
-       * 用户UID
+       * 用户UID（测试模式或未开启鉴权时使用）
        * </pre>
        *
        * <code>string uid = 1;</code>
@@ -1894,7 +1986,7 @@ public final class LoginProto {
       }
       /**
        * <pre>
-       * 用户UID
+       * 用户UID（测试模式或未开启鉴权时使用）
        * </pre>
        *
        * <code>string uid = 1;</code>
@@ -1907,6 +1999,98 @@ public final class LoginProto {
         checkByteStringIsUtf8(value);
         uid_ = value;
         bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object token_ = "";
+      /**
+       * <pre>
+       * 访问令牌（生产环境优先使用）
+       * </pre>
+       *
+       * <code>string token = 2;</code>
+       * @return The token.
+       */
+      public java.lang.String getToken() {
+        java.lang.Object ref = token_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          token_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * 访问令牌（生产环境优先使用）
+       * </pre>
+       *
+       * <code>string token = 2;</code>
+       * @return The bytes for token.
+       */
+      public com.google.protobuf.ByteString
+          getTokenBytes() {
+        java.lang.Object ref = token_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          token_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * 访问令牌（生产环境优先使用）
+       * </pre>
+       *
+       * <code>string token = 2;</code>
+       * @param value The token to set.
+       * @return This builder for chaining.
+       */
+      public Builder setToken(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        token_ = value;
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * 访问令牌（生产环境优先使用）
+       * </pre>
+       *
+       * <code>string token = 2;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearToken() {
+        token_ = getDefaultInstance().getToken();
+        bitField0_ = (bitField0_ & ~0x00000002);
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * 访问令牌（生产环境优先使用）
+       * </pre>
+       *
+       * <code>string token = 2;</code>
+       * @param value The bytes for token to set.
+       * @return This builder for chaining.
+       */
+      public Builder setTokenBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        token_ = value;
+        bitField0_ |= 0x00000002;
         onChanged();
         return this;
       }
@@ -6611,24 +6795,25 @@ public final class LoginProto {
       "\n\013login.proto\022\035org.sunrise.game.genProto" +
       ".gen\"`\n\017STHumanShowInfo\022\013\n\003pos\030\001 \001(\r\022\014\n\004" +
       "name\030\002 \001(\t\022\020\n\010human_id\030\003 \001(\t\022\r\n\005level\030\004 " +
-      "\001(\r\022\021\n\tserver_id\030\005 \001(\r\"\031\n\nMC2S_Login\022\013\n\003" +
-      "uid\030\001 \001(\t\"2\n\020MC2S_SelectHuman\022\013\n\003pos\030\001 \001" +
-      "(\r\022\021\n\tserver_id\030\002 \001(\r\"\037\n\017MC2S_ClientPing" +
-      "\022\014\n\004time\030\001 \001(\004\" \n\nMS2C_Login\022\022\n\naccount_" +
-      "id\030\001 \001(\004\"T\n\016MS2C_HumanList\022B\n\nhuman_list" +
-      "\030\001 \003(\0132..org.sunrise.game.genProto.gen.S" +
-      "THumanShowInfo\"\037\n\017MS2C_ClientPing\022\014\n\004tim" +
-      "e\030\001 \001(\004\"S\n\017MS2C_ServerInfo\022\023\n\013server_tim" +
-      "e\030\001 \001(\004\022\021\n\ttime_zone\030\002 \001(\005\022\030\n\020server_ope" +
-      "n_time\030\003 \001(\004\"\033\n\tMS2C_Kick\022\016\n\006reason\030\001 \001(" +
-      "\t\"<\n\nMS2C_Queue\022\013\n\003pos\030\001 \001(\005\022\016\n\006queues\030\002" +
-      " \001(\005\022\021\n\tneed_time\030\003 \001(\005*X\n\013FROM_CLIENT\022\r" +
-      "\n\tC2S_Login\020\000\022\021\n\rC2S_HumanList\020\001\022\023\n\017C2S_" +
-      "SelectHuman\020\002\022\022\n\016C2S_ClientPing\020\003*\211\001\n\013FR" +
-      "OM_SERVER\022\r\n\tS2C_Login\020\000\022\021\n\rS2C_HumanLis" +
-      "t\020\001\022\023\n\017S2C_SelectHuman\020\002\022\022\n\016S2C_ClientPi" +
-      "ng\020\003\022\022\n\016S2C_ServerInfo\020\004\022\014\n\010S2C_Kick\020\005\022\r" +
-      "\n\tS2C_Queue\020\006B\014B\nLoginProtob\006proto3"
+      "\001(\r\022\021\n\tserver_id\030\005 \001(\r\"(\n\nMC2S_Login\022\013\n\003" +
+      "uid\030\001 \001(\t\022\r\n\005token\030\002 \001(\t\"2\n\020MC2S_SelectH" +
+      "uman\022\013\n\003pos\030\001 \001(\r\022\021\n\tserver_id\030\002 \001(\r\"\037\n\017" +
+      "MC2S_ClientPing\022\014\n\004time\030\001 \001(\004\" \n\nMS2C_Lo" +
+      "gin\022\022\n\naccount_id\030\001 \001(\004\"T\n\016MS2C_HumanLis" +
+      "t\022B\n\nhuman_list\030\001 \003(\0132..org.sunrise.game" +
+      ".genProto.gen.STHumanShowInfo\"\037\n\017MS2C_Cl" +
+      "ientPing\022\014\n\004time\030\001 \001(\004\"S\n\017MS2C_ServerInf" +
+      "o\022\023\n\013server_time\030\001 \001(\004\022\021\n\ttime_zone\030\002 \001(" +
+      "\005\022\030\n\020server_open_time\030\003 \001(\004\"\033\n\tMS2C_Kick" +
+      "\022\016\n\006reason\030\001 \001(\t\"<\n\nMS2C_Queue\022\013\n\003pos\030\001 " +
+      "\001(\005\022\016\n\006queues\030\002 \001(\005\022\021\n\tneed_time\030\003 \001(\005*X" +
+      "\n\013FROM_CLIENT\022\r\n\tC2S_Login\020\000\022\021\n\rC2S_Huma" +
+      "nList\020\001\022\023\n\017C2S_SelectHuman\020\002\022\022\n\016C2S_Clie" +
+      "ntPing\020\003*\211\001\n\013FROM_SERVER\022\r\n\tS2C_Login\020\000\022" +
+      "\021\n\rS2C_HumanList\020\001\022\023\n\017S2C_SelectHuman\020\002\022" +
+      "\022\n\016S2C_ClientPing\020\003\022\022\n\016S2C_ServerInfo\020\004\022" +
+      "\014\n\010S2C_Kick\020\005\022\r\n\tS2C_Queue\020\006B\014B\nLoginPro" +
+      "tob\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -6645,7 +6830,7 @@ public final class LoginProto {
     internal_static_org_sunrise_game_genProto_gen_MC2S_Login_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_org_sunrise_game_genProto_gen_MC2S_Login_descriptor,
-        new java.lang.String[] { "Uid", });
+        new java.lang.String[] { "Uid", "Token", });
     internal_static_org_sunrise_game_genProto_gen_MC2S_SelectHuman_descriptor =
       getDescriptor().getMessageTypes().get(2);
     internal_static_org_sunrise_game_genProto_gen_MC2S_SelectHuman_fieldAccessorTable = new

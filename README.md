@@ -97,7 +97,7 @@ npm run dev</code></pre>
     </div>
     <div class="card">
     <h4>HttpServer</h4>
-        <div class="card-desc">HTTP 服务，客户端登录时，先通过curl请求分配对外服地址。提供对外服地址、服务器状态和白名单接口。</div>
+        <div class="card-desc">HTTP 服务，客户端连接前先通过 HTTP 获取对外服地址；同时提供邮箱注册/登录（验证码、JWT Token）、服务器状态、白名单与公告接口。开启 <code>player.auth.enabled</code> 后，访问地址分配等接口需携带有效 Token，后续登录游戏服也需要有效token。</div>
     </div>
     <div class="card">
     <h4>GmBackServer</h4>
@@ -139,7 +139,7 @@ npm run dev</code></pre>
 │       ├─ external/           # 对外服（TCP/WS/KCP 网关）
 │       ├─ game/               # 游戏服（玩家对象/模块/协议路由/系统）
 │       ├─ global/             # 全局服（聊天/好友/邮件/玩家信息）
-│       ├─ http/               # HTTP 服务（地址分发）
+│       ├─ http/               # HTTP 服务（地址分发 + 邮箱注册登录）
 │       ├─ gmback/             # GM 后台（REST API）
 │       └─ runone/             # 单进程部署（将所有模块集成到一个进程中运行）
 ├─ gmback-ui/                  # GM 后台前端（Vite + Vue 3 SPA）
@@ -176,7 +176,8 @@ npm run dev</code></pre>
 <tr><td>Javalin</td><td>6.7.0</td><td>轻量级 Web 框架</td><td>game</td></tr>
 <tr><td>Luban</td><td>4.x</td><td>游戏配置工作流（Excel → JSON）</td><td>tables</td></tr>
 <tr><td>yitter</td><td>1.0.6</td><td>分布式雪花算法 ID 生成</td><td>network</td></tr>
-<tr><td>JWT</td><td>0.13.0</td><td>GM 后台鉴权</td><td>network</td></tr>
+<tr><td>JWT</td><td>0.13.0</td><td>GM 后台与玩家登录鉴权</td><td>network</td></tr>
+<tr><td>Jakarta Mail</td><td>2.x</td><td>邮箱验证码发送</td><td>network</td></tr>
 <tr><td>Vue</td><td>3.5+</td><td>GM后台前端 SPA</td><td>gmback-ui</td></tr>
 <tr><td>Vite</td><td>6.x</td><td>GM后台前端 构建与开发</td><td>gmback-ui</td></tr>
 </tbody>

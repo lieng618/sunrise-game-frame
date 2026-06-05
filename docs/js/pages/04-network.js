@@ -140,7 +140,9 @@ dbService.executeAsync(callback, "DELETE FROM human_list WHERE human_id = ?", hu
 <tr><td>IdGenerator</td><td>雪花 ID 生成器，基于 yitter</td><td>WorkerId = serverId，生成全局唯一 long ID</td></tr>
 <tr><td>Utils</td><td>通用工具类</td><td>getLocalIp(), createEventLoopGroup(自动选择 Epoll/KQueue/NIO), scanPackage(包扫描), checkMemory(内存检测)</td></tr>
 <tr><td>LogCore</td><td>日志常量类</td><td>定义各模块 Logger（CENTER/RPC/DB/GAME/EXTERNAL 等）</td></tr>
-<tr><td>JwtUtil</td><td>JWT 工具类</td><td>HS256 签名，generateToken/parseToken，支持 Token 黑名单</td></tr>
+<tr><td>JwtUtil</td><td>JWT 工具类</td><td>HS256 签名，createToken/verifyToken；玩家 JWT 由 <code>player.jwt.*</code> 初始化，支持用户级 Token 黑名单</td></tr>
+<tr><td>MailUtil</td><td>邮箱验证码</td><td>SMTP 发送 6 位验证码（5 分钟有效，1 分钟限发一次），verifyCode/removeCode</td></tr>
+<tr><td>PasswordUtil</td><td>密码工具</td><td>SHA-256 哈希，encryptPassword/verifyPassword</td></tr>
 </tbody>
 </table>
 `);

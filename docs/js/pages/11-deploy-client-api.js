@@ -11,7 +11,7 @@ registerPage('deployment', '部署指南', '本地部署、Docker 部署、Linux
 <tr><td>ExternalServer</td><td>10000</td><td>TCP</td><td>客户端 TCP 连接</td></tr>
 <tr><td>ExternalServer</td><td>10001</td><td>WebSocket</td><td>客户端 WS 连接</td></tr>
 <tr><td>ExternalServer</td><td>10002</td><td>KCP</td><td>客户端 KCP 连接</td></tr>
-<tr><td>HttpServer</td><td>8090</td><td>HTTP</td><td>地址分发接口</td></tr>
+<tr><td>HttpServer</td><td>8090</td><td>HTTP</td><td>邮箱注册登录 + 地址分发接口</td></tr>
 <tr><td>GmBackServer</td><td>8010</td><td>HTTP</td><td>GM 后台 REST API（gmback-ui 通过 /api 访问）</td></tr>
 <tr><td>gmback-ui（前端目录）</td><td>5173</td><td>HTTP</td><td>开发环境下Vite 开发服务器，代理 /api → admin.port</td></tr>
 <tr><td>MySQL</td><td>3306</td><td>TCP</td><td>数据库</td></tr>
@@ -315,15 +315,25 @@ registerPage('client-tools', '客户端工具', '消息发送工具、压测机�
 </table>
 
 <h2>客户端连接流程</h2>
+<h3>开发模式（player.auth.enabled=false，默认）</h3>
 <ol class="step-list">
     <li>读取 <code>client-config.properties</code> 配置</li>
-    <li>HTTP 请求 HttpServer:/server_status 检查服务器状态</li>
-    <li>HTTP 请求 HttpServer:/external_address 获取对外服地址</li>
+    <li>HTTP 请求 <code>/server_status?uid=xxx</code> 检查服务器状态</li>
+    <li>HTTP 请求 <code>/external_address?type=tcp&uid=xxx</code> 获取对外服地址</li>
     <li>根据配置选择 TCP/WebSocket/KCP 连接 ExternalServer</li>
     <li>发送认证消息 "CLIENT_CONNECT_"</li>
-    <li>发送 C2S_Login(uid) 登录</li>
-    <li>自动处理 S2C_Login → 请求角色列表(C2S_HumanList) → 选择角色(C2S_SelectHuman)</li>
+    <li>发送 <code>C2S_Login(uid)</code> 登录</li>
+    <li>自动处理 S2C_Login → C2S_HumanList → C2S_SelectHuman</li>
     <li>登录完成，定时发送 C2S_ClientPing（每10秒）</li>
+</ol>
+
+<h3>生产模式（player.auth.enabled=true）</h3>
+<ol class="step-list">
+    <li>调用 Http 服 <code>POST /send_code?email=...</code> 获取邮箱验证码</li>
+    <li>注册：<code>POST /register?email=&password=&code=</code>；注册成功后进行登录：<code>POST /login?email=&password=</code> 获取 <code>token</code></li>
+    <li>HTTP 请求 <code>/server_status</code>、<code>/external_address</code> 时携带 Header <code>Authorization: &lt;token&gt;</code></li>
+    <li>连接对外服后发送 <code>C2S_Login(token)</code>（<code>uid</code> 字段留空）</li>
+    <li>后续流程与开发模式相同</li>
 </ol>
 
 <h2>客户端网络实现</h2>
@@ -433,12 +443,17 @@ registerPage('api-reference', 'API 参考', 'RPC 服务 API、HTTP 接口、注�
 
 <h2>HTTP 接口</h2>
 <h3>HttpServer（端口 8090）</h3>
+<p>认证接口详见 <a href="#/http-server">HTTP 服务</a>。常用接口：</p>
 <table>
 <thead><tr><th>接口</th><th>方法</th><th>参数</th><th>返回</th><th>说明</th></tr></thead>
 <tbody>
-<tr><td>/server_status</td><td>GET</td><td>uid</td><td>{open}</td><td>服务器状态</td></tr>
-<tr><td>/external_address</td><td>GET</td><td>type, uid</td><td>{address}</td><td>分配对外服地址</td></tr>
-<tr><td>/external_address_list</td><td>GET</td><td>-</td><td>{addresses}</td><td>所有对外服地址</td></tr>
+<tr><td>/send_code</td><td>POST</td><td>email</td><td>{result}</td><td>发送邮箱验证码</td></tr>
+<tr><td>/register</td><td>POST</td><td>email, password, code</td><td>{result, msg?}</td><td>邮箱注册</td></tr>
+<tr><td>/login</td><td>POST</td><td>email, password</td><td>{result, token?}</td><td>邮箱登录，返回 JWT</td></tr>
+<tr><td>/forgot_password</td><td>POST</td><td>email, password, code</td><td>{result}</td><td>重置密码</td></tr>
+<tr><td>/server_status</td><td>GET</td><td>uid 或 Authorization</td><td>{open}</td><td>服务器状态</td></tr>
+<tr><td>/external_address</td><td>GET</td><td>type, uid 或 Authorization</td><td>{address}</td><td>分配对外服地址</td></tr>
+<tr><td>/external_address_list</td><td>GET</td><td>-</td><td>[addresses]</td><td>所有对外服地址</td></tr>
 <tr><td>/kcp_conv</td><td>GET</td><td>-</td><td>{conv}</td><td>分配 KCP conv ID</td></tr>
 <tr><td>/announcements</td><td>GET</td><td>-</td><td>[{id,title,content,startTime,endTime}]</td><td>获取当前生效公告列表</td></tr>
 </tbody>

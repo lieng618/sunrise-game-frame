@@ -3,11 +3,14 @@ package org.sunrise.game.jwt;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 import org.sunrise.game.log.LogCore;
 
 import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -27,6 +30,23 @@ public class JwtUtil {
     public static void init(long expirationMs) {
         key = Jwts.SIG.HS256.key().build();
         expiration = expirationMs;
+    }
+
+    public static void init(String secret, long expirationMs) {
+        byte[] bytes = secret.getBytes(StandardCharsets.UTF_8);
+        if (bytes.length < 32) {
+            byte[] padded = new byte[32];
+            System.arraycopy(bytes, 0, padded, 0, bytes.length);
+            bytes = padded;
+        }
+        key = Keys.hmacShaKeyFor(bytes);
+        expiration = expirationMs;
+    }
+
+    public static void init(Properties properties) {
+        String jwtSecret = properties.getProperty("player.jwt.secret", "sunrise-player-jwt-secret-change-me-in-production");
+        long jwtExpirationMs = Long.parseLong(properties.getProperty("player.jwt.expiration", "86400000"));
+        init(jwtSecret, jwtExpirationMs);
     }
 
     /**
@@ -52,11 +72,15 @@ public class JwtUtil {
      * @return 如果 token 有效，返回用户名；否则返回 null
      */
     public static String verifyToken(String token) {
+        if (token == null || token.isBlank() || key == null) {
+            return null;
+        }
+        String raw = token.startsWith("Bearer ") ? token.substring(7).trim() : token.trim();
         try {
             Claims claims = Jwts.parser()
                     .verifyWith(key)
                     .build()
-                    .parseSignedClaims(token)
+                    .parseSignedClaims(raw)
                     .getPayload();
             
             String username = claims.getSubject();

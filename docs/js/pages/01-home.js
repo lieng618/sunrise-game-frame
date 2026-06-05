@@ -44,7 +44,8 @@ registerPage('home', '项目概览', 'Sunrise Game Frame 分布式游戏服务�
 │       ├─ rpc/                # RPC 框架（注解/节点/调用/服务管理/policy 连接策略）
 │       ├─ db/                 # DbService（HikariCP）/ 实体类
 │       ├─ config/             # ConfigReader 配置加载
-│       └─ utils/              # IdGenerator / LogCore / JwtUtil / Utils
+│       ├─ jwt/                # JwtUtil / MailUtil / PasswordUtil
+│       └─ utils/              # IdGenerator / LogCore / Utils
 ├─ gen/                        # 协议 / RPC 枚举 / DB 实体 生成代码
 │   └─ src/main/java/org/sunrise/game/
 │       ├─ genProto/           # .proto 文件 + 生成的 Java 协议类
@@ -55,7 +56,7 @@ registerPage('home', '项目概览', 'Sunrise Game Frame 分布式游戏服务�
 │       ├─ external/           # 对外服（TCP/WS/KCP 网关）
 │       ├─ game/               # 游戏服（玩家对象/模块/协议路由/系统）
 │       ├─ global/             # 全局服（聊天/好友/邮件/玩家信息）
-│       ├─ http/               # HTTP 服务（地址分发）
+│       ├─ http/               # HTTP 服务（地址分发 + 邮箱注册登录）
 │       ├─ gmback/             # GM 后台（REST API）
 │       └─ runone/             # 单进程部署（将所有模块集成到一个进程中运行）
 ├─ gmback-ui/                  # GM 后台前端（Vite + Vue 3 SPA）
@@ -92,7 +93,8 @@ registerPage('home', '项目概览', 'Sunrise Game Frame 分布式游戏服务�
 <tr><td>Javalin</td><td>6.7.0</td><td>轻量级 Web 框架</td><td>game</td></tr>
 <tr><td>Luban</td><td>4.x</td><td>游戏配置工作流（Excel → JSON）</td><td>tables</td></tr>
 <tr><td>yitter</td><td>1.0.6</td><td>分布式雪花算法 ID 生成</td><td>network</td></tr>
-<tr><td>JWT</td><td>0.13.0</td><td>GM后台鉴权</td><td>network</td></tr>
+<tr><td>JWT</td><td>0.13.0</td><td>GM 后台与玩家登录鉴权</td><td>network</td></tr>
+<tr><td>Jakarta Mail</td><td>2.x</td><td>邮箱验证码发送</td><td>network</td></tr>
 <tr><td>Vue</td><td>3.5+</td><td>GM后台前端 SPA</td><td>gmback-ui</td></tr>
 <tr><td>Vite</td><td>6.x</td><td>GM后台前端 构建与开发</td><td>gmback-ui</td></tr>
 </tbody>

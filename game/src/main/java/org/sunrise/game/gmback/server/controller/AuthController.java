@@ -1,6 +1,7 @@
 package org.sunrise.game.gmback.server.controller;
 
 import io.javalin.http.Context;
+import org.sunrise.game.jwt.PasswordUtil;
 import org.sunrise.game.config.ConfigReader;
 import org.sunrise.game.gmback.server.PermissionHelper;
 import org.sunrise.game.jwt.JwtUtil;
@@ -40,7 +41,7 @@ public class AuthController extends BaseController {
             UserController userController = ControllerManager.getController(UserController.class);
             if (userController != null) {
                 UserController.User user = userController.findUser(u);
-                if (user != null && userController.verifyPassword(p, user.getPassword())) {
+                if (user != null && PasswordUtil.verifyPassword(p, user.getPassword())) {
                     loginSuccess = true;
                 }
             }

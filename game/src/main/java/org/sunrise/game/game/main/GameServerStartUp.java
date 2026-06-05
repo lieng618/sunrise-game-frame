@@ -8,6 +8,7 @@ import org.sunrise.game.game.logic.map.MapNavUtils;
 import org.sunrise.game.game.logic.system.GameSystemUtils;
 import org.sunrise.game.game.modules.ModuleUtils;
 import org.sunrise.game.genRpc.gen.CallEnum;
+import org.sunrise.game.jwt.JwtUtil;
 import org.sunrise.game.rpc.function.CallUtils;
 import org.sunrise.game.rpc.node.RpcNodeManager;
 import org.sunrise.game.utils.Utils;
@@ -48,6 +49,8 @@ public class GameServerStartUp {
         ModuleUtils.init(Collections.singletonList("org.sunrise.game.game.modules"));
         // 系统模块初始化
         GameSystemUtils.init(Collections.singletonList("org.sunrise.game.game.logic.system"));
+        // 权限认证初始化
+        JwtUtil.init(properties);
 
         rpcNode.start();
 

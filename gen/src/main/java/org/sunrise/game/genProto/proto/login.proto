@@ -32,7 +32,8 @@ message STHumanShowInfo
 
 message MC2S_Login
 {
-  string uid = 1; //用户UID
+  string uid = 1; //用户UID（测试模式或未开启鉴权时使用）
+  string token = 2; //访问令牌（生产环境优先使用）
 }
 
 message MC2S_SelectHuman

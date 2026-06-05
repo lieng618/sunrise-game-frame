@@ -27,6 +27,7 @@ public class HttpRecvMessageService extends BaseService {
         private boolean wsEnabled;
         private boolean kcpEnabled;
     }
+
     private static final Map<Integer, ExternalRemoteData> remoteStatus = new HashMap<>();
     private final HttpServer httpServer;
 
@@ -41,12 +42,27 @@ public class HttpRecvMessageService extends BaseService {
         httpServer.start();
     }
 
+    @Override
+    public void load() {
+        getDbData("authUsers", new TypeReference<Map<String, HttpServer.AuthUser>>() {
+        }, value -> {
+            if (value != null) {
+                httpServer.setAuthUsers(value);
+            }
+        });
+    }
+
+    @Override
+    public void save() {
+        putDbData("authUsers", httpServer.getAuthUsers());
+    }
+
     @RpcMethod
     public void updateExternalRemoteData(int serverId, String host, int port, boolean tcpEnabled, boolean wsEnabled, boolean kcpEnabled) {
         ExternalRemoteData externalRemoteData = remoteStatus.get(serverId);
         if (externalRemoteData == null) {
             externalRemoteData = new ExternalRemoteData();
-            remoteStatus.put(serverId,  externalRemoteData);
+            remoteStatus.put(serverId, externalRemoteData);
         }
         externalRemoteData.serverId = serverId;
         externalRemoteData.ip = host;
@@ -64,13 +80,15 @@ public class HttpRecvMessageService extends BaseService {
 
     @RpcMethod
     public void setWhitelist(String uids) {
-        List<String> uidList = JSON.parseObject(uids, new TypeReference<List<String>>() {});
+        List<String> uidList = JSON.parseObject(uids, new TypeReference<List<String>>() {
+        });
         httpServer.setWhitelist(uidList);
     }
 
     @RpcMethod
     public void setAnnouncements(String announcements) {
-        List<Map<String, Object>> announcementList = JSON.parseObject(announcements, new TypeReference<List<Map<String, Object>>>() {});
+        List<Map<String, Object>> announcementList = JSON.parseObject(announcements, new TypeReference<List<Map<String, Object>>>() {
+        });
         httpServer.setAnnouncements(announcementList);
     }
 

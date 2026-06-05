@@ -58,6 +58,7 @@ rpc.node.serverId=200</code></pre>
 
 <div class="callout callout-tip">
     <p><strong>💡 配置优先级</strong>：每个服务读取自己对应的 <code>xxx-config.properties</code>，但数据库和中心服地址是通用配置，每个配置文件都有。单进程模式使用 <code>runallone-config.properties</code>，其中 <code>master.id=0</code> 表示无需连接中心服。</p>
+    <p>本地开发默认 <code>player.auth.enabled=false</code>，客户端可直接用 uid 登录；生产环境开启邮箱鉴权时需配置 <code>mail.smtp.*</code> 并保持 Http 与 Game 的 <code>player.jwt.*</code> 一致，详见 <a href="#/http-server">HTTP 服务</a> 与 <a href="#/config">配置参考</a>。</p>
 </div>
 
 <h2>3. 初始化数据库</h2>

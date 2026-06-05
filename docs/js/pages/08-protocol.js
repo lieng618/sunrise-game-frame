@@ -167,7 +167,7 @@ message MTaskInfo {
 <table>
 <thead><tr><th>方向</th><th>消息</th><th>字段</th><th>说明</th></tr></thead>
 <tbody>
-<tr><td>C→S</td><td>C2S_Login</td><td>uid</td><td>登录请求</td></tr>
+<tr><td>C→S</td><td>C2S_Login</td><td>uid, token</td><td>登录请求。<code>player.auth.enabled=false</code> 时用 uid；开启时用 HTTP /login 返回的 token</td></tr>
 <tr><td>C→S</td><td>C2S_HumanList</td><td>（空）</td><td>请求角色列表</td></tr>
 <tr><td>C→S</td><td>C2S_SelectHuman</td><td>pos, server_id</td><td>选择角色</td></tr>
 <tr><td>C→S</td><td>C2S_ClientPing</td><td>time</td><td>客户端心跳（60秒超时）</td></tr>

@@ -151,8 +151,20 @@ public class ItemMsgHandler {
 </ul>
 
 <h2>登录完整流程</h2>
+<h3>玩家鉴权模式</h3>
+<p>由 <code>player.auth.enabled</code> 控制（<code>game-config.properties</code> / <code>runallone-config.properties</code>，默认 <code>false</code>）：</p>
+<table>
+<thead><tr><th>模式</th><th>C2S_Login 入参</th><th>游戏服解析 uid</th></tr></thead>
+<tbody>
+<tr><td>关闭（开发）</td><td><code>uid</code> 字段</td><td>直接使用客户端传入的 uid</td></tr>
+<tr><td>开启（生产）</td><td><code>token</code> 字段（HTTP <code>/login</code> 返回）</td><td><code>JwtUtil.verifyToken(token)</code> 解析 uid，Token 无效则拒绝登录</td></tr>
+</tbody>
+</table>
+<p>游戏服启动时执行 <code>JwtUtil.init(properties)</code>，读取 <code>player.jwt.secret</code> 与 <code>player.jwt.expiration</code>，须与 Http 服配置一致。</p>
+
 <ol class="step-list">
-    <li>客户端发送 <code>C2S_Login(uid)</code>（若触发排队则收到 <code>S2C_Queue</code>，出队后由服务端主动推送 <code>S2C_Login</code>，客户端可定时请求<code>C2S_Login</code>获取排队状态）</li>
+    <li>（可选，生产环境）客户端先调用 Http 服 <code>/login</code> 获取 JWT，再发送 <code>C2S_Login(token)</code>；未开启鉴权时发送 <code>C2S_Login(uid)</code></li>
+    <li>客户端发送登录包（若触发排队则收到 <code>S2C_Queue</code>，出队后由服务端主动推送 <code>S2C_Login</code>，客户端可定时请求 <code>C2S_Login</code> 获取排队状态）</li>
     <li>Game 创建 ConnectObject，查询/创建 Account，返回 <code>S2C_Login(accountId)</code></li>
     <li>客户端发送 <code>C2S_HumanList</code></li>
     <li>Game 查询 human_list 表，返回 <code>S2C_HumanList</code>（角色列表）</li>
@@ -307,29 +319,75 @@ public class GlobalChatService extends BaseService {
 <p>每个 Game 节点各自判断是否持有目标玩家，如果持有则推送消息。这是"广播 + 本地判断"的经典模式。</p>
 `);
 
-registerPage('http-server', 'HTTP 服务', '对外服地址分配、心跳上报', () => `
+registerPage('http-server', 'HTTP 服务', '邮箱注册登录、对外服地址分配、心跳上报', () => `
 <h1>HTTP 服务</h1>
-<p class="page-desc">HttpServer 基于 Javalin 轻量级 Web 框架，主要给客户端分配对外服地址</p>
+<p class="page-desc">HttpServer 基于 Javalin 轻量级 Web 框架，为客户端提供邮箱注册/登录、对外服地址分配与运营接口</p>
 
 <h2>核心职责</h2>
 <ul>
+    <li>邮箱注册/登录/找回密码（验证码邮件 + JWT Token）</li>
     <li>提供对外服地址查询接口（同一 uid 优先分配之前的 external）</li>
     <li>接收对外服的心跳上报（每5秒）</li>
-    <li>提供服务器开关和白名单接口</li>
+    <li>提供服务器开关、白名单与公告接口</li>
     <li>提供 KCP conv ID 分配接口</li>
 </ul>
 
+<h2>玩家鉴权流程</h2>
+<div class="flow-diagram">
+    <div class="flow-row">
+        <span class="flow-node flow-node-primary">Client</span>
+        <span class="flow-arrow">→ POST /send_code →</span>
+        <span class="flow-node flow-node-warning">HttpServer</span>
+        <span class="flow-arrow">→ SMTP 邮件 →</span>
+        <span class="flow-node flow-node-primary">邮箱</span>
+    </div>
+    <div class="flow-row">
+        <span class="flow-node flow-node-primary">Client</span>
+        <span class="flow-arrow">→ POST /register 或 /login →</span>
+        <span class="flow-node flow-node-warning">HttpServer</span>
+        <span class="flow-arrow">→ JWT Token →</span>
+        <span class="flow-node flow-node-secondary">Client 缓存 token</span>
+    </div>
+    <div class="flow-row">
+        <span class="flow-node flow-node-primary">Client</span>
+        <span class="flow-arrow">→ GET /external_address（Header: Authorization）→</span>
+        <span class="flow-node flow-node-warning">HttpServer</span>
+        <span class="flow-arrow">→ 连接对外服 → C2S_Login(token) →</span>
+        <span class="flow-node flow-node-secondary">GameServer</span>
+    </div>
+</div>
+<p>注册成功后由http服务生成 uid 并绑定邮箱。重置密码会使该用户历史 Token 失效。</p>
+
 <h2>HTTP 接口</h2>
+<h3>玩家认证（POST，Query 参数）</h3>
 <table>
 <thead><tr><th>接口</th><th>方法</th><th>参数</th><th>返回</th><th>说明</th></tr></thead>
 <tbody>
-<tr><td>/server_status</td><td>GET</td><td>uid</td><td>{"open":true}</td><td>查询服务器开关状态，uid用于白名单判断</td></tr>
-<tr><td>/external_address</td><td>GET</td><td>type, uid</td><td>{"address":"127.0.0.1:10000"}</td><td>分配对外服地址</td></tr>
-<tr><td>/external_address_list</td><td>GET</td><td>-</td><td>{"addresses":[...]}</td><td>获取所有对外服地址</td></tr>
-<tr><td>/kcp_conv</td><td>GET</td><td>-</td><td>{"conv":12345}</td><td>分配 KCP conv ID</td></tr>
-<tr><td>/announcements</td><td>GET</td><td>-</td><td>[{id,title,content,startTime,endTime}]</td><td>获取当前生效的公告列表，客户端通过curl请求</td></tr>
+<tr><td>/send_code</td><td>POST</td><td>email</td><td>{"result":true}</td><td>发送邮箱验证码（5 分钟有效，同邮箱 1 分钟限发一次）</td></tr>
+<tr><td>/register</td><td>POST</td><td>email, password, code</td><td>{"result":true} 或 {"result":false,"msg":"..."}</td><td>邮箱注册，密码至少 6 位，验证码校验通过后创建账户</td></tr>
+<tr><td>/login</td><td>POST</td><td>email, password</td><td>{"result":true,"token":"..."}</td><td>邮箱登录，Token 的 subject 为 uid</td></tr>
+<tr><td>/forgot_password</td><td>POST</td><td>email, password, code</td><td>{"result":true}</td><td>验证码通过后重置密码，并使该用户旧 Token 失效</td></tr>
 </tbody>
 </table>
+
+<h3>地址与运营（GET）</h3>
+<table>
+<thead><tr><th>接口</th><th>方法</th><th>参数 / Header</th><th>返回</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>/server_status</td><td>GET</td><td>uid 或 Authorization</td><td>{"open":true}</td><td>查询服务器开关；uid 用于白名单判断</td></tr>
+<tr><td>/external_address</td><td>GET</td><td>type, uid 或 Authorization</td><td>{"address":"127.0.0.1:10000"}</td><td>分配对外服地址；开启鉴权时须携带有效 Token</td></tr>
+<tr><td>/external_address_list</td><td>GET</td><td>-</td><td>[{address,type,id}]</td><td>获取所有对外服地址</td></tr>
+<tr><td>/kcp_conv</td><td>GET</td><td>-</td><td>{"conv":12345}</td><td>分配 KCP conv ID</td></tr>
+<tr><td>/announcements</td><td>GET</td><td>-</td><td>[{id,title,content,startTime,endTime}]</td><td>获取当前生效的公告列表</td></tr>
+</tbody>
+</table>
+
+<h3>resolveRequestUid 规则</h3>
+<p><code>/server_status</code> 与 <code>/external_address</code> 通过 <code>resolveRequestUid()</code> 解析请求方 uid：</p>
+<ul>
+    <li><code>player.auth.enabled=true</code>：必须携带 <code>Authorization</code> Header（Bearer Token 或裸 Token），仅 Token 有效时返回 uid</li>
+    <li><code>player.auth.enabled=false</code>：Token 有效则解析 uid；否则回退到 query 参数 <code>uid</code>（兼容开发直连）</li>
+</ul>
 
 <h3>地址分配逻辑</h3>
 <pre><code class="language-text">GET /external_address?type=tcp&uid=xxx
@@ -349,8 +407,11 @@ KCP 要在 UDP 之上实现类似 TCP 的可靠传输（确认、重传、流量
 <table>
 <thead><tr><th>类名</th><th>说明</th></tr></thead>
 <tbody>
-<tr><td>HttpServer</td><td>基于 Javalin 的 HTTP 服务，提供 4 个接口</td></tr>
-<tr><td>HttpRecvMessageService</td><td>@RpcService，管理对外服地址数据，每 5 秒更新 HttpServer 的地址映射</td></tr>
+<tr><td>HttpServer</td><td>基于 Javalin 的 HTTP 服务，注册认证与地址分配接口</td></tr>
+<tr><td>HttpServer.AuthUser</td><td>玩家账户（uid、email、passwordHash），内存 Map 按邮箱索引</td></tr>
+<tr><td>HttpRecvMessageService</td><td>@RpcService，管理对外服地址与 authUsers 持久化，每 5 秒更新地址映射</td></tr>
+<tr><td>MailUtil</td><td>SMTP 验证码发送与校验（network 模块）</td></tr>
+<tr><td>PasswordUtil</td><td>密码 SHA-256 哈希（network 模块）</td></tr>
 </tbody>
 </table>
 
@@ -370,8 +431,16 @@ KCP 要在 UDP 之上实现类似 TCP 的可靠传输（确认、重传、流量
 <thead><tr><th>配置键</th><th>说明</th><th>示例</th></tr></thead>
 <tbody>
 <tr><td>http.port</td><td>HTTP 服务端口</td><td>8090</td></tr>
+<tr><td>player.auth.enabled</td><td>是否强制玩家 Token 鉴权（须与 game-config 一致）</td><td>false</td></tr>
+<tr><td>player.jwt.secret</td><td>玩家 JWT 密钥（≥32 字符，生产环境务必修改）</td><td>sunrise-player-jwt-secret-change-me-in-production-32b</td></tr>
+<tr><td>player.jwt.expiration</td><td>玩家 JWT 过期时间（毫秒）</td><td>86400000</td></tr>
+<tr><td>mail.smtp.username</td><td>SMTP 发件邮箱（QQ 邮箱等）</td><td>your@qq.com</td></tr>
+<tr><td>mail.smtp.password</td><td>SMTP 授权码（非登录密码）</td><td>xxxx</td></tr>
 </tbody>
 </table>
+<div class="callout callout-info">
+    <p><strong>💡 启动初始化</strong>：<code>HttpServerStartUp</code> 与 <code>RunAllOneServerStartUp</code> 启动时调用 <code>JwtUtil.init(properties)</code> 加载玩家 JWT 配置；<code>GameServerStartUp</code> 同样需初始化以便校验 <code>C2S_Login</code> Token。</p>
+</div>
 `);
 
 registerPage('gmback-server', 'GM 后台', 'gmback API、gmback-ui SPA、权限与 Nginx 部署', () => `

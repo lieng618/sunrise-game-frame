@@ -2,7 +2,9 @@ package org.sunrise.game.game.login;
 
 import com.alibaba.fastjson2.JSON;
 
+import org.sunrise.game.config.ConfigReader;
 import org.sunrise.game.db.DbManager;
+import org.sunrise.game.jwt.JwtUtil;
 import org.sunrise.game.db.entity.EntityAccount;
 import org.sunrise.game.db.entity.EntityHumanInfo;
 import org.sunrise.game.db.entity.EntityHumanList;
@@ -20,6 +22,7 @@ import org.sunrise.game.utils.IdGenerator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 public class LoginMsgHandler {
     public static void handlerLogin(long connectId, int packetId, Object data, String externalNodeId) {
@@ -27,7 +30,24 @@ public class LoginMsgHandler {
         switch (packetId) {
             case LoginProto.FROM_CLIENT.C2S_Login_VALUE: {
                 LoginProto.MC2S_Login msg = (LoginProto.MC2S_Login) data;
-                if (msg.getUid().isEmpty()) {
+                Properties properties = ConfigReader.getProp();
+                // 是否开启了token校验
+                String uid = null;
+                boolean gameAuthEnabled = Boolean.parseBoolean(properties.getProperty("player.auth.enabled", "false"));
+                if (gameAuthEnabled) {
+                    if (msg.getToken().isEmpty() || msg.getToken().isBlank()) {
+                        LogCore.GameServer.warn("C2S_Login rejected, invalid auth, connectId={}", connectId);
+                        return;
+                    }
+                    uid = JwtUtil.verifyToken(msg.getToken());
+                    if (uid == null) {
+                        LogCore.GameServer.warn("C2S_Login rejected, invalid auth, connectId={}", connectId);
+                        return;
+                    }
+                }
+
+                if (uid == null || uid.isEmpty()) {
+                    LogCore.GameServer.warn("C2S_Login rejected, invalid auth, connectId={}", connectId);
                     return;
                 }
                 if (connectObject != null) {
@@ -42,10 +62,10 @@ public class LoginMsgHandler {
                 loginQueue.saveExternalNodeIdIfPresent(connectId, externalNodeId);
 
                 // 直接登录或者进入排队队列
-                if (loginQueue.tryEnterOrQueue(connectId, msg.getUid())) {
+                if (loginQueue.tryEnterOrQueue(connectId, uid)) {
                     loginQueue.sendQueueInfo(connectId);
                 } else {
-                    processLogin(connectId, msg.getUid());
+                    processLogin(connectId, uid);
                 }
 
                 break;

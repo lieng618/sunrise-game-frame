@@ -44,7 +44,7 @@ registerPage('database', '数据库', 'MySQL 表结构、数据存储方式、Db
 <thead><tr><th>字段</th><th>类型</th><th>说明</th></tr></thead>
 <tbody>
 <tr><td>id</td><td>INT AUTO_INCREMENT</td><td>主键（accountId）</td></tr>
-<tr><td>uid</td><td>VARCHAR(50)</td><td>用户唯一标识（客户端传入）</td></tr>
+<tr><td>uid</td><td>VARCHAR(50)</td><td>用户唯一标识（邮箱注册时由http服务生成；开发模式可由客户端直接传入）</td></tr>
 </tbody>
 </table>
 
@@ -182,6 +182,9 @@ registerPage('config', '配置参考', '各服务配置项说明', () => `
 <tbody>
 <tr><td>config.path</td><td>Luban 配置 JSON 路径</td><td>E:/sunrise-game-frame/tables/json</td></tr>
 <tr><td>login.queue.maxPerSecond</td><td>登录排队：每秒允许放行的最大登录数（含直通与出队），超出则入队等待</td><td>100</td></tr>
+<tr><td>player.auth.enabled</td><td>游戏服是否强制校验 C2S_Login Token</td><td>false</td></tr>
+<tr><td>player.jwt.secret</td><td>玩家 JWT 密钥（须与 http-config 一致）</td><td>sunrise-player-jwt-secret-change-me-in-production-32b</td></tr>
+<tr><td>player.jwt.expiration</td><td>玩家 JWT 过期时间（毫秒）</td><td>86400000</td></tr>
 </tbody>
 </table>
 
@@ -190,6 +193,11 @@ registerPage('config', '配置参考', '各服务配置项说明', () => `
 <thead><tr><th>配置键</th><th>说明</th><th>示例</th></tr></thead>
 <tbody>
 <tr><td>http.port</td><td>HTTP 服务端口</td><td>8090</td></tr>
+<tr><td>player.auth.enabled</td><td>地址类接口是否强制 Token 鉴权</td><td>false</td></tr>
+<tr><td>player.jwt.secret</td><td>玩家 JWT 密钥</td><td>sunrise-player-jwt-secret-change-me-in-production-32b</td></tr>
+<tr><td>player.jwt.expiration</td><td>玩家 JWT 过期时间（毫秒）</td><td>86400000</td></tr>
+<tr><td>mail.smtp.username</td><td>SMTP 发件邮箱</td><td>your@qq.com</td></tr>
+<tr><td>mail.smtp.password</td><td>SMTP 授权码</td><td>xxxx</td></tr>
 </tbody>
 </table>
 
@@ -229,8 +237,19 @@ registerPage('config', '配置参考', '各服务配置项说明', () => `
 <tr><td>admin.password</td><td>GM 登录密码</td><td>sunrise</td></tr>
 <tr><td>admin.jwt.expiration</td><td>JWT 过期时间（毫秒）</td><td>864000000</td></tr>
 <tr><td>login.queue.maxPerSecond</td><td>登录排队每秒放行上限（与 game-config 含义相同）</td><td>100</td></tr>
+<tr><td>player.auth.enabled</td><td>玩家 Token 鉴权开关（Http + Game 须一致）</td><td>false</td></tr>
+<tr><td>player.jwt.secret</td><td>玩家 JWT 密钥</td><td>sunrise-player-jwt-secret-change-me-in-production-32b</td></tr>
+<tr><td>player.jwt.expiration</td><td>玩家 JWT 过期时间（毫秒）</td><td>86400000</td></tr>
+<tr><td>mail.smtp.username</td><td>SMTP 发件邮箱</td><td>your@qq.com</td></tr>
+<tr><td>mail.smtp.password</td><td>SMTP 授权码</td><td>xxxx</td></tr>
 </tbody>
 </table>
+
+<h2>玩家鉴权配置说明</h2>
+<ul>
+    <li><code>player.auth.enabled=false</code>（默认）：压测机器人、消息发送工具等可直接用任意 uid 登录；HTTP 地址接口也可通过 query <code>uid</code> 访问</li>
+    <li><code>player.auth.enabled=true</code>：须先邮箱登录获取 Token，HTTP 请求带 <code>Authorization</code> Header，游戏登录发 <code>C2S_Login(token)</code></li>
+</ul>
 
 <h2>Docker 配置差异</h2>
 <table>
