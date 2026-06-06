@@ -32,7 +32,7 @@ public class LoginMsgHandler {
                 LoginProto.MC2S_Login msg = (LoginProto.MC2S_Login) data;
                 Properties properties = ConfigReader.getProp();
                 // 是否开启了token校验
-                String uid = null;
+                String uid = msg.getUid();
                 boolean gameAuthEnabled = Boolean.parseBoolean(properties.getProperty("player.auth.enabled", "false"));
                 if (gameAuthEnabled) {
                     if (msg.getToken().isEmpty() || msg.getToken().isBlank()) {
@@ -46,7 +46,7 @@ public class LoginMsgHandler {
                     }
                 }
 
-                if (uid == null || uid.isEmpty()) {
+                if (uid.isEmpty()) {
                     LogCore.GameServer.warn("C2S_Login rejected, invalid auth, connectId={}", connectId);
                     return;
                 }
