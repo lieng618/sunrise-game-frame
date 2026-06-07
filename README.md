@@ -59,7 +59,7 @@ sh start/linux/server_run_allone.sh</code></pre>
 npm install
 npm run dev</code></pre>
 
-<p>浏览器访问 <a href="http://localhost:5173">http://localhost:5173</a>，使用配置中的账号登录（默认 admin / sunrise，见runallone-config.properties）</p>
+<p>浏览器访问 <a href="http://localhost:5173">http://localhost:5173</a>，使用配置中的账号登录（见runallone-config.properties）</p>
 
 <h4>5. 客户端启动</h4>
 <p>消息发送工具：支持多标签页，每标签页一个玩家连接，可向服务器发送消息包</p>
