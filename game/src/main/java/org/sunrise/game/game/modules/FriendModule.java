@@ -5,6 +5,7 @@ import com.alibaba.fastjson2.TypeReference;
 import lombok.Getter;
 import lombok.Setter;
 import org.sunrise.game.game.annotation.HumanModule;
+import org.sunrise.game.game.human.HumanObject;
 import org.sunrise.game.game.human.HumanObjectManger;
 import org.sunrise.game.game.logic.friend.FriendRequestData;
 import org.sunrise.game.game.logic.playerinfo.PlayerInfo;
@@ -14,9 +15,14 @@ import org.sunrise.game.genRpc.gen.CallEnum;
 import org.sunrise.game.rpc.function.ErrorType;
 import org.sunrise.game.rpc.function.RpcFunction;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 好友模块
@@ -82,14 +88,10 @@ public class FriendModule extends BaseModule {
                     PlayerInfo playerInfo = playerInfosMap.get(friendId);
                     FriendProto.STFriendInfo.Builder friendInfoBuilder = FriendProto.STFriendInfo.newBuilder()
                             .setHumanId(friendId)
-                            .setOnlineStatus(HumanObjectManger.getHumanObject(friendId) != null ? 1 : 0);
-                    
-                    if (playerInfo != null) {
-                        friendInfoBuilder.setName(playerInfo.getName() != null ? playerInfo.getName() : "")
-                                .setLevel(playerInfo.getLevel());
-                    } else {
-                        friendInfoBuilder.setName("").setLevel(0);
-                    }
+                            .setOnlineStatus(HumanObjectManger.getHumanObject(friendId) != null ? 1 : 0)
+                            .setHeadIcon(playerInfo.getHeadIcon())
+                            .setName(playerInfo.getName())
+                            .setLevel(playerInfo.getLevel());
                     builder.addFriends(friendInfoBuilder.build());
                 }
                 
@@ -119,9 +121,10 @@ public class FriendModule extends BaseModule {
                 PlayerInfo playerInfo = JSON.parseObject(playerInfoJson, PlayerInfo.class);
                 FriendProto.STFriendInfo friendInfo = FriendProto.STFriendInfo.newBuilder()
                         .setHumanId(playerId)
-                        .setName(playerInfo.getName() != null ? playerInfo.getName() : "")
+                        .setName(playerInfo.getName())
                         .setLevel(playerInfo.getLevel())
                         .setOnlineStatus(HumanObjectManger.getHumanObject(playerId) != null ? 1 : 0)
+                        .setHeadIcon(playerInfo.getHeadIcon())
                         .build();
 
                 FriendProto.MS2C_SearchPlayer.Builder builder = FriendProto.MS2C_SearchPlayer.newBuilder();
@@ -224,19 +227,99 @@ public class FriendModule extends BaseModule {
                     
                     FriendProto.STFriendRequestInfo.Builder requestInfoBuilder = FriendProto.STFriendRequestInfo.newBuilder()
                             .setApplicantHumanId(applicantId)
-                            .setRequestTime(request.getRequestTime());
-                    
-                    if (playerInfo != null) {
-                        requestInfoBuilder.setApplicantName(playerInfo.getName() != null ? playerInfo.getName() : "")
-                                .setApplicantLevel(playerInfo.getLevel());
-                    } else {
-                        requestInfoBuilder.setApplicantName("").setApplicantLevel(0);
-                    }
+                            .setRequestTime(request.getRequestTime())
+                            .setApplicantName(playerInfo.getName())
+                            .setApplicantLevel(playerInfo.getLevel())
+                            .setApplicantHeadIcon(playerInfo.getHeadIcon());
                     builder.addRequests(requestInfoBuilder.build());
                 }
                 
                 getHuman().sendMsg(TopicProto.TOPIC.TOPIC_TYPE_FRIEND_VALUE,
                         FriendProto.FROM_SERVER.S2C_GetFriendRequestList_VALUE, builder);
+            });
+        });
+    }
+
+    /**
+     * 发送好友推荐列表
+     */
+    public void sendFriendRecommendationList() {
+        // 先获取当前玩家的好友列表，用于排除已是好友的玩家
+        RpcFunction rpcFunction = RpcFunction.newInstance();
+        rpcFunction.call(CallEnum.GlobalFriendService_getFriends, "humanId", getHumanId());
+        rpcFunction.listenResult(rpcResult -> {
+            if (getHuman() == null) {
+                return;
+            }
+            if (rpcResult.getResult() != ErrorType.SUCCESS) {
+                return;
+            }
+            @SuppressWarnings("unchecked")
+            List<String> friendIds = (List<String>) rpcResult.getData("friends");
+            Set<String> excludeIds = new HashSet<>();
+            if (friendIds != null) {
+                excludeIds.addAll(friendIds);
+            }
+            excludeIds.add(getHumanId());
+
+            // 从在线玩家中筛选推荐候选人
+            Collection<HumanObject> allOnline = HumanObjectManger.getHumanObjects();
+            List<String> candidates = new ArrayList<>();
+            for (HumanObject humanObject : allOnline) {
+                if (!excludeIds.contains(humanObject.getHumanId())) {
+                    candidates.add(humanObject.getHumanId());
+                }
+                if (candidates.size() >= 10) {
+                    break;
+                }
+            }
+
+            // 随机选取最多5个推荐玩家
+            Collections.shuffle(candidates);
+            int recommendCount = Math.min(5, candidates.size());
+            List<String> recommendIds = candidates.subList(0, recommendCount);
+
+            if (recommendIds.isEmpty()) {
+                FriendProto.MS2C_GetFriendRecommendationList.Builder builder = FriendProto.MS2C_GetFriendRecommendationList.newBuilder();
+                getHuman().sendMsg(TopicProto.TOPIC.TOPIC_TYPE_FRIEND_VALUE,
+                        FriendProto.FROM_SERVER.S2C_GetFriendRecommendationList_VALUE, builder);
+                return;
+            }
+
+            // 通过全局信息系统批量获取推荐玩家信息
+            RpcFunction rpcFunction2 = RpcFunction.newInstance();
+            rpcFunction2.call(CallEnum.GlobalPlayerInfoService_getPlayerInfos, "humanIds", new ArrayList<>(recommendIds));
+            rpcFunction2.listenResult(rpcResult2 -> {
+                if (getHuman() == null) {
+                    return;
+                }
+                if (rpcResult2.getResult() != ErrorType.SUCCESS) {
+                    return;
+                }
+
+                String playerInfosJson = (String) rpcResult2.getData("playerInfosJson");
+                Map<String, PlayerInfo> playerInfosMap = new HashMap<>();
+                if (playerInfosJson != null && !playerInfosJson.isEmpty()) {
+                    playerInfosMap = JSON.parseObject(playerInfosJson, new TypeReference<Map<String, PlayerInfo>>() {});
+                }
+
+                FriendProto.MS2C_GetFriendRecommendationList.Builder builder = FriendProto.MS2C_GetFriendRecommendationList.newBuilder();
+                for (String recommendId : recommendIds) {
+                    PlayerInfo playerInfo = playerInfosMap.get(recommendId);
+                    if (playerInfo == null) {
+                        continue;
+                    }
+                    FriendProto.STFriendInfo.Builder friendInfoBuilder = FriendProto.STFriendInfo.newBuilder()
+                            .setHumanId(recommendId)
+                            .setName(playerInfo.getName())
+                            .setLevel(playerInfo.getLevel())
+                            .setOnlineStatus(HumanObjectManger.getHumanObject(recommendId) != null ? 1 : 0)
+                            .setHeadIcon(playerInfo.getHeadIcon());
+                    builder.addPlayers(friendInfoBuilder.build());
+                }
+
+                getHuman().sendMsg(TopicProto.TOPIC.TOPIC_TYPE_FRIEND_VALUE,
+                        FriendProto.FROM_SERVER.S2C_GetFriendRecommendationList_VALUE, builder);
             });
         });
     }
@@ -266,21 +349,13 @@ public class FriendModule extends BaseModule {
             }
             
             String playerInfoJson = (String) rpcResult.getData("playerInfoJson");
-            PlayerInfo playerInfo = null;
-            if (playerInfoJson != null && !playerInfoJson.isEmpty()) {
-                playerInfo = JSON.parseObject(playerInfoJson, PlayerInfo.class);
-            }
-            
+            PlayerInfo playerInfo = JSON.parseObject(playerInfoJson, PlayerInfo.class);
             FriendProto.STFriendInfo.Builder friendInfoBuilder = FriendProto.STFriendInfo.newBuilder()
                     .setHumanId(friendHumanId)
-                    .setOnlineStatus(HumanObjectManger.getHumanObject(friendHumanId) != null ? 1 : 0);
-            
-            if (playerInfo != null) {
-                friendInfoBuilder.setName(playerInfo.getName() != null ? playerInfo.getName() : "")
-                        .setLevel(playerInfo.getLevel());
-            } else {
-                friendInfoBuilder.setName("").setLevel(0);
-            }
+                    .setName(playerInfo.getName())
+                    .setLevel(playerInfo.getLevel())
+                    .setOnlineStatus(HumanObjectManger.getHumanObject(friendHumanId) != null ? 1 : 0)
+                    .setHeadIcon(playerInfo.getHeadIcon());
             
             FriendProto.MS2C_FriendUpdate.Builder builder = FriendProto.MS2C_FriendUpdate.newBuilder();
             builder.setFriend(friendInfoBuilder.build());

@@ -78,4 +78,15 @@ public class FriendMsgHandler {
             module.sendFriendRequestList();
         }
     }
+
+    /**
+     * 获取好友推荐列表（空消息）
+     */
+    @MsgHandlerMethod(packetId = FriendProto.FROM_CLIENT.C2S_GetFriendRecommendationList_VALUE)
+    public static void GetFriendRecommendationList(HumanObject humanObject) {
+        FriendModule module = humanObject.getModule(FriendModule.class);
+        if (module != null) {
+            module.sendFriendRecommendationList();
+        }
+    }
 }

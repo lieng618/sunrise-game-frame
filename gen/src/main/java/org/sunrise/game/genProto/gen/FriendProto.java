@@ -78,6 +78,14 @@ public final class FriendProto {
      * <code>C2S_GetFriendRequestList = 5;</code>
      */
     C2S_GetFriendRequestList(5),
+    /**
+     * <pre>
+     * 获取好友推荐列表（空消息）
+     * </pre>
+     *
+     * <code>C2S_GetFriendRecommendationList = 6;</code>
+     */
+    C2S_GetFriendRecommendationList(6),
     UNRECOGNIZED(-1),
     ;
 
@@ -138,6 +146,14 @@ public final class FriendProto {
      * <code>C2S_GetFriendRequestList = 5;</code>
      */
     public static final int C2S_GetFriendRequestList_VALUE = 5;
+    /**
+     * <pre>
+     * 获取好友推荐列表（空消息）
+     * </pre>
+     *
+     * <code>C2S_GetFriendRecommendationList = 6;</code>
+     */
+    public static final int C2S_GetFriendRecommendationList_VALUE = 6;
 
 
     public final int getNumber() {
@@ -170,6 +186,7 @@ public final class FriendProto {
         case 3: return C2S_HandleFriendRequest;
         case 4: return C2S_DeleteFriend;
         case 5: return C2S_GetFriendRequestList;
+        case 6: return C2S_GetFriendRecommendationList;
         default: return null;
       }
     }
@@ -271,6 +288,14 @@ public final class FriendProto {
      * <code>S2C_GetFriendRequestList = 4;</code>
      */
     S2C_GetFriendRequestList(4),
+    /**
+     * <pre>
+     * 好友推荐列表响应
+     * </pre>
+     *
+     * <code>S2C_GetFriendRecommendationList = 5;</code>
+     */
+    S2C_GetFriendRecommendationList(5),
     UNRECOGNIZED(-1),
     ;
 
@@ -323,6 +348,14 @@ public final class FriendProto {
      * <code>S2C_GetFriendRequestList = 4;</code>
      */
     public static final int S2C_GetFriendRequestList_VALUE = 4;
+    /**
+     * <pre>
+     * 好友推荐列表响应
+     * </pre>
+     *
+     * <code>S2C_GetFriendRecommendationList = 5;</code>
+     */
+    public static final int S2C_GetFriendRecommendationList_VALUE = 5;
 
 
     public final int getNumber() {
@@ -354,6 +387,7 @@ public final class FriendProto {
         case 2: return S2C_FriendUpdate;
         case 3: return S2C_FriendRequestUpdate;
         case 4: return S2C_GetFriendRequestList;
+        case 5: return S2C_GetFriendRecommendationList;
         default: return null;
       }
     }
@@ -2781,6 +2815,26 @@ public final class FriendProto {
      * @return The onlineStatus.
      */
     int getOnlineStatus();
+
+    /**
+     * <pre>
+     * 头像
+     * </pre>
+     *
+     * <code>string headIcon = 5;</code>
+     * @return The headIcon.
+     */
+    java.lang.String getHeadIcon();
+    /**
+     * <pre>
+     * 头像
+     * </pre>
+     *
+     * <code>string headIcon = 5;</code>
+     * @return The bytes for headIcon.
+     */
+    com.google.protobuf.ByteString
+        getHeadIconBytes();
   }
   /**
    * <pre>
@@ -2810,6 +2864,7 @@ public final class FriendProto {
     private STFriendInfo() {
       humanId_ = "";
       name_ = "";
+      headIcon_ = "";
     }
 
     public static final com.google.protobuf.Descriptors.Descriptor
@@ -2949,6 +3004,53 @@ public final class FriendProto {
       return onlineStatus_;
     }
 
+    public static final int HEADICON_FIELD_NUMBER = 5;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object headIcon_ = "";
+    /**
+     * <pre>
+     * 头像
+     * </pre>
+     *
+     * <code>string headIcon = 5;</code>
+     * @return The headIcon.
+     */
+    @java.lang.Override
+    public java.lang.String getHeadIcon() {
+      java.lang.Object ref = headIcon_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        headIcon_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * 头像
+     * </pre>
+     *
+     * <code>string headIcon = 5;</code>
+     * @return The bytes for headIcon.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getHeadIconBytes() {
+      java.lang.Object ref = headIcon_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        headIcon_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -2975,6 +3077,9 @@ public final class FriendProto {
       if (onlineStatus_ != 0) {
         output.writeInt32(4, onlineStatus_);
       }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(headIcon_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 5, headIcon_);
+      }
       getUnknownFields().writeTo(output);
     }
 
@@ -2997,6 +3102,9 @@ public final class FriendProto {
       if (onlineStatus_ != 0) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(4, onlineStatus_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(headIcon_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(5, headIcon_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
@@ -3021,6 +3129,8 @@ public final class FriendProto {
           != other.getLevel()) return false;
       if (getOnlineStatus()
           != other.getOnlineStatus()) return false;
+      if (!getHeadIcon()
+          .equals(other.getHeadIcon())) return false;
       if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
@@ -3040,6 +3150,8 @@ public final class FriendProto {
       hash = (53 * hash) + getLevel();
       hash = (37 * hash) + ONLINESTATUS_FIELD_NUMBER;
       hash = (53 * hash) + getOnlineStatus();
+      hash = (37 * hash) + HEADICON_FIELD_NUMBER;
+      hash = (53 * hash) + getHeadIcon().hashCode();
       hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -3179,6 +3291,7 @@ public final class FriendProto {
         name_ = "";
         level_ = 0;
         onlineStatus_ = 0;
+        headIcon_ = "";
         return this;
       }
 
@@ -3224,6 +3337,9 @@ public final class FriendProto {
         if (((from_bitField0_ & 0x00000008) != 0)) {
           result.onlineStatus_ = onlineStatus_;
         }
+        if (((from_bitField0_ & 0x00000010) != 0)) {
+          result.headIcon_ = headIcon_;
+        }
       }
 
       @java.lang.Override
@@ -3253,6 +3369,11 @@ public final class FriendProto {
         }
         if (other.getOnlineStatus() != 0) {
           setOnlineStatus(other.getOnlineStatus());
+        }
+        if (!other.getHeadIcon().isEmpty()) {
+          headIcon_ = other.headIcon_;
+          bitField0_ |= 0x00000010;
+          onChanged();
         }
         this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
@@ -3300,6 +3421,11 @@ public final class FriendProto {
                 bitField0_ |= 0x00000008;
                 break;
               } // case 32
+              case 42: {
+                headIcon_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000010;
+                break;
+              } // case 42
               default: {
                 if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                   done = true; // was an endgroup tag
@@ -3589,6 +3715,98 @@ public final class FriendProto {
         return this;
       }
 
+      private java.lang.Object headIcon_ = "";
+      /**
+       * <pre>
+       * 头像
+       * </pre>
+       *
+       * <code>string headIcon = 5;</code>
+       * @return The headIcon.
+       */
+      public java.lang.String getHeadIcon() {
+        java.lang.Object ref = headIcon_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          headIcon_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * 头像
+       * </pre>
+       *
+       * <code>string headIcon = 5;</code>
+       * @return The bytes for headIcon.
+       */
+      public com.google.protobuf.ByteString
+          getHeadIconBytes() {
+        java.lang.Object ref = headIcon_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          headIcon_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * 头像
+       * </pre>
+       *
+       * <code>string headIcon = 5;</code>
+       * @param value The headIcon to set.
+       * @return This builder for chaining.
+       */
+      public Builder setHeadIcon(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        headIcon_ = value;
+        bitField0_ |= 0x00000010;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * 头像
+       * </pre>
+       *
+       * <code>string headIcon = 5;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearHeadIcon() {
+        headIcon_ = getDefaultInstance().getHeadIcon();
+        bitField0_ = (bitField0_ & ~0x00000010);
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * 头像
+       * </pre>
+       *
+       * <code>string headIcon = 5;</code>
+       * @param value The bytes for headIcon to set.
+       * @return This builder for chaining.
+       */
+      public Builder setHeadIconBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        headIcon_ = value;
+        bitField0_ |= 0x00000010;
+        onChanged();
+        return this;
+      }
+
       // @@protoc_insertion_point(builder_scope:org.sunrise.game.genProto.gen.STFriendInfo)
     }
 
@@ -3703,6 +3921,26 @@ public final class FriendProto {
      * @return The requestTime.
      */
     long getRequestTime();
+
+    /**
+     * <pre>
+     * 申请人头像
+     * </pre>
+     *
+     * <code>string applicantHeadIcon = 5;</code>
+     * @return The applicantHeadIcon.
+     */
+    java.lang.String getApplicantHeadIcon();
+    /**
+     * <pre>
+     * 申请人头像
+     * </pre>
+     *
+     * <code>string applicantHeadIcon = 5;</code>
+     * @return The bytes for applicantHeadIcon.
+     */
+    com.google.protobuf.ByteString
+        getApplicantHeadIconBytes();
   }
   /**
    * <pre>
@@ -3732,6 +3970,7 @@ public final class FriendProto {
     private STFriendRequestInfo() {
       applicantHumanId_ = "";
       applicantName_ = "";
+      applicantHeadIcon_ = "";
     }
 
     public static final com.google.protobuf.Descriptors.Descriptor
@@ -3871,6 +4110,53 @@ public final class FriendProto {
       return requestTime_;
     }
 
+    public static final int APPLICANTHEADICON_FIELD_NUMBER = 5;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object applicantHeadIcon_ = "";
+    /**
+     * <pre>
+     * 申请人头像
+     * </pre>
+     *
+     * <code>string applicantHeadIcon = 5;</code>
+     * @return The applicantHeadIcon.
+     */
+    @java.lang.Override
+    public java.lang.String getApplicantHeadIcon() {
+      java.lang.Object ref = applicantHeadIcon_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        applicantHeadIcon_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * 申请人头像
+     * </pre>
+     *
+     * <code>string applicantHeadIcon = 5;</code>
+     * @return The bytes for applicantHeadIcon.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getApplicantHeadIconBytes() {
+      java.lang.Object ref = applicantHeadIcon_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        applicantHeadIcon_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -3897,6 +4183,9 @@ public final class FriendProto {
       if (requestTime_ != 0L) {
         output.writeInt64(4, requestTime_);
       }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(applicantHeadIcon_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 5, applicantHeadIcon_);
+      }
       getUnknownFields().writeTo(output);
     }
 
@@ -3919,6 +4208,9 @@ public final class FriendProto {
       if (requestTime_ != 0L) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt64Size(4, requestTime_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(applicantHeadIcon_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(5, applicantHeadIcon_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
@@ -3943,6 +4235,8 @@ public final class FriendProto {
           != other.getApplicantLevel()) return false;
       if (getRequestTime()
           != other.getRequestTime()) return false;
+      if (!getApplicantHeadIcon()
+          .equals(other.getApplicantHeadIcon())) return false;
       if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
@@ -3963,6 +4257,8 @@ public final class FriendProto {
       hash = (37 * hash) + REQUESTTIME_FIELD_NUMBER;
       hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
           getRequestTime());
+      hash = (37 * hash) + APPLICANTHEADICON_FIELD_NUMBER;
+      hash = (53 * hash) + getApplicantHeadIcon().hashCode();
       hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -4102,6 +4398,7 @@ public final class FriendProto {
         applicantName_ = "";
         applicantLevel_ = 0;
         requestTime_ = 0L;
+        applicantHeadIcon_ = "";
         return this;
       }
 
@@ -4147,6 +4444,9 @@ public final class FriendProto {
         if (((from_bitField0_ & 0x00000008) != 0)) {
           result.requestTime_ = requestTime_;
         }
+        if (((from_bitField0_ & 0x00000010) != 0)) {
+          result.applicantHeadIcon_ = applicantHeadIcon_;
+        }
       }
 
       @java.lang.Override
@@ -4176,6 +4476,11 @@ public final class FriendProto {
         }
         if (other.getRequestTime() != 0L) {
           setRequestTime(other.getRequestTime());
+        }
+        if (!other.getApplicantHeadIcon().isEmpty()) {
+          applicantHeadIcon_ = other.applicantHeadIcon_;
+          bitField0_ |= 0x00000010;
+          onChanged();
         }
         this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
@@ -4223,6 +4528,11 @@ public final class FriendProto {
                 bitField0_ |= 0x00000008;
                 break;
               } // case 32
+              case 42: {
+                applicantHeadIcon_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000010;
+                break;
+              } // case 42
               default: {
                 if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                   done = true; // was an endgroup tag
@@ -4508,6 +4818,98 @@ public final class FriendProto {
       public Builder clearRequestTime() {
         bitField0_ = (bitField0_ & ~0x00000008);
         requestTime_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object applicantHeadIcon_ = "";
+      /**
+       * <pre>
+       * 申请人头像
+       * </pre>
+       *
+       * <code>string applicantHeadIcon = 5;</code>
+       * @return The applicantHeadIcon.
+       */
+      public java.lang.String getApplicantHeadIcon() {
+        java.lang.Object ref = applicantHeadIcon_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          applicantHeadIcon_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * 申请人头像
+       * </pre>
+       *
+       * <code>string applicantHeadIcon = 5;</code>
+       * @return The bytes for applicantHeadIcon.
+       */
+      public com.google.protobuf.ByteString
+          getApplicantHeadIconBytes() {
+        java.lang.Object ref = applicantHeadIcon_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          applicantHeadIcon_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * 申请人头像
+       * </pre>
+       *
+       * <code>string applicantHeadIcon = 5;</code>
+       * @param value The applicantHeadIcon to set.
+       * @return This builder for chaining.
+       */
+      public Builder setApplicantHeadIcon(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        applicantHeadIcon_ = value;
+        bitField0_ |= 0x00000010;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * 申请人头像
+       * </pre>
+       *
+       * <code>string applicantHeadIcon = 5;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearApplicantHeadIcon() {
+        applicantHeadIcon_ = getDefaultInstance().getApplicantHeadIcon();
+        bitField0_ = (bitField0_ & ~0x00000010);
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * 申请人头像
+       * </pre>
+       *
+       * <code>string applicantHeadIcon = 5;</code>
+       * @param value The bytes for applicantHeadIcon to set.
+       * @return This builder for chaining.
+       */
+      public Builder setApplicantHeadIconBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        applicantHeadIcon_ = value;
+        bitField0_ |= 0x00000010;
         onChanged();
         return this;
       }
@@ -8511,6 +8913,866 @@ public final class FriendProto {
 
   }
 
+  public interface MS2C_GetFriendRecommendationListOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:org.sunrise.game.genProto.gen.MS2C_GetFriendRecommendationList)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <pre>
+     * 推荐结果列表
+     * </pre>
+     *
+     * <code>repeated .org.sunrise.game.genProto.gen.STFriendInfo players = 1;</code>
+     */
+    java.util.List<org.sunrise.game.genProto.gen.FriendProto.STFriendInfo> 
+        getPlayersList();
+    /**
+     * <pre>
+     * 推荐结果列表
+     * </pre>
+     *
+     * <code>repeated .org.sunrise.game.genProto.gen.STFriendInfo players = 1;</code>
+     */
+    org.sunrise.game.genProto.gen.FriendProto.STFriendInfo getPlayers(int index);
+    /**
+     * <pre>
+     * 推荐结果列表
+     * </pre>
+     *
+     * <code>repeated .org.sunrise.game.genProto.gen.STFriendInfo players = 1;</code>
+     */
+    int getPlayersCount();
+    /**
+     * <pre>
+     * 推荐结果列表
+     * </pre>
+     *
+     * <code>repeated .org.sunrise.game.genProto.gen.STFriendInfo players = 1;</code>
+     */
+    java.util.List<? extends org.sunrise.game.genProto.gen.FriendProto.STFriendInfoOrBuilder> 
+        getPlayersOrBuilderList();
+    /**
+     * <pre>
+     * 推荐结果列表
+     * </pre>
+     *
+     * <code>repeated .org.sunrise.game.genProto.gen.STFriendInfo players = 1;</code>
+     */
+    org.sunrise.game.genProto.gen.FriendProto.STFriendInfoOrBuilder getPlayersOrBuilder(
+        int index);
+  }
+  /**
+   * <pre>
+   * 好友好友推荐列表响应
+   * </pre>
+   *
+   * Protobuf type {@code org.sunrise.game.genProto.gen.MS2C_GetFriendRecommendationList}
+   */
+  public static final class MS2C_GetFriendRecommendationList extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:org.sunrise.game.genProto.gen.MS2C_GetFriendRecommendationList)
+      MS2C_GetFriendRecommendationListOrBuilder {
+  private static final long serialVersionUID = 0L;
+    static {
+      com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
+        com.google.protobuf.RuntimeVersion.RuntimeDomain.PUBLIC,
+        /* major= */ 4,
+        /* minor= */ 28,
+        /* patch= */ 2,
+        /* suffix= */ "",
+        MS2C_GetFriendRecommendationList.class.getName());
+    }
+    // Use MS2C_GetFriendRecommendationList.newBuilder() to construct.
+    private MS2C_GetFriendRecommendationList(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+    }
+    private MS2C_GetFriendRecommendationList() {
+      players_ = java.util.Collections.emptyList();
+    }
+
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return org.sunrise.game.genProto.gen.FriendProto.internal_static_org_sunrise_game_genProto_gen_MS2C_GetFriendRecommendationList_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return org.sunrise.game.genProto.gen.FriendProto.internal_static_org_sunrise_game_genProto_gen_MS2C_GetFriendRecommendationList_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              org.sunrise.game.genProto.gen.FriendProto.MS2C_GetFriendRecommendationList.class, org.sunrise.game.genProto.gen.FriendProto.MS2C_GetFriendRecommendationList.Builder.class);
+    }
+
+    public static final int PLAYERS_FIELD_NUMBER = 1;
+    @SuppressWarnings("serial")
+    private java.util.List<org.sunrise.game.genProto.gen.FriendProto.STFriendInfo> players_;
+    /**
+     * <pre>
+     * 推荐结果列表
+     * </pre>
+     *
+     * <code>repeated .org.sunrise.game.genProto.gen.STFriendInfo players = 1;</code>
+     */
+    @java.lang.Override
+    public java.util.List<org.sunrise.game.genProto.gen.FriendProto.STFriendInfo> getPlayersList() {
+      return players_;
+    }
+    /**
+     * <pre>
+     * 推荐结果列表
+     * </pre>
+     *
+     * <code>repeated .org.sunrise.game.genProto.gen.STFriendInfo players = 1;</code>
+     */
+    @java.lang.Override
+    public java.util.List<? extends org.sunrise.game.genProto.gen.FriendProto.STFriendInfoOrBuilder> 
+        getPlayersOrBuilderList() {
+      return players_;
+    }
+    /**
+     * <pre>
+     * 推荐结果列表
+     * </pre>
+     *
+     * <code>repeated .org.sunrise.game.genProto.gen.STFriendInfo players = 1;</code>
+     */
+    @java.lang.Override
+    public int getPlayersCount() {
+      return players_.size();
+    }
+    /**
+     * <pre>
+     * 推荐结果列表
+     * </pre>
+     *
+     * <code>repeated .org.sunrise.game.genProto.gen.STFriendInfo players = 1;</code>
+     */
+    @java.lang.Override
+    public org.sunrise.game.genProto.gen.FriendProto.STFriendInfo getPlayers(int index) {
+      return players_.get(index);
+    }
+    /**
+     * <pre>
+     * 推荐结果列表
+     * </pre>
+     *
+     * <code>repeated .org.sunrise.game.genProto.gen.STFriendInfo players = 1;</code>
+     */
+    @java.lang.Override
+    public org.sunrise.game.genProto.gen.FriendProto.STFriendInfoOrBuilder getPlayersOrBuilder(
+        int index) {
+      return players_.get(index);
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      for (int i = 0; i < players_.size(); i++) {
+        output.writeMessage(1, players_.get(i));
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      for (int i = 0; i < players_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(1, players_.get(i));
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof org.sunrise.game.genProto.gen.FriendProto.MS2C_GetFriendRecommendationList)) {
+        return super.equals(obj);
+      }
+      org.sunrise.game.genProto.gen.FriendProto.MS2C_GetFriendRecommendationList other = (org.sunrise.game.genProto.gen.FriendProto.MS2C_GetFriendRecommendationList) obj;
+
+      if (!getPlayersList()
+          .equals(other.getPlayersList())) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (getPlayersCount() > 0) {
+        hash = (37 * hash) + PLAYERS_FIELD_NUMBER;
+        hash = (53 * hash) + getPlayersList().hashCode();
+      }
+      hash = (29 * hash) + getUnknownFields().hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static org.sunrise.game.genProto.gen.FriendProto.MS2C_GetFriendRecommendationList parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.sunrise.game.genProto.gen.FriendProto.MS2C_GetFriendRecommendationList parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.sunrise.game.genProto.gen.FriendProto.MS2C_GetFriendRecommendationList parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.sunrise.game.genProto.gen.FriendProto.MS2C_GetFriendRecommendationList parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.sunrise.game.genProto.gen.FriendProto.MS2C_GetFriendRecommendationList parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.sunrise.game.genProto.gen.FriendProto.MS2C_GetFriendRecommendationList parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.sunrise.game.genProto.gen.FriendProto.MS2C_GetFriendRecommendationList parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static org.sunrise.game.genProto.gen.FriendProto.MS2C_GetFriendRecommendationList parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static org.sunrise.game.genProto.gen.FriendProto.MS2C_GetFriendRecommendationList parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static org.sunrise.game.genProto.gen.FriendProto.MS2C_GetFriendRecommendationList parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static org.sunrise.game.genProto.gen.FriendProto.MS2C_GetFriendRecommendationList parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static org.sunrise.game.genProto.gen.FriendProto.MS2C_GetFriendRecommendationList parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(org.sunrise.game.genProto.gen.FriendProto.MS2C_GetFriendRecommendationList prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * <pre>
+     * 好友好友推荐列表响应
+     * </pre>
+     *
+     * Protobuf type {@code org.sunrise.game.genProto.gen.MS2C_GetFriendRecommendationList}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:org.sunrise.game.genProto.gen.MS2C_GetFriendRecommendationList)
+        org.sunrise.game.genProto.gen.FriendProto.MS2C_GetFriendRecommendationListOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return org.sunrise.game.genProto.gen.FriendProto.internal_static_org_sunrise_game_genProto_gen_MS2C_GetFriendRecommendationList_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return org.sunrise.game.genProto.gen.FriendProto.internal_static_org_sunrise_game_genProto_gen_MS2C_GetFriendRecommendationList_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                org.sunrise.game.genProto.gen.FriendProto.MS2C_GetFriendRecommendationList.class, org.sunrise.game.genProto.gen.FriendProto.MS2C_GetFriendRecommendationList.Builder.class);
+      }
+
+      // Construct using org.sunrise.game.genProto.gen.FriendProto.MS2C_GetFriendRecommendationList.newBuilder()
+      private Builder() {
+
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        bitField0_ = 0;
+        if (playersBuilder_ == null) {
+          players_ = java.util.Collections.emptyList();
+        } else {
+          players_ = null;
+          playersBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000001);
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return org.sunrise.game.genProto.gen.FriendProto.internal_static_org_sunrise_game_genProto_gen_MS2C_GetFriendRecommendationList_descriptor;
+      }
+
+      @java.lang.Override
+      public org.sunrise.game.genProto.gen.FriendProto.MS2C_GetFriendRecommendationList getDefaultInstanceForType() {
+        return org.sunrise.game.genProto.gen.FriendProto.MS2C_GetFriendRecommendationList.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public org.sunrise.game.genProto.gen.FriendProto.MS2C_GetFriendRecommendationList build() {
+        org.sunrise.game.genProto.gen.FriendProto.MS2C_GetFriendRecommendationList result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public org.sunrise.game.genProto.gen.FriendProto.MS2C_GetFriendRecommendationList buildPartial() {
+        org.sunrise.game.genProto.gen.FriendProto.MS2C_GetFriendRecommendationList result = new org.sunrise.game.genProto.gen.FriendProto.MS2C_GetFriendRecommendationList(this);
+        buildPartialRepeatedFields(result);
+        if (bitField0_ != 0) { buildPartial0(result); }
+        onBuilt();
+        return result;
+      }
+
+      private void buildPartialRepeatedFields(org.sunrise.game.genProto.gen.FriendProto.MS2C_GetFriendRecommendationList result) {
+        if (playersBuilder_ == null) {
+          if (((bitField0_ & 0x00000001) != 0)) {
+            players_ = java.util.Collections.unmodifiableList(players_);
+            bitField0_ = (bitField0_ & ~0x00000001);
+          }
+          result.players_ = players_;
+        } else {
+          result.players_ = playersBuilder_.build();
+        }
+      }
+
+      private void buildPartial0(org.sunrise.game.genProto.gen.FriendProto.MS2C_GetFriendRecommendationList result) {
+        int from_bitField0_ = bitField0_;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof org.sunrise.game.genProto.gen.FriendProto.MS2C_GetFriendRecommendationList) {
+          return mergeFrom((org.sunrise.game.genProto.gen.FriendProto.MS2C_GetFriendRecommendationList)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(org.sunrise.game.genProto.gen.FriendProto.MS2C_GetFriendRecommendationList other) {
+        if (other == org.sunrise.game.genProto.gen.FriendProto.MS2C_GetFriendRecommendationList.getDefaultInstance()) return this;
+        if (playersBuilder_ == null) {
+          if (!other.players_.isEmpty()) {
+            if (players_.isEmpty()) {
+              players_ = other.players_;
+              bitField0_ = (bitField0_ & ~0x00000001);
+            } else {
+              ensurePlayersIsMutable();
+              players_.addAll(other.players_);
+            }
+            onChanged();
+          }
+        } else {
+          if (!other.players_.isEmpty()) {
+            if (playersBuilder_.isEmpty()) {
+              playersBuilder_.dispose();
+              playersBuilder_ = null;
+              players_ = other.players_;
+              bitField0_ = (bitField0_ & ~0x00000001);
+              playersBuilder_ = 
+                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                   getPlayersFieldBuilder() : null;
+            } else {
+              playersBuilder_.addAllMessages(other.players_);
+            }
+          }
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
+        try {
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 10: {
+                org.sunrise.game.genProto.gen.FriendProto.STFriendInfo m =
+                    input.readMessage(
+                        org.sunrise.game.genProto.gen.FriendProto.STFriendInfo.parser(),
+                        extensionRegistry);
+                if (playersBuilder_ == null) {
+                  ensurePlayersIsMutable();
+                  players_.add(m);
+                } else {
+                  playersBuilder_.addMessage(m);
+                }
+                break;
+              } // case 10
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.unwrapIOException();
+        } finally {
+          onChanged();
+        } // finally
+        return this;
+      }
+      private int bitField0_;
+
+      private java.util.List<org.sunrise.game.genProto.gen.FriendProto.STFriendInfo> players_ =
+        java.util.Collections.emptyList();
+      private void ensurePlayersIsMutable() {
+        if (!((bitField0_ & 0x00000001) != 0)) {
+          players_ = new java.util.ArrayList<org.sunrise.game.genProto.gen.FriendProto.STFriendInfo>(players_);
+          bitField0_ |= 0x00000001;
+         }
+      }
+
+      private com.google.protobuf.RepeatedFieldBuilder<
+          org.sunrise.game.genProto.gen.FriendProto.STFriendInfo, org.sunrise.game.genProto.gen.FriendProto.STFriendInfo.Builder, org.sunrise.game.genProto.gen.FriendProto.STFriendInfoOrBuilder> playersBuilder_;
+
+      /**
+       * <pre>
+       * 推荐结果列表
+       * </pre>
+       *
+       * <code>repeated .org.sunrise.game.genProto.gen.STFriendInfo players = 1;</code>
+       */
+      public java.util.List<org.sunrise.game.genProto.gen.FriendProto.STFriendInfo> getPlayersList() {
+        if (playersBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(players_);
+        } else {
+          return playersBuilder_.getMessageList();
+        }
+      }
+      /**
+       * <pre>
+       * 推荐结果列表
+       * </pre>
+       *
+       * <code>repeated .org.sunrise.game.genProto.gen.STFriendInfo players = 1;</code>
+       */
+      public int getPlayersCount() {
+        if (playersBuilder_ == null) {
+          return players_.size();
+        } else {
+          return playersBuilder_.getCount();
+        }
+      }
+      /**
+       * <pre>
+       * 推荐结果列表
+       * </pre>
+       *
+       * <code>repeated .org.sunrise.game.genProto.gen.STFriendInfo players = 1;</code>
+       */
+      public org.sunrise.game.genProto.gen.FriendProto.STFriendInfo getPlayers(int index) {
+        if (playersBuilder_ == null) {
+          return players_.get(index);
+        } else {
+          return playersBuilder_.getMessage(index);
+        }
+      }
+      /**
+       * <pre>
+       * 推荐结果列表
+       * </pre>
+       *
+       * <code>repeated .org.sunrise.game.genProto.gen.STFriendInfo players = 1;</code>
+       */
+      public Builder setPlayers(
+          int index, org.sunrise.game.genProto.gen.FriendProto.STFriendInfo value) {
+        if (playersBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensurePlayersIsMutable();
+          players_.set(index, value);
+          onChanged();
+        } else {
+          playersBuilder_.setMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * 推荐结果列表
+       * </pre>
+       *
+       * <code>repeated .org.sunrise.game.genProto.gen.STFriendInfo players = 1;</code>
+       */
+      public Builder setPlayers(
+          int index, org.sunrise.game.genProto.gen.FriendProto.STFriendInfo.Builder builderForValue) {
+        if (playersBuilder_ == null) {
+          ensurePlayersIsMutable();
+          players_.set(index, builderForValue.build());
+          onChanged();
+        } else {
+          playersBuilder_.setMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * 推荐结果列表
+       * </pre>
+       *
+       * <code>repeated .org.sunrise.game.genProto.gen.STFriendInfo players = 1;</code>
+       */
+      public Builder addPlayers(org.sunrise.game.genProto.gen.FriendProto.STFriendInfo value) {
+        if (playersBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensurePlayersIsMutable();
+          players_.add(value);
+          onChanged();
+        } else {
+          playersBuilder_.addMessage(value);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * 推荐结果列表
+       * </pre>
+       *
+       * <code>repeated .org.sunrise.game.genProto.gen.STFriendInfo players = 1;</code>
+       */
+      public Builder addPlayers(
+          int index, org.sunrise.game.genProto.gen.FriendProto.STFriendInfo value) {
+        if (playersBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensurePlayersIsMutable();
+          players_.add(index, value);
+          onChanged();
+        } else {
+          playersBuilder_.addMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * 推荐结果列表
+       * </pre>
+       *
+       * <code>repeated .org.sunrise.game.genProto.gen.STFriendInfo players = 1;</code>
+       */
+      public Builder addPlayers(
+          org.sunrise.game.genProto.gen.FriendProto.STFriendInfo.Builder builderForValue) {
+        if (playersBuilder_ == null) {
+          ensurePlayersIsMutable();
+          players_.add(builderForValue.build());
+          onChanged();
+        } else {
+          playersBuilder_.addMessage(builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * 推荐结果列表
+       * </pre>
+       *
+       * <code>repeated .org.sunrise.game.genProto.gen.STFriendInfo players = 1;</code>
+       */
+      public Builder addPlayers(
+          int index, org.sunrise.game.genProto.gen.FriendProto.STFriendInfo.Builder builderForValue) {
+        if (playersBuilder_ == null) {
+          ensurePlayersIsMutable();
+          players_.add(index, builderForValue.build());
+          onChanged();
+        } else {
+          playersBuilder_.addMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * 推荐结果列表
+       * </pre>
+       *
+       * <code>repeated .org.sunrise.game.genProto.gen.STFriendInfo players = 1;</code>
+       */
+      public Builder addAllPlayers(
+          java.lang.Iterable<? extends org.sunrise.game.genProto.gen.FriendProto.STFriendInfo> values) {
+        if (playersBuilder_ == null) {
+          ensurePlayersIsMutable();
+          com.google.protobuf.AbstractMessageLite.Builder.addAll(
+              values, players_);
+          onChanged();
+        } else {
+          playersBuilder_.addAllMessages(values);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * 推荐结果列表
+       * </pre>
+       *
+       * <code>repeated .org.sunrise.game.genProto.gen.STFriendInfo players = 1;</code>
+       */
+      public Builder clearPlayers() {
+        if (playersBuilder_ == null) {
+          players_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000001);
+          onChanged();
+        } else {
+          playersBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * 推荐结果列表
+       * </pre>
+       *
+       * <code>repeated .org.sunrise.game.genProto.gen.STFriendInfo players = 1;</code>
+       */
+      public Builder removePlayers(int index) {
+        if (playersBuilder_ == null) {
+          ensurePlayersIsMutable();
+          players_.remove(index);
+          onChanged();
+        } else {
+          playersBuilder_.remove(index);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * 推荐结果列表
+       * </pre>
+       *
+       * <code>repeated .org.sunrise.game.genProto.gen.STFriendInfo players = 1;</code>
+       */
+      public org.sunrise.game.genProto.gen.FriendProto.STFriendInfo.Builder getPlayersBuilder(
+          int index) {
+        return getPlayersFieldBuilder().getBuilder(index);
+      }
+      /**
+       * <pre>
+       * 推荐结果列表
+       * </pre>
+       *
+       * <code>repeated .org.sunrise.game.genProto.gen.STFriendInfo players = 1;</code>
+       */
+      public org.sunrise.game.genProto.gen.FriendProto.STFriendInfoOrBuilder getPlayersOrBuilder(
+          int index) {
+        if (playersBuilder_ == null) {
+          return players_.get(index);  } else {
+          return playersBuilder_.getMessageOrBuilder(index);
+        }
+      }
+      /**
+       * <pre>
+       * 推荐结果列表
+       * </pre>
+       *
+       * <code>repeated .org.sunrise.game.genProto.gen.STFriendInfo players = 1;</code>
+       */
+      public java.util.List<? extends org.sunrise.game.genProto.gen.FriendProto.STFriendInfoOrBuilder> 
+           getPlayersOrBuilderList() {
+        if (playersBuilder_ != null) {
+          return playersBuilder_.getMessageOrBuilderList();
+        } else {
+          return java.util.Collections.unmodifiableList(players_);
+        }
+      }
+      /**
+       * <pre>
+       * 推荐结果列表
+       * </pre>
+       *
+       * <code>repeated .org.sunrise.game.genProto.gen.STFriendInfo players = 1;</code>
+       */
+      public org.sunrise.game.genProto.gen.FriendProto.STFriendInfo.Builder addPlayersBuilder() {
+        return getPlayersFieldBuilder().addBuilder(
+            org.sunrise.game.genProto.gen.FriendProto.STFriendInfo.getDefaultInstance());
+      }
+      /**
+       * <pre>
+       * 推荐结果列表
+       * </pre>
+       *
+       * <code>repeated .org.sunrise.game.genProto.gen.STFriendInfo players = 1;</code>
+       */
+      public org.sunrise.game.genProto.gen.FriendProto.STFriendInfo.Builder addPlayersBuilder(
+          int index) {
+        return getPlayersFieldBuilder().addBuilder(
+            index, org.sunrise.game.genProto.gen.FriendProto.STFriendInfo.getDefaultInstance());
+      }
+      /**
+       * <pre>
+       * 推荐结果列表
+       * </pre>
+       *
+       * <code>repeated .org.sunrise.game.genProto.gen.STFriendInfo players = 1;</code>
+       */
+      public java.util.List<org.sunrise.game.genProto.gen.FriendProto.STFriendInfo.Builder> 
+           getPlayersBuilderList() {
+        return getPlayersFieldBuilder().getBuilderList();
+      }
+      private com.google.protobuf.RepeatedFieldBuilder<
+          org.sunrise.game.genProto.gen.FriendProto.STFriendInfo, org.sunrise.game.genProto.gen.FriendProto.STFriendInfo.Builder, org.sunrise.game.genProto.gen.FriendProto.STFriendInfoOrBuilder> 
+          getPlayersFieldBuilder() {
+        if (playersBuilder_ == null) {
+          playersBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+              org.sunrise.game.genProto.gen.FriendProto.STFriendInfo, org.sunrise.game.genProto.gen.FriendProto.STFriendInfo.Builder, org.sunrise.game.genProto.gen.FriendProto.STFriendInfoOrBuilder>(
+                  players_,
+                  ((bitField0_ & 0x00000001) != 0),
+                  getParentForChildren(),
+                  isClean());
+          players_ = null;
+        }
+        return playersBuilder_;
+      }
+
+      // @@protoc_insertion_point(builder_scope:org.sunrise.game.genProto.gen.MS2C_GetFriendRecommendationList)
+    }
+
+    // @@protoc_insertion_point(class_scope:org.sunrise.game.genProto.gen.MS2C_GetFriendRecommendationList)
+    private static final org.sunrise.game.genProto.gen.FriendProto.MS2C_GetFriendRecommendationList DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new org.sunrise.game.genProto.gen.FriendProto.MS2C_GetFriendRecommendationList();
+    }
+
+    public static org.sunrise.game.genProto.gen.FriendProto.MS2C_GetFriendRecommendationList getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<MS2C_GetFriendRecommendationList>
+        PARSER = new com.google.protobuf.AbstractParser<MS2C_GetFriendRecommendationList>() {
+      @java.lang.Override
+      public MS2C_GetFriendRecommendationList parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
+      }
+    };
+
+    public static com.google.protobuf.Parser<MS2C_GetFriendRecommendationList> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<MS2C_GetFriendRecommendationList> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public org.sunrise.game.genProto.gen.FriendProto.MS2C_GetFriendRecommendationList getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_org_sunrise_game_genProto_gen_MC2S_SearchPlayer_descriptor;
   private static final 
@@ -8566,6 +9828,11 @@ public final class FriendProto {
   private static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_org_sunrise_game_genProto_gen_MS2C_FriendRequestUpdate_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_org_sunrise_game_genProto_gen_MS2C_GetFriendRecommendationList_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_org_sunrise_game_genProto_gen_MS2C_GetFriendRecommendationList_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -8581,32 +9848,37 @@ public final class FriendProto {
       "manId\030\001 \001(\t\"D\n\030MC2S_HandleFriendRequest\022" +
       "\030\n\020applicantHumanId\030\001 \001(\t\022\016\n\006action\030\002 \001(" +
       "\005\"*\n\021MC2S_DeleteFriend\022\025\n\rfriendHumanId\030" +
-      "\001 \001(\t\"R\n\014STFriendInfo\022\017\n\007humanId\030\001 \001(\t\022\014" +
+      "\001 \001(\t\"d\n\014STFriendInfo\022\017\n\007humanId\030\001 \001(\t\022\014" +
       "\n\004name\030\002 \001(\t\022\r\n\005level\030\003 \001(\005\022\024\n\014onlineSta" +
-      "tus\030\004 \001(\005\"s\n\023STFriendRequestInfo\022\030\n\020appl" +
-      "icantHumanId\030\001 \001(\t\022\025\n\rapplicantName\030\002 \001(" +
-      "\t\022\026\n\016applicantLevel\030\003 \001(\005\022\023\n\013requestTime" +
-      "\030\004 \001(\003\"Q\n\021MS2C_SearchPlayer\022<\n\007players\030\001" +
-      " \003(\0132+.org.sunrise.game.genProto.gen.STF" +
-      "riendInfo\"R\n\022MS2C_GetFriendList\022<\n\007frien" +
-      "ds\030\001 \003(\0132+.org.sunrise.game.genProto.gen" +
-      ".STFriendInfo\"d\n\021MS2C_FriendUpdate\022;\n\006fr" +
-      "iend\030\001 \001(\0132+.org.sunrise.game.genProto.g" +
-      "en.STFriendInfo\022\022\n\nupdateType\030\002 \001(\005\"a\n\031M" +
-      "S2C_GetFriendRequestList\022D\n\010requests\030\001 \003" +
-      "(\01322.org.sunrise.game.genProto.gen.STFri" +
-      "endRequestInfo\"_\n\030MS2C_FriendRequestUpda" +
-      "te\022C\n\007request\030\001 \001(\01322.org.sunrise.game.g" +
-      "enProto.gen.STFriendRequestInfo*\245\001\n\013FROM" +
-      "_CLIENT\022\025\n\021C2S_GetFriendList\020\000\022\024\n\020C2S_Se" +
-      "archPlayer\020\001\022\030\n\024C2S_AddFriendRequest\020\002\022\033" +
-      "\n\027C2S_HandleFriendRequest\020\003\022\024\n\020C2S_Delet" +
-      "eFriend\020\004\022\034\n\030C2S_GetFriendRequestList\020\005*" +
-      "\213\001\n\013FROM_SERVER\022\025\n\021S2C_GetFriendList\020\000\022\024" +
-      "\n\020S2C_SearchPlayer\020\001\022\024\n\020S2C_FriendUpdate" +
-      "\020\002\022\033\n\027S2C_FriendRequestUpdate\020\003\022\034\n\030S2C_G" +
-      "etFriendRequestList\020\004B\rB\013FriendProtob\006pr" +
-      "oto3"
+      "tus\030\004 \001(\005\022\020\n\010headIcon\030\005 \001(\t\"\216\001\n\023STFriend" +
+      "RequestInfo\022\030\n\020applicantHumanId\030\001 \001(\t\022\025\n" +
+      "\rapplicantName\030\002 \001(\t\022\026\n\016applicantLevel\030\003" +
+      " \001(\005\022\023\n\013requestTime\030\004 \001(\003\022\031\n\021applicantHe" +
+      "adIcon\030\005 \001(\t\"Q\n\021MS2C_SearchPlayer\022<\n\007pla" +
+      "yers\030\001 \003(\0132+.org.sunrise.game.genProto.g" +
+      "en.STFriendInfo\"R\n\022MS2C_GetFriendList\022<\n" +
+      "\007friends\030\001 \003(\0132+.org.sunrise.game.genPro" +
+      "to.gen.STFriendInfo\"d\n\021MS2C_FriendUpdate" +
+      "\022;\n\006friend\030\001 \001(\0132+.org.sunrise.game.genP" +
+      "roto.gen.STFriendInfo\022\022\n\nupdateType\030\002 \001(" +
+      "\005\"a\n\031MS2C_GetFriendRequestList\022D\n\010reques" +
+      "ts\030\001 \003(\01322.org.sunrise.game.genProto.gen" +
+      ".STFriendRequestInfo\"_\n\030MS2C_FriendReque" +
+      "stUpdate\022C\n\007request\030\001 \001(\01322.org.sunrise." +
+      "game.genProto.gen.STFriendRequestInfo\"`\n" +
+      " MS2C_GetFriendRecommendationList\022<\n\007pla" +
+      "yers\030\001 \003(\0132+.org.sunrise.game.genProto.g" +
+      "en.STFriendInfo*\312\001\n\013FROM_CLIENT\022\025\n\021C2S_G" +
+      "etFriendList\020\000\022\024\n\020C2S_SearchPlayer\020\001\022\030\n\024" +
+      "C2S_AddFriendRequest\020\002\022\033\n\027C2S_HandleFrie" +
+      "ndRequest\020\003\022\024\n\020C2S_DeleteFriend\020\004\022\034\n\030C2S" +
+      "_GetFriendRequestList\020\005\022#\n\037C2S_GetFriend" +
+      "RecommendationList\020\006*\260\001\n\013FROM_SERVER\022\025\n\021" +
+      "S2C_GetFriendList\020\000\022\024\n\020S2C_SearchPlayer\020" +
+      "\001\022\024\n\020S2C_FriendUpdate\020\002\022\033\n\027S2C_FriendReq" +
+      "uestUpdate\020\003\022\034\n\030S2C_GetFriendRequestList" +
+      "\020\004\022#\n\037S2C_GetFriendRecommendationList\020\005B" +
+      "\rB\013FriendProtob\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -8641,13 +9913,13 @@ public final class FriendProto {
     internal_static_org_sunrise_game_genProto_gen_STFriendInfo_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_org_sunrise_game_genProto_gen_STFriendInfo_descriptor,
-        new java.lang.String[] { "HumanId", "Name", "Level", "OnlineStatus", });
+        new java.lang.String[] { "HumanId", "Name", "Level", "OnlineStatus", "HeadIcon", });
     internal_static_org_sunrise_game_genProto_gen_STFriendRequestInfo_descriptor =
       getDescriptor().getMessageTypes().get(5);
     internal_static_org_sunrise_game_genProto_gen_STFriendRequestInfo_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_org_sunrise_game_genProto_gen_STFriendRequestInfo_descriptor,
-        new java.lang.String[] { "ApplicantHumanId", "ApplicantName", "ApplicantLevel", "RequestTime", });
+        new java.lang.String[] { "ApplicantHumanId", "ApplicantName", "ApplicantLevel", "RequestTime", "ApplicantHeadIcon", });
     internal_static_org_sunrise_game_genProto_gen_MS2C_SearchPlayer_descriptor =
       getDescriptor().getMessageTypes().get(6);
     internal_static_org_sunrise_game_genProto_gen_MS2C_SearchPlayer_fieldAccessorTable = new
@@ -8678,6 +9950,12 @@ public final class FriendProto {
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_org_sunrise_game_genProto_gen_MS2C_FriendRequestUpdate_descriptor,
         new java.lang.String[] { "Request", });
+    internal_static_org_sunrise_game_genProto_gen_MS2C_GetFriendRecommendationList_descriptor =
+      getDescriptor().getMessageTypes().get(11);
+    internal_static_org_sunrise_game_genProto_gen_MS2C_GetFriendRecommendationList_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_org_sunrise_game_genProto_gen_MS2C_GetFriendRecommendationList_descriptor,
+        new java.lang.String[] { "Players", });
     descriptor.resolveAllFeaturesImmutable();
   }
 

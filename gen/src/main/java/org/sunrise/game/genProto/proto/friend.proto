@@ -9,6 +9,7 @@ enum FROM_CLIENT {
   C2S_HandleFriendRequest = 3;   // 处理好友申请（同意/拒绝）
   C2S_DeleteFriend = 4;          // 删除好友
   C2S_GetFriendRequestList = 5;  // 获取好友申请列表（空消息）
+  C2S_GetFriendRecommendationList = 6;  // 获取好友推荐列表（空消息）
 }
 
 enum FROM_SERVER {
@@ -17,6 +18,7 @@ enum FROM_SERVER {
   S2C_FriendUpdate = 2;          // 好友更新（添加/删除/状态变化）
   S2C_FriendRequestUpdate = 3;   // 好友申请更新（新增申请/处理结果）
   S2C_GetFriendRequestList = 4; // 好友申请列表响应
+  S2C_GetFriendRecommendationList = 5; // 好友推荐列表响应
 }
 
 // 搜索玩家请求
@@ -46,6 +48,7 @@ message STFriendInfo {
   string name = 2;         // 玩家名称
   int32 level = 3;         // 等级
   int32 onlineStatus = 4;  // 在线状态：0-离线，1-在线
+  string headIcon = 5;     // 头像
 }
 
 // 好友申请信息
@@ -54,6 +57,7 @@ message STFriendRequestInfo {
   string applicantName = 2;      // 申请人名称
   int32 applicantLevel = 3;      // 申请人等级
   int64 requestTime = 4;         // 申请时间（时间戳）
+  string applicantHeadIcon = 5;     // 申请人头像
 }
 
 // 搜索玩家响应
@@ -80,4 +84,9 @@ message MS2C_GetFriendRequestList {
 // 好友申请更新
 message MS2C_FriendRequestUpdate {
   STFriendRequestInfo request = 1;  // 申请信息
+}
+
+// 好友好友推荐列表响应
+message MS2C_GetFriendRecommendationList {
+  repeated STFriendInfo players = 1;  // 推荐结果列表
 }
