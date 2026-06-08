@@ -139,7 +139,9 @@ public class CallUtils {
             if (method == null) {
                 result = ErrorType.RPC_METHOD_NOT_FOUND;
             } else {
-                if (call.getData().length / 2 != method.getParameterCount()) {
+                Object[] callData = call.getData();
+                int paramCount = callData == null ? 0 : callData.length;
+                if (paramCount != method.getParameterCount()) {
                     result = ErrorType.RPC_ARGS_NOT_MATCH;
                 } else {
                     Object[] args = parseCallArgs(call, method);

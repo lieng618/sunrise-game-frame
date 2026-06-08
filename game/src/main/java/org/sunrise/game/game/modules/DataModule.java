@@ -106,9 +106,9 @@ public class DataModule extends BaseModule {
 
         RpcFunction.newInstance()
                 .call(CallEnum.GlobalRankService_updateRank,
-                        "rankType", RankType.LEVEL.getId(),
-                        "humanId", getHumanId(),
-                        "score", level);
+                        RankType.LEVEL.getId(),
+                        getHumanId(),
+                        level);
     }
 
     /**
@@ -156,11 +156,11 @@ public class DataModule extends BaseModule {
     private void syncToPlayerInfoSystem() {
         RpcFunction.newInstance()
                 .call(CallEnum.GlobalPlayerInfoService_updatePlayerInfo,
-                        "humanId", getHumanId(),
-                        "name", name,
-                        "level", level,
-                        "headIcon", headIcon,
-                        "sex", sex,
-                        "fightPower", fightPower);
+                        getHumanId(),
+                        name,
+                        level,
+                        headIcon,
+                        sex,
+                        fightPower);
     }
 }

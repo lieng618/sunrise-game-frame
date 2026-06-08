@@ -52,12 +52,12 @@ public class ExternalRecvGameMessageService extends BaseService {
         super.pulsePer5Sec();
         pulseRemoveClients();
         RpcFunction.newInstance().call(CallEnum.HttpRecvMessageService_updateExternalRemoteData,
-                "serverId", RpcNodeManager.getRpcServerId(),
-                "host", externalServer.getExternalHost(),
-                "port", externalServer.getExternalPort(),
-                "tcpEnabled", externalServer.isTcpEnabled(),
-                "wsEnabled", externalServer.isWsEnabled(),
-                "kcpEnabled", externalServer.isKcpEnabled());
+                RpcNodeManager.getRpcServerId(),
+                externalServer.getExternalHost(),
+                externalServer.getExternalPort(),
+                externalServer.isTcpEnabled(),
+                externalServer.isWsEnabled(),
+                externalServer.isKcpEnabled());
     }
 
     @Override
@@ -89,7 +89,7 @@ public class ExternalRecvGameMessageService extends BaseService {
                 if (data == null) {
                     continue;
                 }
-                RpcFunction.newInstance(connection.getGameNodeId()).call(CallEnum.GameRecvExternalMessageService_recvMessage, "id", connection.getId(), "data", data, "nodeId", connection.isFirstSend() ? "" : RpcNodeManager.getRpcServerNodeId());
+                RpcFunction.newInstance(connection.getGameNodeId()).call(CallEnum.GameRecvExternalMessageService_recvMessage, connection.getId(), data, connection.isFirstSend() ? "" : RpcNodeManager.getRpcServerNodeId());
                 if (!connection.isFirstSend()) {
                     connection.setFirstSend(true);
                 }
@@ -136,6 +136,6 @@ public class ExternalRecvGameMessageService extends BaseService {
         dataMap.put("tcpEnabled", externalServer.isTcpEnabled());
         dataMap.put("wsEnabled", externalServer.isWsEnabled());
         dataMap.put("kcpEnabled", externalServer.isKcpEnabled());
-        RpcFunction.newInstance().call(CallEnum.GmBackRecvMessageService_recvMessage, "operation", "reportNodeData", "data", JSON.toJSONString(dataMap));
+        RpcFunction.newInstance().call(CallEnum.GmBackRecvMessageService_recvMessage, "reportNodeData", JSON.toJSONString(dataMap));
     }
 }

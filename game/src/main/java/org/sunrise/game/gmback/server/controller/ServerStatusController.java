@@ -41,7 +41,7 @@ public class ServerStatusController extends BaseController {
         }
 
         serverOpen = open;
-        RpcFunction.newInstance().call(CallEnum.HttpRecvMessageService_setExternalServerStatus, "open", serverOpen);
+        RpcFunction.newInstance().call(CallEnum.HttpRecvMessageService_setExternalServerStatus, serverOpen);
 
         String action = serverOpen ? "开启服务器" : "关闭服务器";
         ControllerManager.getController(OperationLogController.class).recordLog(

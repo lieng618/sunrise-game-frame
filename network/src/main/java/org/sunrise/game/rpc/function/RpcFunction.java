@@ -71,9 +71,6 @@ public class RpcFunction {
      * 发起一次调用
      */
     public boolean call(int id, Object... params) {
-        if (params.length % 2 != 0) {
-            return false;
-        }
         var callNode = callIdNodes.get(id);
         // 没有任何节点提供此方法
         if (callNode == null || callNode.isEmpty()) {

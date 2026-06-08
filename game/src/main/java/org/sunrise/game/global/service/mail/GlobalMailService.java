@@ -102,7 +102,7 @@ public class GlobalMailService extends BaseService {
 
         RpcFunction.newInstance(RpcFunction.RpcCallType.SendAll)
                 .call(CallEnum.GameRpcListenService_sendToHuman,
-                        "humanId", humanId, "packetType", TopicProto.TOPIC.TOPIC_TYPE_MAIL_VALUE, "packetId", MailProto.FROM_SERVER.S2C_NewMail_VALUE, "protoData", protoData);
+                        humanId, TopicProto.TOPIC.TOPIC_TYPE_MAIL_VALUE, MailProto.FROM_SERVER.S2C_NewMail_VALUE, protoData);
     }
 
     @RpcMethod

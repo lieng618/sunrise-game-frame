@@ -82,8 +82,7 @@ public class GlobalFriendService extends BaseService {
         addFriendRequest(applicantHumanId, targetHumanId, System.currentTimeMillis());
 
         RpcFunction.newInstance(RpcFunction.RpcCallType.SendAll)
-                .call(CallEnum.FriendRpcListenService_onNewFriendRequest,
-                        "targetHumanId", targetHumanId);
+                .call(CallEnum.FriendRpcListenService_onNewFriendRequest, targetHumanId);
 
         returns("applicantHumanId", applicantHumanId, "targetHumanId", targetHumanId, "result", 0);
     }
@@ -94,14 +93,10 @@ public class GlobalFriendService extends BaseService {
 
         if (request != null && action == 1) {
             RpcFunction.newInstance(RpcFunction.RpcCallType.SendAll)
-                    .call(CallEnum.FriendRpcListenService_onFriendAdded,
-                            "humanId1", targetHumanId,
-                            "humanId2", applicantHumanId);
+                    .call(CallEnum.FriendRpcListenService_onFriendAdded, targetHumanId, applicantHumanId);
 
             RpcFunction.newInstance(RpcFunction.RpcCallType.SendAll)
-                    .call(CallEnum.FriendRpcListenService_onFriendAdded,
-                            "humanId1", applicantHumanId,
-                            "humanId2", targetHumanId);
+                    .call(CallEnum.FriendRpcListenService_onFriendAdded, applicantHumanId, targetHumanId);
         }
 
         returns("targetHumanId", targetHumanId, "applicantHumanId", applicantHumanId, "action", action, "success", request != null);
@@ -112,14 +107,10 @@ public class GlobalFriendService extends BaseService {
         removeFriend(humanId1, humanId2);
 
         RpcFunction.newInstance(RpcFunction.RpcCallType.SendAll)
-                .call(CallEnum.FriendRpcListenService_onFriendDeleted,
-                        "humanId1", humanId1,
-                        "humanId2", humanId2);
+                .call(CallEnum.FriendRpcListenService_onFriendDeleted, humanId1, humanId2);
 
         RpcFunction.newInstance(RpcFunction.RpcCallType.SendAll)
-                .call(CallEnum.FriendRpcListenService_onFriendDeleted,
-                        "humanId1", humanId2,
-                        "humanId2", humanId1);
+                .call(CallEnum.FriendRpcListenService_onFriendDeleted, humanId2, humanId1);
 
         returns("humanId1", humanId1, "humanId2", humanId2, "success", true);
     }

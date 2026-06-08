@@ -34,7 +34,7 @@ public class ChatMsgHandler {
             return;
         }
 
-        RpcFunction.newInstance().call(CallEnum.GlobalChatService_chat, "humanId", humanObject.getHumanId(), "name",humanObject.getModule(DataModule.class).getName(), "message", SensitiveWordHelper.replace(msg));
+        RpcFunction.newInstance().call(CallEnum.GlobalChatService_chat, humanObject.getHumanId(), humanObject.getModule(DataModule.class).getName(), SensitiveWordHelper.replace(msg));
     }
 
     @MsgHandlerMethod(packetId = ChatProto.FROM_CLIENT.C2S_Horn_VALUE)
@@ -92,15 +92,14 @@ public class ChatMsgHandler {
 
         Map<String, Object> redeemData = new HashMap<>();
         redeemData.put("code", code);
-        RpcFunction.newInstance().call(CallEnum.GmBackRecvMessageService_recvMessage,
-                "operation", "cdkRedeem", "data", JSON.toJSONString(redeemData));
+        RpcFunction.newInstance().call(CallEnum.GmBackRecvMessageService_recvMessage, "cdkRedeem", JSON.toJSONString(redeemData));
 
         String attachmentsJson = info.getAttachments() != null ? JSON.toJSONString(info.getAttachments()) : "[]";
         RpcFunction.newInstance().call(CallEnum.GlobalMailService_sendMail,
-                "humanId", humanObject.getHumanId(),
-                "templateId", info.getTemplateId(),
-                "attachmentsJson", attachmentsJson,
-                "senderName", "兑换码奖励");
+                humanObject.getHumanId(),
+                info.getTemplateId(),
+                attachmentsJson,
+                "兑换码奖励");
 
         humanObject.sendTips("兑换成功");
     }
@@ -108,7 +107,7 @@ public class ChatMsgHandler {
     @MsgHandlerMethod(packetId = ChatProto.FROM_CLIENT.C2S_GetHistory_VALUE)
     public static void history(HumanObject humanObject) {
         RpcFunction rpcFunction = RpcFunction.newInstance();
-        rpcFunction.call(CallEnum.GlobalChatService_history, "humanId", humanObject.getHumanId());
+        rpcFunction.call(CallEnum.GlobalChatService_history, humanObject.getHumanId());
         rpcFunction.listenResult(rpcResult -> {
             String humanId = (String) rpcResult.getContext("humanId");
             HumanObject humanObj = HumanObjectManger.getHumanObject(humanId);

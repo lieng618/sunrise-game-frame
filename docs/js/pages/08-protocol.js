@@ -43,7 +43,7 @@ public class SocketMessageEncoder extends MessageToByteEncoder<SocketMessage> {
 <pre><code class="language-java">public class ConnectObject {
     public void sendMsg(int packetType, int packetId) {
         var sendBuilder = TopicProto.MBasePacketData.newBuilder().setPacketType(TopicProto.TOPIC.forNumber(packetType)).setPacketId(packetId);
-        RpcFunction.newInstance(externalNodeId).call(CallEnum.ExternalRecvGameMessageService_recvMessage, "id", connectId, "data", sendBuilder.build().toByteArray());
+        RpcFunction.newInstance(externalNodeId).call(CallEnum.ExternalRecvGameMessageService_recvMessage, connectId, sendBuilder.build().toByteArray(), firstSend ? "" : RpcNodeManager.getRpcServerNodeId());
     }
 }
 </code></pre>

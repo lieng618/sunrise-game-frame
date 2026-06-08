@@ -134,24 +134,22 @@ rpc.connect.http=</code></pre>
 <p>默认模式。如果当前节点自己注册了此方法，优先本地处理（不经过网络）；否则从远端节点随机选一个。</p>
 <pre><code class="language-java">// 示例：发送聊天消息（随机选一个 Global 节点处理）
 RpcFunction.newInstance().call(CallEnum.GlobalChatService_chat,
-    "humanId", humanId,
-    "message", message);</code></pre>
+    humanId, name, message);</code></pre>
 
 <h3>SendAll（广播调用）</h3>
 <p>给所有注册了该方法的节点都发一份。</p>
 <pre><code class="language-java">// 示例：通知所有 Game 节点有新好友申请
-RpcFunction.newInstance(RpcFunction.SendAll).call(
+RpcFunction.newInstance(RpcFunction.RpcCallType.SendAll).call(
     CallEnum.FriendRpcListenService_onNewFriendRequest,
-    "targetHumanId", targetHumanId);</code></pre>
+    targetHumanId);</code></pre>
 
 <h3>SendDesignated（定向调用）</h3>
 <p>按指定 serverNodeId 发给某一个目标节点。如果目标节点无效，退化为 SendRandom。External ↔ Game 之间的消息转发大量使用此模式。</p>
 <pre><code class="language-java">// 示例：Game 向指定 External 节点发送消息
 RpcFunction.newInstance(externalNodeId).call(
     CallEnum.ExternalRecvGameMessageService_recvMessage,
-    "connectionId", connectionId,
-    "data", data,
-    "gameNodeId", gameNodeId);  // 首次发送带 gameNodeId</code></pre>
+    connectionId, data,
+    firstSend ? "" : RpcNodeManager.getRpcServerNodeId());  // 首次发送带 gameNodeId</code></pre>
 
 <h3>调用参数说明</h3>
 
@@ -159,17 +157,11 @@ RpcFunction.newInstance(externalNodeId).call(
 <p>以邮件系统举例，发送邮件时调用写法是：</p>
 <pre><code class="language-java">RpcFunction.newInstance().call(
     CallEnum.GlobalMailService_sendMail,
-    "humanId", humanId,
-    "templateId", templateId,
-    "attachmentsJson", attachmentsJson,
-    "senderName", senderName
+    humanId, templateId, attachmentsJson, senderName
 );</code></pre>
-<p>这四个键值对，底层会把它塞进Object数组中</p>
-<code>
-Object[] data = {"humanId", ..., "templateId", ..., ...}
-</code>
+<p>参数按目标方法签名<strong>顺序</strong>直接传入，底层会放入 <code>Object[] data</code> 数组，经 MessagePack 序列化后发送。</p>
 
-<p>底层服务收到call调用时，会调用<code>CallUtils.handler()</code>处理此call，此方法内部调用：</p>
+<p>底层服务收到 call 调用时，会调用 <code>CallUtils.handler()</code> 处理此 call，此方法内部调用：</p>
 <pre><code class="language-java">// 将call中的数据，传递给方法的参数
 private static Object[] parseCallArgs(Call call, Method method) {
     Object[] args = new Object[method.getParameterCount()];
@@ -179,7 +171,8 @@ private static Object[] parseCallArgs(Call call, Method method) {
     return args;
 }
 </code></pre>
-<p>通过<code>call.getData(i)</code>，根据位置取出数据，作为参数传递给服务方法，进行处理。可以看到发起调用时传递的参数名称无实际意义，只需要顺序一致即可。</p>
+<p>通过 <code>call.getData(i)</code> 按位置取出数据，作为参数传递给服务方法。调用侧只需保证<strong>参数个数与顺序</strong>与 <code>@RpcMethod</code> 方法签名一致（由 <code>CallEnum</code> 绑定到具体 Method）。</p>
+<p><strong>注意</strong>：<code>returns()</code> 与 <code>listenResult()</code> 的 context 仍使用键值对；仅 <code>call()</code> 请求参数改为按位置传值。</p>
 
 <pre><code class="language-java">@RpcService
 public class GlobalMailService extends BaseService {
@@ -207,7 +200,7 @@ public class GlobalMailService extends BaseService {
 <pre><code class="language-java">@MsgHandlerMethod(packetId = ChatProto.FROM_CLIENT.C2S_GetHistory_VALUE)
     public static void history(HumanObject humanObject) {
         RpcFunction rpcFunction = RpcFunction.newInstance();
-        rpcFunction.call(CallEnum.GlobalChatService_history, "humanId", humanObject.getHumanId());
+        rpcFunction.call(CallEnum.GlobalChatService_history, humanObject.getHumanId());
         rpcFunction.listenResult(rpcResult -> {
             String humanId = (String) rpcResult.getContext("humanId");
             HumanObject humanObj = HumanObjectManger.getHumanObject(humanId);
@@ -236,7 +229,7 @@ public class GlobalMailService extends BaseService {
 <tr><td>messageId</td><td>long</td><td>唯一消息 ID（用于回调匹配）</td></tr>
 <tr><td>rpcId</td><td>int</td><td>RPC 方法编号（对应 CallEnum）</td></tr>
 <tr><td>type</td><td>CallType</td><td>Call（业务调用）或 Update（方法列表更新）</td></tr>
-<tr><td>data</td><td>Object[]</td><td>键值对参数数组（偶数索引为 key，奇数索引为 value）</td></tr>
+<tr><td>data</td><td>Object[]</td><td>请求参数数组（按位置对应方法参数）</td></tr>
 <tr><td>result</td><td>int</td><td>调用结果码（0=成功，100+=错误）</td></tr>
 </tbody>
 </table>
@@ -249,7 +242,7 @@ public class GlobalMailService extends BaseService {
 <tr><td>100</td><td>RPC_TIMEOUT</td><td>RPC 调用超时</td><td>10秒内未收到回包</td></tr>
 <tr><td>101</td><td>RPC_SERVICE_NOT_FOUND</td><td>服务未找到</td><td>CallEnum 对应的 @RpcService 不存在</td></tr>
 <tr><td>102</td><td>RPC_METHOD_NOT_FOUND</td><td>方法未找到</td><td>CallEnum 对应的 @RpcMethod 不存在</td></tr>
-<tr><td>103</td><td>RPC_ARGS_NOT_MATCH</td><td>参数数量不匹配</td><td>call() 传的键值对数量 ≠ 方法参数个数</td></tr>
+<tr><td>103</td><td>RPC_ARGS_NOT_MATCH</td><td>参数数量不匹配</td><td>call() 传的参数个数 ≠ 方法参数个数</td></tr>
 <tr><td>104</td><td>RPC_CALL_CATCH</td><td>调用异常</td><td>方法执行抛出异常</td></tr>
 <tr><td>105</td><td>RPC_NOT_REGISTER</td><td>方法未注册</td><td>callIdNodes 中没有节点注册了该方法</td></tr>
 </tbody>
@@ -270,7 +263,7 @@ Call currentCall = CallContext.getLastCall();  // 取栈顶</code></pre>
     <p><strong>⚠️ 一个进程只能有一个 RpcNode</strong>：RpcNodeManager 维护单例静态引用，一个 JVM 进程只能创建一个 RpcNode。</p>
 </div>
 <div class="callout callout-danger">
-    <p><strong>⚠️ 参数数量必须严格匹配</strong>：<code>call()</code> 传的键值对数量必须和方法参数个数一致，且顺序要和目标方法参数顺序一致。CallUtils.handler 会校验 data.length/2 == method.getParameterCount()。</p>
+    <p><strong>⚠️ 参数数量必须严格匹配</strong>：<code>call()</code> 传的参数个数必须和方法参数个数一致，且顺序要和目标方法参数顺序一致。CallUtils.handler 会校验 data.length == method.getParameterCount()。</p>
 </div>
 
 <h2>ServiceManager 生命周期</h2>

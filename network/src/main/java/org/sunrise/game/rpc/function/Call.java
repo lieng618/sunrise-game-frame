@@ -37,6 +37,6 @@ public class Call extends BaseMessage {
     }
 
     public Object getData(int index) {
-        return data[index * 2 + 1];
+        return data[index];
     }
 }

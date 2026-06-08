@@ -48,7 +48,7 @@ public class FriendModule extends BaseModule {
      */
     public void sendFriendList() {
         RpcFunction rpcFunction = RpcFunction.newInstance();
-        rpcFunction.call(CallEnum.GlobalFriendService_getFriends, "humanId", getHumanId());
+        rpcFunction.call(CallEnum.GlobalFriendService_getFriends, getHumanId());
         rpcFunction.listenResult(rpcResult -> {
             if (getHuman() == null) {
                 return;
@@ -68,7 +68,7 @@ public class FriendModule extends BaseModule {
 
             // 在回调中再次发起RPC调用，批量获取玩家信息
             RpcFunction rpcFunction2 = RpcFunction.newInstance();
-            rpcFunction2.call(CallEnum.GlobalPlayerInfoService_getPlayerInfos, "humanIds", friendIds);
+            rpcFunction2.call(CallEnum.GlobalPlayerInfoService_getPlayerInfos, friendIds);
             rpcFunction2.listenResult(rpcResult2 -> {
                 if (getHuman() == null) {
                     return;
@@ -107,7 +107,7 @@ public class FriendModule extends BaseModule {
     public void searchPlayer(String playerId) {
         // 通过PlayerInfoService搜索玩家
         RpcFunction rpcFunction = RpcFunction.newInstance();
-        rpcFunction.call(CallEnum.GlobalPlayerInfoService_getPlayerInfo, "humanId", playerId);
+        rpcFunction.call(CallEnum.GlobalPlayerInfoService_getPlayerInfo, playerId);
         rpcFunction.listenResult(rpcResult -> {
             if (getHuman() == null) {
                 return;
@@ -145,9 +145,7 @@ public class FriendModule extends BaseModule {
      */
     public void sendFriendRequest(String targetHumanId) {
         RpcFunction rpcFunction = RpcFunction.newInstance();
-        rpcFunction.call(CallEnum.GlobalFriendService_sendFriendRequest,
-            "applicantHumanId", getHumanId(),
-            "targetHumanId", targetHumanId);
+        rpcFunction.call(CallEnum.GlobalFriendService_sendFriendRequest, getHumanId(), targetHumanId);
     }
 
     /**
@@ -155,10 +153,7 @@ public class FriendModule extends BaseModule {
      */
     public void handleFriendRequest(String applicantHumanId, int action) {
         RpcFunction rpcFunction = RpcFunction.newInstance();
-        rpcFunction.call(CallEnum.GlobalFriendService_handleFriendRequest,
-            "targetHumanId", getHumanId(),
-            "applicantHumanId", applicantHumanId,
-            "action", action);
+        rpcFunction.call(CallEnum.GlobalFriendService_handleFriendRequest, getHumanId(), applicantHumanId, action);
     }
 
     /**
@@ -166,9 +161,7 @@ public class FriendModule extends BaseModule {
      */
     public void deleteFriend(String friendHumanId) {
         RpcFunction rpcFunction = RpcFunction.newInstance();
-        rpcFunction.call(CallEnum.GlobalFriendService_deleteFriend,
-            "humanId1", getHumanId(),
-            "humanId2", friendHumanId);
+        rpcFunction.call(CallEnum.GlobalFriendService_deleteFriend, getHumanId(), friendHumanId);
         rpcFunction.listenResult(rpcResult -> {
 
         });
@@ -179,7 +172,7 @@ public class FriendModule extends BaseModule {
      */
     public void sendFriendRequestList() {
         RpcFunction rpcFunction = RpcFunction.newInstance();
-        rpcFunction.call(CallEnum.GlobalFriendService_getFriendRequests, "targetHumanId", getHumanId());
+        rpcFunction.call(CallEnum.GlobalFriendService_getFriendRequests, getHumanId());
         rpcFunction.listenResult(rpcResult -> {
             if (getHuman() == null) {
                 return;
@@ -205,7 +198,7 @@ public class FriendModule extends BaseModule {
 
             // 在回调中再次发起RPC调用，批量获取玩家信息
             RpcFunction rpcFunction2 = RpcFunction.newInstance();
-            rpcFunction2.call(CallEnum.GlobalPlayerInfoService_getPlayerInfos, "humanIds", applicantIds);
+            rpcFunction2.call(CallEnum.GlobalPlayerInfoService_getPlayerInfos, applicantIds);
             rpcFunction2.listenResult(rpcResult2 -> {
                 if (getHuman() == null) {
                     return;
@@ -246,7 +239,7 @@ public class FriendModule extends BaseModule {
     public void sendFriendRecommendationList() {
         // 先获取当前玩家的好友列表，用于排除已是好友的玩家
         RpcFunction rpcFunction = RpcFunction.newInstance();
-        rpcFunction.call(CallEnum.GlobalFriendService_getFriends, "humanId", getHumanId());
+        rpcFunction.call(CallEnum.GlobalFriendService_getFriends, getHumanId());
         rpcFunction.listenResult(rpcResult -> {
             if (getHuman() == null) {
                 return;
@@ -288,7 +281,7 @@ public class FriendModule extends BaseModule {
 
             // 通过全局信息系统批量获取推荐玩家信息
             RpcFunction rpcFunction2 = RpcFunction.newInstance();
-            rpcFunction2.call(CallEnum.GlobalPlayerInfoService_getPlayerInfos, "humanIds", new ArrayList<>(recommendIds));
+            rpcFunction2.call(CallEnum.GlobalPlayerInfoService_getPlayerInfos, new ArrayList<>(recommendIds));
             rpcFunction2.listenResult(rpcResult2 -> {
                 if (getHuman() == null) {
                     return;
@@ -339,7 +332,7 @@ public class FriendModule extends BaseModule {
     public void notifyFriendAdded(String friendHumanId) {
         // 在RPC回调中获取好友信息
         RpcFunction rpcFunction = RpcFunction.newInstance();
-        rpcFunction.call(CallEnum.GlobalPlayerInfoService_getPlayerInfo, "humanId", friendHumanId);
+        rpcFunction.call(CallEnum.GlobalPlayerInfoService_getPlayerInfo, friendHumanId);
         rpcFunction.listenResult(rpcResult -> {
             if (getHuman() == null) {
                 return;

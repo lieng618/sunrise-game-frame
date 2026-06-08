@@ -25,18 +25,18 @@ public class GmController extends BaseController {
         if ("-1".equals(humanId.trim())) {
             RpcFunction.newInstance().call(
                     CallEnum.GlobalMailService_sendMailToAll,
-                    "templateId", templateId,
-                    "attachmentsJson", attachmentsStr,
-                    "senderName", "运营邮件");
+                    templateId,
+                    attachmentsStr,
+                    "运营邮件");
             ControllerManager.getController(OperationLogController.class).recordLog(ctx, OperationLogController.OperationType.SEND_MAIL, "发送全服邮件(attachments:" + attachmentsStr + ")");
 
         } else {
             RpcFunction.newInstance().call(
                     CallEnum.GlobalMailService_sendMail,
-                    "humanId", humanId.trim(),
-                    "templateId", templateId,
-                    "attachmentsJson", attachmentsStr,
-                    "senderName", "运营邮件");
+                    humanId.trim(),
+                    templateId,
+                    attachmentsStr,
+                    "运营邮件");
             ControllerManager.getController(OperationLogController.class).recordLog(ctx, OperationLogController.OperationType.SEND_MAIL, "为玩家(ID:" + humanId.trim() + ")发送邮件(attachments:" + attachmentsStr + ")");
         }
 

@@ -50,9 +50,9 @@ public class ConnectObject {
         }
         RpcFunction.newInstance(externalNodeId).call(
                 CallEnum.ExternalRecvGameMessageService_recvMessage,
-                "id", connectId,
-                "data", sendBuilder.build().toByteArray(),
-                "nodeId", RpcNodeManager.getRpcServerNodeId());
+                connectId,
+                sendBuilder.build().toByteArray(),
+                RpcNodeManager.getRpcServerNodeId());
         LogCore.GameServer.debug("sendToClient, connectionId = {}, packetType = {}, packetId = {}, msgData = {{}}",
                 connectId, packetType, packetId, builder == null ? "" : builder.toString().replace("\n", ""));
     }
@@ -60,7 +60,7 @@ public class ConnectObject {
     public void sendMsg(int packetType, int packetId) {
         var sendBuilder = TopicProto.MBasePacketData.newBuilder().setPacketType(TopicProto.TOPIC.forNumber(packetType)).setPacketId(packetId);
 
-        RpcFunction.newInstance(externalNodeId).call(CallEnum.ExternalRecvGameMessageService_recvMessage, "id", connectId, "data", sendBuilder.build().toByteArray(), "nodeId", firstSend ? "" : RpcNodeManager.getRpcServerNodeId());
+        RpcFunction.newInstance(externalNodeId).call(CallEnum.ExternalRecvGameMessageService_recvMessage, connectId, sendBuilder.build().toByteArray(), firstSend ? "" : RpcNodeManager.getRpcServerNodeId());
         firstSend = true;
 
         LogCore.GameServer.debug("send msg, connectionId = {}, uid = {}, packetType = {}, packetId = {}", connectId, uid, packetType, packetId);
@@ -71,7 +71,7 @@ public class ConnectObject {
         if (builder != null) {
             sendBuilder.setPacketData(builder.build().toByteString());
         }
-        RpcFunction.newInstance(externalNodeId).call(CallEnum.ExternalRecvGameMessageService_recvMessage, "id", connectId, "data", sendBuilder.build().toByteArray(), "nodeId", firstSend ? "" : RpcNodeManager.getRpcServerNodeId());
+        RpcFunction.newInstance(externalNodeId).call(CallEnum.ExternalRecvGameMessageService_recvMessage, connectId, sendBuilder.build().toByteArray(), firstSend ? "" : RpcNodeManager.getRpcServerNodeId());
         firstSend = true;
 
         LogCore.GameServer.debug("send msg, connectionId = {}, uid = {}, packetType = {}, packetId = {}, msgData = {{}}", connectId, uid, packetType, packetId, builder == null ? "" : builder.toString().replace("\n", ""));
@@ -82,7 +82,7 @@ public class ConnectObject {
         if (rawData != null) {
             sendBuilder.setPacketData(UnsafeByteOperations.unsafeWrap(rawData));
         }
-        RpcFunction.newInstance(externalNodeId).call(CallEnum.ExternalRecvGameMessageService_recvMessage, "id", connectId, "data", sendBuilder.build().toByteArray(), "nodeId", firstSend ? "" : RpcNodeManager.getRpcServerNodeId());
+        RpcFunction.newInstance(externalNodeId).call(CallEnum.ExternalRecvGameMessageService_recvMessage, connectId, sendBuilder.build().toByteArray(), firstSend ? "" : RpcNodeManager.getRpcServerNodeId());
         firstSend = true;
 
         LogCore.GameServer.debug("send msg, connectionId = {}, uid = {}, packetType = {}, packetId = {}", connectId, uid, packetType, packetId);

@@ -65,9 +65,8 @@ registerPage('game-server', '游戏服', '玩家对象、模块系统、消息�
     public void sendMsg(int packetType, int packetId, ByteString data) {
         RpcFunction.newInstance(externalNodeId).call(
             CallEnum.ExternalRecvGameMessageService_recvMessage,
-            "connectionId", connectId,
-            "data", bytes,
-            "gameNodeId", gameNodeId  // 首次发送带 gameNodeId
+            connectId, bytes,
+            firstSend ? "" : RpcNodeManager.getRpcServerNodeId()  // 首次发送带 gameNodeId
         );
     }
 }</code></pre>
@@ -247,8 +246,8 @@ public class GlobalChatService extends BaseService {
         }
         // 广播给所有 Game 节点
         RpcFunction.newInstance(RpcFunction.RpcCallType.SendAll)
-                .call(CallEnum.GameRpcListenService_sendToAllHuman, "packetType", TopicProto.TOPIC.TOPIC_TYPE_CHAT_VALUE, "packetId", ChatProto.FROM_SERVER.S2C_Chat_VALUE,
-                        "time", ChatProto.MS2C_Chat.newBuilder().setId(humanId).setMsg(message).setTime(time).build().toByteArray());
+                .call(CallEnum.GameRpcListenService_sendToAllHuman, TopicProto.TOPIC.TOPIC_TYPE_CHAT_VALUE, ChatProto.FROM_SERVER.S2C_Chat_VALUE,
+                        ChatProto.MS2C_Chat.newBuilder().setId(humanId).setName(name).setMsg(message).setTime(time).build().toByteArray());
     }
 
     @RpcMethod

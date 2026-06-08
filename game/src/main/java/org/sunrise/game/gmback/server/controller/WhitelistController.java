@@ -144,6 +144,6 @@ public class WhitelistController extends BaseController {
 
     public void syncWhitelistToHttp() {
         List<String> uids = new ArrayList<>(whitelistRecords.keySet());
-        RpcFunction.newInstance().call(CallEnum.HttpRecvMessageService_setWhitelist, "uids", JSON.toJSONString(uids));
+        RpcFunction.newInstance().call(CallEnum.HttpRecvMessageService_setWhitelist, JSON.toJSONString(uids));
     }
 }

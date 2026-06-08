@@ -184,18 +184,18 @@ public class HttpRecvMessageService extends BaseService {
 <p>在注册了该方法的节点中随机选一个；若本机也注册了该方法则优先本地执行。</p>
 <pre><code class="language-java">RpcFunction.newInstance().call(
     CallEnum.MyNotifyService_ping,
-    "fromNodeId", RpcNodeManager.getRpcServerNodeId()
+    RpcNodeManager.getRpcServerNodeId()
 );</code></pre>
 
 <h3>带回调的调用</h3>
 <pre><code class="language-java">RpcFunction rpc = RpcFunction.newInstance();
-rpc.call(CallEnum.MyNotifyService_ping, "fromNodeId", "testNode");
+rpc.call(CallEnum.MyNotifyService_ping, "testNode");
 rpc.listenResult(result -> {
     if (result.getResult() != ErrorType.SUCCESS) return;
     Boolean ok = (Boolean) result.getData("ok");
 });
 </code></pre>
-<p>注意：<code>call()</code> 的键值对个数必须等于目标方法参数个数，<strong>顺序与方法签名一致</strong>；键名本身无意义。回调取返回值时，<code>getData("key")</code> 的 key 须与远端 <code>returns()</code> 一致。</p>
+<p>注意：<code>call()</code> 按位置传参，参数个数须等于目标方法参数个数，<strong>顺序与方法签名一致</strong>。回调取返回值时，<code>getData("key")</code> 的 key 须与远端 <code>returns()</code> 一致（返回值仍为键值对）。</p>
 
 
 <h2>更多</h2>

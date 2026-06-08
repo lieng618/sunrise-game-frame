@@ -39,7 +39,7 @@ public class MailModule extends BaseModule {
      */
     public void sendMailList() {
         RpcFunction rpcFunction = RpcFunction.newInstance();
-        rpcFunction.call(CallEnum.GlobalMailService_getPlayerMails, "humanId", getHumanId());
+        rpcFunction.call(CallEnum.GlobalMailService_getPlayerMails, getHumanId());
         rpcFunction.listenResult(rpcResult -> {
             String humanId = (String) rpcResult.getContext("humanId");
             HumanObject humanObj = HumanObjectManger.getHumanObject(humanId);
@@ -58,7 +58,7 @@ public class MailModule extends BaseModule {
      */
     public void readMail(long mailId) {
         RpcFunction rpcFunction = RpcFunction.newInstance();
-        rpcFunction.call(CallEnum.GlobalMailService_readMail, "humanId", getHumanId(), "mailId", mailId);
+        rpcFunction.call(CallEnum.GlobalMailService_readMail, getHumanId(), mailId);
         rpcFunction.listenResult(rpcResult -> {
             if (getHuman() == null) {
                 return;
@@ -78,7 +78,7 @@ public class MailModule extends BaseModule {
      */
     public void receiveMailAttachment(long mailId) {
         RpcFunction rpcFunction = RpcFunction.newInstance();
-        rpcFunction.call(CallEnum.GlobalMailService_receiveMailAttachment, "humanId", getHumanId(), "mailId", mailId);
+        rpcFunction.call(CallEnum.GlobalMailService_receiveMailAttachment, getHumanId(), mailId);
         rpcFunction.listenResult(rpcResult -> {
             if (getHuman() == null) {
                 return;
@@ -113,7 +113,7 @@ public class MailModule extends BaseModule {
      */
     public void deleteMail(long mailId) {
         RpcFunction rpcFunction = RpcFunction.newInstance();
-        rpcFunction.call(CallEnum.GlobalMailService_deleteMail, "humanId", getHumanId(), "mailId", mailId);
+        rpcFunction.call(CallEnum.GlobalMailService_deleteMail, getHumanId(), mailId);
         rpcFunction.listenResult(rpcResult -> {
             if (getHuman() == null) {
                 return;

@@ -184,7 +184,7 @@ public class GlobalRankService extends BaseService {
             return;
         }
         RpcFunction rpcFunction = RpcFunction.newInstance();
-        rpcFunction.call(CallEnum.GlobalPlayerInfoService_getPlayerInfos, "humanIds", humanIds);
+        rpcFunction.call(CallEnum.GlobalPlayerInfoService_getPlayerInfos, humanIds);
         rpcFunction.listenResult(rpcResult -> {
             Map<String, PlayerInfo> playerInfos = new HashMap<>();
             if (rpcResult.getResult() == ErrorType.SUCCESS) {

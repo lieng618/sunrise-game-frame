@@ -234,6 +234,6 @@ public class AnnouncementController extends BaseController {
             item.put("endTime", record.getEndTime());
             announcements.add(item);
         }
-        RpcFunction.newInstance().call(CallEnum.HttpRecvMessageService_setAnnouncements, "announcements", JSON.toJSONString(announcements));
+        RpcFunction.newInstance().call(CallEnum.HttpRecvMessageService_setAnnouncements, JSON.toJSONString(announcements));
     }
 }

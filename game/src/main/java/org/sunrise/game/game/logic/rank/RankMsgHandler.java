@@ -20,9 +20,9 @@ public class RankMsgHandler {
     public static void getRankList(HumanObject humanObject, RankProto.MC2S_GetRankList data) {
         RpcFunction rpcFunction = RpcFunction.newInstance();
         rpcFunction.call(CallEnum.GlobalRankService_getRankList,
-                "rankType", data.getRankType(),
-                "page", data.getPage(),
-                "pageSize", data.getPageSize());
+                data.getRankType(),
+                data.getPage(),
+                data.getPageSize());
         rpcFunction.listenResult(rpcResult -> {
             String humanId = (String) rpcResult.getContext("humanId");
             HumanObject humanObj = HumanObjectManger.getHumanObject(humanId);
@@ -37,8 +37,8 @@ public class RankMsgHandler {
     public static void getMyRank(HumanObject humanObject, RankProto.MC2S_GetMyRank data) {
         RpcFunction rpcFunction = RpcFunction.newInstance();
         rpcFunction.call(CallEnum.GlobalRankService_getMyRank,
-                "rankType", data.getRankType(),
-                "humanId", humanObject.getHumanId());
+                data.getRankType(),
+                humanObject.getHumanId());
         rpcFunction.listenResult(rpcResult -> {
             String humanId = (String) rpcResult.getContext("humanId");
             HumanObject humanObj = HumanObjectManger.getHumanObject(humanId);
