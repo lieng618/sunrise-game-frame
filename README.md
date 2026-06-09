@@ -20,7 +20,7 @@
 
 <h2>快速开始</h2>
 <p>环境要求：<strong>JDK 21+</strong>、<strong>Maven 3.8+</strong>、<strong>MySQL 5.7+</strong></p>
-
+    
 <h4>1. 编译</h4>
 <pre><code class="language-bash">git clone https://gitee.com/lieng618/sunrise-game-frame.git
 或 git clone https://github.com/lieng618/sunrise-game-frame.git
@@ -67,7 +67,7 @@ npm run dev</code></pre>
 
 <h2>架构图</h2>
 <div class="arch-diagram">
-    <img src="https://files.seeusercontent.com/2026/04/27/Im3e/sunrise-game-frame.png" alt="架构图" style="max-width:100%;border-radius:8px;" />
+    <img src="docs/img/sunrise-game-frame.png" alt="架构图" style="max-width:100%;border-radius:8px;">
 </div>
 
 <h2>各服务职责</h2>
