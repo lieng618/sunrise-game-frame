@@ -1,31 +1,22 @@
 <div class="hero">
     <p align="center"><img src="docs/img/logo_big.png" alt="Sunrise Game Frame" width="380"></p>
     <p class="subtitle">基于 Java 21 实现的轻量级分布式游戏服务器框架，采用"中心服 + 对外服 + 游戏服 + 全局服 + HTTP 服务 + GM 后台 + 可扩展RPC服务"的多服务多进程架构，也可部署为多服务单进程，不同服务支持随意的拆分和组合，支持全球通服模式和滚服模式（一套业务代码，仅修改部署方式），框架不依赖任何第三方中间件，仅需Java环境即可运行，代码简洁规范、易理解、易扩展。</p>
-    <div class="hero-badges">
-        <span class="hero-badge">☕ Java 21</span>
-        <span class="hero-badge">🌐 Netty</span>
-        <span class="hero-badge">📦 Protobuf</span>
-        <span class="hero-badge">🔗 RPC</span>
-        <span class="hero-badge">🗄️ MySQL</span>
-        <span class="hero-badge">🐳 Docker</span>
-    </div>
 </div>
 
 <h2>项目文档</h2>
 <a href="https://sunrise-game-frame.pages.dev">https://sunrise-game-frame.pages.dev</a>
 
 <h2>核心特性</h2>
-<div class="feature-grid">
-    <div class="feature-item"><span class="feature-icon">🏗️</span><span class="feature-text">分布式多节点架构，不同服务可随意组合拆分为多进程或单进程部署，支持动态扩容</span></div>
-    <div class="feature-item"><span class="feature-icon">📡</span><span class="feature-text">RPC 框架，支持随机/广播/定向三种调用模式，含回调与超时机制；中心服可配置连接策略，内置拓扑可视化面板</span></div>
-    <div class="feature-item"><span class="feature-icon">📭</span><span class="feature-text">零中间件依赖，无需 Redis / ZooKeeper / MQ，真正做到轻量级</span></div>
-    <div class="feature-item"><span class="feature-icon">🚀</span><span class="feature-text">业务代码无需修改，仅修改部署方式，即可支持全球通服与滚服模式</span></div>
-    <div class="feature-item"><span class="feature-icon">🔒</span><span class="feature-text">RPC服与游戏服单线程处理业务，无需加锁，无需考虑线程安全问题</span></div>
-    <div class="feature-item"><span class="feature-icon">🔌</span><span class="feature-text">对外服同时支持TCP / WebSocket / KCP 三种协议</span></div>
-    <div class="feature-item"><span class="feature-icon">🛠️</span><span class="feature-text">完善的GM 后台管理，实现节点监控、策划表格与代码热更、运营服务、权限管理等</span></div>
-    <div class="feature-item"><span class="feature-icon">🤖</span><span class="feature-text">消息发送工具、压测机器人与压测统计工具，便于联调与性能基准</span></div>
-    <div class="feature-item"><span class="feature-icon">🔃</span><span class="feature-text">业务模块化，已实现游戏必需的模块如登录、存库、消息处理、玩家模块、系统模块等</span></div>
-</div>
+
+- 分布式多节点架构，不同服务可随意组合拆分为多进程或单进程部署，支持动态扩容
+- RPC 框架，支持随机/广播/定向三种调用模式，含回调与超时机制；中心服可配置连接策略，内置拓扑可视化面板
+- 零中间件依赖，无需 Redis / ZooKeeper / MQ，真正做到轻量级
+- 业务代码无需修改，仅修改部署方式，即可支持全球通服与滚服模式
+- RPC服与游戏服单线程处理业务，无需加锁，无需考虑线程安全问题
+- 对外服同时支持 TCP / WebSocket / KCP 三种协议
+- 完善的 GM 后台管理，实现节点监控、策划表格与代码热更、运营服务、权限管理等
+- 消息发送工具、压测机器人与压测统计工具，便于联调与性能基准
+- 业务模块化，已实现游戏必需的模块如登录、存库、消息处理、玩家模块、系统模块等
 
 <h2>快速开始</h2>
 <p>环境要求：<strong>JDK 21+</strong>、<strong>Maven 3.8+</strong>、<strong>MySQL 5.7+</strong></p>
@@ -62,6 +53,8 @@ npm run dev</code></pre>
 <p>浏览器访问 <a href="http://localhost:5173">http://localhost:5173</a>，使用配置中的账号登录（见runallone-config.properties）</p>
 
 <h4>5. 客户端启动</h4>
+<p>Godot 游戏客户端：独立仓库 <a href="https://gitee.com/lieng618/sunrise-game-frame-client">sunrise-game-frame-client</a>，Godot 4.6 + C# 实现的 2D 像素风 RPG 完整示例，覆盖登录、地图探索、多人同步、聊天/背包/邮件等玩法（详见 <a href="https://sunrise-game-frame.pages.dev/#/client-example">客户端示例文档</a>）</p>
+<pre><code class="language-bash">git clone https://gitee.com/lieng618/sunrise-game-frame-client.git</code></pre>
 <p>消息发送工具：支持多标签页，每标签页一个玩家连接，可向服务器发送消息包</p>
 <pre><code class="language-bash">start/windows/client.bat</code></pre>
 <p>压测机器人工具：支持批量创建客户端、一键登录、批量定时向服务器发消息包</p>

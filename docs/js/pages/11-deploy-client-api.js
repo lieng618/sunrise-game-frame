@@ -370,6 +370,9 @@ registerPage('client-example', '客户端示例', '用于连接服务器的一�
 <p class="page-desc">用于连接服务器的一些客户端简单示例</p>
 
 <h2>通信示例</h2>
+<p>sunrise-game-frame-client：</p>
+<a href="https://gitee.com/lieng618/sunrise-game-frame-client" target="_blank">Godot 版游戏客户端</a>
+
 <p>sunrise-goldminer：</p>
 <a href="https://gitee.com/lieng618/sunrise-goldminer" target="_blank">网页版通信客户端</a>
 

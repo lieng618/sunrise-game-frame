@@ -128,6 +128,10 @@ start\\windows\\single\\runallone.bat
 sh start/linux/server_run_allone.sh</code></pre>
 
 <h2>5. 启动客户端</h2>
+<h3>Godot 游戏客户端</h3>
+<p>独立仓库 <a href="https://gitee.com/lieng618/sunrise-game-frame-client" target="_blank" rel="noopener noreferrer">sunrise-game-frame-client</a>：Godot 4.6 + C# 实现的 2D 像素风 RPG 完整示例，覆盖登录、地图探索、多人同步、聊天/背包/邮件等玩法。默认连接 <code>http://127.0.0.1:8090</code> 网关，开发模式下输入 UID（如 <code>test</code>）即可联调。详见 <a href="#/client-example">客户端示例</a>。</p>
+<pre><code class="language-bash">git clone https://gitee.com/lieng618/sunrise-game-frame-client.git
+# 用 Godot 4.6 打开项目，F5 运行</code></pre>
 <h3>消息发送工具</h3>
 <p>基于 Swing 的 GUI 工具，支持多标签页，每标签页一个玩家连接。自动读取 proto 信息构建 UI，可向服务器发送消息包。</p>
 <pre><code class="language-bash">start\\windows\\client.bat</code></pre>
