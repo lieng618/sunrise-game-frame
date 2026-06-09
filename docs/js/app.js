@@ -1,3 +1,5 @@
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 function init() {
     const savedTheme = localStorage.getItem('theme') || 'light';
     document.documentElement.setAttribute('data-theme', savedTheme);
@@ -12,10 +14,16 @@ function init() {
     const searchInput = document.getElementById('searchInput');
     const searchResults = document.getElementById('searchResults');
 
+    function setSearchOpen(open) {
+        searchResults.classList.toggle('active', open);
+        searchInput.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+
     searchInput.addEventListener('input', (e) => {
         const query = e.target.value.trim().toLowerCase();
         if (!query) {
-            searchResults.classList.remove('active');
+            setSearchOpen(false);
+            searchResults.innerHTML = '';
             return;
         }
         const results = searchIndex.filter(item =>
@@ -23,31 +31,31 @@ function init() {
             item.desc.toLowerCase().includes(query)
         );
         if (results.length === 0) {
-            searchResults.innerHTML = '<div class="search-result-item"><div class="search-result-title">无搜索结果</div></div>';
+            searchResults.innerHTML = '<div class="search-result-empty"><div class="search-result-title">未找到匹配页面</div><div class="search-result-desc">换个关键词，或从左侧导航浏览章节</div></div>';
         } else {
             searchResults.innerHTML = results.map(item =>
-                `<div class="search-result-item" onclick="navigateTo('${item.page}')">
+                `<button type="button" class="search-result-item" role="option" onclick="navigateTo('${item.page}')">
                     <div class="search-result-title">${item.title}</div>
                     <div class="search-result-desc">${item.desc}</div>
-                </div>`
+                </button>`
             ).join('');
         }
-        searchResults.classList.add('active');
+        setSearchOpen(true);
     });
 
     searchInput.addEventListener('blur', () => {
-        setTimeout(() => searchResults.classList.remove('active'), 200);
+        setTimeout(() => setSearchOpen(false), 200);
     });
 
     searchInput.addEventListener('focus', (e) => {
         if (e.target.value.trim()) {
-            searchResults.classList.add('active');
+            setSearchOpen(true);
         }
     });
 
     document.addEventListener('click', (e) => {
         if (!e.target.closest('.search-box')) {
-            searchResults.classList.remove('active');
+            setSearchOpen(false);
         }
     });
 
@@ -59,7 +67,7 @@ function init() {
         const scrollTop = window.scrollY;
         const docHeight = document.documentElement.scrollHeight - window.innerHeight;
         const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
-        scrollProgress.style.width = progress + '%';
+        scrollProgress.style.transform = `scaleX(${progress / 100})`;
 
         // Back to top visibility
         if (scrollTop > 300) {
@@ -70,14 +78,41 @@ function init() {
     }, { passive: true });
 
     backToTop.addEventListener('click', () => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
     });
 
-    // Keyboard shortcut: Ctrl/Cmd + K to focus search
+    // Keyboard shortcut: Ctrl/Cmd + K to focus search; arrow keys in results
     document.addEventListener('keydown', (e) => {
         if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
             e.preventDefault();
             searchInput.focus();
+            return;
+        }
+
+        if (!searchResults.classList.contains('active')) return;
+
+        const items = [...searchResults.querySelectorAll('.search-result-item:not([aria-disabled])')];
+        if (!items.length) return;
+
+        const current = document.activeElement;
+        const index = items.indexOf(current);
+
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            items[index < 0 ? 0 : Math.min(index + 1, items.length - 1)]?.focus();
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            if (index <= 0) {
+                searchInput.focus();
+            } else {
+                items[index - 1]?.focus();
+            }
+        } else if (e.key === 'Enter' && index >= 0) {
+            e.preventDefault();
+            current.click();
+        } else if (e.key === 'Escape') {
+            setSearchOpen(false);
+            searchInput.blur();
         }
     });
 }
@@ -88,32 +123,43 @@ function handleRoute() {
     if (page) {
         const content = document.getElementById('contentInner');
 
-        // Fade out, then update, then fade in
-        content.style.opacity = '0';
-        content.style.transform = 'translateY(8px)';
+        if (!prefersReducedMotion) {
+            content.style.opacity = '0';
+            content.style.transform = 'translateY(8px)';
+        }
 
-        setTimeout(() => {
+        const applyPage = () => {
             content.innerHTML = page();
             document.querySelectorAll('.nav-link').forEach(link => {
                 link.classList.toggle('active', link.dataset.page === hash);
             });
             window.scrollTo(0, 0);
 
-            // Reset scroll progress
             const scrollProgress = document.getElementById('scrollProgress');
-            if (scrollProgress) scrollProgress.style.width = '0%';
+            if (scrollProgress) scrollProgress.style.transform = 'scaleX(0)';
 
             content.querySelectorAll('pre code').forEach(block => {
                 hljs.highlightElement(block);
             });
 
-            // Fade in
+            if (prefersReducedMotion) {
+                content.style.opacity = '1';
+                content.style.transform = 'none';
+                return;
+            }
+
             requestAnimationFrame(() => {
-                content.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                content.style.transition = 'opacity 250ms cubic-bezier(0.16, 1, 0.3, 1), transform 250ms cubic-bezier(0.16, 1, 0.3, 1)';
                 content.style.opacity = '1';
                 content.style.transform = 'translateY(0)';
             });
-        }, 150);
+        };
+
+        if (prefersReducedMotion) {
+            applyPage();
+        } else {
+            setTimeout(applyPage, 120);
+        }
     }
 }
 

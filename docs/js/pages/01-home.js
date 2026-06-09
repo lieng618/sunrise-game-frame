@@ -1,6 +1,6 @@
 registerPage('home', '项目概览', 'Sunrise Game Frame 分布式游戏服务器框架介绍', () => `
 <div class="hero">
-    <h1>Sunrise Game Frame</h1>
+    <img class="hero-logo" src="img/logo_big.png" alt="Sunrise Game Frame" width="1536" height="1024">
     <p class="subtitle">基于 Java 21 实现的轻量级分布式游戏服务器框架，采用"中心服 + 对外服 + 游戏服 + 全局服 + HTTP 服务 + GM 后台 + 可扩展RPC服务"的多服务多进程架构，也可部署为多服务单进程，不同服务支持随意的拆分和组合，支持全球通服模式和滚服模式（一套业务代码，仅修改部署方式），框架不依赖任何第三方中间件，仅需Java环境即可运行，代码简洁规范、易理解、易扩展。</p>
     <div class="hero-badges">
         <span class="hero-badge">☕ Java 21</span>
@@ -9,6 +9,10 @@ registerPage('home', '项目概览', 'Sunrise Game Frame 分布式游戏服务�
         <span class="hero-badge">🔗 RPC</span>
         <span class="hero-badge">🗄️ MySQL</span>
         <span class="hero-badge">🐳 Docker</span>
+    </div>
+    <div class="hero-actions">
+        <a href="#/quick-start" class="hero-btn">开始快速上手</a>
+        <a href="#/architecture" class="hero-btn">查看架构总览</a>
     </div>
 </div>
 
