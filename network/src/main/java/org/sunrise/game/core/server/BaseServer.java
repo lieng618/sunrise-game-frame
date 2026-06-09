@@ -29,6 +29,8 @@ public class BaseServer {
     private BaseMessageManager messageManager;
     private Function<ChannelHandler, String> serverHandler;
     private Function<ChannelHandler, String> pulseHandler;
+    private EventLoopGroup bossGroup;
+    private EventLoopGroup workerGroup;
     private volatile boolean isShutdown = false;
 
     public BaseServer() {
@@ -50,10 +52,10 @@ public class BaseServer {
         if (ip == null || port == 0) {
             return;
         }
-        EventLoopGroup bossGroup = Utils.createEventLoopGroup(1);
-        EventLoopGroup workerGroup = Utils.createEventLoopGroup(0);
+        this.bossGroup = Utils.createEventLoopGroup(1);
+        this.workerGroup = Utils.createEventLoopGroup(0);
         ServerBootstrap b = new ServerBootstrap();
-        b.group(bossGroup, workerGroup)
+        b.group(this.bossGroup, this.workerGroup)
                 .channel(Utils.getServerChannelClass())
                 .option(ChannelOption.SO_BACKLOG, 10240) //内核为这个套接字排队的最大连接数
                 .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT) //使用内存池
@@ -78,8 +80,7 @@ public class BaseServer {
                 onStart();
             } else {
                 LogCore.BaseServer.error("Failed to bind server on ip: {} and port: {}", ip, port, future.cause());
-                bossGroup.shutdownGracefully().syncUninterruptibly();
-                workerGroup.shutdownGracefully().syncUninterruptibly();
+                shutdownEventLoopGroups();
                 System.exit(-1);
             }
         });
@@ -99,18 +100,29 @@ public class BaseServer {
 
     public void onStop() {
         isShutdown = true;
-        if (!startSuccess) {
-            return;
+        if (startSuccess) {
+            if (channel != null) {
+                LogCore.BaseServer.info("BaseServer close, nodeId = { {} }, messageManager = { {} }, BaseServerHandler = { {} }, localAddress = { {} }",
+                        nodeId, messageManager.getClass().getSimpleName(), serverHandler.apply(nodeId).getClass().getSimpleName(), channel.localAddress());
+                channel.close();
+                channel = null;
+            }
+            if (messageManager != null) {
+                messageManager.getDispatchThread().shutdown();
+                messageManager = null;
+            }
         }
-        if (channel != null) {
-            LogCore.BaseServer.info("BaseServer close, nodeId = { {} }, messageManager = { {} }, BaseServerHandler = { {} }, localAddress = { {} }",
-                    nodeId, messageManager.getClass().getSimpleName(), serverHandler.apply(nodeId).getClass().getSimpleName(), channel.localAddress());
-            channel.close();
-            channel = null;
+        shutdownEventLoopGroups();
+    }
+
+    private void shutdownEventLoopGroups() {
+        if (bossGroup != null) {
+            bossGroup.shutdownGracefully().syncUninterruptibly();
+            bossGroup = null;
         }
-        if (messageManager != null) {
-            messageManager.getDispatchThread().shutdown();
-            messageManager = null;
+        if (workerGroup != null) {
+            workerGroup.shutdownGracefully().syncUninterruptibly();
+            workerGroup = null;
         }
     }
 }

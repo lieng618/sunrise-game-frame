@@ -7,6 +7,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class RpcManager {
 
+    public static final long DEFAULT_TIMEOUT_MS = 10_000;
+
     public static final Map<Long, CallResult> callResults = new ConcurrentHashMap<>();
     public static final Map<Long, Long> checkTimeout = new ConcurrentHashMap<>();
 
@@ -38,20 +40,17 @@ public class RpcManager {
 
     public static void registerCallback(long uid, CallResult result) {
         callResults.put(uid, result);
-        checkTimeout.put(uid, System.currentTimeMillis() + 10 * 1000);
+        checkTimeout.put(uid, System.currentTimeMillis() + DEFAULT_TIMEOUT_MS);
     }
 
     /**
-     * 手动设置超时时间
+     * 手动设置超时时间，millis 为 0 时使用 {@link #DEFAULT_TIMEOUT_MS}
      */
     public static void setTimeOut(long uid, long millis) {
         CallResult callResult = callResults.get(uid);
         if (callResult != null) {
-            if (millis == 0) {
-                checkTimeout.remove(uid);
-            } else {
-                checkTimeout.put(uid, System.currentTimeMillis() + millis);
-            }
+            long timeout = millis <= 0 ? DEFAULT_TIMEOUT_MS : millis;
+            checkTimeout.put(uid, System.currentTimeMillis() + timeout);
         }
     }
 }

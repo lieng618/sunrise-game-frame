@@ -24,7 +24,7 @@ public class MessageUtils {
             return objectMapper.writeValueAsBytes(message);
         } catch (Exception e) {
             LogCore.RpcUtils.error("Failed to serialize message", e);
+            throw new RuntimeException("Failed to serialize message", e);
         }
-        return new byte[0];
     }
 }

@@ -167,7 +167,7 @@ public class RpcFunction {
     }
 
     /**
-     * 监听返回值后，手动设置超时时间，不设置默认为10秒
+     * 监听返回值后，手动设置超时时间；mills 为 0 时使用默认 10 秒，不调用则同为默认 10 秒
      */
     public void setTimeOut(long mills) {
         if (calls.isEmpty()) {

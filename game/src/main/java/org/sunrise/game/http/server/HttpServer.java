@@ -91,7 +91,7 @@ public class HttpServer {
                 return;
             }
             // 生成uid
-            String uid = String.valueOf(IdGenerator.getId());
+            String uid = IdGenerator.getUid();
             // 创建账户
             AuthUser user = new AuthUser();
             user.setUid(uid);
