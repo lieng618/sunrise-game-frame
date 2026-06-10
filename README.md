@@ -6,6 +6,25 @@
 <h2>项目文档</h2>
 <a href="https://sunrise-game-frame.pages.dev">https://sunrise-game-frame.pages.dev</a>
 
+<h2>提交规范</h2>
+<p>Commit message 采用 <code>type(scope): subject</code> 格式，subject 用一句话说明改动目的，句末不加句号。</p>
+<table>
+<tr><th>type</th><th>用途</th></tr>
+<tr><td><code>feat</code></td><td>新功能</td></tr>
+<tr><td><code>fix</code></td><td>Bug 修复</td></tr>
+<tr><td><code>security</code></td><td>安全加固</td></tr>
+<tr><td><code>refactor</code></td><td>重构（不改变外部行为）</td></tr>
+<tr><td><code>perf</code></td><td>性能优化</td></tr>
+<tr><td><code>docs</code></td><td>文档</td></tr>
+<tr><td><code>test</code></td><td>测试</td></tr>
+<tr><td><code>chore</code></td><td>构建、依赖、脚本等杂项</td></tr>
+</table>
+<p><code>scope</code> 为影响模块，如 <code>rpc</code>、<code>network</code>、<code>game</code>、<code>gmback</code>、<code>config</code>。</p>
+<pre><code>fix(rpc): MessagePack 反序列化增加类型白名单
+feat(gmback): 在线玩家列表支持按节点筛选
+docs: 补充部署说明</code></pre>
+<p>一个 commit 只做一件事；不要提交密钥、<code>log/</code>、<code>.idea/</code>、<code>start/jar/</code> 等本地文件。</p>
+
 <h2>核心特性</h2>
 
 - 分布式多节点架构，不同服务可随意组合拆分为多进程或单进程部署，支持动态扩容
