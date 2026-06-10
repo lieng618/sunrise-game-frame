@@ -1,27 +1,37 @@
 <template>
   <div class="login-container min-h-screen flex items-center justify-center">
-    <el-card class="login-card w-96 rounded-xl relative z-10">
+    <el-card class="login-card w-96 relative z-10">
       <template #header>
-        <div class="text-center">Sunrise Game Frame</div>
+        <div class="login-logo">
+          <img
+              :src="logoBig"
+              alt="Sunrise Game Frame"
+              class="login-logo__img"
+          />
+        </div>
       </template>
-      <el-form label-position="top" class="px-2">
-        <el-form-item label="账号" class="mb-6">
-          <el-input v-model="form.user" prefix-icon="User" placeholder="请输入账号" size="large"/>
+      <el-form label-position="top" @submit.prevent="handleLogin" aria-label="登录表单">
+        <el-form-item label="账号">
+          <el-input
+              v-model="form.user"
+              prefix-icon="User"
+              placeholder="请输入账号"
+              autocomplete="username"
+          />
         </el-form-item>
-        <el-form-item label="密码" class="mb-6">
+        <el-form-item label="密码">
           <el-input
               v-model="form.pass"
               type="password"
               prefix-icon="Lock"
               placeholder="请输入密码"
-              size="large"
+              autocomplete="current-password"
               @keyup.enter="handleLogin"
           />
         </el-form-item>
         <el-button
             type="primary"
-            class="login-button w-full mt-4"
-            size="large"
+            class="login-button w-full"
             :loading="loading"
             @click="handleLogin"
         >
@@ -33,13 +43,14 @@
 </template>
 
 <script>
+import logoBig from '@/assets/images/logo_big.png';
 import {useAuth} from '@/composables/useAuth';
 
 export default {
   name: 'LoginView',
   setup() {
     const {form, loading, handleLogin} = useAuth();
-    return {form, loading, handleLogin};
+    return {form, loading, handleLogin, logoBig};
   },
 };
 </script>

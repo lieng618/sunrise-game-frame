@@ -8,10 +8,10 @@
     </template>
     <el-form :model="addForm" label-width="100px" label-position="left" inline>
       <el-form-item label="玩家UID" required>
-        <el-input v-model="addForm.uid" placeholder="请输入玩家UID" style="width: 200px;"></el-input>
+        <el-input v-model="addForm.uid" placeholder="请输入玩家UID" class="gm-field-sm"></el-input>
       </el-form-item>
       <el-form-item label="备注">
-        <el-input v-model="addForm.remark" placeholder="请输入备注（非必须）" style="width: 200px;"></el-input>
+        <el-input v-model="addForm.remark" placeholder="请输入备注（非必须）" class="gm-field-sm"></el-input>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="addToWhitelist" :loading="adding">
@@ -36,10 +36,10 @@
         </el-button>
       </div>
     </template>
-    <el-table :data="tableData" stripe style="width: 100%" v-loading="loadingData" border>
+    <el-table :data="tableData" stripe class="table-full" v-loading="loadingData" border>
       <el-table-column prop="uid" label="玩家UID" width="200">
         <template #default="scope">
-          <div class="flex items-center font-medium text-gray-700">
+          <div class="flex items-center gm-text-emphasis">
             <el-icon class="mr-1">
               <User/>
             </el-icon>
@@ -49,12 +49,12 @@
       </el-table-column>
       <el-table-column prop="remark" label="备注" min-width="200">
         <template #default="scope">
-          <span class="text-gray-800">{{ scope.row.remark || '-' }}</span>
+          <span class="gm-text-emphasis">{{ scope.row.remark || '-' }}</span>
         </template>
       </el-table-column>
       <el-table-column prop="addTime" label="添加时间" width="200">
         <template #default="scope">
-          <div class="flex items-center text-gray-600">
+          <div class="flex items-center gm-text-secondary">
             <el-icon class="mr-1">
               <Clock/>
             </el-icon>
@@ -94,7 +94,7 @@ import {reactive, toRefs, onMounted} from 'vue';
 import {ElementPlus} from '@/plugins/element-plus';
 
 import {
-  apiFetch, isApiSuccess, apiMsg, formatTime, defaultPagination,
+  apiFetch, handleApiResult, parsePagedData, isApiSuccess, apiMsg, formatTime, defaultPagination,
   buildPageQuery, confirmDialog, isUserCancel,
 } from '@/utils';
 
@@ -110,19 +110,18 @@ export default {
 
     const fetchWhitelist = async () => {
       state.loadingData = true;
-      try {
-        const qs = buildPageQuery(state.pagination.page, state.pagination.size);
-        const result = await apiFetch(`/api/whitelist?${qs}`);
-        if (result.unauthorized) return;
-        if (isApiSuccess(result)) {
-          state.tableData = result.data.data.list || [];
-          state.pagination.total = result.data.data.total || 0;
-        }
-      } catch (e) {
-        console.error('获取白名单失败', e);
-      } finally {
+      const qs = buildPageQuery(state.pagination.page, state.pagination.size);
+      const result = await apiFetch(`/api/whitelist?${qs}`);
+      if (result.unauthorized) {
         state.loadingData = false;
+        return;
       }
+      if (handleApiResult(result, {errorMsg: '白名单加载失败'}) === 'ok') {
+        const page = parsePagedData(result.data?.data);
+        state.tableData = page.list;
+        state.pagination.total = page.total;
+      }
+      state.loadingData = false;
     };
 
     const addToWhitelist = async () => {

@@ -1,4 +1,7 @@
 import {ElementPlus} from '@/plugins/element-plus';
+import {MSG} from './messages';
+
+export {MSG};
 
 export {apiFetch, getAuthToken, clearAuthStorage, handleLoginExpired} from '@/api/client';
 
@@ -10,9 +13,43 @@ export function apiMsg(result, fallback = '操作失败') {
     return result?.data?.msg || fallback;
 }
 
+export function safeArray(value) {
+    return Array.isArray(value) ? value : [];
+}
+
+/**
+ * 统一处理 API 响应
+ * @returns {'ok'|'unauthorized'|'network'|'failed'}
+ */
+export function handleApiResult(result, {errorMsg = '操作失败', showToast = true} = {}) {
+    if (!result) {
+        if (showToast) ElementPlus.ElMessage.error(errorMsg);
+        return 'failed';
+    }
+    if (result.unauthorized) return 'unauthorized';
+    if (result.networkError) {
+        if (showToast) ElementPlus.ElMessage.error(MSG.NETWORK);
+        return 'network';
+    }
+    if (isApiSuccess(result)) return 'ok';
+    if (showToast) ElementPlus.ElMessage.error(apiMsg(result, errorMsg));
+    return 'failed';
+}
+
+export function parsePagedData(payload) {
+    const data = payload?.data ?? payload ?? {};
+    return {
+        list: safeArray(data.list),
+        total: Number(data.total) || 0,
+        extra: data,
+    };
+}
+
 export function formatTime(ts) {
-    if (!ts) return '-';
-    return new Date(ts).toLocaleString();
+    if (ts == null || ts === '') return '-';
+    const d = new Date(typeof ts === 'number' ? ts : Number(ts) || ts);
+    if (Number.isNaN(d.getTime())) return '-';
+    return d.toLocaleString();
 }
 
 export function defaultPagination(size = 20) {

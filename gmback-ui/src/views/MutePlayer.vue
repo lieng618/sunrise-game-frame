@@ -7,10 +7,10 @@
     </template>
     <el-form :model="muteForm" label-width="100px" label-position="left" inline>
       <el-form-item label="玩家ID" required>
-        <el-input v-model="muteForm.humanId" placeholder="请输入玩家ID" style="width: 200px;"></el-input>
+        <el-input v-model="muteForm.humanId" placeholder="请输入玩家ID" class="gm-field-sm"></el-input>
       </el-form-item>
       <el-form-item label="禁言原因" required>
-        <el-input v-model="muteForm.reason" placeholder="请输入禁言原因" style="width: 200px;"></el-input>
+        <el-input v-model="muteForm.reason" placeholder="请输入禁言原因" class="gm-field-sm"></el-input>
       </el-form-item>
       <el-form-item label="到期时间" required>
         <el-date-picker
@@ -20,7 +20,7 @@
             format="YYYY-MM-DD HH:mm:ss"
             value-format="x"
             :disabled-date="disabledDate"
-            style="width: 220px;">
+            class="gm-field-date">
         </el-date-picker>
       </el-form-item>
       <el-form-item>
@@ -51,10 +51,10 @@
         </el-button>
       </div>
     </template>
-    <el-table :data="tableData" stripe style="width: 100%" v-loading="loadingData" border>
+    <el-table :data="tableData" stripe class="table-full" v-loading="loadingData" border>
       <el-table-column prop="humanId" label="玩家ID" width="180">
         <template #default="scope">
-          <div class="flex items-center font-medium text-gray-700">
+          <div class="flex items-center gm-text-emphasis">
             <el-icon class="mr-1">
               <User/>
             </el-icon>
@@ -64,7 +64,7 @@
       </el-table-column>
       <el-table-column prop="muteTime" label="禁言时间" width="200">
         <template #default="scope">
-          <div class="flex items-center text-gray-600">
+          <div class="flex items-center gm-text-secondary">
             <el-icon class="mr-1">
               <Clock/>
             </el-icon>
@@ -74,7 +74,7 @@
       </el-table-column>
       <el-table-column prop="muteExpireTime" label="解禁时间" width="200">
         <template #default="scope">
-          <div class="flex items-center text-gray-600">
+          <div class="flex items-center gm-text-secondary">
             <el-icon class="mr-1">
               <Clock/>
             </el-icon>
@@ -84,7 +84,7 @@
       </el-table-column>
       <el-table-column prop="reason" label="禁言原因" min-width="150">
         <template #default="scope">
-          <span class="text-gray-800">{{ scope.row.reason || '-' }}</span>
+          <span class="gm-text-emphasis">{{ scope.row.reason || '-' }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" width="120" fixed="right">
@@ -118,7 +118,7 @@ import {Refresh} from '@element-plus/icons-vue';
 import {reactive, toRefs, onMounted} from 'vue';
 import {ElementPlus} from '@/plugins/element-plus';
 import {
-  apiFetch, isApiSuccess, apiMsg, formatTime, defaultPagination,
+  apiFetch, handleApiResult, parsePagedData, isApiSuccess, apiMsg, formatTime, defaultPagination,
   buildPageQuery, confirmDialog, isUserCancel,
 } from '@/utils';
 
@@ -136,19 +136,18 @@ export default {
 
     const fetchMuteList = async () => {
       state.loadingData = true;
-      try {
-        const qs = buildPageQuery(state.pagination.page, state.pagination.size);
-        const result = await apiFetch(`/api/mute/list?${qs}`);
-        if (result.unauthorized) return;
-        if (isApiSuccess(result)) {
-          state.tableData = result.data.data.list || [];
-          state.pagination.total = result.data.data.total || 0;
-        }
-      } catch (e) {
-        console.error('获取禁言列表失败', e);
-      } finally {
+      const qs = buildPageQuery(state.pagination.page, state.pagination.size);
+      const result = await apiFetch(`/api/mute/list?${qs}`);
+      if (result.unauthorized) {
         state.loadingData = false;
+        return;
       }
+      if (handleApiResult(result, {errorMsg: '禁言列表加载失败'}) === 'ok') {
+        const page = parsePagedData(result.data?.data);
+        state.tableData = page.list;
+        state.pagination.total = page.total;
+      }
+      state.loadingData = false;
     };
 
     const doMute = async (humanId, reason, muteExpireTime) => {

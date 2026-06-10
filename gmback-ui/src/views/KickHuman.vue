@@ -2,14 +2,14 @@
   <el-card shadow="never" class="page-card rounded-lg">
     <el-form :model="form" label-width="120px" label-position="left">
       <el-form-item label="玩家ID" required>
-        <el-input v-model="form.humanId" placeholder="请输入玩家ID" style="width: 400px;"></el-input>
+        <el-input v-model="form.humanId" placeholder="请输入玩家ID" class="gm-field-md"></el-input>
       </el-form-item>
 
       <el-form-item>
-        <el-button type="primary" @click="kick" :loading="sending" size="large">
+        <el-button type="primary" @click="kick" :loading="sending">
           执行下线
         </el-button>
-        <el-button @click="resetForm" size="large">重置</el-button>
+        <el-button @click="resetForm">清空</el-button>
       </el-form-item>
     </el-form>
   </el-card>
@@ -18,7 +18,7 @@
 <script>
 import {reactive, toRefs} from 'vue';
 import {ElementPlus} from '@/plugins/element-plus';
-import {apiFetch, isApiSuccess} from '@/utils';
+import {apiFetch, handleApiResult} from '@/utils';
 
 export default {
   setup() {
@@ -48,21 +48,16 @@ export default {
       };
 
       state.sending = true;
-      try {
-        const result = await apiFetch('/api/gm/kick', {method: 'POST', body: requestData});
-        if (result.unauthorized) return;
-        if (isApiSuccess(result)) {
-          ElementPlus.ElMessage.success('玩家下线指令已发送');
-          resetForm();
-        } else {
-          ElementPlus.ElMessage.error(result.data?.msg || '发送失败');
-        }
-      } catch (e) {
-        console.error(e);
-        ElementPlus.ElMessage.error('网络错误，请重试');
-      } finally {
+      const result = await apiFetch('/api/gm/kick', {method: 'POST', body: requestData});
+      if (result.unauthorized) {
         state.sending = false;
+        return;
       }
+      if (handleApiResult(result, {errorMsg: '玩家下线失败'}) === 'ok') {
+        ElementPlus.ElMessage.success('玩家下线指令已发送');
+        resetForm();
+      }
+      state.sending = false;
     };
 
     return {

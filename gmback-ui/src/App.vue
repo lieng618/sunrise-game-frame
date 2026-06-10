@@ -1,6 +1,9 @@
 <template>
   <div v-if="!sessionReady" class="login-container min-h-screen flex items-center justify-center">
-    <div class="text-gray-500">加载中...</div>
+    <div class="app-loading" role="status" aria-live="polite" aria-label="正在加载">
+      <div class="app-loading__bar" aria-hidden="true"></div>
+      <span>正在恢复登录状态</span>
+    </div>
   </div>
   <LoginView v-else-if="!isLoggedIn"/>
   <MainLayout v-else/>

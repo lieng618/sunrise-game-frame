@@ -7,10 +7,10 @@
         </el-button>
       </div>
     </template>
-    <el-table :data="tableData" stripe style="width: 100%" v-loading="loadingData" border>
+    <el-table :data="tableData" stripe class="table-full" v-loading="loadingData" border>
       <el-table-column prop="username" label="用户名" width="200">
         <template #default="scope">
-          <div class="flex items-center font-medium text-gray-700">
+          <div class="flex items-center gm-text-emphasis">
             <el-icon class="mr-2">
               <User/>
             </el-icon>
@@ -21,7 +21,7 @@
 
       <el-table-column prop="createTime" label="创建时间" width="200" sortable>
         <template #default="scope">
-          <div class="flex items-center text-gray-600">
+          <div class="flex items-center gm-text-secondary">
             <el-icon class="mr-1">
               <Clock/>
             </el-icon>
@@ -62,8 +62,8 @@
   <!-- 添加用户对话框 -->
   <el-dialog v-model="showAddDialog" width="400px" @close="resetAddForm">
     <template #header>
-      <div class="flex items-center gap-2">
-        <el-icon class="text-blue-500">
+      <div class="dialog-header">
+        <el-icon class="dialog-header__icon">
           <UserFilled/>
         </el-icon>
         <span>添加用户</span>
@@ -93,7 +93,7 @@
     <template #footer>
             <span class="dialog-footer">
                 <el-button @click="showAddDialog = false">取消</el-button>
-                <el-button type="primary" @click="handleAdd" :loading="addLoading">确定</el-button>
+                <el-button type="primary" @click="handleAdd" :loading="addLoading">添加用户</el-button>
             </span>
     </template>
   </el-dialog>
@@ -101,14 +101,14 @@
   <!-- 权限管理对话框 -->
   <el-dialog v-model="showPermDialog" width="560px" @close="resetPermForm">
     <template #header>
-      <div class="flex items-center gap-2">
-        <el-icon class="text-green-500">
+      <div class="dialog-header">
+        <el-icon class="dialog-header__icon dialog-header__icon--success">
           <Setting/>
         </el-icon>
-        <span>权限管理 - {{ permForm.username }}</span>
+        <span>权限管理 — {{ permForm.username }}</span>
       </div>
     </template>
-    <div class="text-gray-500 text-sm mb-4">勾选该用户可访问的前端页面，保存后该用户需重新登录生效。</div>
+    <div class="dialog-hint">勾选该用户可访问的前端页面，保存后该用户需重新登录生效。</div>
     <el-checkbox-group v-model="permForm.permissions" class="perm-checkbox-grid">
       <el-checkbox
           v-for="page in permForm.pages"
@@ -129,8 +129,8 @@
   <!-- 修改密码对话框 -->
   <el-dialog v-model="showEditDialog" width="400px" @close="resetEditForm">
     <template #header>
-      <div class="flex items-center gap-2">
-        <el-icon class="text-orange-500">
+      <div class="dialog-header">
+        <el-icon class="dialog-header__icon">
           <Edit/>
         </el-icon>
         <span>修改密码</span>
@@ -160,7 +160,7 @@
     <template #footer>
             <span class="dialog-footer">
                 <el-button @click="showEditDialog = false">取消</el-button>
-                <el-button type="primary" @click="handleUpdatePassword" :loading="editLoading">确定</el-button>
+                <el-button type="primary" @click="handleUpdatePassword" :loading="editLoading">保存密码</el-button>
             </span>
     </template>
   </el-dialog>

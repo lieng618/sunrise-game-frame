@@ -31,6 +31,8 @@ import {
     ElTable,
     ElTableColumn,
     ElTag,
+    ElTooltip,
+    ElAlert,
 } from 'element-plus';
 import {
     Bell,
@@ -91,6 +93,8 @@ const elementComponents = [
     ElTable,
     ElTableColumn,
     ElTag,
+    ElTooltip,
+    ElAlert,
 ];
 
 const icons = {

@@ -3,16 +3,16 @@
   <el-card shadow="never" class="page-card rounded-lg mb-4">
     <template #header>
       <div class="flex items-center gap-2">
-        <span class="font-medium">发布公告</span>
+        <span class="gm-text-emphasis">发布公告</span>
       </div>
     </template>
     <el-form :model="announcementForm" label-width="100px" label-position="left">
       <el-form-item label="公告标题" required>
-        <el-input v-model="announcementForm.title" placeholder="请输入公告标题" style="width: 400px;"></el-input>
+        <el-input v-model="announcementForm.title" placeholder="请输入公告标题" class="gm-field-md"></el-input>
       </el-form-item>
       <el-form-item label="公告内容" required>
         <el-input v-model="announcementForm.content" type="textarea" :rows="4" placeholder="请输入公告内容"
-                  style="width: 400px;"></el-input>
+                  class="gm-field-md"></el-input>
       </el-form-item>
       <el-form-item label="开始时间" required>
         <el-date-picker
@@ -21,7 +21,7 @@
             placeholder="选择开始时间"
             format="YYYY-MM-DD HH:mm:ss"
             value-format="x"
-            style="width: 220px;">
+            class="gm-field-date">
         </el-date-picker>
       </el-form-item>
       <el-form-item label="结束时间" required>
@@ -32,7 +32,7 @@
             format="YYYY-MM-DD HH:mm:ss"
             value-format="x"
             :disabled-date="disabledEndDate"
-            style="width: 220px;">
+            class="gm-field-date">
         </el-date-picker>
       </el-form-item>
       <el-form-item>
@@ -42,12 +42,7 @@
           </el-icon>
           发布公告
         </el-button>
-        <el-button @click="resetForm">
-          <el-icon class="mr-1">
-            <RefreshLeft/>
-          </el-icon>
-          重置
-        </el-button>
+        <el-button @click="resetForm">清空</el-button>
       </el-form-item>
     </el-form>
   </el-card>
@@ -55,31 +50,29 @@
   <!-- 公告列表 -->
   <el-card shadow="never" class="page-card rounded-lg">
     <template #header>
-      <div class="flex justify-between items-center">
-        <div class="flex items-center gap-2">
-          <span class="font-medium">公告列表</span>
-        </div>
-        <el-button type="primary" :icon="Refresh" @click="fetchAnnouncementList" :loading="loadingData" size="default">
+      <div class="page-toolbar">
+        <span class="gm-text-emphasis">公告列表</span>
+        <el-button type="primary" :icon="Refresh" @click="fetchAnnouncementList" :loading="loadingData">
           刷新
         </el-button>
       </div>
     </template>
-    <el-table :data="tableData" stripe style="width: 100%" v-loading="loadingData" border>
+    <el-table :data="tableData" stripe class="table-full" v-loading="loadingData" border>
       <el-table-column prop="id" label="ID" width="80">
       </el-table-column>
       <el-table-column prop="title" label="标题" width="200">
         <template #default="scope">
-          <span class="font-medium text-gray-800">{{ scope.row.title }}</span>
+          <span class="gm-text-emphasis">{{ scope.row.title }}</span>
         </template>
       </el-table-column>
       <el-table-column prop="content" label="内容" min-width="250">
         <template #default="scope">
-          <span class="text-gray-600">{{ scope.row.content }}</span>
+          <span class="gm-text-secondary">{{ scope.row.content }}</span>
         </template>
       </el-table-column>
       <el-table-column prop="startTime" label="开始时间" width="180">
         <template #default="scope">
-          <div class="flex items-center text-gray-600">
+          <div class="flex items-center gm-text-secondary">
             <el-icon class="mr-1">
               <Clock/>
             </el-icon>
@@ -89,7 +82,7 @@
       </el-table-column>
       <el-table-column prop="endTime" label="结束时间" width="180">
         <template #default="scope">
-          <div class="flex items-center text-gray-600">
+          <div class="flex items-center gm-text-secondary">
             <el-icon class="mr-1">
               <Clock/>
             </el-icon>
@@ -99,7 +92,7 @@
       </el-table-column>
       <el-table-column prop="createTime" label="创建时间" width="180">
         <template #default="scope">
-          <div class="flex items-center text-gray-600">
+          <div class="flex items-center gm-text-secondary">
             <el-icon class="mr-1">
               <Clock/>
             </el-icon>
@@ -162,7 +155,7 @@
             placeholder="选择开始时间"
             format="YYYY-MM-DD HH:mm:ss"
             value-format="x"
-            style="width: 100%;">
+            class="gm-field-full">
         </el-date-picker>
       </el-form-item>
       <el-form-item label="结束时间" required>
@@ -173,13 +166,13 @@
             format="YYYY-MM-DD HH:mm:ss"
             value-format="x"
             :disabled-date="disabledEndDate"
-            style="width: 100%;">
+            class="gm-field-full">
         </el-date-picker>
       </el-form-item>
     </el-form>
     <template #footer>
       <el-button @click="editDialogVisible = false">取消</el-button>
-      <el-button type="primary" @click="updateAnnouncement" :loading="updating">确定</el-button>
+      <el-button type="primary" @click="updateAnnouncement" :loading="updating">保存修改</el-button>
     </template>
   </el-dialog>
 </template>
@@ -189,7 +182,7 @@ import {Delete, Edit, Refresh} from '@element-plus/icons-vue';
 import {reactive, toRefs, onMounted} from 'vue';
 import {ElementPlus} from '@/plugins/element-plus';
 import {
-  apiFetch, isApiSuccess, apiMsg, formatTime, defaultPagination,
+  apiFetch, handleApiResult, parsePagedData, isApiSuccess, apiMsg, formatTime, defaultPagination,
   buildPageQuery, confirmDialog, isUserCancel,
 } from '@/utils';
 
@@ -212,19 +205,18 @@ export default {
 
     const fetchAnnouncementList = async () => {
       state.loadingData = true;
-      try {
-        const qs = buildPageQuery(state.pagination.page, state.pagination.size);
-        const result = await apiFetch(`/api/announcements?${qs}`);
-        if (result.unauthorized) return;
-        if (isApiSuccess(result)) {
-          state.tableData = result.data.data.list || [];
-          state.pagination.total = result.data.data.total || 0;
-        }
-      } catch (e) {
-        console.error('获取公告列表失败', e);
-      } finally {
+      const qs = buildPageQuery(state.pagination.page, state.pagination.size);
+      const result = await apiFetch(`/api/announcements?${qs}`);
+      if (result.unauthorized) {
         state.loadingData = false;
+        return;
       }
+      if (handleApiResult(result, {errorMsg: '公告列表加载失败'}) === 'ok') {
+        const page = parsePagedData(result.data?.data);
+        state.tableData = page.list;
+        state.pagination.total = page.total;
+      }
+      state.loadingData = false;
     };
 
     const addAnnouncement = async () => {

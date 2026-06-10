@@ -1,3 +1,5 @@
+import {MSG} from '@/utils/messages';
+
 export function getAuthToken() {
     return localStorage.getItem('admin_token');
 }
@@ -34,7 +36,10 @@ export async function apiFetch(url, options = {}) {
     };
 
     if (auth) {
-        init.headers.Authorization = getAuthToken();
+        const token = getAuthToken();
+        if (token) {
+            init.headers.Authorization = token;
+        }
     }
 
     if (body !== undefined) {
@@ -42,7 +47,19 @@ export async function apiFetch(url, options = {}) {
         init.body = JSON.stringify(body);
     }
 
-    const res = await fetch(url, init);
+    let res;
+    try {
+        res = await fetch(url, init);
+    } catch (error) {
+        return {
+            ok: false,
+            status: 0,
+            data: null,
+            networkError: true,
+            error,
+            res: null,
+        };
+    }
 
     if (res.status === 401) {
         handleLoginExpired();
@@ -56,6 +73,15 @@ export async function apiFetch(url, options = {}) {
         } catch {
             data = null;
         }
+    }
+
+    if (!res.ok && data == null) {
+        return {
+            ok: false,
+            status: res.status,
+            data: {code: res.status, msg: MSG.LOAD_FAILED},
+            res,
+        };
     }
 
     return {ok: res.ok, status: res.status, data, res};

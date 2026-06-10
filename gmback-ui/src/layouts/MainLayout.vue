@@ -11,12 +11,15 @@
 
       <el-main class="main-content">
         <div v-if="!hasAnyPagePermission" class="empty-permission">
-          暂无页面访问权限，请联系管理员分配权限后重新登录
+          <div class="empty-state">
+            <p class="empty-state__title">暂无页面访问权限</p>
+            <p class="empty-state__desc">请联系管理员分配权限后重新登录</p>
+          </div>
         </div>
         <router-view v-else v-slot="{ Component }">
-          <div class="page-content">
+          <main class="page-content">
             <component :is="Component"/>
-          </div>
+          </main>
         </router-view>
       </el-main>
     </el-container>

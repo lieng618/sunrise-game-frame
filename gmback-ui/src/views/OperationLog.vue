@@ -4,7 +4,7 @@
       <div class="flex justify-between items-center">
         <div class="flex items-center gap-4">
           <el-select v-model="queryForm.operationType" placeholder="筛选操作类型" clearable
-                     style="width: 160px" size="default" @change="handleFilterChange"
+                     class="gm-field-filter" @change="handleFilterChange"
                      @clear="handleClearFilter">
             <el-option label="全部" value=""></el-option>
             <el-option label="登录" value="LOGIN"></el-option>
@@ -25,11 +25,19 @@
         </div>
       </div>
     </template>
-    <el-table :data="tableData" stripe style="width: 100%" v-loading="loadingData" border>
+    <el-table :data="tableData" stripe class="table-full" v-loading="loadingData" border>
+      <template #empty>
+        <TableEmpty
+            :error="loadError"
+            empty-title="暂无操作记录"
+            empty-hint="调整筛选条件或稍后再查看"
+            @retry="fetchLogs"
+        />
+      </template>
 
       <el-table-column prop="createTime" label="操作时间" width="200" sortable>
         <template #default="scope">
-          <div class="flex items-center text-gray-600">
+          <div class="flex items-center gm-text-secondary">
             <el-icon class="mr-1">
               <Clock/>
             </el-icon>
@@ -40,7 +48,7 @@
 
       <el-table-column prop="operator" label="操作人员" width="180">
         <template #default="scope">
-          <div class="flex items-center font-medium text-gray-700">
+          <div class="flex items-center gm-text-emphasis">
             {{ scope.row.operator }}
           </div>
         </template>
@@ -64,7 +72,7 @@
 
       <el-table-column prop="action" label="操作行为" min-width="300">
         <template #default="scope">
-                    <span class="text-gray-800">
+                    <span class="gm-text-emphasis">
                         {{ scope.row.action }}
                     </span>
         </template>
@@ -86,15 +94,18 @@
 
 <script>
 import {reactive, toRefs, onMounted} from 'vue';
+import TableEmpty from '@/components/feedback/TableEmpty.vue';
 
 import {
-  apiFetch, isApiSuccess, formatTime, defaultPagination, buildPageQuery,
+  apiFetch, handleApiResult, parsePagedData, formatTime, defaultPagination, buildPageQuery, MSG, apiMsg,
 } from '@/utils';
 
 export default {
+  components: {TableEmpty},
   setup() {
     const state = reactive({
       loadingData: false,
+      loadError: '',
       tableData: [],
       queryForm: {operationType: ''},
       pagination: defaultPagination(),
@@ -102,21 +113,26 @@ export default {
 
     const fetchLogs = async () => {
       state.loadingData = true;
-      try {
-        const qs = buildPageQuery(state.pagination.page, state.pagination.size, {
-          operationType: state.queryForm.operationType,
-        });
-        const result = await apiFetch(`/api/logs?${qs}`);
-        if (result.unauthorized) return;
-        if (isApiSuccess(result)) {
-          state.tableData = result.data.data.list || [];
-          state.pagination.total = result.data.data.total || 0;
-        }
-      } catch (e) {
-        console.error('获取日志失败', e);
-      } finally {
+      state.loadError = '';
+      const qs = buildPageQuery(state.pagination.page, state.pagination.size, {
+        operationType: state.queryForm.operationType,
+      });
+      const result = await apiFetch(`/api/logs?${qs}`);
+      if (result.unauthorized) {
         state.loadingData = false;
+        return;
       }
+      const status = handleApiResult(result, {errorMsg: '操作日志加载失败'});
+      if (status === 'ok') {
+        const page = parsePagedData(result.data?.data);
+        state.tableData = page.list;
+        state.pagination.total = page.total;
+      } else if (status === 'network') {
+        state.loadError = MSG.NETWORK;
+      } else if (status === 'failed') {
+        state.loadError = apiMsg(result, '操作日志加载失败');
+      }
+      state.loadingData = false;
     };
 
     // 筛选变化时自动请求数据

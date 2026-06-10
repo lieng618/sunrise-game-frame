@@ -3,7 +3,7 @@
   <el-card shadow="never" class="page-card rounded-lg mb-4">
     <template #header>
       <div class="flex items-center gap-2">
-        <span class="font-medium">创建兑换码</span>
+        <span class="gm-text-emphasis">创建兑换码</span>
       </div>
     </template>
     <el-form :model="cdkForm" label-width="120px" label-position="left">
@@ -14,7 +14,7 @@
         </el-radio-group>
       </el-form-item>
       <el-form-item label="兑换码" v-if="!cdkForm.randomGenerate" required>
-        <el-input v-model="cdkForm.code" placeholder="如 vip666" style="width: 300px;"></el-input>
+        <el-input v-model="cdkForm.code" placeholder="如 vip666" class="gm-field-code"></el-input>
       </el-form-item>
       <el-form-item label="开始时间" required>
         <el-date-picker
@@ -23,7 +23,7 @@
             placeholder="选择开始时间"
             format="YYYY-MM-DD HH:mm:ss"
             value-format="x"
-            style="width: 220px;">
+            class="gm-field-date">
         </el-date-picker>
       </el-form-item>
       <el-form-item label="结束时间" required>
@@ -33,17 +33,17 @@
             placeholder="选择结束时间"
             format="YYYY-MM-DD HH:mm:ss"
             value-format="x"
-            style="width: 220px;">
+            class="gm-field-date">
         </el-date-picker>
       </el-form-item>
       <el-form-item label="可兑换数量" required>
-        <el-input-number v-model="cdkForm.totalCount" :min="1" style="width: 200px;"></el-input-number>
+        <el-input-number v-model="cdkForm.totalCount" :min="1" class="gm-field-sm"></el-input-number>
       </el-form-item>
       <el-form-item label="邮件模板ID">
-        <el-input-number v-model="cdkForm.templateId" :min="1" style="width: 200px;"></el-input-number>
+        <el-input-number v-model="cdkForm.templateId" :min="1" class="gm-field-sm"></el-input-number>
       </el-form-item>
       <el-form-item label="奖励附件">
-        <div style="width: 600px;">
+        <div class="gm-field-lg">
           <div v-for="(attachment, index) in cdkForm.attachments" :key="index"
                class="attachment-item flex items-center gap-3 mb-2">
             <el-input-number v-model="attachment.itemId" :min="1" placeholder="道具ID"
@@ -51,7 +51,8 @@
             <el-input-number v-model="attachment.count" :min="1" placeholder="数量"
                              style="flex: 1;"></el-input-number>
             <el-button type="danger" size="small" @click="removeAttachment(index)"
-                       :disabled="cdkForm.attachments.length <= 1" circle>
+                       :disabled="cdkForm.attachments.length <= 1" circle
+                       aria-label="删除此附件">
               <el-icon>
                 <Delete/>
               </el-icon>
@@ -80,30 +81,30 @@
   <!-- 兑换码列表 -->
   <el-card shadow="never" class="page-card rounded-lg">
     <template #header>
-      <div class="flex justify-between items-center">
-        <span class="font-medium">兑换码列表</span>
-        <el-button type="primary" :icon="Refresh" @click="fetchCdkList" :loading="loadingData" size="default">
+      <div class="page-toolbar">
+        <span class="gm-text-emphasis">兑换码列表</span>
+        <el-button type="primary" :icon="Refresh" @click="fetchCdkList" :loading="loadingData">
           刷新
         </el-button>
       </div>
     </template>
-    <el-table :data="tableData" stripe style="width: 100%" v-loading="loadingData" border>
+    <el-table :data="tableData" stripe class="table-full" v-loading="loadingData" border>
       <el-table-column prop="id" label="ID" width="70"></el-table-column>
       <el-table-column prop="code" label="兑换码" width="160">
         <template #default="scope">
-          <span class="font-mono font-medium text-blue-700">{{ scope.row.code }}</span>
+          <span class="gm-text-code">{{ scope.row.code }}</span>
         </template>
       </el-table-column>
       <el-table-column label="数量" width="120">
         <template #default="scope">
           <span>{{ scope.row.usedCount }} / {{ scope.row.totalCount }}</span>
-          <span class="text-gray-400 text-xs ml-1">(剩{{ scope.row.totalCount - scope.row.usedCount }})</span>
+          <span class="gm-text-muted">(剩{{ scope.row.totalCount - scope.row.usedCount }})</span>
         </template>
       </el-table-column>
       <el-table-column label="附件" min-width="180">
         <template #default="scope">
-          <span v-if="!scope.row.attachments || scope.row.attachments.length === 0" class="text-gray-400">无</span>
-          <span v-else class="text-gray-600 text-sm">
+          <span v-if="!scope.row.attachments || scope.row.attachments.length === 0" class="cell-empty">无</span>
+          <span v-else class="gm-text-secondary">
                         <span v-for="(a, i) in scope.row.attachments" :key="i">
                             {{ a.itemId }}×{{ a.count }}<span v-if="i < scope.row.attachments.length - 1">, </span>
                         </span>
@@ -151,14 +152,14 @@
       </el-form-item>
       <el-form-item label="开始时间" required>
         <el-date-picker v-model="editForm.startTime" type="datetime" format="YYYY-MM-DD HH:mm:ss"
-                        value-format="x" style="width: 100%;"></el-date-picker>
+                        value-format="x" class="gm-field-full"></el-date-picker>
       </el-form-item>
       <el-form-item label="结束时间" required>
         <el-date-picker v-model="editForm.endTime" type="datetime" format="YYYY-MM-DD HH:mm:ss"
-                        value-format="x" style="width: 100%;"></el-date-picker>
+                        value-format="x" class="gm-field-full"></el-date-picker>
       </el-form-item>
       <el-form-item label="邮件模板ID">
-        <el-input-number v-model="editForm.templateId" :min="1" style="width: 100%;"></el-input-number>
+        <el-input-number v-model="editForm.templateId" :min="1" class="gm-field-full"></el-input-number>
       </el-form-item>
       <el-form-item label="奖励附件">
         <div v-for="(attachment, index) in editForm.attachments" :key="index"
@@ -166,7 +167,8 @@
           <el-input-number v-model="attachment.itemId" :min="1" style="flex: 1;"></el-input-number>
           <el-input-number v-model="attachment.count" :min="1" style="flex: 1;"></el-input-number>
           <el-button type="danger" size="small" @click="removeEditAttachment(index)"
-                     :disabled="editForm.attachments.length <= 1" circle>
+                     :disabled="editForm.attachments.length <= 1" circle
+                     aria-label="删除此附件">
             <el-icon>
               <Delete/>
             </el-icon>
@@ -177,23 +179,23 @@
     </el-form>
     <template #footer>
       <el-button @click="editDialogVisible = false">取消</el-button>
-      <el-button type="primary" @click="updateCdk" :loading="updating">确定</el-button>
+      <el-button type="primary" @click="updateCdk" :loading="updating">保存修改</el-button>
     </template>
   </el-dialog>
 
   <!-- 调整数量对话框 -->
   <el-dialog v-model="adjustDialogVisible" title="调整兑换数量" width="400px">
-    <p class="text-gray-600 mb-4">兑换码：<strong>{{ adjustForm.code }}</strong></p>
-    <p class="text-gray-600 mb-4">当前：已用 {{ adjustForm.usedCount }} / 总量 {{ adjustForm.totalCount }}</p>
+    <p class="gm-text-secondary mb-4">兑换码：<strong>{{ adjustForm.code }}</strong></p>
+    <p class="gm-text-secondary mb-4">当前：已用 {{ adjustForm.usedCount }} / 总量 {{ adjustForm.totalCount }}</p>
     <el-form label-width="100px">
       <el-form-item label="调整数量">
         <el-input-number v-model="adjustForm.delta" placeholder="正数增加，负数减少"></el-input-number>
-        <div class="text-gray-400 text-xs mt-1">正数为增加总量，负数为减少总量</div>
+        <div class="form-hint">正数为增加总量，负数为减少总量</div>
       </el-form-item>
     </el-form>
     <template #footer>
       <el-button @click="adjustDialogVisible = false">取消</el-button>
-      <el-button type="primary" @click="adjustCount" :loading="adjusting">确定</el-button>
+      <el-button type="primary" @click="adjustCount" :loading="adjusting">确认调整</el-button>
     </template>
   </el-dialog>
 </template>

@@ -2,10 +2,10 @@
   <el-card shadow="never" class="page-card rounded-lg">
     <el-form :model="form" label-width="120px" label-position="left">
       <el-form-item label="玩家ID" required>
-        <div class="flex flex-col gap-2" style="width: 400px;">
-          <div class="flex items-center gap-2">
-            <span class="text-gray-700 font-medium">全服发送</span>
-            <el-switch v-model="isServerWide" size="default"></el-switch>
+        <div class="form-stack gm-field-md">
+          <div class="form-stack__row">
+            <span class="gm-text-emphasis">全服发送</span>
+            <el-switch v-model="isServerWide"></el-switch>
           </div>
           <el-input v-model="form.humanId" placeholder="请输入玩家ID" :disabled="isServerWide"></el-input>
         </div>
@@ -13,11 +13,11 @@
 
       <el-form-item label="邮件模板ID" required>
         <el-input-number v-model="form.templateId" :min="1" placeholder="请输入邮件模板ID"
-                         style="width: 400px;"></el-input-number>
+                         class="gm-field-md"></el-input-number>
       </el-form-item>
 
       <el-form-item label="邮件附件">
-        <div style="width: 600px;">
+        <div class="gm-field-lg">
           <div v-for="(attachment, index) in form.attachments" :key="index"
                class="attachment-item flex items-center gap-3">
             <el-input-number v-model="attachment.itemId" :min="1" placeholder="道具ID"
@@ -25,23 +25,24 @@
             <el-input-number v-model="attachment.count" :min="1" placeholder="数量"
                              style="flex: 1;"></el-input-number>
             <el-button type="danger" size="small" @click="removeAttachment(index)"
-                       :disabled="form.attachments.length <= 1" circle>
+                       :disabled="form.attachments.length <= 1" circle
+                       aria-label="删除此附件">
               <el-icon>
                 <Delete/>
               </el-icon>
             </el-button>
           </div>
-          <el-button type="primary" size="large" @click="addAttachment">
+          <el-button type="primary" @click="addAttachment">
             添加附件
           </el-button>
         </div>
       </el-form-item>
 
       <el-form-item>
-        <el-button type="primary" @click="sendMail" :loading="sending" size="large">
+        <el-button type="primary" @click="sendMail" :loading="sending" :disabled="sending">
           发送邮件
         </el-button>
-        <el-button @click="resetForm" size="large">重置</el-button>
+        <el-button @click="resetForm">清空</el-button>
       </el-form-item>
     </el-form>
   </el-card>
@@ -51,7 +52,7 @@
 import {reactive, toRefs, watch} from 'vue';
 import {ElementPlus} from '@/plugins/element-plus';
 
-import {apiFetch, isApiSuccess, apiMsg, confirmDialog, isUserCancel} from '@/utils';
+import {apiFetch, handleApiResult, confirmDialog, isUserCancel} from '@/utils';
 
 export default {
   setup() {
@@ -157,24 +158,19 @@ export default {
       };
 
       state.sending = true;
-      try {
-        const result = await apiFetch('/api/gm/send-mail', {
-          method: 'POST',
-          body: requestData,
-        });
-        if (result.unauthorized) return;
-        if (isApiSuccess(result)) {
-          ElementPlus.ElMessage.success('邮件发送指令已发送');
-          resetForm();
-        } else {
-          ElementPlus.ElMessage.error(apiMsg(result, '发送失败'));
-        }
-      } catch (e) {
-        console.error(e);
-        ElementPlus.ElMessage.error('网络错误，请重试');
-      } finally {
+      const result = await apiFetch('/api/gm/send-mail', {
+        method: 'POST',
+        body: requestData,
+      });
+      if (result.unauthorized) {
         state.sending = false;
+        return;
       }
+      if (handleApiResult(result, {errorMsg: '邮件发送失败'}) === 'ok') {
+        ElementPlus.ElMessage.success('邮件发送指令已发送');
+        resetForm();
+      }
+      state.sending = false;
     };
 
     return {

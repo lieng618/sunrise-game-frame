@@ -1,7 +1,7 @@
 import {reactive, toRefs, computed, watch} from 'vue';
 import {useRoute, useRouter} from 'vue-router';
 import {ElementPlus} from '@/plugins/element-plus';
-import {apiFetch, isApiSuccess} from '@/utils';
+import {apiFetch, isApiSuccess, MSG} from '@/utils';
 import {MENU_ITEMS, ROUTE_TITLES, getFirstAllowedRoute} from '@/constants/menu';
 
 const state = reactive({
@@ -141,32 +141,36 @@ export function useAuth() {
             return;
         }
         state.loading = true;
-        try {
-            const result = await apiFetch('/api/login', {
-                method: 'POST',
-                body: state.form,
-                auth: false,
-            });
-            const data = result.data;
-            if (data?.code === 200) {
-                localStorage.setItem('admin_token', data.token);
-                localStorage.setItem('admin_username', state.form.user);
-                if (Array.isArray(data.permissions)) {
-                    savePermissions(data.permissions, data.isAdmin);
-                } else {
-                    await refreshSession();
-                }
-                state.isLoggedIn = true;
-                await navigateToFirstAllowed();
-                ElementPlus.ElMessage.success('登录成功');
-            } else {
-                ElementPlus.ElMessage.error(data?.msg || '登录失败');
-            }
-        } catch {
-            ElementPlus.ElMessage.error('网络连接错误');
-        } finally {
+        const result = await apiFetch('/api/login', {
+            method: 'POST',
+            body: state.form,
+            auth: false,
+        });
+        if (result.unauthorized) {
             state.loading = false;
+            return;
         }
+        if (result.networkError) {
+            ElementPlus.ElMessage.error(MSG.NETWORK);
+            state.loading = false;
+            return;
+        }
+        const data = result.data;
+        if (data?.code === 200) {
+            localStorage.setItem('admin_token', data.token);
+            localStorage.setItem('admin_username', state.form.user);
+            if (Array.isArray(data.permissions)) {
+                savePermissions(data.permissions, data.isAdmin);
+            } else {
+                await refreshSession();
+            }
+            state.isLoggedIn = true;
+            await navigateToFirstAllowed();
+            ElementPlus.ElMessage.success('登录成功');
+        } else {
+            ElementPlus.ElMessage.error(data?.msg || MSG.LOGIN_FAILED);
+        }
+        state.loading = false;
     };
 
     const logout = async () => {

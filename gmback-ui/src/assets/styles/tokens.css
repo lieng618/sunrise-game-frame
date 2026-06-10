@@ -1,0 +1,111 @@
+/* Sunrise GM — Design Tokens (see gmback-ui/DESIGN.md) */
+:root {
+    /* Backgrounds */
+    --gm-bg-page: #f5f4f1;
+    --gm-bg-surface: #ffffff;
+    --gm-bg-header: #faf9f7;
+    --gm-bg-muted: #f0eeeb;
+    --gm-bg-sidebar: #1c1917;
+    --gm-bg-sidebar-elevated: #292524;
+
+    /* Text */
+    --gm-text-primary: #1c1917;
+    --gm-text-secondary: #57534e;
+    --gm-text-tertiary: #a8a29e;
+    --gm-text-on-dark: rgba(255, 255, 255, 0.88);
+    --gm-text-on-dark-muted: rgba(255, 255, 255, 0.52);
+
+    /* Accent */
+    --gm-accent: #ea580c;
+    --gm-accent-hover: #c2410c;
+    --gm-accent-subtle: rgba(234, 88, 12, 0.1);
+
+    /* Semantic */
+    --gm-success: #16a34a;
+    --gm-danger: #dc2626;
+    --gm-warning: #d97706;
+    --gm-info: #57534e;
+
+    /* Borders */
+    --gm-border: #e7e5e4;
+    --gm-border-subtle: #f0eeeb;
+
+    /* Sidebar active */
+    --gm-sidebar-active: rgba(234, 88, 12, 0.12);
+    --gm-sidebar-active-border: #ea580c;
+
+    /* Spacing */
+    --gm-space-1: 4px;
+    --gm-space-2: 8px;
+    --gm-space-3: 16px;
+    --gm-space-4: 24px;
+    --gm-space-5: 32px;
+
+    /* Typography */
+    --gm-text-sm: 13px;
+    --gm-text-base: 14px;
+    --gm-text-lg: 18px;
+    --gm-text-xl: 20px;
+    --gm-font-ui: "DM Sans", "Noto Sans SC", sans-serif;
+    --gm-font-mono: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
+
+    /* Radius */
+    --gm-radius-sm: 6px;
+    --gm-radius-md: 8px;
+    --gm-radius-lg: 12px;
+
+    /* Shadows */
+    --gm-shadow-sm: 0 1px 2px rgba(28, 25, 23, 0.06);
+    --gm-shadow-md: 0 4px 12px rgba(28, 25, 23, 0.08);
+
+    /* Motion */
+    --gm-ease: cubic-bezier(0.16, 1, 0.3, 1);
+    --gm-duration-fast: 150ms;
+    --gm-duration: 200ms;
+
+    /* Layout */
+    --gm-sidebar-width: 220px;
+    --gm-header-height: 56px;
+    --gm-content-padding: 24px;
+
+    /* Focus */
+    --gm-focus-ring: 0 0 0 2px var(--gm-bg-surface), 0 0 0 4px var(--gm-accent);
+    --gm-focus-input: 0 0 0 1px var(--gm-accent) inset;
+
+    /* Element Plus overrides */
+    --el-color-primary: var(--gm-accent);
+    --el-color-primary-light-3: #f97316;
+    --el-color-primary-light-5: #fb923c;
+    --el-color-primary-light-7: #fdba74;
+    --el-color-primary-light-8: #fed7aa;
+    --el-color-primary-light-9: #ffedd5;
+    --el-color-primary-dark-2: var(--gm-accent-hover);
+    --el-color-success: var(--gm-success);
+    --el-color-danger: var(--gm-danger);
+    --el-color-warning: var(--gm-warning);
+    --el-border-radius-base: var(--gm-radius-md);
+    --el-border-radius-small: var(--gm-radius-sm);
+    --el-font-family: var(--gm-font-ui);
+    --el-text-color-primary: var(--gm-text-primary);
+    --el-text-color-regular: var(--gm-text-secondary);
+    --el-text-color-secondary: var(--gm-text-tertiary);
+    --el-border-color: var(--gm-border);
+    --el-border-color-light: var(--gm-border-subtle);
+    --el-fill-color-light: var(--gm-bg-muted);
+    --el-fill-color-blank: var(--gm-bg-surface);
+    --el-input-border-color: var(--gm-border);
+    --el-input-hover-border-color: #d6d3d1;
+    --el-input-focus-border-color: var(--gm-accent);
+    --el-bg-color: var(--gm-bg-surface);
+    --el-bg-color-page: var(--gm-bg-page);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

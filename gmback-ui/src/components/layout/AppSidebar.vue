@@ -1,22 +1,32 @@
 <template>
   <el-aside width="220px" class="sidebar-wrapper">
-    <el-menu :default-active="activeMenuPath" class="flex-1" router>
-      <el-menu-item v-for="item in menuItems" :key="item.key" :index="item.path">
-        <el-icon>
-          <component :is="menuIcons[item.key]"/>
-        </el-icon>
-        <span>{{ item.title }}</span>
-      </el-menu-item>
-    </el-menu>
+    <div class="logo-area">
+      <p class="logo-title"><span class="logo-accent">Sunrise</span> GM</p>
+    </div>
+    <nav aria-label="主导航">
+      <el-menu :default-active="activeMenuPath" class="flex-1" router>
+        <el-menu-item
+            v-for="item in menuItems"
+            :key="item.key"
+            :index="item.path"
+            :aria-current="activeMenuPath === item.path ? 'page' : undefined"
+        >
+          <el-icon aria-hidden="true">
+            <component :is="menuIcons[item.key]"/>
+          </el-icon>
+          <span>{{ item.title }}</span>
+        </el-menu-item>
+      </el-menu>
+    </nav>
 
     <div class="sidebar-footer">
       <a
           href="https://sunrise-game-frame.pages.dev"
           target="_blank"
           rel="noopener noreferrer"
-          class="text-gray-500 hover:text-blue-600 transition-colors no-underline"
+          aria-label="打开 Sunrise 文档站（新窗口）"
       >
-        sunrise-game-frame@lieng
+        文档站
       </a>
     </div>
   </el-aside>
