@@ -11,6 +11,8 @@ public class ErrorType {
     public static final int RPC_METHOD_NOT_FOUND = 102;
     // 调用参数不匹配
     public static final int RPC_ARGS_NOT_MATCH = 103;
+    // 调用参数类型不匹配
+    public static final int RPC_ARG_TYPE_MISMATCH = 106;
     // 异常
     public static final int RPC_CALL_CATCH = 104;
     // 远端没有注册此方法

@@ -39,4 +39,8 @@ public class BaseMessage {
         this.messageId = messageId;
         this.msg = msg;
     }
+
+    public void setMsg(Object msg) {
+        this.msg = RpcDataSanitizer.sanitize(msg);
+    }
 }

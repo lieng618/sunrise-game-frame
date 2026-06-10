@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.sunrise.game.core.message.BaseMessage;
+import org.sunrise.game.core.message.RpcDataSanitizer;
 
 @Getter
 @Setter
@@ -33,7 +34,7 @@ public class Call extends BaseMessage {
     }
 
     public void setData(Object... params) {
-        data = params;
+        data = RpcDataSanitizer.sanitizeArray(params);
     }
 
     public Object getData(int index) {

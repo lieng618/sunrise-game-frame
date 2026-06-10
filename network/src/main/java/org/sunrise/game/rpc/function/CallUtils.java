@@ -144,12 +144,23 @@ public class CallUtils {
                 if (paramCount != method.getParameterCount()) {
                     result = ErrorType.RPC_ARGS_NOT_MATCH;
                 } else {
-                    Object[] args = parseCallArgs(call, method);
-                    BaseService service = ServiceManager.getService(method.getDeclaringClass().getSimpleName());
-                    if (service == null) {
-                        result = ErrorType.RPC_SERVICE_NOT_FOUND;
-                    } else {
-                        method.invoke(service, args);
+                    Object[] args;
+                    try {
+                        args = parseCallArgs(call, method);
+                    } catch (IllegalArgumentException e) {
+                        LogCore.RpcServer.warn(
+                                "RPC argument type mismatch, rpcId = {}, expected parameter types = {}, data = {}, error = {}",
+                                call.getRpcId(), method.getParameterTypes(), call.getData(), e.getMessage());
+                        result = ErrorType.RPC_ARG_TYPE_MISMATCH;
+                        args = null;
+                    }
+                    if (args != null) {
+                        BaseService service = ServiceManager.getService(method.getDeclaringClass().getSimpleName());
+                        if (service == null) {
+                            result = ErrorType.RPC_SERVICE_NOT_FOUND;
+                        } else {
+                            method.invoke(service, args);
+                        }
                     }
                 }
             }
@@ -193,9 +204,10 @@ public class CallUtils {
 
     // 将call中的数据，传递给方法的参数
     private static Object[] parseCallArgs(Call call, Method method) {
-        Object[] args = new Object[method.getParameterCount()];
+        Class<?>[] parameterTypes = method.getParameterTypes();
+        Object[] args = new Object[parameterTypes.length];
         for (int i = 0; i < args.length; i++) {
-            args[i] = call.getData(i);
+            args[i] = RpcArgConverter.convert(call.getData(i), parameterTypes[i]);
         }
         return args;
     }
