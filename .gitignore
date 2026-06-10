@@ -36,3 +36,7 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+### Local secrets ###
+start/docker/.env
+config/local-*.properties

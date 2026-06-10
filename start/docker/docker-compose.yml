@@ -2,7 +2,7 @@ services:
   mysql:
     image: mysql:8.0
     environment:
-      MYSQL_ROOT_PASSWORD: "123456"
+      MYSQL_ROOT_PASSWORD: "${JDBC_PASSWORD:-123456}"
       MYSQL_DATABASE: "sunrise"
     ports:
       - "13306:3306"
@@ -21,19 +21,29 @@ services:
       context: ../..
       dockerfile: Dockerfile
     command: ["java", "-Xms256m", "-Xmx1024m", "-jar", "jar/sunrise-center.jar", "config/center-config.properties"]
+    env_file: .env
+    environment:
+      JDBC_URL: jdbc:mysql://mysql:3306/sunrise
+      MASTER_ADDRESS: 0.0.0.0
     depends_on:
       mysql:
         condition: service_healthy
     ports:
       - "8088:8088"
     volumes:
-      - ./config/center-config.properties:/app/config/center-config.properties
+      - ../../config/center-config.properties:/app/config/center-config.properties:ro
 
   external:
     build:
       context: ../..
       dockerfile: Dockerfile
     command: ["java", "-Xms256m", "-Xmx1024m", "-jar", "jar/sunrise-external.jar", "config/external-config.properties"]
+    env_file: .env
+    environment:
+      JDBC_URL: jdbc:mysql://mysql:3306/sunrise
+      MASTER_ADDRESS: center
+      REPORT_ADDRESS: external
+      EXTERNAL_ADDRESS: 0.0.0.0
     depends_on:
       mysql:
         condition: service_healthy
@@ -44,39 +54,56 @@ services:
       - "10001:10001"
       - "10002:10002"
     volumes:
-      - ./config/external-config.properties:/app/config/external-config.properties
+      - ../../config/external-config.properties:/app/config/external-config.properties:ro
 
   game:
     build:
       context: ../..
       dockerfile: Dockerfile
     command: ["java", "-Xms256m", "-Xmx1024m", "-jar", "jar/sunrise-game.jar", "config/game-config.properties"]
+    env_file: .env
+    environment:
+      JDBC_URL: jdbc:mysql://mysql:3306/sunrise
+      MASTER_ADDRESS: center
+      REPORT_ADDRESS: game
+      CONFIG_PATH: /app/tables/json
+      CONFIG_NAV_PATH: /app/tables/mapjson
     depends_on:
       mysql:
         condition: service_healthy
       center:
         condition: service_started
     volumes:
-      - ./config/game-config.properties:/app/config/game-config.properties
+      - ../../config/game-config.properties:/app/config/game-config.properties:ro
 
   global:
     build:
       context: ../..
       dockerfile: Dockerfile
     command: ["java", "-Xms256m", "-Xmx1024m", "-jar", "jar/sunrise-global.jar", "config/global-config.properties"]
+    env_file: .env
+    environment:
+      JDBC_URL: jdbc:mysql://mysql:3306/sunrise
+      MASTER_ADDRESS: center
+      REPORT_ADDRESS: global
     depends_on:
       mysql:
         condition: service_healthy
       center:
         condition: service_started
     volumes:
-      - ./config/global-config.properties:/app/config/global-config.properties
+      - ../../config/global-config.properties:/app/config/global-config.properties:ro
 
   http:
     build:
       context: ../..
       dockerfile: Dockerfile
     command: ["java", "-Xms256m", "-Xmx1024m", "-jar", "jar/sunrise-http.jar", "config/http-config.properties"]
+    env_file: .env
+    environment:
+      JDBC_URL: jdbc:mysql://mysql:3306/sunrise
+      MASTER_ADDRESS: center
+      REPORT_ADDRESS: http
     depends_on:
       mysql:
         condition: service_healthy
@@ -85,13 +112,18 @@ services:
     ports:
       - "8090:8090"
     volumes:
-      - ./config/http-config.properties:/app/config/http-config.properties
+      - ../../config/http-config.properties:/app/config/http-config.properties:ro
 
   gmback:
     build:
       context: ../..
       dockerfile: Dockerfile
     command: ["java", "-Xms256m", "-Xmx1024m", "-jar", "jar/sunrise-gmback.jar", "config/gmback-config.properties"]
+    env_file: .env
+    environment:
+      JDBC_URL: jdbc:mysql://mysql:3306/sunrise
+      MASTER_ADDRESS: center
+      REPORT_ADDRESS: gmback
     depends_on:
       mysql:
         condition: service_healthy
@@ -100,7 +132,7 @@ services:
     ports:
       - "8010:8010"
     volumes:
-      - ./config/gmback-config.properties:/app/config/gmback-config.properties
+      - ../../config/gmback-config.properties:/app/config/gmback-config.properties:ro
 
 volumes:
   mysql_data:

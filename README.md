@@ -55,7 +55,11 @@ start\windows\create_sql_table.bat</code></pre>
 <pre><code class="language-bash"># Linux
 sh start/linux/create_sql_table.sh</code></pre>
 
-<h4>3. 单进程启动（RunAllOneServerStartUp）</h4>
+<h4>3. 配置与环境变量</h4>
+<p>各服务配置文件位于 <code>config/</code>，模板见 <code>config/*.example.properties</code>。敏感项支持 <code>${ENV_NAME:default}</code> 占位符，生产环境请通过环境变量注入密码与密钥，详见 <a href="config/ENV.md">config/ENV.md</a>。</p>
+<p>Docker 部署统一挂载仓库根目录 <code>config/</code>，在 <code>start/docker/.env</code>（由 <code>.env.example</code> 复制）中设置 <code>JDBC_PASSWORD</code> 等变量即可。</p>
+
+<h4>4. 单进程启动（RunAllOneServerStartUp）</h4>
 <p>将对外服、游戏服、全局服、HTTP 服务、GM 后台合并到一个进程中运行，无需单独启动中心服，适合本地开发调试</p>
 <p>修改配置文件： <code>config/runallone-config.properties</code>
 <a href="https://sunrise-game-frame.pages.dev/#/config">配置参考</a></p>
@@ -64,14 +68,14 @@ start\windows\single\runallone.bat</code></pre>
 <pre><code class="language-bash"># Linux
 sh start/linux/server_run_allone.sh</code></pre>
 
-<h4>4.访问 GM 后台</h4>
+<h4>5.访问 GM 后台</h4>
 <pre><code class="language-bash">cd gmback-ui
 npm install
 npm run dev</code></pre>
 
 <p>浏览器访问 <a href="http://localhost:5173">http://localhost:5173</a>，使用配置中的账号登录（见runallone-config.properties）</p>
 
-<h4>5. 客户端启动</h4>
+<h4>6. 客户端启动</h4>
 <p>Godot 游戏客户端：独立仓库 <a href="https://gitee.com/lieng618/sunrise-game-frame-client">sunrise-game-frame-client</a>，Godot 4.6 + C# 实现的 2D 像素风 RPG 完整示例，覆盖登录、地图探索、多人同步、聊天/背包/邮件等玩法（详见 <a href="https://sunrise-game-frame.pages.dev/#/client-example">客户端示例文档</a>）</p>
 <pre><code class="language-bash">git clone https://gitee.com/lieng618/sunrise-game-frame-client.git</code></pre>
 <p>消息发送工具：支持多标签页，每标签页一个玩家连接，可向服务器发送消息包</p>
@@ -81,7 +85,7 @@ npm run dev</code></pre>
 <p>压测统计工具：登录耗时 + 以服务器回包为准的发包 TPS，含端到端诊断（详见 <a href="https://sunrise-game-frame.pages.dev/#/stress-testing">压测统计文档</a>）</p>
 <pre><code class="language-bash">start/windows/stress.bat</code></pre>
 
-<h4>6. 生产环境部署</h4>
+<h4>7. 生产环境部署</h4>
 <p>生产环境建议多服务多进程运行，根据需求拆分与合并服务。详见文档：<a href="https://sunrise-game-frame.pages.dev/#/deployment">部署指南</a></p>
 
 <h2>架构图</h2>

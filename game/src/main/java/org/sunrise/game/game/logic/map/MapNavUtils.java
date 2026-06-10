@@ -24,7 +24,7 @@ public class MapNavUtils {
             LogCore.GameServer.warn("config.nav.path not set, skip map nav loading");
             return;
         }
-        Path navDir = Paths.get(path);
+        Path navDir = ConfigReader.resolvePath(path);
         if (!Files.isDirectory(navDir)) {
             LogCore.GameServer.warn("Map nav directory not found: {}", path);
             return;

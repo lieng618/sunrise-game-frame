@@ -8,7 +8,7 @@ import org.sunrise.game.log.LogCore;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 
 @Getter
 public class ConfigUtils {
@@ -19,7 +19,8 @@ public class ConfigUtils {
         long startTime = System.currentTimeMillis();
         try {
             // 1. 加载构建新实例
-            Tables newTables = new Tables(file -> JsonParser.parseString(Files.readString(Paths.get(getConfigFilePath(), file + ".json"))));
+            Path configDir = getConfigFilePath();
+            Tables newTables = new Tables(file -> JsonParser.parseString(Files.readString(configDir.resolve(file + ".json"))));
 
             // 2. 更新本地持有 (Root引用)
             currentTables = newTables;
@@ -35,13 +36,12 @@ public class ConfigUtils {
     /**
      * 获取配置目录
      */
-    private static String getConfigFilePath() {
+    private static Path getConfigFilePath() {
         String path = ConfigReader.getProp().getProperty("config.path");
-        if (path.isEmpty()) {
+        if (path == null || path.isEmpty()) {
             LogCore.GameServer.error("Load config failed,  config path not found");
             System.exit(-1);
         }
-
-        return path;
+        return ConfigReader.resolvePath(path);
     }
 }
