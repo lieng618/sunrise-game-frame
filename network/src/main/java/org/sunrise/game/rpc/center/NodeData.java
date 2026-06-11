@@ -7,7 +7,7 @@ public class NodeData {
     private String nodeId;
     private String ip;
     private int port;
-    private long reportTime;
+    private volatile long reportTime;
     private int serverId;
     private String nodeType;
 

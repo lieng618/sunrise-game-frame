@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class NodeManager {
-    public static int INTERVAL_SIMPLE = 3000; // 上报间隔-发送简易包证明活跃
+    public static final int INTERVAL_SIMPLE = 3000; // 上报间隔-发送简易包证明活跃
 
     // 节点id-节点信息 所有rpc节点
     public static Map<String, NodeData> datasByNodeId = new ConcurrentHashMap<>();

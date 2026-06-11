@@ -14,7 +14,7 @@ import org.sunrise.game.rpc.node.RpcNodeManager;
  */
 public class ReportClientMessageManager extends ClientMessageManager {
 
-    private long lastSimpleReportTime = 0;
+    private volatile long lastSimpleReportTime = 0;
 
     public ReportClientMessageManager(String nodeId) {
         super(nodeId);

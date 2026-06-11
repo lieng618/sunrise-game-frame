@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -29,7 +30,7 @@ public class RpcFunction {
     private RpcCallType callType = RpcCallType.SendRandom;
     public static String nodeId; //当前rpc服务器的节点id
     private final List<Call> calls = new ArrayList<>();
-    public static final Map<Integer, List<String>> callIdNodes = new ConcurrentHashMap<>();
+    static final Map<Integer, List<String>> callIdNodes = new ConcurrentHashMap<>();
     private String designatedServerNodeId; // 指定服务节点id
 
     public RpcFunction() {
@@ -205,15 +206,20 @@ public class RpcFunction {
             return;
         }
         for (int callId : callIds) {
-            List<String> list = RpcFunction.callIdNodes.get(callId);
-            if (list == null) {
-                list = new ArrayList<>();
-            }
+            List<String> list = RpcFunction.callIdNodes.computeIfAbsent(callId, k -> new CopyOnWriteArrayList<>());
             list.add(call.getNodeId());
-            RpcFunction.callIdNodes.put(callId, list);
         }
         LogCore.RpcServer.info("rpc update, from NodeId = { {} }, rpcId = {}, data = {{}}", call.getNodeId(), call.getRpcId(), call.getMsg());
 
+    }
+
+    /**
+     * 从所有 callId 的节点列表中移除指定节点（节点下线时调用）。
+     */
+    public static void removeNodeFromAllCallIds(String nodeId) {
+        for (List<String> nodes : callIdNodes.values()) {
+            nodes.remove(nodeId);
+        }
     }
 
     private static String getCurNodeByServerNode(String serverNode) {

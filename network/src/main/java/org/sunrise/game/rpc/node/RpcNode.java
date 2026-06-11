@@ -50,6 +50,8 @@ public class RpcNode {
     private final Map<Integer, BaseClient> connectToOthers = new ConcurrentHashMap<>();
     private RpcClientMessageManager fromOtherMessageManager = null;
 
+    private final Object connectLock = new Object();
+
     public RpcNode(int serverId, String nodeType) {
         this.serverId = serverId;
         this.nodeType = nodeType.trim().toLowerCase();
@@ -132,16 +134,13 @@ public class RpcNode {
     public void otherOffline(int id) {
         BaseClient removeClient;
 
-        synchronized (connectToOthers) {
-            // 原子：先移除连接
+        synchronized (connectLock) {
             removeClient = connectToOthers.remove(id);
             if (removeClient == null) {
                 return;
             }
             String serverNodeId = removeClient.getServerNodeId();
-            for (List<String> callIdNodes : RpcFunction.callIdNodes.values()) {
-                callIdNodes.remove(serverNodeId);
-            }
+            RpcFunction.removeNodeFromAllCallIds(serverNodeId);
         }
 
         BaseClientManager.remove(removeClient.getNodeId());
