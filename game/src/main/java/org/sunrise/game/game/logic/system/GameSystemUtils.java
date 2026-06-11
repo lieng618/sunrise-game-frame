@@ -8,6 +8,7 @@ import org.sunrise.game.game.annotation.GameSystem;
 import org.sunrise.game.game.human.HumanObject;
 import org.sunrise.game.game.human.HumanObjectManger;
 import org.sunrise.game.game.logic.ToolsUtils;
+import org.sunrise.game.graceful.OnShutdown;
 import org.sunrise.game.log.LogCore;
 import org.sunrise.game.rpc.node.RpcNodeManager;
 import org.sunrise.game.utils.Utils;
@@ -63,7 +64,6 @@ public class GameSystemUtils {
         loadStartTime = System.currentTimeMillis();
         load();
         waitInitEnd();
-        Utils.setShutdownHook(GameSystemUtils::saveSync);
     }
 
     /**
@@ -122,6 +122,7 @@ public class GameSystemUtils {
     /**
      * GameSystem save db (同步)
      */
+    @OnShutdown(order = 50)
     public static void saveSync() {
         for (Map.Entry<String, BaseSystem> entry : systems.entrySet()) {
             entry.getValue().save();
@@ -129,6 +130,29 @@ public class GameSystemUtils {
             DbManager.getDbService().execute("update `server_data` set `data` = ? where `server_id` = ? and `name` = ?",
                     JSON.toJSONBytes(entry.getValue().getDataMap()), RpcNodeManager.getRpcServerId(), entry.getKey());
         }
+    }
+
+    /**
+     * 停机时强制保存全部在线玩家数据（同步）。
+     */
+    @OnShutdown(order = 30, timeoutMs = 30_000)
+    public static int saveAllHumansSync() {
+        int saved = 0;
+        int errors = 0;
+        for (HumanObject humanObject : HumanObjectManger.getHumanObjects()) {
+            try {
+                DbManager.getDbService().execute("update `human_info` set `role_data` = ? where `human_id` = ?",
+                        JSON.toJSONBytes(humanObject.save()), humanObject.getHumanId());
+                saved++;
+            } catch (Exception e) {
+                errors++;
+                LogCore.GameServer.error("saveAllHumansSync failed for humanId={}: {}",
+                        humanObject.getHumanId(), e.getMessage(), e);
+            }
+        }
+        LogCore.GameServer.info("saveAllHumansSync done: saved={}, errors={}, totalOnline={}",
+                saved, errors, HumanObjectManger.getOnlineCount());
+        return saved;
     }
 
     /**

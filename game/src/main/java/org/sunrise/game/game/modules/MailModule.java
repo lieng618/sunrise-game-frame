@@ -5,7 +5,6 @@ import com.alibaba.fastjson2.TypeReference;
 import lombok.Getter;
 import lombok.Setter;
 import org.sunrise.game.game.annotation.HumanModule;
-import org.sunrise.game.game.async.AsyncEventManager;
 import org.sunrise.game.game.human.HumanObject;
 import org.sunrise.game.game.human.HumanObjectManger;
 import org.sunrise.game.game.logic.mail.MailData;
@@ -16,6 +15,7 @@ import org.sunrise.game.rpc.function.ErrorType;
 import org.sunrise.game.rpc.function.RpcFunction;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 邮件模块
@@ -50,7 +50,7 @@ public class MailModule extends BaseModule {
             byte[] protoData = (byte[]) rpcResult.getData("protoData");
             humanObj.sendMsg(TopicProto.TOPIC.TOPIC_TYPE_MAIL_VALUE,
                     MailProto.FROM_SERVER.S2C_GetMailList_VALUE, protoData);
-        }, "humanId", getHumanId());
+        }, Map.of("humanId", getHumanId()));
     }
 
     /**

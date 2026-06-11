@@ -17,4 +17,6 @@ public class ErrorType {
     public static final int RPC_CALL_CATCH = 104;
     // 远端没有注册此方法
     public static final int RPC_NOT_REGISTER = 105;
+    // 停机中，调用被中断
+    public static final int RPC_SHUTDOWN = 107;
 }

@@ -8,6 +8,7 @@ import org.sunrise.game.game.logic.map.MapNavUtils;
 import org.sunrise.game.game.logic.system.GameSystemUtils;
 import org.sunrise.game.game.modules.ModuleUtils;
 import org.sunrise.game.genRpc.gen.CallEnum;
+import org.sunrise.game.graceful.GracefulShutdown;
 import org.sunrise.game.jwt.JwtUtil;
 import org.sunrise.game.rpc.function.CallUtils;
 import org.sunrise.game.rpc.node.RpcNodeManager;
@@ -53,6 +54,8 @@ public class GameServerStartUp {
         JwtUtil.init(properties);
 
         rpcNode.start();
+
+        GracefulShutdown.scanAndInstall();
 
         // 内存检测
         Utils.startMemoryCheck();

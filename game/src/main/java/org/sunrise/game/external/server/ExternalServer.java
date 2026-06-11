@@ -18,12 +18,14 @@ import io.netty.handler.logging.LoggingHandler;
 import kcp.ChannelConfig;
 import kcp.KcpServer;
 import lombok.Data;
+import lombok.Getter;
 import org.sunrise.game.config.ConfigReader;
 import org.sunrise.game.core.coder.SocketMessageDecoder;
 import org.sunrise.game.core.coder.SocketMessageEncoder;
 import org.sunrise.game.core.coder.WebSocketMessageCodec;
 import org.sunrise.game.db.DbManager;
 import org.sunrise.game.db.entity.EntityExternalSystem;
+import org.sunrise.game.graceful.OnShutdown;
 import org.sunrise.game.log.LogCore;
 import org.sunrise.game.rpc.node.RpcNodeManager;
 import org.sunrise.game.utils.Utils;
@@ -43,8 +45,18 @@ public class ExternalServer {
     private boolean kcpEnabled;
 
     private volatile boolean statusUpdated;
+    private volatile boolean isShutdown;
+    @Getter
+    private static ExternalServer instance;
+
+    // 持有 EventLoopGroup 引用，供停机时关闭
+    private EventLoopGroup tcpBossGroup;
+    private EventLoopGroup tcpWorkerGroup;
+    private EventLoopGroup wsBossGroup;
+    private EventLoopGroup wsWorkerGroup;
 
     public void start() {
+        instance = this;
         int serverId = RpcNodeManager.getRpcServerId();
         int port = 0;
         String ip = null;
@@ -91,14 +103,68 @@ public class ExternalServer {
             LogCore.ExternalServer.error("Server StartUp Failed, name = { ExternalServer }, serverId = {}, reason = {}", serverId, e.getLocalizedMessage());
             System.exit(-1);
         }
-        Utils.setShutdownHook(() -> DbManager.getDbService().execute("update `external_system` set `status` = ? where `id` = ?", 0, serverId));
+    }
+
+    /**
+     * 优雅停机入口（静态方法，供 {@code @OnShutdown} 注解扫描）。
+     */
+    @OnShutdown(order = 70, timeoutMs = 15_000)
+    public static void shutdownInstance() {
+        ExternalServer es = getInstance();
+        if (es != null) es.onStop();
+    }
+
+    /**
+     * 优雅停机：关闭所有监听端口的 EventLoopGroup 并更新 DB 状态为离线。
+     */
+    public void onStop() {
+        if (isShutdown) return;
+        isShutdown = true;
+        LogCore.ExternalServer.info("ExternalServer onStop begin, port={}", externalPort);
+
+        // 更新状态为离线
+        int serverId = RpcNodeManager.getRpcServerId();
+        try {
+            DbManager.getDbService().execute("update `external_system` set `status` = ? where `id` = ?", 0, serverId);
+        } catch (Exception e) {
+            LogCore.ExternalServer.error("ExternalServer onStop update status error", e);
+        }
+
+        // 关闭 KCP
+        if (kcpServer != null) {
+            try {
+                kcpServer.stop();
+            } catch (Exception e) {
+                LogCore.ExternalServer.error("ExternalServer kcpServer stop error", e);
+            }
+        }
+
+        // 关闭 TCP EventLoopGroup
+        shutdownGroup(tcpBossGroup, "tcpBoss");
+        shutdownGroup(tcpWorkerGroup, "tcpWorker");
+        // 关闭 WS EventLoopGroup
+        shutdownGroup(wsBossGroup, "wsBoss");
+        shutdownGroup(wsWorkerGroup, "wsWorker");
+
+        LogCore.ExternalServer.info("ExternalServer onStop end, port={}", externalPort);
+    }
+
+    private void shutdownGroup(EventLoopGroup group, String name) {
+        if (group != null) {
+            try {
+                group.shutdownGracefully().awaitUninterruptibly(5000);
+                LogCore.ExternalServer.info("ExternalServer shutdown {} group done", name);
+            } catch (Exception e) {
+                LogCore.ExternalServer.error("ExternalServer shutdown {} group error", name, e);
+            }
+        }
     }
 
     private void startTcpListen(String ip, int port) {
-        EventLoopGroup bossGroup = Utils.createEventLoopGroup(1);
-        EventLoopGroup workerGroup = Utils.createEventLoopGroup(0);
+        this.tcpBossGroup = Utils.createEventLoopGroup(1);
+        this.tcpWorkerGroup = Utils.createEventLoopGroup(0);
         ServerBootstrap b = new ServerBootstrap();
-        b.group(bossGroup, workerGroup)
+        b.group(this.tcpBossGroup, this.tcpWorkerGroup)
                 .channel(Utils.getServerChannelClass())
                 .option(ChannelOption.SO_BACKLOG, 10240) //内核为这个套接字排队的最大连接数
                 .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT) //使用内存池
@@ -122,8 +188,8 @@ public class ExternalServer {
                 markServerRunning();
             } else {
                 LogCore.ExternalServer.error("Failed to bind server on ip: {} and port: {}", ip, port, future.cause());
-                bossGroup.shutdownGracefully().syncUninterruptibly();
-                workerGroup.shutdownGracefully().syncUninterruptibly();
+                shutdownGroup(tcpBossGroup, "tcpBoss");
+                shutdownGroup(tcpWorkerGroup, "tcpWorker");
                 System.exit(-1);
             }
         });
@@ -133,10 +199,10 @@ public class ExternalServer {
         if (ip == null || port == 0) {
             return;
         }
-        EventLoopGroup bossGroup = Utils.createEventLoopGroup(1);
-        EventLoopGroup workerGroup = Utils.createEventLoopGroup(0);
+        this.wsBossGroup = Utils.createEventLoopGroup(1);
+        this.wsWorkerGroup = Utils.createEventLoopGroup(0);
         ServerBootstrap b = new ServerBootstrap();
-        b.group(bossGroup, workerGroup)
+        b.group(this.wsBossGroup, this.wsWorkerGroup)
                 .channel(Utils.getServerChannelClass())
                 .handler(new LoggingHandler(LogLevel.INFO))
                 .childHandler(new ChannelInitializer<SocketChannel>() {
@@ -157,8 +223,8 @@ public class ExternalServer {
                 markServerRunning();
             } else {
                 LogCore.ExternalServer.error("Failed to bind server on ip: {} and port: {}", ip, port, future.cause());
-                bossGroup.shutdownGracefully();
-                workerGroup.shutdownGracefully();
+                shutdownGroup(wsBossGroup, "wsBoss");
+                shutdownGroup(wsWorkerGroup, "wsWorker");
                 System.exit(-1);
             }
         });

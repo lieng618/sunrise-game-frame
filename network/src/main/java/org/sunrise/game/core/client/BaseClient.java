@@ -36,16 +36,18 @@ public class BaseClient {
     private Bootstrap b;
     private volatile boolean isShutdown = false;
     private AtomicBoolean connectFinish = new AtomicBoolean(false);
+    /** 是否自己创建了 group（需要在 onStop 时关闭），共享 group 不关闭 */
+    private boolean groupOwned = true;
 
     public BaseClient() {
         this.messageManager = new ClientMessageManager(nodeId);
         this.clientHandler = r -> new BaseClientHandler(nodeId);
         this.pulseHandler = r -> new BaseClientPulseHandler(nodeId);
         this.group = Utils.createEventLoopGroup(1);
+        this.groupOwned = true;
         this.b = new Bootstrap();
         this.b.group(this.group);
         init();
-        Utils.setShutdownHook(this::onStop);
     }
 
     public BaseClient(String nodeId) {
@@ -54,14 +56,14 @@ public class BaseClient {
         this.clientHandler = r -> new BaseClientHandler(nodeId);
         this.pulseHandler = r -> new BaseClientPulseHandler(nodeId);
         this.group = Utils.createEventLoopGroup(1);
+        this.groupOwned = true;
         this.b = new Bootstrap();
         this.b.group(this.group);
         init();
-        Utils.setShutdownHook(this::onStop);
     }
 
     /**
-     * 多个BaseClient可共用同一个group
+     * 多个BaseClient可共用同一个group（传入外部 group 时不会在 onStop 中关闭）。
      */
     public BaseClient(String nodeId, EventLoopGroup group, Bootstrap b) {
         this.nodeId = nodeId;
@@ -70,6 +72,9 @@ public class BaseClient {
         this.pulseHandler = r -> new BaseClientPulseHandler(nodeId);
         if (group == null) {
             group = Utils.createEventLoopGroup(1);
+            this.groupOwned = true;
+        } else {
+            this.groupOwned = false; // 外部传入，不负责关闭
         }
         this.group = group;
         if (b == null) {
@@ -78,7 +83,6 @@ public class BaseClient {
         this.b = b;
         this.b.group(this.group);
         init();
-        Utils.setShutdownHook(this::onStop);
     }
 
     public void init() {
@@ -148,16 +152,31 @@ public class BaseClient {
     public void onFail() {
     }
 
+    /**
+     * 优雅停机：关闭 channel → 排空队列 → 关闭 DispatchThread → 关闭自有 EventLoopGroup。
+     * 由 {@code GracefulShutdown} 统一编排调用。
+     */
     public void onStop() {
         isShutdown = true;
         if (serverChannel != null) {
             connectStatus = false;
+            LogCore.BaseClient.info("BaseClient close, nodeId = { {} }, remoteAddress = { {} }",
+                    nodeId, serverChannel.remoteAddress());
             serverChannel.close();
             serverChannel = null;
         }
         if (messageManager != null) {
+            // 停机前先排空队列
+            messageManager.drainRecvQueue(2000);
+            messageManager.drainSendQueue(3000);
             messageManager.getDispatchThread().shutdown();
+            messageManager.getDispatchThread().awaitTermination(5000);
             messageManager = null;
+        }
+        // 仅关闭自身创建的 EventLoopGroup
+        if (groupOwned && group != null) {
+            group.shutdownGracefully().awaitUninterruptibly(5000);
+            group = null;
         }
     }
 }

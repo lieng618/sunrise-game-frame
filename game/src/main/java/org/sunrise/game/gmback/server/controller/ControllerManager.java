@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
 import org.sunrise.game.db.DbManager;
 import org.sunrise.game.db.entity.EntityServerData;
+import org.sunrise.game.graceful.OnShutdown;
 import org.sunrise.game.log.LogCore;
 import org.sunrise.game.thread.DispatchThread;
 import org.sunrise.game.utils.Utils;
@@ -36,7 +37,6 @@ public class ControllerManager {
         load();
         waitInitEnd();
         startSaveDbPulse();
-        Utils.setShutdownHook(ControllerManager::saveSync);
     }
 
     @SuppressWarnings("unchecked")
@@ -99,6 +99,7 @@ public class ControllerManager {
     /**
      * ControllerManager save db (同步)
      */
+    @OnShutdown(order = 60)
     public static void saveSync() {
         for (Map.Entry<String, BaseController> entry : controllers.entrySet()) {
             entry.getValue().save();

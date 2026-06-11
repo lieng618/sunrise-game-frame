@@ -33,6 +33,9 @@ public class RpcFunction {
     static final Map<Integer, List<String>> callIdNodes = new ConcurrentHashMap<>();
     private String designatedServerNodeId; // 指定服务节点id
 
+    /** 全局停机标志，置为 true 后所有新的 RPC 调用将被拒绝 */
+    public static volatile boolean shuttingDown = false;
+
     public RpcFunction() {
     }
 
@@ -72,6 +75,10 @@ public class RpcFunction {
      * 发起一次调用
      */
     public boolean call(int id, Object... params) {
+        if (shuttingDown) {
+            LogCore.RpcClient.warn("rpc call rejected (shutting down), callId = {}", id);
+            return false;
+        }
         var callNode = callIdNodes.get(id);
         // 没有任何节点提供此方法
         if (callNode == null || callNode.isEmpty()) {
@@ -147,17 +154,27 @@ public class RpcFunction {
     }
 
     /**
-     * rpcClient发起调用之后，注册回调函数
+     * rpcClient发起调用之后，注册回调函数。
+     *
+     * @param callback RPC 返回后的回调
+     * @param contexts 透传到回调的键值对上下文（key 为 String）；可为 null
      */
-    public void listenResult(Callback<RpcResult> callback, Object... contexts) {
+    /**
+     * 注册回调（无上下文，等效于 {@code listenResult(callback, null)}）。
+     */
+    public void listenResult(Callback<RpcResult> callback) {
+        listenResult(callback, null);
+    }
+
+    /**
+     * 注册回调并透传上下文键值对。
+     */
+    public void listenResult(Callback<RpcResult> callback, Map<String, Object> contexts) {
         if (calls.isEmpty()) {
             LogCore.RpcClient.error("rpc listenResult, calls empty");
             return;
         }
         Call last = calls.getLast();
-        if (contexts.length % 2 != 0) {
-            LogCore.RpcClient.error("rpc listenResult, contexts length error, contexts = {}", contexts);
-        }
         CallResult callResult = new CallResult(callback, contexts);
         if (last.getNodeId() != null) {
             RpcManager.registerCallback(last.getMessageId(), callResult);

@@ -2,6 +2,7 @@ package org.sunrise.game.global.main;
 
 import org.sunrise.game.config.ConfigReader;
 import org.sunrise.game.genRpc.gen.CallEnum;
+import org.sunrise.game.graceful.GracefulShutdown;
 import org.sunrise.game.rpc.function.CallUtils;
 import org.sunrise.game.rpc.node.RpcNodeManager;
 import org.sunrise.game.utils.Utils;
@@ -27,6 +28,8 @@ public class GlobalServerStartUp {
         var rpcNode = RpcNodeManager.createRpcNode(serverId, nodeType);
         CallUtils.init(rpcNode.getNodeId(), Collections.singletonList("org.sunrise.game.global.service"), CallEnum.class);
         rpcNode.start();
+
+        GracefulShutdown.scanAndInstall();
 
         Utils.startMemoryCheck();
     }

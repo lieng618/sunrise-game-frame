@@ -2,6 +2,8 @@ package org.sunrise.game.game.logic.chat;
 
 import com.alibaba.fastjson2.JSON;
 import com.github.houbb.sensitive.word.core.SensitiveWordHelper;
+
+import java.util.Map;
 import org.sunrise.game.game.annotation.MsgHandlerClass;
 import org.sunrise.game.game.annotation.MsgHandlerMethod;
 import org.sunrise.game.game.human.HumanObject;
@@ -115,6 +117,6 @@ public class ChatMsgHandler {
             if (rpcResult.getResult() != ErrorType.SUCCESS) return;
             byte[] protoData = (byte[]) rpcResult.getData("info");
             humanObj.sendMsg(TopicProto.TOPIC.TOPIC_TYPE_CHAT_VALUE, ChatProto.FROM_SERVER.S2C_History_VALUE, protoData);
-        }, "humanId", humanObject.getHumanId());
+        }, Map.of("humanId", humanObject.getHumanId()));
     }
 }

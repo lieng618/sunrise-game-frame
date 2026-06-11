@@ -4,6 +4,7 @@ import org.sunrise.game.core.message.BaseMessage;
 import org.sunrise.game.core.message.MessageType;
 import org.sunrise.game.core.message.MessageUtils;
 import org.sunrise.game.core.message.SocketMessage;
+import org.sunrise.game.graceful.OnShutdown;
 import org.sunrise.game.log.LogCore;
 import org.sunrise.game.utils.Utils;
 
@@ -87,6 +88,22 @@ public class BaseServerManager {
         } else {
             LogCore.BaseServer.warn("BaseServer sendToClient fail, use NodeId = { {} }, message = {{}}", message.getNodeId(), message);
         }
+    }
+
+    /**
+     * 停机时关闭所有已注册的 BaseServer。
+     */
+    @OnShutdown(order = 90)
+    public static void shutdownAll() {
+        for (Map.Entry<String, BaseServer> entry : baseServers.entrySet()) {
+            try {
+                entry.getValue().onStop();
+            } catch (Exception e) {
+                LogCore.BaseServer.error("BaseServerManager shutdownAll error, nodeId={}: {}",
+                        entry.getKey(), e.getMessage(), e);
+            }
+        }
+        baseServers.clear();
     }
 
     /**

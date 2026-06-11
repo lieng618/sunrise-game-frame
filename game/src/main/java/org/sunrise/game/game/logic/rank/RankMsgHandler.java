@@ -1,5 +1,7 @@
 package org.sunrise.game.game.logic.rank;
 
+import java.util.Map;
+
 import org.sunrise.game.game.annotation.MsgHandlerClass;
 import org.sunrise.game.game.annotation.MsgHandlerMethod;
 import org.sunrise.game.game.human.HumanObject;
@@ -30,7 +32,7 @@ public class RankMsgHandler {
             byte[] protoData = (byte[]) rpcResult.getData("protoData");
             humanObj.sendMsg(TopicProto.TOPIC.TOPIC_TYPE_RANK_VALUE,
                     RankProto.FROM_SERVER.S2C_GetRankList_VALUE, protoData);
-        }, "humanId", humanObject.getHumanId());
+        }, Map.of("humanId", humanObject.getHumanId()));
     }
 
     @MsgHandlerMethod(packetId = RankProto.FROM_CLIENT.C2S_GetMyRank_VALUE)
@@ -46,6 +48,6 @@ public class RankMsgHandler {
             byte[] protoData = (byte[]) rpcResult.getData("protoData");
             humanObject.sendMsg(TopicProto.TOPIC.TOPIC_TYPE_RANK_VALUE,
                     RankProto.FROM_SERVER.S2C_GetMyRank_VALUE, protoData);
-        }, "humanId", humanObject.getHumanId());
+        }, Map.of("humanId", humanObject.getHumanId()));
     }
 }

@@ -2,6 +2,7 @@ package org.sunrise.game.http.main;
 
 import org.sunrise.game.config.ConfigReader;
 import org.sunrise.game.genRpc.gen.CallEnum;
+import org.sunrise.game.graceful.GracefulShutdown;
 import org.sunrise.game.jwt.JwtUtil;
 import org.sunrise.game.rpc.function.CallUtils;
 import org.sunrise.game.rpc.node.RpcNodeManager;
@@ -31,6 +32,8 @@ public class HttpServerStartUp {
         JwtUtil.init(properties);
 
         rpcNode.start();
+
+        GracefulShutdown.scanAndInstall();
 
         Utils.startMemoryCheck();
     }

@@ -65,10 +65,6 @@ public class Utils {
         return "0.0.0.0";
     }
 
-    public static void setShutdownHook(Runnable task) {
-        Runtime.getRuntime().addShutdownHook(new Thread(task, "ServerShutdown"));
-    }
-
     /**
      * 根据当前系统环境创建最优的 EventLoopGroup
      * @param nThreads 线程数 (传入 0 则使用 Netty 默认值：CPU 核心数 * 2)
@@ -215,11 +211,19 @@ public class Utils {
         }
     }
 
-    public static void sleep(long millis) {
+    /**
+     * 睡眠指定毫秒。被中断时恢复中断标志并返回 false。
+     *
+     * @return true 如果正常睡眠结束；false 如果被中断
+     */
+    public static boolean sleep(long millis) {
         try {
             Thread.sleep(millis);
+            return true;
         } catch (InterruptedException e) {
-            LogCore.ServerStartUp.error("sleep:", e);
+            Thread.currentThread().interrupt(); // 恢复中断标志
+            LogCore.ServerStartUp.debug("sleep interrupted: {}", e.getMessage());
+            return false;
         }
     }
 }

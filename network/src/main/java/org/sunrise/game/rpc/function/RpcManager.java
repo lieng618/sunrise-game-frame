@@ -1,7 +1,9 @@
 package org.sunrise.game.rpc.function;
 
+import org.sunrise.game.graceful.OnShutdown;
 import org.sunrise.game.log.LogCore;
 
+import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -52,5 +54,67 @@ public class RpcManager {
             long timeout = millis <= 0 ? DEFAULT_TIMEOUT_MS : millis;
             checkTimeout.put(uid, System.currentTimeMillis() + timeout);
         }
+    }
+
+    /**
+     * 当前 pending 的 RPC 调用数
+     */
+    public static int getPendingCount() {
+        return callResults.size();
+    }
+
+    /**
+     * 停机时等待所有 pending RPC 调用完成或超时。
+     *
+     * @param timeoutMs 最大等待毫秒数
+     */
+    public static void awaitPending(long timeoutMs) {
+        long deadline = System.currentTimeMillis() + timeoutMs;
+        int pending;
+        while ((pending = callResults.size()) > 0 && System.currentTimeMillis() < deadline) {
+            LogCore.RpcServer.info("awaitPending: {} pending RPC calls remaining", pending);
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                break;
+            }
+        }
+        int remaining = callResults.size();
+        if (remaining > 0) {
+            LogCore.RpcServer.warn("awaitPending timeout: {} RPC calls still pending after {}ms", remaining, timeoutMs);
+        } else {
+            LogCore.RpcServer.info("awaitPending: all RPC calls completed");
+        }
+    }
+
+    /**
+     * 停机时强制清理所有残留的 RPC pending 条目，触发 timeout 回调。
+     * 在 awaitPending 超时后调用，确保所有回调都被触发（以 RPC_TIMEOUT 状态）。
+     */
+    public static void shutdown() {
+        int cleaned = 0;
+        Iterator<Map.Entry<Long, CallResult>> it = callResults.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<Long, CallResult> entry = it.next();
+            it.remove();
+            checkTimeout.remove(entry.getKey());
+            CallResult callResult = entry.getValue();
+            if (callResult != null && callResult.getCallback() != null) {
+                callResult.getRpcResult().setResult(ErrorType.RPC_SHUTDOWN);
+                callResult.getCallback().process(callResult.getRpcResult());
+                cleaned++;
+            }
+        }
+        LogCore.RpcServer.info("RpcManager shutdown: cleaned {} pending calls", cleaned);
+    }
+
+    /**
+     * 优雅停机入口：等待 pending RPC 完成 → 强制清理超时回调。
+     */
+    @OnShutdown(order = 20)
+    public static void shutdownGracefully() {
+        awaitPending(8000);
+        shutdown();
     }
 }

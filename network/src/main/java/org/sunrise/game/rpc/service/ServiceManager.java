@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
 import org.sunrise.game.db.DbManager;
 import org.sunrise.game.db.entity.EntityServerData;
+import org.sunrise.game.graceful.OnShutdown;
 import org.sunrise.game.log.LogCore;
 import org.sunrise.game.rpc.node.RpcNodeManager;
 import org.sunrise.game.utils.Utils;
@@ -34,7 +35,6 @@ public class ServiceManager {
         }
         load();
         waitInitEnd();
-        Utils.setShutdownHook(ServiceManager::saveSync);
     }
 
     /**
@@ -97,6 +97,7 @@ public class ServiceManager {
     /**
      * ServiceManager save db (同步)
      */
+    @OnShutdown(order = 40)
     public static void saveSync() {
         for (Map.Entry<String, BaseService> entry : services.entrySet()) {
             entry.getValue().save();

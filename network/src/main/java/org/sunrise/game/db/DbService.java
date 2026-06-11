@@ -237,6 +237,18 @@ public class DbService {
         });
     }
 
+    /**
+     * 关闭数据库连接池。
+     */
+    public void close() {
+        if (dataSource != null && !dataSource.isClosed()) {
+            dataSource.close();
+        }
+        if (dbExecutor != null && !dbExecutor.isShutdown()) {
+            dbExecutor.shutdown();
+        }
+    }
+
     // 提取结果集
     private Map<String, Object> extractResultSet(ResultSet resultSet) throws SQLException {
         Map<String, Object> rowMap = new HashMap<>();

@@ -113,4 +113,58 @@ public abstract class BaseMessageManager {
         }
     }
 
+    /**
+     * 停机时排空入站队列（阻塞当前线程），直到队列为空或超时。
+     *
+     * @param timeoutMs 最大等待毫秒数
+     * @return 本次排空处理的消息条数
+     */
+    public int drainRecvQueue(long timeoutMs) {
+        long deadline = System.currentTimeMillis() + timeoutMs;
+        int processed = 0;
+        while (System.currentTimeMillis() < deadline) {
+            int batch = pulseHandler();
+            processed += batch;
+            if (batch == 0 && recvMsgQueue.isEmpty()) {
+                break;
+            }
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                break;
+            }
+        }
+        LogCore.BaseServer.info("drainRecvQueue done: processed={}, remaining={}, nodeId={}",
+                processed, recvMsgQueue.size(), nodeId);
+        return processed;
+    }
+
+    /**
+     * 停机时排空出站队列（阻塞当前线程），直到队列为空或超时。
+     *
+     * @param timeoutMs 最大等待毫秒数
+     * @return 本次排空发送的消息条数
+     */
+    public int drainSendQueue(long timeoutMs) {
+        long deadline = System.currentTimeMillis() + timeoutMs;
+        int sent = 0;
+        while (System.currentTimeMillis() < deadline) {
+            int batch = pulseSender();
+            sent += batch;
+            if (batch == 0 && sendMsgQueue.isEmpty()) {
+                break;
+            }
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                break;
+            }
+        }
+        LogCore.BaseServer.info("drainSendQueue done: sent={}, remaining={}, nodeId={}",
+                sent, sendMsgQueue.size(), nodeId);
+        return sent;
+    }
+
 }

@@ -37,7 +37,6 @@ public class BaseServer {
         this.messageManager = new ServerMessageManager(nodeId);
         this.serverHandler = r -> new BaseServerHandler(nodeId);
         this.pulseHandler = r -> new BaseServerPulseHandler(nodeId);
-        Utils.setShutdownHook(this::onStop);
     }
 
     public BaseServer(String nodeId) {
@@ -45,7 +44,6 @@ public class BaseServer {
         this.messageManager = new ServerMessageManager(nodeId);
         this.serverHandler = r -> new BaseServerHandler(nodeId);
         this.pulseHandler = r -> new BaseServerPulseHandler(nodeId);
-        Utils.setShutdownHook(this::onStop);
     }
 
     public void startListen(String ip, int port) {
@@ -98,30 +96,42 @@ public class BaseServer {
         messageManager.run();
     }
 
+    /**
+     * 优雅停机：关闭 channel 拒绝新连接 → 排空消息队列 → 关闭 EventLoopGroup。
+     * 由 {@code GracefulShutdown} 统一编排调用，不应作为独立的 JVM shutdown hook 使用。
+     */
     public void onStop() {
         isShutdown = true;
         if (startSuccess) {
+            // 1. 关闭监听 channel，拒绝新连接
             if (channel != null) {
                 LogCore.BaseServer.info("BaseServer close, nodeId = { {} }, messageManager = { {} }, BaseServerHandler = { {} }, localAddress = { {} }",
                         nodeId, messageManager.getClass().getSimpleName(), serverHandler.apply(nodeId).getClass().getSimpleName(), channel.localAddress());
                 channel.close();
                 channel = null;
             }
+            // 2. 排空消息队列（最多等待 5 秒）
             if (messageManager != null) {
+                messageManager.drainRecvQueue(2000);
+                messageManager.drainSendQueue(3000);
                 messageManager.getDispatchThread().shutdown();
+                messageManager.getDispatchThread().awaitTermination(5000);
                 messageManager = null;
             }
         }
         shutdownEventLoopGroups();
     }
 
+    /**
+     * 关闭 EventLoopGroup（异步 + 超时，不阻塞当前线程无限等待）。
+     */
     private void shutdownEventLoopGroups() {
         if (bossGroup != null) {
-            bossGroup.shutdownGracefully().syncUninterruptibly();
+            bossGroup.shutdownGracefully().awaitUninterruptibly(5000);
             bossGroup = null;
         }
         if (workerGroup != null) {
-            workerGroup.shutdownGracefully().syncUninterruptibly();
+            workerGroup.shutdownGracefully().awaitUninterruptibly(5000);
             workerGroup = null;
         }
     }
