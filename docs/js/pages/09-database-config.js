@@ -144,13 +144,17 @@ registerPage('config', '配置参考', '各服务配置项说明', () => `
 <tr><td>jdbc.url</td><td>MySQL 连接地址</td><td>jdbc:mysql://127.0.0.1:3306/sunrise?useUnicode=true&characterEncoding=utf8mb4</td></tr>
 <tr><td>jdbc.user</td><td>数据库用户</td><td>root</td></tr>
 <tr><td>jdbc.password</td><td>数据库密码</td><td>666666</td></tr>
-<tr><td>jdbc.maximumPoolSize</td><td>连接池最大连接数</td><td>5</td></tr>
+<tr><td>jdbc.pool.maximum-size</td><td>连接池最大连接数</td><td>5</td></tr>
+<tr><td>jdbc.pool.minimum-idle</td><td>连接池最小空闲连接数</td><td>3</td></tr>
+<tr><td>jdbc.pool.connection-timeout</td><td>获取连接超时（毫秒）</td><td>30000</td></tr>
+<tr><td>jdbc.pool.idle-timeout</td><td>空闲连接存活时间（毫秒）</td><td>600000</td></tr>
+<tr><td>jdbc.pool.max-lifetime</td><td>连接最大生命周期（毫秒）</td><td>1800000</td></tr>
 <tr><td>master.id</td><td>中心服 ID（0=不连接中心服，单进程模式）</td><td>1</td></tr>
 <tr><td>master.address</td><td>中心服地址</td><td>127.0.0.1</td></tr>
 <tr><td>master.port</td><td>中心服端口</td><td>8000</td></tr>
 <tr><td>report.address</td><td>本机上报 IP</td><td>127.0.0.1</td></tr>
 <tr><td>rpc.node.type</td><td>RPC 节点类型，用于连接策略与拓扑展示（external/game/global/http/gmback 等）</td><td>game</td></tr>
-<tr><td>rpc.node.serverId</td><td>RPC 节点 ID，写入 rpc_server_system，集群内唯一</td><td>200</td></tr>
+<tr><td>rpc.node.server-id</td><td>RPC 节点 ID，写入 rpc_server_system，集群内唯一</td><td>200</td></tr>
 <tr><td>log.level</td><td>日志级别</td><td>DEBUG</td></tr>
 </tbody>
 </table>
@@ -173,6 +177,7 @@ registerPage('config', '配置参考', '各服务配置项说明', () => `
 <tr><td>external.listen.tcp</td><td>tcp协议是否启动</td><td>true</td></tr>
 <tr><td>external.listen.ws</td><td>ws协议是否启动</td><td>true</td></tr>
 <tr><td>external.listen.kcp</td><td>kcp协议是否启动</td><td>true</td></tr>
+<tr><td>external.rate-limit.per-minute</td><td>单客户端每分钟最大接收消息数</td><td>1000</td></tr>
 </tbody>
 </table>
 
@@ -181,7 +186,7 @@ registerPage('config', '配置参考', '各服务配置项说明', () => `
 <thead><tr><th>配置键</th><th>说明</th><th>示例</th></tr></thead>
 <tbody>
 <tr><td>config.path</td><td>Luban 配置 JSON 路径</td><td>E:/sunrise-game-frame/tables/json</td></tr>
-<tr><td>login.queue.maxPerSecond</td><td>登录排队：每秒允许放行的最大登录数（含直通与出队），超出则入队等待</td><td>100</td></tr>
+<tr><td>login.queue.max-per-second</td><td>登录排队：每秒允许放行的最大登录数（含直通与出队），超出则入队等待</td><td>100</td></tr>
 <tr><td>player.auth.enabled</td><td>游戏服是否强制校验 C2S_Login Token</td><td>false</td></tr>
 <tr><td>player.jwt.secret</td><td>玩家 JWT 密钥（须与 http-config 一致）</td><td>sunrise-player-jwt-secret-change-me-in-production-32b</td></tr>
 <tr><td>player.jwt.expiration</td><td>玩家 JWT 过期时间（毫秒）</td><td>86400000</td></tr>
@@ -236,7 +241,7 @@ registerPage('config', '配置参考', '各服务配置项说明', () => `
 <tr><td>admin.user</td><td>GM 登录用户名（gmback-ui 登录）</td><td>admin</td></tr>
 <tr><td>admin.password</td><td>GM 登录密码</td><td>sunrise</td></tr>
 <tr><td>admin.jwt.expiration</td><td>JWT 过期时间（毫秒）</td><td>864000000</td></tr>
-<tr><td>login.queue.maxPerSecond</td><td>登录排队每秒放行上限（与 game-config 含义相同）</td><td>100</td></tr>
+<tr><td>login.queue.max-per-second</td><td>登录排队每秒放行上限（与 game-config 含义相同）</td><td>100</td></tr>
 <tr><td>player.auth.enabled</td><td>玩家 Token 鉴权开关（Http + Game 须一致）</td><td>false</td></tr>
 <tr><td>player.jwt.secret</td><td>玩家 JWT 密钥</td><td>sunrise-player-jwt-secret-change-me-in-production-32b</td></tr>
 <tr><td>player.jwt.expiration</td><td>玩家 JWT 过期时间（毫秒）</td><td>86400000</td></tr>

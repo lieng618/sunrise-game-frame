@@ -79,7 +79,7 @@ rpc.connect.http=</code></pre>
 <tr><td>global</td><td>GlobalServer</td><td>4000</td></tr>
 </tbody>
 </table>
-<p>各 RPC 进程须在自身配置中设置 <code>rpc.node.type</code>（与上表一致）和 <code>rpc.node.serverId</code>（集群内唯一整数）。自定义 RPC 服务也需使用未占用的 type 名，并在中心服策略中补充对应规则。</p>
+<p>各 RPC 进程须在自身配置中设置 <code>rpc.node.type</code>（与上表一致）和 <code>rpc.node.server-id</code>（集群内唯一整数）。自定义 RPC 服务也需使用未占用的 type 名，并在中心服策略中补充对应规则。</p>
 
 <div class="flow-diagram">
     <div class="flow-row">

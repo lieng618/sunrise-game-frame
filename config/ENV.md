@@ -2,6 +2,8 @@
 
 配置文件在 `config/`，启动时作为 jar 的第一个参数传入。敏感项写成 `${ENV:default}`，由框架在启动时替换。
 
+**命名规范：** `service.category.name`，全小写点分，多词段用连字符（如 `jdbc.pool.maximum-size`、`external.rate-limit.per-minute`）。properties 文件统一 `key=value` 格式，等号两侧不加空格。各 `*-config.example.properties` 模板中附有字段说明注释。
+
 **解析顺序：** 环境变量 → JVM `-D` 参数 → 默认值
 
 | 写法 | 含义 |
@@ -15,6 +17,19 @@
 |------|------|
 | `*-config.properties` | 实际配置，本地可直接用 |
 | `*-config.example.properties` | 模板，可复制为 `local-*.properties` |
+| `reset-config.sh` / `reset-config.bat` | 从模板批量覆盖所有 `*-config.properties` |
+
+从模板重置全部配置（**会覆盖现有修改**）：
+
+```bash
+# Linux / macOS / Git Bash
+sh config/reset-config.sh
+```
+
+```bat
+REM Windows CMD
+config\reset-config.bat
+```
 | `start/docker/.env` | Docker 密钥，从 `.env.example` 复制 |
 
 ---

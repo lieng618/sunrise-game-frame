@@ -51,21 +51,21 @@ public class LoginQueueSystem extends BaseSystem {
         Properties properties = ConfigReader.getProp();
         int max = DEFAULT_MAX_LOGIN_PER_SECOND;
         if (properties != null) {
-            String value = properties.getProperty("login.queue.maxPerSecond");
+            String value = properties.getProperty("login.queue.max-per-second");
             if (value != null && !value.isBlank()) {
                 try {
                     max = Integer.parseInt(value.trim());
                 } catch (NumberFormatException e) {
-                    LogCore.GameServer.warn("invalid login.queue.maxPerSecond={}, use default {}", value, DEFAULT_MAX_LOGIN_PER_SECOND);
+                    LogCore.GameServer.warn("invalid login.queue.max-per-second={}, use default {}", value, DEFAULT_MAX_LOGIN_PER_SECOND);
                 }
             }
         }
         if (max <= 0) {
-            LogCore.GameServer.warn("login.queue.maxPerSecond must be > 0, use default {}", DEFAULT_MAX_LOGIN_PER_SECOND);
+            LogCore.GameServer.warn("login.queue.max-per-second must be > 0, use default {}", DEFAULT_MAX_LOGIN_PER_SECOND);
             max = DEFAULT_MAX_LOGIN_PER_SECOND;
         }
         maxLoginPerSecond = max;
-        LogCore.GameServer.info("LoginQueueSystem init, login.queue.maxPerSecond = {}", maxLoginPerSecond);
+        LogCore.GameServer.info("LoginQueueSystem init, login.queue.max-per-second = {}", maxLoginPerSecond);
     }
 
     /**

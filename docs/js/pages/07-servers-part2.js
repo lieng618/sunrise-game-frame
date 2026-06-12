@@ -19,7 +19,7 @@ registerPage('game-server', '游戏服', '玩家对象、模块系统、消息�
     public static void main(String[] args) {
         ConfigReader.loadConfig(args[0]); // 默认 game-config.properties
         Properties properties = ConfigReader.getProp();
-        int serverId = Integer.parseInt(properties.getProperty("rpc.node.serverId"));
+        int serverId = Integer.parseInt(properties.getProperty("rpc.node.server-id"));
         String nodeType = properties.getProperty("rpc.node.type");
         RpcNode rpcNode = RpcNodeManager.createRpcNode(serverId, nodeType);
         ConfigUtils.load();           // 加载 Luban 配置表

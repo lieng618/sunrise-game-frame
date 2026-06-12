@@ -39,7 +39,7 @@ mvn clean package</code></pre>
 jdbc.url=jdbc:mysql://127.0.0.1:3306/sunrise?useUnicode=true&characterEncoding=utf8mb4
 jdbc.user=root
 jdbc.password=your_password
-jdbc.maximumPoolSize=5
+jdbc.pool.maximum-size=5
 
 # ===== 中心服地址（所有 RPC 服务共用）=====
 master.id=1
@@ -54,7 +54,7 @@ external.address=127.0.0.1
 
 # ===== RPC 节点身份 =====
 rpc.node.type=game
-rpc.node.serverId=200</code></pre>
+rpc.node.server-id=200</code></pre>
 
 <div class="callout callout-tip">
     <p><strong>💡 配置优先级</strong>：每个服务读取自己对应的 <code>xxx-config.properties</code>，但数据库和中心服地址是通用配置，每个配置文件都有。单进程模式使用 <code>runallone-config.properties</code>，其中 <code>master.id=0</code> 表示无需连接中心服。</p>

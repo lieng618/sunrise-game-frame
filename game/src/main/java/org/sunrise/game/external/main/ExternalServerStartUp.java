@@ -20,7 +20,7 @@ public class ExternalServerStartUp {
         if (properties == null) {
             return;
         }
-        int serverId = Integer.parseInt(properties.getProperty("rpc.node.serverId"));
+        int serverId = Integer.parseInt(properties.getProperty("rpc.node.server-id"));
         String nodeType = properties.getProperty("rpc.node.type");
         System.setProperty("programName", "ExternalServer-" + serverId);
         Utils.setLogLevel(properties.getProperty("log.level"));

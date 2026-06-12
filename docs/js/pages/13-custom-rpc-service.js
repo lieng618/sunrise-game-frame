@@ -39,7 +39,7 @@ registerPage('custom-rpc-service', '可扩展 RPC 服务', '新建 RPC 进程、
         if (properties == null) {
             return;
         }
-        int serverId = Integer.parseInt(properties.getProperty("rpc.node.serverId"));
+        int serverId = Integer.parseInt(properties.getProperty("rpc.node.server-id"));
         String nodeType = properties.getProperty("rpc.node.type");
         System.setProperty("programName", "HttpServer-" + serverId);
         Utils.setLogLevel(properties.getProperty("log.level"));
@@ -68,11 +68,11 @@ registerPage('custom-rpc-service', '可扩展 RPC 服务', '新建 RPC 进程、
 <pre><code class="language-properties">jdbc.url=jdbc:mysql://127.0.0.1:3306/sunrise
 jdbc.user=root
 jdbc.password=123456
-jdbc.maximumPoolSize=5
-jdbc.minimumIdle=3
-jdbc.connectionTimeout=30000
-jdbc.idleTimeout=600000
-jdbc.maxLifetime=1800000
+jdbc.pool.maximum-size=5
+jdbc.pool.minimum-idle=3
+jdbc.pool.connection-timeout=30000
+jdbc.pool.idle-timeout=600000
+jdbc.pool.max-lifetime=1800000
 
 # 连接中心服（合服调试可设 master.id=0，见配置参考）
 master.id=1
@@ -83,7 +83,7 @@ report.address=127.0.0.1
 
 # RPC 节点身份（必填）
 rpc.node.type=http
-rpc.node.serverId=3
+rpc.node.server-id=3
 
 # 本服务特有项（示例：HTTP 端口）
 http.port=8090

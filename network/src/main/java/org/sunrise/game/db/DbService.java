@@ -28,11 +28,11 @@ public class DbService {
         config.setJdbcUrl(properties.getProperty("jdbc.url"));
         config.setUsername(properties.getProperty("jdbc.user"));
         config.setPassword(properties.getProperty("jdbc.password"));
-        config.setMaximumPoolSize(Integer.parseInt(properties.getProperty("jdbc.maximumPoolSize")));
-        config.setMinimumIdle(Integer.parseInt(properties.getProperty("jdbc.minimumIdle")));
-        config.setConnectionTimeout(Long.parseLong(properties.getProperty("jdbc.connectionTimeout")));
-        config.setIdleTimeout(Long.parseLong(properties.getProperty("jdbc.idleTimeout")));
-        config.setMaxLifetime(Long.parseLong(properties.getProperty("jdbc.maxLifetime")));
+        config.setMaximumPoolSize(Integer.parseInt(properties.getProperty("jdbc.pool.maximum-size")));
+        config.setMinimumIdle(Integer.parseInt(properties.getProperty("jdbc.pool.minimum-idle")));
+        config.setConnectionTimeout(Long.parseLong(properties.getProperty("jdbc.pool.connection-timeout")));
+        config.setIdleTimeout(Long.parseLong(properties.getProperty("jdbc.pool.idle-timeout")));
+        config.setMaxLifetime(Long.parseLong(properties.getProperty("jdbc.pool.max-lifetime")));
 
         dataSource = new HikariDataSource(config);
         dbExecutor = Executors.newFixedThreadPool(Math.max(2, Runtime.getRuntime().availableProcessors()), new ThreadFactory() {
@@ -53,11 +53,11 @@ public class DbService {
         prop.setProperty("jdbc.url", "jdbc:mysql://127.0.0.1:3306/sunrise");
         prop.setProperty("jdbc.user", "root");
         prop.setProperty("jdbc.password", "123456");
-        prop.setProperty("jdbc.maximumPoolSize", "5");
-        prop.setProperty("jdbc.minimumIdle", "3");
-        prop.setProperty("jdbc.connectionTimeout", "30000");
-        prop.setProperty("jdbc.idleTimeout", "600000");
-        prop.setProperty("jdbc.maxLifetime", "1800000");
+        prop.setProperty("jdbc.pool.maximum-size", "5");
+        prop.setProperty("jdbc.pool.minimum-idle", "3");
+        prop.setProperty("jdbc.pool.connection-timeout", "30000");
+        prop.setProperty("jdbc.pool.idle-timeout", "600000");
+        prop.setProperty("jdbc.pool.max-lifetime", "1800000");
         return prop;
     }
 

@@ -27,7 +27,7 @@ public class ClientConnection {
     private static int msgCountPerMin() {
         if (msgCountPerMin < 0) {
             msgCountPerMin = Integer.parseInt(
-                    ConfigReader.getProp().getProperty("external.msgcountpermin", "1000"));
+                    ConfigReader.getProp().getProperty("external.rate-limit.per-minute", "1000"));
         }
         return msgCountPerMin;
     }

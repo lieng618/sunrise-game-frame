@@ -51,7 +51,7 @@ start\\windows\\stress.bat
     </div>
 </div>
 
-<p><code>external.msgcountpermin</code>（对外服配置）设置单连接每分钟从客户端接收的最大消息数；压测时需按目标 TPS 调大，避免对外服限流拦截。</p>
+<p><code>external.rate-limit.per-minute</code>（对外服配置）设置单连接每分钟从客户端接收的最大消息数；压测时需按目标 TPS 调大，避免对外服限流拦截。</p>
 
 <h3>发包模式</h3>
 <table>
