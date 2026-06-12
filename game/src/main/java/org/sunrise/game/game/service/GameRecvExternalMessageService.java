@@ -38,7 +38,7 @@ public class GameRecvExternalMessageService extends BaseService {
                     if (method != null) {
                         msgData = method.invoke(null, msg.getPacketData());
                     }
-                    LogCore.GameServer.debug("recv msg, connectionId = {}, packetType = {}, packetId = {}, msgData = {{}}",
+                    LogCore.GameServer.debug("recv msg, connectionId = {}, handler = LoginMsgHandler.handlerLogin, packetType = {}, packetId = {}, msgData = {{}}",
                             connectionId, msg.getPacketType(), msg.getPacketId(),
                             msgData == null ? "" : msgData.toString().replace("\n", ""));
                     LoginMsgHandler.handlerLogin(connectionId, msg.getPacketId(), msgData, externalNodeId);

@@ -84,7 +84,8 @@ public class LogicUtils {
             Class<?>[] parameterTypes = method.getParameterTypes();
 
             if (parameterTypes.length == 1 && parameterTypes[0] == HumanObject.class) {
-                LogCore.GameServer.debug("recv msg, humanId = {}, packetType = {}, packetId = {}", humanObject.getHumanId(), packetType, packetId);
+                LogCore.GameServer.debug("recv msg, humanId = {}, handler = {}.{}, packetType = {}, packetId = {}", humanObject.getHumanId(),
+                        method.getDeclaringClass().getSimpleName(), method.getName(), packetType, packetId);
                 method.invoke(null, humanObject);
             } else if (parameterTypes.length == 2 && parameterTypes[0] == HumanObject.class) {
                 Object parseData = null;
@@ -92,7 +93,8 @@ public class LogicUtils {
                 if (parseMethod != null && packetData != null && !packetData.isEmpty()) {
                     parseData = parseMethod.invoke(null, packetData);
                 }
-                LogCore.GameServer.debug("recv msg, humanId = {}, packetType = {}, packetId = {}, msgData = {{}}", humanObject.getHumanId(), packetType, packetId, parseData == null ? "" : parseData.toString().replace("\n", ""));
+                LogCore.GameServer.debug("recv msg, humanId = {}, handler =  {}.{}, packetType = {}, packetId = {}, msgData = {{}}", humanObject.getHumanId(),
+                        method.getDeclaringClass().getSimpleName(), method.getName(), packetType, packetId, parseData == null ? "" : parseData.toString().replace("\n", ""));
                 method.invoke(null, humanObject, parseData);
             } else {
                 LogCore.GameServer.warn("Handler method has unsupported parameter types for packetType: {}, packetId: {}", packetType, packetId);
