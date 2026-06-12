@@ -269,6 +269,35 @@ public class ItemModule extends BaseModule {
     }
 
     /**
+     * 检查背包是否能容纳指定数量的物品。
+     *
+     * @return true 表示可以完全放入
+     */
+    public boolean canAddItem(int itemId, int count) {
+        if (count <= 0) return true;
+
+        int remaining = count;
+        int maxStack = Tables.ConfigParam.getItemMaxStack();
+
+        // 先扣现有堆叠的可堆叠空间
+        List<ItemData> sameIdItems = itemsById.get(itemId);
+        if (sameIdItems != null) {
+            for (ItemData item : sameIdItems) {
+                int space = maxStack - item.getCount();
+                if (space > 0) {
+                    remaining -= space;
+                    if (remaining <= 0) return true;
+                }
+            }
+        }
+
+        // 需要开新格子
+        int slotsNeeded = (int) Math.ceil((double) remaining / maxStack);
+        int emptySlots = Tables.ConfigParam.getItemBoxCapacity() - itemsList.size();
+        return slotsNeeded <= emptySlots;
+    }
+
+    /**
      * 整理背包,自动合并堆叠
      */
     public void sortItem() {

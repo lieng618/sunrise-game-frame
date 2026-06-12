@@ -19,7 +19,8 @@
     "defense_percent": 0,
     "hp_percent": 0,
     "mp_percent": 0,
-    "speed_percent": 0
+    "speed_percent": 0,
+    "drop_id": 0
   },
   {
     "id": 10002,
@@ -41,7 +42,8 @@
     "defense_percent": 0,
     "hp_percent": 0,
     "mp_percent": 0,
-    "speed_percent": 0
+    "speed_percent": 0,
+    "drop_id": 0
   },
   {
     "id": 10003,
@@ -63,15 +65,16 @@
     "defense_percent": 0,
     "hp_percent": 0,
     "mp_percent": 0,
-    "speed_percent": 0
+    "speed_percent": 0,
+    "drop_id": 0
   },
   {
     "id": 10004,
     "name": "史莱姆4",
     "level": 4,
     "map_id": 10001,
-    "spawn_x": 550,
-    "spawn_y": 336,
+    "spawn_x": 499,
+    "spawn_y": 247,
     "spawn_z": 0,
     "respawn_time": 33,
     "hp": 100,
@@ -85,7 +88,8 @@
     "defense_percent": 0,
     "hp_percent": 0,
     "mp_percent": 0,
-    "speed_percent": 0
+    "speed_percent": 0,
+    "drop_id": 0
   },
   {
     "id": 10005,
@@ -107,7 +111,8 @@
     "defense_percent": 0,
     "hp_percent": 0,
     "mp_percent": 0,
-    "speed_percent": 0
+    "speed_percent": 0,
+    "drop_id": 0
   },
   {
     "id": 10006,
@@ -129,7 +134,8 @@
     "defense_percent": 0,
     "hp_percent": 0,
     "mp_percent": 0,
-    "speed_percent": 0
+    "speed_percent": 0,
+    "drop_id": 0
   },
   {
     "id": 10007,
@@ -151,7 +157,8 @@
     "defense_percent": 0,
     "hp_percent": 0,
     "mp_percent": 0,
-    "speed_percent": 0
+    "speed_percent": 0,
+    "drop_id": 0
   },
   {
     "id": 10008,
@@ -173,7 +180,8 @@
     "defense_percent": 0,
     "hp_percent": 0,
     "mp_percent": 0,
-    "speed_percent": 0
+    "speed_percent": 0,
+    "drop_id": 0
   },
   {
     "id": 10009,
@@ -195,7 +203,8 @@
     "defense_percent": 0,
     "hp_percent": 0,
     "mp_percent": 0,
-    "speed_percent": 0
+    "speed_percent": 0,
+    "drop_id": 0
   },
   {
     "id": 10010,
@@ -217,6 +226,7 @@
     "defense_percent": 0,
     "hp_percent": 0,
     "mp_percent": 0,
-    "speed_percent": 0
+    "speed_percent": 0,
+    "drop_id": 0
   }
 ]

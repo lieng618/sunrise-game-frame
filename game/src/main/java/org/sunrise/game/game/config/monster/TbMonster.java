@@ -36,6 +36,7 @@ public final class TbMonster extends AbstractBean {
         hpPercent = _buf.get("hp_percent").getAsDouble();
         mpPercent = _buf.get("mp_percent").getAsDouble();
         speedPercent = _buf.get("speed_percent").getAsDouble();
+        dropId = _buf.get("drop_id").getAsInt();
     }
 
     public static TbMonster deserialize(JsonObject _buf) {
@@ -104,6 +105,10 @@ public final class TbMonster extends AbstractBean {
      * 速度百分比加成
      */
     public final double speedPercent;
+    /**
+     * 掉落
+     */
+    public final int dropId;
 
     public static final int __ID__ = -1601139624;
     
@@ -133,6 +138,7 @@ public final class TbMonster extends AbstractBean {
         + "hpPercent:" + hpPercent + ","
         + "mpPercent:" + mpPercent + ","
         + "speedPercent:" + speedPercent + ","
+        + "dropId:" + dropId + ","
         + "}";
     }
 }

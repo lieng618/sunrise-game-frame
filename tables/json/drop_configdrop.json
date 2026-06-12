@@ -1,0 +1,30 @@
+[
+  {
+    "id": 1001,
+    "item_id": 1001,
+    "count_min": 1,
+    "count_max": 1,
+    "weight": 8000
+  },
+  {
+    "id": 1002,
+    "item_id": 1002,
+    "count_min": 1,
+    "count_max": 2,
+    "weight": 8000
+  },
+  {
+    "id": 1003,
+    "item_id": 1003,
+    "count_min": 1,
+    "count_max": 3,
+    "weight": 8000
+  },
+  {
+    "id": 1004,
+    "item_id": 1004,
+    "count_min": 1,
+    "count_max": 4,
+    "weight": 8000
+  }
+]

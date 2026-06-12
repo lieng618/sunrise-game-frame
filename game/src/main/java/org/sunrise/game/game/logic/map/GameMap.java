@@ -5,6 +5,7 @@ import lombok.Getter;
 import org.sunrise.game.game.human.HumanObject;
 import org.sunrise.game.game.human.HumanObjectManager;
 import org.sunrise.game.game.logic.monster.MonsterAi;
+import org.sunrise.game.game.logic.unit.DropItemUnit;
 import org.sunrise.game.game.logic.unit.GameUnit;
 import org.sunrise.game.game.logic.unit.MonsterUnit;
 import org.sunrise.game.game.logic.unit.PlayerUnit;
@@ -12,6 +13,7 @@ import org.sunrise.game.game.logic.unit.UnitUtils;
 import org.sunrise.game.genProto.gen.MapProto;
 import org.sunrise.game.genProto.gen.TopicProto;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,6 +31,9 @@ public class GameMap {
     /** 当前地图内的怪物单位，key 为 unitId */
     private final Map<String, MonsterUnit> monsters = new HashMap<>();
 
+    /** 当前地图内的掉落物单位，key 为 unitId */
+    private final Map<String, DropItemUnit> dropItems = new HashMap<>();
+
     public GameMap(int mapId) {
         this.mapId = mapId;
     }
@@ -41,7 +46,11 @@ public class GameMap {
         if (player != null) {
             return player;
         }
-        return monsters.get(unitId);
+        MonsterUnit monster = monsters.get(unitId);
+        if (monster != null) {
+            return monster;
+        }
+        return dropItems.get(unitId);
     }
 
     public PlayerUnit getPlayer(String unitId) {
@@ -50,6 +59,15 @@ public class GameMap {
 
     public MonsterUnit getMonster(String unitId) {
         return monsters.get(unitId);
+    }
+
+    public DropItemUnit getDropItem(String unitId) {
+        return dropItems.get(unitId);
+    }
+
+    /** 获取地图上所有掉落物（只读视图） */
+    public Collection<DropItemUnit> getDropItems() {
+        return dropItems.values();
     }
 
     /** 当前地图是否有玩家在线（用于决定是否驱动怪物 AI、是否广播） */
@@ -64,6 +82,7 @@ public class GameMap {
         switch (unit.getUnitType()) {
             case PLAYER -> enterPlayer((PlayerUnit) unit);
             case MONSTER -> enterMonster((MonsterUnit) unit);
+            case DROP_ITEM -> enterDropItem((DropItemUnit) unit);
             default -> {
             }
         }
@@ -96,6 +115,20 @@ public class GameMap {
     }
 
     /**
+     * 掉落物进入地图，仅当地图内有玩家时才广播。
+     */
+    public void enterDropItem(DropItemUnit dropItem) {
+        if (dropItems.containsKey(dropItem.getUnitId())) {
+            return;
+        }
+        dropItem.setMapId(mapId);
+        dropItems.put(dropItem.getUnitId(), dropItem);
+        if (hasPlayers()) {
+            broadcastUnitEnter(dropItem);
+        }
+    }
+
+    /**
      * 单位离开地图，从对应容器中移除；有玩家在场时才广播离场。
      */
     public void leaveUnit(String unitId) {
@@ -104,6 +137,10 @@ public class GameMap {
             return;
         }
         if (monsters.remove(unitId) != null && hasPlayers()) {
+            broadcastUnitLeave(unitId);
+            return;
+        }
+        if (dropItems.remove(unitId) != null && hasPlayers()) {
             broadcastUnitLeave(unitId);
         }
     }
@@ -178,6 +215,11 @@ public class GameMap {
             builder.addUnits(UnitUtils.toUnitInfo(monster));
             builder.addPositions(UnitUtils.toUnitPosition(monster));
             builder.addUnitAttributes(UnitUtils.toUnitAttributes(monster));
+        }
+        for (DropItemUnit drop : dropItems.values()) {
+            builder.addUnits(UnitUtils.toUnitInfo(drop));
+            builder.addPositions(UnitUtils.toUnitPosition(drop));
+            builder.addUnitAttributes(UnitUtils.toUnitAttributes(drop));
         }
         humanObject.sendMsg(TopicProto.TOPIC.TOPIC_TYPE_MAP_VALUE,
                 MapProto.FROM_SERVER.S2C_SceneSync_VALUE, builder);

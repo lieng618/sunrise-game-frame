@@ -2,10 +2,12 @@ package org.sunrise.game.game.logic.monster;
 
 import org.sunrise.game.game.config.Tables;
 import org.sunrise.game.game.config.monster.TbMonster;
+import org.sunrise.game.game.logic.drop.DropSystem;
 import org.sunrise.game.game.logic.map.GameMap;
 import org.sunrise.game.game.logic.system.GameSystemUtils;
 import org.sunrise.game.game.logic.system.MapSystem;
 import org.sunrise.game.game.logic.unit.MonsterUnit;
+import org.sunrise.game.game.logic.unit.Position;
 import org.sunrise.game.game.logic.unit.UnitUtils;
 
 /**
@@ -24,15 +26,25 @@ public class MonsterSpawner {
         this.mapId = mapId;
     }
 
-    /** 怪物死亡：标记状态并从地图移除单位（AI 随单位一起失效） */
+    /** 怪物死亡：生成掉落物，标记状态并从地图移除单位（AI 随单位一起失效） */
     public void onDead() {
         if (current == null) {
             return;
         }
         current.setAlive(false);
         current.setDeadTime(System.currentTimeMillis());
+
         GameMap gameMap = getGameMap();
         if (gameMap != null) {
+            // 生成掉落物（在移除怪物前，利用怪物当前位置）
+            TbMonster cfg = Tables.ConfigMonster.get(monsterId);
+            if (cfg != null && cfg.dropId > 0) {
+                DropSystem dropSystem = GameSystemUtils.getSystem(DropSystem.class);
+                if (dropSystem != null) {
+                    Position pos = current.getPosition();
+                    dropSystem.generateDrops(cfg.dropId, mapId, pos.getX(), pos.getY(), pos.getZ(), null);
+                }
+            }
             gameMap.leaveUnit(current.getUnitId());
         }
     }

@@ -1,0 +1,26 @@
+syntax = "proto3";
+option java_outer_classname = "DropProto";
+package org.sunrise.game.genProto.gen;
+
+// 掉落系统协议
+// 掉落物作为地图单位（UnitType=4）出现，使用 MAP 主题的 S2C_UnitEnter/S2C_UnitLeave 广播
+// 拾取使用本主题的 C2S_PickupDrop
+
+enum FROM_CLIENT {
+  C2S_PickupDrop = 0; // 拾取掉落物
+}
+
+enum FROM_SERVER {
+  S2C_DropPickupResult = 0; // 拾取结果
+}
+
+// 拾取掉落物请求
+message MC2S_PickupDrop {
+  string unit_id = 1; // 掉落物 unitId
+}
+
+// 拾取结果（成功时通过 MAP.UnitLeave + ITEM.ItemUpdate 通知）
+message MS2C_DropPickupResult {
+  string unit_id = 1;   // 掉落物 unitId
+  bool success = 2;     // 是否成功
+}

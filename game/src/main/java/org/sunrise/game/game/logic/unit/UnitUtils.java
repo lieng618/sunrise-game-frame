@@ -2,6 +2,7 @@ package org.sunrise.game.game.logic.unit;
 
 import org.sunrise.game.game.config.Enum.AttributeType;
 import org.sunrise.game.game.config.Tables;
+import org.sunrise.game.game.config.item.TbItem;
 import org.sunrise.game.game.config.monster.TbMonster;
 import org.sunrise.game.game.human.HumanObject;
 import org.sunrise.game.game.human.HumanObjectManager;
@@ -14,6 +15,7 @@ import java.util.Map;
 public final class UnitUtils {
     public static final int ATTRIBUTE_SCALE = 1000;
     private static long unitId = 0L;
+    private static long dropUnitId = 0L;
 
     private UnitUtils() {
     }
@@ -21,6 +23,11 @@ public final class UnitUtils {
     public static long genMonsterUnitId() {
         unitId++;
         return unitId;
+    }
+
+    public static long genDropUnitId() {
+        dropUnitId++;
+        return dropUnitId;
     }
 
     public static void initPlayerDefaultAttributes(AttributeContainer container) {
@@ -81,6 +88,12 @@ public final class UnitUtils {
             TbMonster cfg = Tables.ConfigMonster.get(unit.getConfigId());
             return cfg != null ? cfg.name : "";
         }
+        if (unit.getUnitType() == UnitType.DROP_ITEM) {
+            DropItemUnit drop = (DropItemUnit) unit;
+            TbItem cfg = Tables.ConfigItem.get(drop.getConfigId());
+            String name = cfg != null ? cfg.name : "???";
+            return name + " x" + drop.getCount();
+        }
         return "";
     }
 
@@ -118,6 +131,9 @@ public final class UnitUtils {
 
     public static MapProto.STUnitAttributes toUnitAttributes(GameUnit unit) {
         AttributeContainer container = unit.getAttributeContainer();
+        if (container == null) {
+            return MapProto.STUnitAttributes.newBuilder().setUnitId(unit.getUnitId()).build();
+        }
         if (container.isDirty()) {
             container.recalculate();
         }

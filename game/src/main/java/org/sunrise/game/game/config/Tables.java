@@ -36,6 +36,12 @@ public final class Tables
     private final org.sunrise.game.game.config.monster.ConfigMonster _configmonster;
     public static volatile org.sunrise.game.game.config.monster.ConfigMonster ConfigMonster;
     private org.sunrise.game.game.config.monster.ConfigMonster getConfigMonster() { return _configmonster; }
+    private final org.sunrise.game.game.config.drop.ConfigDrop _configdrop;
+    public static volatile org.sunrise.game.game.config.drop.ConfigDrop ConfigDrop;
+    private org.sunrise.game.game.config.drop.ConfigDrop getConfigDrop() { return _configdrop; }
+    private final org.sunrise.game.game.config.drop.ConfigDropGroup _configdropgroup;
+    public static volatile org.sunrise.game.game.config.drop.ConfigDropGroup ConfigDropGroup;
+    private org.sunrise.game.game.config.drop.ConfigDropGroup getConfigDropGroup() { return _configdropgroup; }
 
     public Tables(IJsonLoader loader) throws java.io.IOException {
         _configitem = new org.sunrise.game.game.config.item.ConfigItem(loader.load("item_configitem"));
@@ -44,6 +50,8 @@ public final class Tables
         _configmap = new org.sunrise.game.game.config.map.ConfigMap(loader.load("map_configmap"));
         _configactivity = new org.sunrise.game.game.config.activity.ConfigActivity(loader.load("activity_configactivity"));
         _configmonster = new org.sunrise.game.game.config.monster.ConfigMonster(loader.load("monster_configmonster"));
+        _configdrop = new org.sunrise.game.game.config.drop.ConfigDrop(loader.load("drop_configdrop"));
+        _configdropgroup = new org.sunrise.game.game.config.drop.ConfigDropGroup(loader.load("drop_configdropgroup"));
     }
 
     public static void load(Tables tables) {
@@ -54,6 +62,8 @@ public final class Tables
         ConfigMap = tables.getConfigMap(); 
         ConfigActivity = tables.getConfigActivity(); 
         ConfigMonster = tables.getConfigMonster(); 
+        ConfigDrop = tables.getConfigDrop(); 
+        ConfigDropGroup = tables.getConfigDropGroup(); 
     }
 }
 
