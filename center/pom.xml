@@ -44,33 +44,30 @@
                     </compilerArgs>
                 </configuration>
             </plugin>
-            <!-- 添加maven-assembly-plugin插件 -->
+            <!-- Thin JAR：仅含 center 自身代码，依赖由共享 sunrise-lib.jar 提供 -->
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>3.6.0</version>
                 <executions>
                     <execution>
                         <id>make-assembly</id>
-                        <!-- 绑定到打包生命周期阶段上 -->
                         <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
+                        <goals><goal>single</goal></goals>
                         <configuration>
                             <finalName>sunrise-center</finalName>
                             <outputDirectory>${project.basedir}/../start/jar</outputDirectory>
-                            <!-- 指定打包方式为jar -->
+                            <appendAssemblyId>false</appendAssemblyId>
                             <archive>
                                 <manifest>
-                                    <!-- 指定主类 -->
                                     <mainClass>org.sunrise.game.main.CenterServerStartUp</mainClass>
                                 </manifest>
+                                <manifestEntries>
+                                    <Class-Path>sunrise-lib.jar</Class-Path>
+                                </manifestEntries>
                             </archive>
-                            <descriptorRefs>
-                                <!-- 指定打包成jar包 -->
-                                <descriptorRef>jar-with-dependencies</descriptorRef>
-                            </descriptorRefs>
-                            <appendAssemblyId>false</appendAssemblyId>
+                            <descriptors>
+                                <descriptor>src/main/assembly/thin-jar.xml</descriptor>
+                            </descriptors>
                         </configuration>
                     </execution>
                 </executions>

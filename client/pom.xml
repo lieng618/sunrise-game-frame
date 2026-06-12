@@ -34,6 +34,12 @@
             <artifactId>flatlaf</artifactId>
             <version>3.4</version>
         </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.34</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -78,7 +84,6 @@
                                 </manifest>
                             </archive>
                             <descriptorRefs>
-                                <!-- 指定打包成jar包 -->
                                 <descriptorRef>jar-with-dependencies</descriptorRef>
                             </descriptorRefs>
                             <appendAssemblyId>false</appendAssemblyId>
@@ -138,7 +143,6 @@
                                 </manifest>
                             </archive>
                             <descriptorRefs>
-                                <!-- 指定打包成jar包 -->
                                 <descriptorRef>jar-with-dependencies</descriptorRef>
                             </descriptorRefs>
                             <appendAssemblyId>false</appendAssemblyId>

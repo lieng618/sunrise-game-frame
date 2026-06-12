@@ -34,6 +34,12 @@
             <artifactId>hotswap</artifactId>
             <version>${project.sunrise.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.34</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -49,201 +55,175 @@
                 <version>3.8.1</version>
                 <configuration>
                     <compilerArgs>
-                        <!-- 启用完整的注解处理 -->
                         <arg>-proc:full</arg>
                     </compilerArgs>
                 </configuration>
             </plugin>
-            
-            <!-- ExternalServer -->
+
+            <!-- 所有 JAR 打包统一用一个 assembly-plugin，7 个 execution -->
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>3.6.0</version>
                 <executions>
+
+                    <!-- ======== 共享库：所有依赖（不含 game 自身代码） ======== -->
+                    <execution>
+                        <id>make-shared-lib</id>
+                        <phase>package</phase>
+                        <goals><goal>single</goal></goals>
+                        <configuration>
+                            <finalName>sunrise-lib</finalName>
+                            <outputDirectory>${project.basedir}/../start/jar</outputDirectory>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <archive>
+                                <manifest>
+                                    <addClasspath>false</addClasspath>
+                                </manifest>
+                            </archive>
+                            <descriptors>
+                                <descriptor>src/main/assembly/shared-lib.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                    </execution>
+
+                    <!-- ======== ExternalServer（thin） ======== -->
                     <execution>
                         <id>make-assembly-external</id>
-                        <!-- 绑定到打包生命周期阶段上 -->
                         <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
+                        <goals><goal>single</goal></goals>
                         <configuration>
                             <finalName>sunrise-external</finalName>
                             <outputDirectory>${project.basedir}/../start/jar</outputDirectory>
-                            <!-- 指定打包方式为jar -->
+                            <appendAssemblyId>false</appendAssemblyId>
                             <archive>
                                 <manifest>
-                                    <!-- 指定主类 -->
                                     <mainClass>org.sunrise.game.external.main.ExternalServerStartUp</mainClass>
                                 </manifest>
+                                <manifestEntries>
+                                    <Class-Path>sunrise-lib.jar</Class-Path>
+                                </manifestEntries>
                             </archive>
-                            <descriptorRefs>
-                                <!-- 指定打包成jar包 -->
-                                <descriptorRef>jar-with-dependencies</descriptorRef>
-                            </descriptorRefs>
-                            <appendAssemblyId>false</appendAssemblyId>
+                            <descriptors>
+                                <descriptor>src/main/assembly/thin-jar.xml</descriptor>
+                            </descriptors>
                         </configuration>
                     </execution>
-                </executions>
-            </plugin>
-            
-            <!-- GameServer -->
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>3.6.0</version>
-                <executions>
+
+                    <!-- ======== GameServer（thin） ======== -->
                     <execution>
                         <id>make-assembly-game</id>
-                        <!-- 绑定到打包生命周期阶段上 -->
                         <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
+                        <goals><goal>single</goal></goals>
                         <configuration>
                             <finalName>sunrise-game</finalName>
                             <outputDirectory>${project.basedir}/../start/jar</outputDirectory>
-                            <!-- 指定打包方式为jar -->
+                            <appendAssemblyId>false</appendAssemblyId>
                             <archive>
                                 <manifest>
-                                    <!-- 指定主类 -->
                                     <mainClass>org.sunrise.game.game.main.GameServerStartUp</mainClass>
                                 </manifest>
+                                <manifestEntries>
+                                    <Class-Path>sunrise-lib.jar</Class-Path>
+                                </manifestEntries>
                             </archive>
-                            <descriptorRefs>
-                                <!-- 指定打包成jar包 -->
-                                <descriptorRef>jar-with-dependencies</descriptorRef>
-                            </descriptorRefs>
-                            <appendAssemblyId>false</appendAssemblyId>
+                            <descriptors>
+                                <descriptor>src/main/assembly/thin-jar.xml</descriptor>
+                            </descriptors>
                         </configuration>
                     </execution>
-                </executions>
-            </plugin>
-            
-            <!-- GlobalServer -->
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>3.6.0</version>
-                <executions>
+
+                    <!-- ======== GlobalServer（thin） ======== -->
                     <execution>
                         <id>make-assembly-global</id>
-                        <!-- 绑定到打包生命周期阶段上 -->
                         <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
+                        <goals><goal>single</goal></goals>
                         <configuration>
                             <finalName>sunrise-global</finalName>
                             <outputDirectory>${project.basedir}/../start/jar</outputDirectory>
-                            <!-- 指定打包方式为jar -->
+                            <appendAssemblyId>false</appendAssemblyId>
                             <archive>
                                 <manifest>
-                                    <!-- 指定主类 -->
                                     <mainClass>org.sunrise.game.global.main.GlobalServerStartUp</mainClass>
                                 </manifest>
+                                <manifestEntries>
+                                    <Class-Path>sunrise-lib.jar</Class-Path>
+                                </manifestEntries>
                             </archive>
-                            <descriptorRefs>
-                                <!-- 指定打包成jar包 -->
-                                <descriptorRef>jar-with-dependencies</descriptorRef>
-                            </descriptorRefs>
-                            <appendAssemblyId>false</appendAssemblyId>
+                            <descriptors>
+                                <descriptor>src/main/assembly/thin-jar.xml</descriptor>
+                            </descriptors>
                         </configuration>
                     </execution>
-                </executions>
-            </plugin>
-            
-            <!-- GmBackServer -->
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>3.6.0</version>
-                <executions>
+
+                    <!-- ======== GmBackServer（thin） ======== -->
                     <execution>
                         <id>make-assembly-gmback</id>
-                        <!-- 绑定到打包生命周期阶段上 -->
                         <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
+                        <goals><goal>single</goal></goals>
                         <configuration>
                             <finalName>sunrise-gmback</finalName>
                             <outputDirectory>${project.basedir}/../start/jar</outputDirectory>
-                            <!-- 指定打包方式为jar -->
+                            <appendAssemblyId>false</appendAssemblyId>
                             <archive>
                                 <manifest>
-                                    <!-- 指定主类 -->
                                     <mainClass>org.sunrise.game.gmback.main.GmBackServerStartUp</mainClass>
                                 </manifest>
+                                <manifestEntries>
+                                    <Class-Path>sunrise-lib.jar</Class-Path>
+                                </manifestEntries>
                             </archive>
-                            <descriptorRefs>
-                                <!-- 指定打包成jar包 -->
-                                <descriptorRef>jar-with-dependencies</descriptorRef>
-                            </descriptorRefs>
-                            <appendAssemblyId>false</appendAssemblyId>
+                            <descriptors>
+                                <descriptor>src/main/assembly/thin-jar.xml</descriptor>
+                            </descriptors>
                         </configuration>
                     </execution>
-                </executions>
-            </plugin>
-            
-            <!-- HttpServer -->
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>3.6.0</version>
-                <executions>
+
+                    <!-- ======== HttpServer（thin） ======== -->
                     <execution>
                         <id>make-assembly-http</id>
-                        <!-- 绑定到打包生命周期阶段上 -->
                         <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
+                        <goals><goal>single</goal></goals>
                         <configuration>
                             <finalName>sunrise-http</finalName>
                             <outputDirectory>${project.basedir}/../start/jar</outputDirectory>
-                            <!-- 指定打包方式为jar -->
+                            <appendAssemblyId>false</appendAssemblyId>
                             <archive>
                                 <manifest>
-                                    <!-- 指定主类 -->
                                     <mainClass>org.sunrise.game.http.main.HttpServerStartUp</mainClass>
                                 </manifest>
+                                <manifestEntries>
+                                    <Class-Path>sunrise-lib.jar</Class-Path>
+                                </manifestEntries>
                             </archive>
-                            <descriptorRefs>
-                                <!-- 指定打包成jar包 -->
-                                <descriptorRef>jar-with-dependencies</descriptorRef>
-                            </descriptorRefs>
-                            <appendAssemblyId>false</appendAssemblyId>
+                            <descriptors>
+                                <descriptor>src/main/assembly/thin-jar.xml</descriptor>
+                            </descriptors>
                         </configuration>
                     </execution>
-                </executions>
-            </plugin>
 
-            <!-- RunAllOneServer -->
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>3.6.0</version>
-                <executions>
+                    <!-- ======== RunAllOneServer（thin） ======== -->
                     <execution>
                         <id>make-assembly-runallone</id>
-                        <!-- 绑定到打包生命周期阶段上 -->
                         <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
+                        <goals><goal>single</goal></goals>
                         <configuration>
                             <finalName>sunrise-runallone</finalName>
                             <outputDirectory>${project.basedir}/../start/jar</outputDirectory>
-                            <!-- 指定打包方式为jar -->
+                            <appendAssemblyId>false</appendAssemblyId>
                             <archive>
                                 <manifest>
-                                    <!-- 指定主类 -->
                                     <mainClass>org.sunrise.game.runone.main.RunAllOneServerStartUp</mainClass>
                                 </manifest>
+                                <manifestEntries>
+                                    <Class-Path>sunrise-lib.jar</Class-Path>
+                                </manifestEntries>
                             </archive>
-                            <descriptorRefs>
-                                <!-- 指定打包成jar包 -->
-                                <descriptorRef>jar-with-dependencies</descriptorRef>
-                            </descriptorRefs>
-                            <appendAssemblyId>false</appendAssemblyId>
+                            <descriptors>
+                                <descriptor>src/main/assembly/thin-jar.xml</descriptor>
+                            </descriptors>
                         </configuration>
                     </execution>
+
                 </executions>
             </plugin>
         </plugins>
