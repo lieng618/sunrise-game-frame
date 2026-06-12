@@ -5,7 +5,7 @@ import java.util.Map;
 import org.sunrise.game.game.annotation.MsgHandlerClass;
 import org.sunrise.game.game.annotation.MsgHandlerMethod;
 import org.sunrise.game.game.human.HumanObject;
-import org.sunrise.game.game.human.HumanObjectManger;
+import org.sunrise.game.game.human.HumanObjectManager;
 import org.sunrise.game.genProto.gen.RankProto;
 import org.sunrise.game.genProto.gen.TopicProto;
 import org.sunrise.game.genRpc.gen.CallEnum;
@@ -27,7 +27,7 @@ public class RankMsgHandler {
                 data.getPageSize());
         rpcFunction.listenResult(rpcResult -> {
             String humanId = (String) rpcResult.getContext("humanId");
-            HumanObject humanObj = HumanObjectManger.getHumanObject(humanId);
+            HumanObject humanObj = HumanObjectManager.getHumanObject(humanId);
             if (humanObj == null || rpcResult.getResult() != ErrorType.SUCCESS) return;
             byte[] protoData = (byte[]) rpcResult.getData("protoData");
             humanObj.sendMsg(TopicProto.TOPIC.TOPIC_TYPE_RANK_VALUE,
@@ -43,7 +43,7 @@ public class RankMsgHandler {
                 humanObject.getHumanId());
         rpcFunction.listenResult(rpcResult -> {
             String humanId = (String) rpcResult.getContext("humanId");
-            HumanObject humanObj = HumanObjectManger.getHumanObject(humanId);
+            HumanObject humanObj = HumanObjectManager.getHumanObject(humanId);
             if (humanObj == null || rpcResult.getResult() != ErrorType.SUCCESS) return;
             byte[] protoData = (byte[]) rpcResult.getData("protoData");
             humanObject.sendMsg(TopicProto.TOPIC.TOPIC_TYPE_RANK_VALUE,

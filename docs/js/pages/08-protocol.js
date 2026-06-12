@@ -54,7 +54,7 @@ public class ExternalRecvGameMessageService extends BaseService {
     @RpcMethod
     public void recvMessage(long connectionId, byte[] data) {
         if (connectionId > 0) {
-            var connection = ExternalConnectionManger.getClientConnect(connectionId);
+            var connection = ExternalConnectionManager.getClientConnect(connectionId);
             if (connection != null) {
                 connection.sendMessage(data);
             }

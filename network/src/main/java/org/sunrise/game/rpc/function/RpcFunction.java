@@ -2,7 +2,7 @@ package org.sunrise.game.rpc.function;
 
 import org.sunrise.game.core.client.BaseClientManager;
 import org.sunrise.game.core.server.BaseServerManager;
-import org.sunrise.game.core.server.ConnectionManger;
+import org.sunrise.game.core.server.ConnectionManager;
 import org.sunrise.game.log.LogCore;
 import org.sunrise.game.rpc.node.RpcNodeManager;
 import org.sunrise.game.utils.IdGenerator;
@@ -199,7 +199,7 @@ public class RpcFunction {
      * rpcServer发起一次更新，推送给指定node的rpcClient，通知自身所管理的rpc方法
      */
     public void update(String connectNode, List<Integer> callIds) {
-        if (!ConnectionManger.isConnectExist(connectNode)) {
+        if (!ConnectionManager.isConnectExist(connectNode)) {
             return;
         }
         if (nodeId == null) {

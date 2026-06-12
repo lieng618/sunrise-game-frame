@@ -7,7 +7,7 @@ import com.google.protobuf.Message;
 import lombok.Data;
 import org.sunrise.game.game.config.Enum.ActivityStatus;
 import org.sunrise.game.game.human.HumanObject;
-import org.sunrise.game.game.human.HumanObjectManger;
+import org.sunrise.game.game.human.HumanObjectManager;
 import org.sunrise.game.genProto.gen.ActivityProto;
 import org.sunrise.game.genProto.gen.TopicProto;
 
@@ -55,7 +55,7 @@ public class BaseActivityLogic {
     }
 
     public HumanObject getHuman() {
-        return HumanObjectManger.getHumanObject(humanId);
+        return HumanObjectManager.getHumanObject(humanId);
     }
 
     /**

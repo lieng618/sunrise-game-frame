@@ -3,7 +3,7 @@ package org.sunrise.game.game.service;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
 import org.sunrise.game.core.HotswapScanner;
-import org.sunrise.game.game.human.HumanObjectManger;
+import org.sunrise.game.game.human.HumanObjectManager;
 import org.sunrise.game.game.logic.ConfigUtils;
 import org.sunrise.game.game.logic.system.CdkSystem;
 import org.sunrise.game.game.logic.system.GameSystemUtils;
@@ -76,7 +76,7 @@ public class GameRecvGmBackMessageService extends BaseService {
      */
     private void handleKickHuman(Map<String, Object> data) {
         String humanId = (String) data.get("humanId");
-        HumanObjectManger.deleteHumanQueue.add(humanId);
+        HumanObjectManager.deleteHumanQueue.add(humanId);
         LogCore.GameServer.debug("Received KickHuman command, humanId: {}", humanId);
     }
 
@@ -86,9 +86,9 @@ public class GameRecvGmBackMessageService extends BaseService {
     private void handleBanHumanList(Map<String, Object> data) {
         String humanIds = (String) data.get("humanIds");
         List<String> bans = JSON.parseObject(humanIds, new TypeReference<List<String>>() {});
-        HumanObjectManger.banHumanQueue.clear();
-        HumanObjectManger.banHumanQueue.addAll(bans);
-        HumanObjectManger.deleteHumanQueue.addAll(bans);
+        HumanObjectManager.banHumanQueue.clear();
+        HumanObjectManager.banHumanQueue.addAll(bans);
+        HumanObjectManager.deleteHumanQueue.addAll(bans);
         LogCore.GameServer.debug("Received BanHumanList command, humanIds: {}", humanIds);
     }
 
@@ -129,8 +129,8 @@ public class GameRecvGmBackMessageService extends BaseService {
     private void handleMuteHumanList(Map<String, Object> data) {
         String humanIds = (String) data.get("humanIds");
         List<String> bans = JSON.parseObject(humanIds, new TypeReference<List<String>>() {});
-        HumanObjectManger.muteHumanQueue.clear();
-        HumanObjectManger.muteHumanQueue.addAll(bans);
+        HumanObjectManager.muteHumanQueue.clear();
+        HumanObjectManager.muteHumanQueue.addAll(bans);
         LogCore.GameServer.debug("Received MuteHumanList command, humanIds: {}", humanIds);
     }
 
@@ -143,8 +143,8 @@ public class GameRecvGmBackMessageService extends BaseService {
         dataMap.put("serverId", RpcNodeManager.getRpcServerId());
         dataMap.put("ip", Utils.getLocalIpAddress());
         dataMap.put("port", RpcNodeManager.getRpcNode().getPort());
-        dataMap.put("online", HumanObjectManger.getOnlineCount());
-        dataMap.put("humanIds", JSON.toJSONString(HumanObjectManger.getOnlineHumanIds()));
+        dataMap.put("online", HumanObjectManager.getOnlineCount());
+        dataMap.put("humanIds", JSON.toJSONString(HumanObjectManager.getOnlineHumanIds()));
         dataMap.put("processId", Utils.getProcessId());
         dataMap.put("type", "GameServer");
         RpcFunction.newInstance().call(CallEnum.GmBackRecvMessageService_recvMessage, "reportNodeData", JSON.toJSONString(dataMap));

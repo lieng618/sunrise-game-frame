@@ -3,7 +3,7 @@ package org.sunrise.game.game.logic.system;
 import com.alibaba.fastjson2.TypeReference;
 import org.sunrise.game.game.annotation.GameSystem;
 import org.sunrise.game.game.human.HumanObject;
-import org.sunrise.game.game.human.HumanObjectManger;
+import org.sunrise.game.game.human.HumanObjectManager;
 import org.sunrise.game.game.logic.ToolsUtils;
 import org.sunrise.game.game.modules.BaseModule;
 import org.sunrise.game.game.modules.DataModule;
@@ -60,7 +60,7 @@ public class ResetSystem extends BaseSystem {
         if (cur < nextDailyRefreshTime) {
             return;
         }
-        for (HumanObject humanObject : HumanObjectManger.getHumanObjects()) {
+        for (HumanObject humanObject : HumanObjectManager.getHumanObjects()) {
             tryRefreshDaily(humanObject);
         }
         nextDailyRefreshTime = ToolsUtils.getDayTimeMillisByOffset(1);
@@ -74,7 +74,7 @@ public class ResetSystem extends BaseSystem {
         if (cur < nextWeekRefreshTime) {
             return;
         }
-        for (HumanObject humanObject : HumanObjectManger.getHumanObjects()) {
+        for (HumanObject humanObject : HumanObjectManager.getHumanObjects()) {
             tryRefreshWeek(humanObject);
         }
         nextWeekRefreshTime = ToolsUtils.getWeekZeroTimeMillisByOffset(7);

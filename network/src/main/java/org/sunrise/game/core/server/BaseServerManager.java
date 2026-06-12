@@ -77,7 +77,7 @@ public class BaseServerManager {
     public static void sendMsgToClient(BaseMessage message) {
         BaseServer baseServer = baseServers.get(message.getNodeId());
         if (baseServer != null) {
-            var nodeConnect = ConnectionManger.getConnect(message.getToNodeId());
+            var nodeConnect = ConnectionManager.getConnect(message.getToNodeId());
             if (nodeConnect != null) {
                 if (nodeConnect.getChannel() == null) {
                     LogCore.BaseServer.warn("client disconnect, discard message, cur NodeId = {}, to NodeId = {}, MessageId = {}", message.getNodeId(), message.getToNodeId(), message.getMessageId());

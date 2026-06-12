@@ -112,7 +112,7 @@ registerPage('external-server', '对外服', 'TCP/WS/KCP 网关、客户端连�
 </ul>
 
 <h2>多协议支持</h2>
-<p>ExternalServer 同时启动三种协议监听，共享同一个 ExternalConnectionManger：</p>
+<p>ExternalServer 同时启动三种协议监听，共享同一个 ExternalConnectionManager：</p>
 <table>
 <thead><tr><th>协议</th><th>端口</th><th>Pipeline</th><th>处理器</th></tr></thead>
 <tbody>
@@ -160,7 +160,7 @@ registerPage('external-server', '对外服', 'TCP/WS/KCP 网关、客户端连�
 <tr><td>ExternalServer</td><td>同时启动 TCP/WS/KCP 三种协议监听，查询 external_system 表管理端口</td></tr>
 <tr><td>ExternalServerHandler</td><td>TCP/WS 入站处理器，首包验证，后续消息加入 msgQueue</td></tr>
 <tr><td>KcpServerHandler</td><td>KCP 入站处理器</td></tr>
-<tr><td>ExternalConnectionManger</td><td>客户端连接管理器，维护 clients Map(connectionId → ClientConnection)</td></tr>
+<tr><td>ExternalConnectionManager</td><td>客户端连接管理器，维护 clients Map(connectionId → ClientConnection)</td></tr>
 <tr><td>ClientConnection</td><td>客户端连接对象，支持 Channel(TCP/WS) 和 Ukcp(KCP)，含消息频率限制</td></tr>
 <tr><td>ExternalRecvGameMessageService</td><td>@RpcService，核心服务：消息转发、地址上报</td></tr>
 </tbody>

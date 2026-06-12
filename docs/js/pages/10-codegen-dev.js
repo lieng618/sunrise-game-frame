@@ -255,7 +255,7 @@ public class AchievementRpcListenService extends BaseService {
 
     @RpcMethod
     public void onAchievementUpdate(String humanId, byte[] protoData) {
-        HumanObject human = HumanObjectManger.getHumanObject(humanId);
+        HumanObject human = HumanObjectManager.getHumanObject(humanId);
         if (human != null) {
             human.sendMsg(TopicProto.TOPIC.TOPIC_TYPE_ACHIEVEMENT_VALUE,
                 AchievementProto.FROM_SERVER.S2C_Update_VALUE, protoData);

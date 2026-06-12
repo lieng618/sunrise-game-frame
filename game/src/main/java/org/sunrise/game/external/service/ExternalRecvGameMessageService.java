@@ -3,7 +3,7 @@ package org.sunrise.game.external.service;
 import com.alibaba.fastjson2.JSON;
 import org.sunrise.game.config.ConfigReader;
 import org.sunrise.game.external.server.ClientConnection;
-import org.sunrise.game.external.server.ExternalConnectionManger;
+import org.sunrise.game.external.server.ExternalConnectionManager;
 import org.sunrise.game.external.server.ExternalServer;
 import org.sunrise.game.genRpc.gen.CallEnum;
 import org.sunrise.game.log.LogCore;
@@ -69,7 +69,7 @@ public class ExternalRecvGameMessageService extends BaseService {
     @RpcMethod
     public void recvMessage(long connectionId, byte[] data, String gameNodeId) {
         if (connectionId > 0) {
-            var connection = ExternalConnectionManger.getClientConnect(connectionId);
+            var connection = ExternalConnectionManager.getClientConnect(connectionId);
             if (connection != null) {
                 if (gameNodeId != null && !gameNodeId.isEmpty()) {
                     connection.setGameNodeId(gameNodeId);
@@ -83,7 +83,7 @@ public class ExternalRecvGameMessageService extends BaseService {
         long drainStart = System.currentTimeMillis();
 
         int forwarded = 0;
-        for (ClientConnection connection : ExternalConnectionManger.getClientConnections()) {
+        for (ClientConnection connection : ExternalConnectionManager.getClientConnections()) {
             while (!connection.getMsgQueue().isEmpty()) {
                 byte[] data = connection.getMsgQueue().poll();
                 if (data == null) {
@@ -100,7 +100,7 @@ public class ExternalRecvGameMessageService extends BaseService {
         // 当每秒10万tps时，每帧预计500次转发，打印诊断日志
         if (forwarded >= 500) {
             long drainMs = System.currentTimeMillis() - drainStart;
-            LogCore.ExternalServer.warn("当前帧转发总耗时 {} ms, 客户端在线总数 {}, 转发消息总数 {}", drainMs, ExternalConnectionManger.getClientConnections().size(), forwarded);
+            LogCore.ExternalServer.warn("当前帧转发总耗时 {} ms, 客户端在线总数 {}, 转发消息总数 {}", drainMs, ExternalConnectionManager.getClientConnections().size(), forwarded);
         }
     }
 
@@ -108,7 +108,7 @@ public class ExternalRecvGameMessageService extends BaseService {
      * 心跳清理失效客户端
      */
     private void pulseRemoveClients() {
-        for (ClientConnection connection : ExternalConnectionManger.getClientConnections()) {
+        for (ClientConnection connection : ExternalConnectionManager.getClientConnections()) {
             if (connection.getGameNodeId() == null || connection.getGameNodeId().isEmpty()) {
                 continue;
             }
@@ -130,7 +130,7 @@ public class ExternalRecvGameMessageService extends BaseService {
         dataMap.put("serverId", RpcNodeManager.getRpcServerId());
         dataMap.put("ip", Utils.getLocalIpAddress());
         dataMap.put("port", externalServer.getExternalPort());
-        dataMap.put("online", ExternalConnectionManger.getOnlineCount());
+        dataMap.put("online", ExternalConnectionManager.getOnlineCount());
         dataMap.put("processId", Utils.getProcessId());
         dataMap.put("type", "ExternalServer");
         dataMap.put("tcpEnabled", externalServer.isTcpEnabled());

@@ -1,7 +1,7 @@
 package org.sunrise.game.game.service;
 
 import org.sunrise.game.game.human.HumanObject;
-import org.sunrise.game.game.human.HumanObjectManger;
+import org.sunrise.game.game.human.HumanObjectManager;
 import org.sunrise.game.game.modules.FriendModule;
 import org.sunrise.game.rpc.annotation.RpcMethod;
 import org.sunrise.game.rpc.annotation.RpcService;
@@ -18,7 +18,7 @@ public class FriendRpcListenService extends BaseService {
 
     @RpcMethod
     public void onNewFriendRequest(String targetHumanId) {
-        HumanObject human = HumanObjectManger.getHumanObject(targetHumanId);
+        HumanObject human = HumanObjectManager.getHumanObject(targetHumanId);
         if (human != null) {
             FriendModule friendModule = human.getModule(FriendModule.class);
             if (friendModule != null) {
@@ -29,7 +29,7 @@ public class FriendRpcListenService extends BaseService {
 
     @RpcMethod
     public void onFriendAdded(String humanId1, String humanId2) {
-        HumanObject human = HumanObjectManger.getHumanObject(humanId1);
+        HumanObject human = HumanObjectManager.getHumanObject(humanId1);
         if (human != null) {
             FriendModule friendModule = human.getModule(FriendModule.class);
             if (friendModule != null) {
@@ -40,7 +40,7 @@ public class FriendRpcListenService extends BaseService {
 
     @RpcMethod
     public void onFriendDeleted(String humanId1, String humanId2) {
-        HumanObject human = HumanObjectManger.getHumanObject(humanId1);
+        HumanObject human = HumanObjectManager.getHumanObject(humanId1);
         if (human != null) {
             FriendModule friendModule = human.getModule(FriendModule.class);
             if (friendModule != null) {

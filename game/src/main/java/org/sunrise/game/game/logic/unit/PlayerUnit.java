@@ -1,7 +1,7 @@
 package org.sunrise.game.game.logic.unit;
 
 import lombok.Getter;
-import org.sunrise.game.game.human.HumanObjectManger;
+import org.sunrise.game.game.human.HumanObjectManager;
 import org.sunrise.game.game.logic.attribute.AttributeContainer;
 import org.sunrise.game.game.modules.PlayerUnitModule;
 
@@ -17,7 +17,7 @@ public class PlayerUnit implements GameUnit {
     }
 
     private PlayerUnitModule module() {
-        return HumanObjectManger.getHumanObject(humanId).getModule(PlayerUnitModule.class);
+        return HumanObjectManager.getHumanObject(humanId).getModule(PlayerUnitModule.class);
     }
 
     @Override

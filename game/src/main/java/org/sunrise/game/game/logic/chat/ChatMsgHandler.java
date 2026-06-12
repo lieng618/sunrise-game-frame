@@ -7,7 +7,7 @@ import java.util.Map;
 import org.sunrise.game.game.annotation.MsgHandlerClass;
 import org.sunrise.game.game.annotation.MsgHandlerMethod;
 import org.sunrise.game.game.human.HumanObject;
-import org.sunrise.game.game.human.HumanObjectManger;
+import org.sunrise.game.game.human.HumanObjectManager;
 import org.sunrise.game.game.logic.gm.GmCommandManager;
 import org.sunrise.game.game.logic.system.CdkSystem;
 import org.sunrise.game.game.logic.system.GameSystemUtils;
@@ -26,7 +26,7 @@ import java.util.Map;
 public class ChatMsgHandler {
     @MsgHandlerMethod(packetId = ChatProto.FROM_CLIENT.C2S_Chat_VALUE)
     public static void chat(HumanObject humanObject, ChatProto.MC2S_Chat data) {
-        if (HumanObjectManger.muteHumanQueue.contains(humanObject.getHumanId())) {
+        if (HumanObjectManager.muteHumanQueue.contains(humanObject.getHumanId())) {
             return;
         }
 
@@ -112,7 +112,7 @@ public class ChatMsgHandler {
         rpcFunction.call(CallEnum.GlobalChatService_history, humanObject.getHumanId());
         rpcFunction.listenResult(rpcResult -> {
             String humanId = (String) rpcResult.getContext("humanId");
-            HumanObject humanObj = HumanObjectManger.getHumanObject(humanId);
+            HumanObject humanObj = HumanObjectManager.getHumanObject(humanId);
             if (humanObj == null) return;
             if (rpcResult.getResult() != ErrorType.SUCCESS) return;
             byte[] protoData = (byte[]) rpcResult.getData("info");

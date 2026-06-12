@@ -64,7 +64,7 @@ public class KcpServerHandler implements KcpListener {
     public void handleClose(Ukcp ukcp) {
         ClientConnection clientConnection = getClientConnection(ukcp);
         if (clientConnection != null) {
-            ExternalConnectionManger.removeClientConnect(clientConnection.getId());
+            ExternalConnectionManager.removeClientConnect(clientConnection.getId());
             LogCore.ExternalServer.info("client disconnected, id = {}, remoteAddress = {}", clientConnection.getId(), clientConnection.getRemoteAddress());
         }
     }
@@ -79,7 +79,7 @@ public class KcpServerHandler implements KcpListener {
     private void verify(Ukcp ukcp, byte[] data) {
         String message = new String(data, StandardCharsets.UTF_8);
         if (message.startsWith(Utils.CLIENT_CONNECT)) {
-            ClientConnection clientConnection = ExternalConnectionManger.createClientConnect(ukcp);
+            ClientConnection clientConnection = ExternalConnectionManager.createClientConnect(ukcp);
             ukcp.user().setCache(clientConnection);
             LogCore.ExternalServer.info("recv connection from client : connectionId = {}, conv = {}, remoteAddress = {}",
                 clientConnection.getId(), ukcp.getConv(), clientConnection.getRemoteAddress());

@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class HumanObjectManger {
+public class HumanObjectManager {
     // humanId-玩家对象
     private static final Map<String, HumanObject> humanObjects = new HashMap<>();
     // connectId-连接对象

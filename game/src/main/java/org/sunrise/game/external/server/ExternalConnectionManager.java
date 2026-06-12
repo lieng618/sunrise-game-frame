@@ -9,7 +9,7 @@ import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class ExternalConnectionManger {
+public class ExternalConnectionManager {
     private static final ConcurrentHashMap<Long, ClientConnection> clients = new ConcurrentHashMap<>();
     // 连接id计数器
     private static final AtomicInteger connectionIdAuto = new AtomicInteger();

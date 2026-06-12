@@ -203,7 +203,7 @@ public class GlobalMailService extends BaseService {
         rpcFunction.call(CallEnum.GlobalChatService_history, humanObject.getHumanId());
         rpcFunction.listenResult(rpcResult -> {
             String humanId = (String) rpcResult.getContext("humanId");
-            HumanObject humanObj = HumanObjectManger.getHumanObject(humanId);
+            HumanObject humanObj = HumanObjectManager.getHumanObject(humanId);
             if (humanObj == null) return;
             if (rpcResult.getResult() != ErrorType.SUCCESS) return;
             byte[] protoData = (byte[]) rpcResult.getData("info");

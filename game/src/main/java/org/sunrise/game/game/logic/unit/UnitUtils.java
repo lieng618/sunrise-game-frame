@@ -4,7 +4,7 @@ import org.sunrise.game.game.config.Enum.AttributeType;
 import org.sunrise.game.game.config.Tables;
 import org.sunrise.game.game.config.monster.TbMonster;
 import org.sunrise.game.game.human.HumanObject;
-import org.sunrise.game.game.human.HumanObjectManger;
+import org.sunrise.game.game.human.HumanObjectManager;
 import org.sunrise.game.game.logic.attribute.AttributeContainer;
 import org.sunrise.game.game.modules.DataModule;
 import org.sunrise.game.genProto.gen.MapProto;
@@ -71,7 +71,7 @@ public final class UnitUtils {
 
     public static String getUnitDisplayName(GameUnit unit) {
         if (unit.getUnitType() == UnitType.PLAYER) {
-            HumanObject humanObject = HumanObjectManger.getHumanObject(unit.getUnitId());
+            HumanObject humanObject = HumanObjectManager.getHumanObject(unit.getUnitId());
             if (humanObject != null) {
                 return humanObject.getModule(DataModule.class).getName();
             }

@@ -50,10 +50,10 @@ public class BaseServerHandler extends SimpleChannelInboundHandler<SocketMessage
         if (message.startsWith(Utils.CLIENT_CONNECT)) {
             connectNode = message.substring(Utils.CLIENT_CONNECT.length());
 
-            boolean exist = ConnectionManger.isConnectExist(connectNode);
+            boolean exist = ConnectionManager.isConnectExist(connectNode);
             if (!exist) {
                 String sendMsg = Utils.CLIENT_CONNECT_RESPONSE + Utils.SUCCESS + nodeId;
-                ConnectionManger.createConnect(connectNode, channel);
+                ConnectionManager.createConnect(connectNode, channel);
                 channel.writeAndFlush(new SocketMessage(MessageType.biz, sendMsg.getBytes(StandardCharsets.UTF_8)));
 
                 LogCore.BaseServer.info("recv connection success, connectNode = { {} }, remoteAddress = { {} }", connectNode, channel.remoteAddress());
@@ -77,7 +77,7 @@ public class BaseServerHandler extends SimpleChannelInboundHandler<SocketMessage
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         if (connectNode != null) {
-            ConnectionManger.removeConnect(connectNode);
+            ConnectionManager.removeConnect(connectNode);
         }
         LogCore.BaseServer.error("disconnected, connectNode = { {} }, remoteAddress = {}", connectNode, ctx.channel().remoteAddress());
         super.channelInactive(ctx);

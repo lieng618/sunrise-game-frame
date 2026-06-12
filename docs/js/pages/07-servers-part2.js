@@ -71,7 +71,7 @@ registerPage('game-server', '游戏服', '玩家对象、模块系统、消息�
     }
 }</code></pre>
 
-<h3>HumanObjectManger</h3>
+<h3>HumanObjectManager</h3>
 <p>玩家对象管理器，维护多种映射：</p>
 <table>
 <thead><tr><th>集合</th><th>映射</th><th>说明</th></tr></thead>

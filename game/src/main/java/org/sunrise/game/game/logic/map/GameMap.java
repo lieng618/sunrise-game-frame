@@ -3,7 +3,7 @@ package org.sunrise.game.game.logic.map;
 import com.google.protobuf.Message;
 import lombok.Getter;
 import org.sunrise.game.game.human.HumanObject;
-import org.sunrise.game.game.human.HumanObjectManger;
+import org.sunrise.game.game.human.HumanObjectManager;
 import org.sunrise.game.game.logic.monster.MonsterAi;
 import org.sunrise.game.game.logic.unit.GameUnit;
 import org.sunrise.game.game.logic.unit.MonsterUnit;
@@ -185,7 +185,7 @@ public class GameMap {
 
     private void broadcastToAll(int packetId, Message.Builder builder) {
         for (PlayerUnit player : players.values()) {
-            HumanObject humanObject = HumanObjectManger.getHumanObject(player.getUnitId());
+            HumanObject humanObject = HumanObjectManager.getHumanObject(player.getUnitId());
             if (humanObject != null) {
                 humanObject.sendMsg(TopicProto.TOPIC.TOPIC_TYPE_MAP_VALUE, packetId, builder);
             }

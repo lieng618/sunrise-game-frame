@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.sunrise.game.game.annotation.HumanModule;
 import org.sunrise.game.game.human.HumanObject;
-import org.sunrise.game.game.human.HumanObjectManger;
+import org.sunrise.game.game.human.HumanObjectManager;
 import org.sunrise.game.game.logic.mail.MailData;
 import org.sunrise.game.genProto.gen.MailProto;
 import org.sunrise.game.genProto.gen.TopicProto;
@@ -42,7 +42,7 @@ public class MailModule extends BaseModule {
         rpcFunction.call(CallEnum.GlobalMailService_getPlayerMails, getHumanId());
         rpcFunction.listenResult(rpcResult -> {
             String humanId = (String) rpcResult.getContext("humanId");
-            HumanObject humanObj = HumanObjectManger.getHumanObject(humanId);
+            HumanObject humanObj = HumanObjectManager.getHumanObject(humanId);
             if (humanObj == null) return;
             if (rpcResult.getResult() != ErrorType.SUCCESS) {
                 return;

@@ -1,7 +1,7 @@
 package org.sunrise.game.game.service;
 
 import org.sunrise.game.game.human.HumanObject;
-import org.sunrise.game.game.human.HumanObjectManger;
+import org.sunrise.game.game.human.HumanObjectManager;
 import org.sunrise.game.game.logic.LogicUtils;
 import org.sunrise.game.game.logic.ProtoParserUtils;
 import org.sunrise.game.game.login.LoginMsgHandler;
@@ -45,13 +45,13 @@ public class GameRecvExternalMessageService extends BaseService {
                     break;
                 }
                 default: {
-                    String humanId = HumanObjectManger.humanIds.get(connectionId);
+                    String humanId = HumanObjectManager.humanIds.get(connectionId);
                     if (humanId == null) {
                         LogCore.GameServer.error("recv msg, connectionId = {}, packetType = {}, packetId = {}, humanObject not found",
                                 connectionId, msg.getPacketType(), msg.getPacketId());
                         return;
                     }
-                    HumanObject humanObject = HumanObjectManger.getHumanObject(humanId);
+                    HumanObject humanObject = HumanObjectManager.getHumanObject(humanId);
                     if (humanObject == null) {
                         LogCore.GameServer.error("recv msg, humanId = {}, packetType = {}, packetId = {}, humanObject not found",
                                 humanId, msg.getPacketType(), msg.getPacketId());

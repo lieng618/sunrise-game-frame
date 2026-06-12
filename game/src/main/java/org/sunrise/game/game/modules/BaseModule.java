@@ -5,7 +5,7 @@ import com.alibaba.fastjson2.TypeReference;
 import lombok.Getter;
 import lombok.Setter;
 import org.sunrise.game.game.human.HumanObject;
-import org.sunrise.game.game.human.HumanObjectManger;
+import org.sunrise.game.game.human.HumanObjectManager;
 import org.sunrise.game.game.logic.attribute.AttributeProvider;
 
 import java.util.HashMap;
@@ -97,7 +97,7 @@ public class BaseModule {
     }
 
     public HumanObject getHuman() {
-        return HumanObjectManger.getHumanObject(humanId);
+        return HumanObjectManager.getHumanObject(humanId);
     }
 
     public <T> void getDbData(String key, TypeReference<T> typeReference, Consumer<T> func) {

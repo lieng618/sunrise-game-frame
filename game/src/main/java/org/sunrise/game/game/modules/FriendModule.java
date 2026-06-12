@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.sunrise.game.game.annotation.HumanModule;
 import org.sunrise.game.game.human.HumanObject;
-import org.sunrise.game.game.human.HumanObjectManger;
+import org.sunrise.game.game.human.HumanObjectManager;
 import org.sunrise.game.game.logic.friend.FriendRequestData;
 import org.sunrise.game.game.logic.playerinfo.PlayerInfo;
 import org.sunrise.game.genProto.gen.FriendProto;
@@ -88,7 +88,7 @@ public class FriendModule extends BaseModule {
                     PlayerInfo playerInfo = playerInfosMap.get(friendId);
                     FriendProto.STFriendInfo.Builder friendInfoBuilder = FriendProto.STFriendInfo.newBuilder()
                             .setHumanId(friendId)
-                            .setOnlineStatus(HumanObjectManger.getHumanObject(friendId) != null ? 1 : 0)
+                            .setOnlineStatus(HumanObjectManager.getHumanObject(friendId) != null ? 1 : 0)
                             .setHeadIcon(playerInfo.getHeadIcon())
                             .setName(playerInfo.getName())
                             .setLevel(playerInfo.getLevel());
@@ -123,7 +123,7 @@ public class FriendModule extends BaseModule {
                         .setHumanId(playerId)
                         .setName(playerInfo.getName())
                         .setLevel(playerInfo.getLevel())
-                        .setOnlineStatus(HumanObjectManger.getHumanObject(playerId) != null ? 1 : 0)
+                        .setOnlineStatus(HumanObjectManager.getHumanObject(playerId) != null ? 1 : 0)
                         .setHeadIcon(playerInfo.getHeadIcon())
                         .build();
 
@@ -256,7 +256,7 @@ public class FriendModule extends BaseModule {
             excludeIds.add(getHumanId());
 
             // 从在线玩家中筛选推荐候选人
-            Collection<HumanObject> allOnline = HumanObjectManger.getHumanObjects();
+            Collection<HumanObject> allOnline = HumanObjectManager.getHumanObjects();
             List<String> candidates = new ArrayList<>();
             for (HumanObject humanObject : allOnline) {
                 if (!excludeIds.contains(humanObject.getHumanId())) {
@@ -306,7 +306,7 @@ public class FriendModule extends BaseModule {
                             .setHumanId(recommendId)
                             .setName(playerInfo.getName())
                             .setLevel(playerInfo.getLevel())
-                            .setOnlineStatus(HumanObjectManger.getHumanObject(recommendId) != null ? 1 : 0)
+                            .setOnlineStatus(HumanObjectManager.getHumanObject(recommendId) != null ? 1 : 0)
                             .setHeadIcon(playerInfo.getHeadIcon());
                     builder.addPlayers(friendInfoBuilder.build());
                 }
@@ -347,7 +347,7 @@ public class FriendModule extends BaseModule {
                     .setHumanId(friendHumanId)
                     .setName(playerInfo.getName())
                     .setLevel(playerInfo.getLevel())
-                    .setOnlineStatus(HumanObjectManger.getHumanObject(friendHumanId) != null ? 1 : 0)
+                    .setOnlineStatus(HumanObjectManager.getHumanObject(friendHumanId) != null ? 1 : 0)
                     .setHeadIcon(playerInfo.getHeadIcon());
             
             FriendProto.MS2C_FriendUpdate.Builder builder = FriendProto.MS2C_FriendUpdate.newBuilder();

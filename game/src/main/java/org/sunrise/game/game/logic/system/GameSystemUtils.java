@@ -6,7 +6,7 @@ import org.sunrise.game.db.DbManager;
 import org.sunrise.game.db.entity.EntityServerData;
 import org.sunrise.game.game.annotation.GameSystem;
 import org.sunrise.game.game.human.HumanObject;
-import org.sunrise.game.game.human.HumanObjectManger;
+import org.sunrise.game.game.human.HumanObjectManager;
 import org.sunrise.game.game.logic.ToolsUtils;
 import org.sunrise.game.graceful.OnShutdown;
 import org.sunrise.game.log.LogCore;
@@ -139,7 +139,7 @@ public class GameSystemUtils {
     public static int saveAllHumansSync() {
         int saved = 0;
         int errors = 0;
-        for (HumanObject humanObject : HumanObjectManger.getHumanObjects()) {
+        for (HumanObject humanObject : HumanObjectManager.getHumanObjects()) {
             try {
                 DbManager.getDbService().execute("update `human_info` set `role_data` = ? where `human_id` = ?",
                         JSON.toJSONBytes(humanObject.save()), humanObject.getHumanId());
@@ -151,7 +151,7 @@ public class GameSystemUtils {
             }
         }
         LogCore.GameServer.info("saveAllHumansSync done: saved={}, errors={}, totalOnline={}",
-                saved, errors, HumanObjectManger.getOnlineCount());
+                saved, errors, HumanObjectManager.getOnlineCount());
         return saved;
     }
 
@@ -167,7 +167,7 @@ public class GameSystemUtils {
         }
 
         // 玩家模块心跳
-        for (HumanObject humanObject : HumanObjectManger.getHumanObjects()) {
+        for (HumanObject humanObject : HumanObjectManager.getHumanObjects()) {
             humanObject.pulse();
         }
     }
@@ -182,7 +182,7 @@ public class GameSystemUtils {
             }
         }
 
-        for (HumanObject humanObject : HumanObjectManger.getHumanObjects()) {
+        for (HumanObject humanObject : HumanObjectManager.getHumanObjects()) {
             humanObject.pulsePer100Ms();
         }
     }
@@ -207,7 +207,7 @@ public class GameSystemUtils {
         }
 
         // 每秒调用一次玩家模块心跳
-        for (HumanObject humanObject : HumanObjectManger.getHumanObjects()) {
+        for (HumanObject humanObject : HumanObjectManager.getHumanObjects()) {
             humanObject.pulsePerSec();
         }
     }

@@ -1,7 +1,7 @@
 package org.sunrise.game.game.service;
 
 import org.sunrise.game.game.human.HumanObject;
-import org.sunrise.game.game.human.HumanObjectManger;
+import org.sunrise.game.game.human.HumanObjectManager;
 import org.sunrise.game.rpc.annotation.RpcMethod;
 import org.sunrise.game.rpc.annotation.RpcService;
 import org.sunrise.game.rpc.service.BaseService;
@@ -17,7 +17,7 @@ public class GameRpcListenService extends BaseService {
      */
     @RpcMethod
     public void sendToAllHuman(int packetType, int packetId, byte[] protoData) {
-        for (HumanObject humanObject : HumanObjectManger.getHumanObjects()) {
+        for (HumanObject humanObject : HumanObjectManager.getHumanObjects()) {
             humanObject.sendMsg(packetType, packetId, protoData);
         }
     }
@@ -27,7 +27,7 @@ public class GameRpcListenService extends BaseService {
      */
     @RpcMethod
     public void sendToHuman(String humanId, int packetType, int packetId, byte[] protoData) {
-        HumanObject humanObject = HumanObjectManger.getHumanObject(humanId);
+        HumanObject humanObject = HumanObjectManager.getHumanObject(humanId);
         if (humanObject != null) {
             humanObject.sendMsg(packetType, packetId, protoData);
         }

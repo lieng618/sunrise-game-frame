@@ -35,7 +35,7 @@ public class ExternalServerHandler extends SimpleChannelInboundHandler<SocketMes
         isAuthMessage = false;
         String message = new String(data, StandardCharsets.UTF_8);
         if (message.startsWith(Utils.CLIENT_CONNECT)) {
-            clientConnection = ExternalConnectionManger.createClientConnect(channel);
+            clientConnection = ExternalConnectionManager.createClientConnect(channel);
             LogCore.ExternalServer.info("recv connection from client : connectionId = {}, remoteAddress = {}", clientConnection.getId(), channel.remoteAddress());
         } else {
             LogCore.ExternalServer.error("recv connection from client : check fail,  close, remoteAddress = {}", channel.remoteAddress());
@@ -46,7 +46,7 @@ public class ExternalServerHandler extends SimpleChannelInboundHandler<SocketMes
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         if (clientConnection != null) {
-            ExternalConnectionManger.removeClientConnect(clientConnection.getId());
+            ExternalConnectionManager.removeClientConnect(clientConnection.getId());
             LogCore.ExternalServer.info("client disconnected, id = {}, remoteAddress = {}", clientConnection.getId(), clientConnection.getRemoteAddress());
             clientConnection = null;
         }

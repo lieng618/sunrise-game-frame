@@ -13,7 +13,7 @@ import org.sunrise.game.game.logic.system.GameSystemUtils;
 import org.sunrise.game.game.logic.system.LoginQueueSystem;
 import org.sunrise.game.game.human.ConnectObject;
 import org.sunrise.game.game.human.HumanObject;
-import org.sunrise.game.game.human.HumanObjectManger;
+import org.sunrise.game.game.human.HumanObjectManager;
 import org.sunrise.game.genProto.gen.LoginProto;
 import org.sunrise.game.genProto.gen.TopicProto;
 import org.sunrise.game.log.LogCore;
@@ -26,7 +26,7 @@ import java.util.Properties;
 
 public class LoginMsgHandler {
     public static void handlerLogin(long connectId, int packetId, Object data, String externalNodeId) {
-        ConnectObject connectObject = HumanObjectManger.getConnectObject(connectId);
+        ConnectObject connectObject = HumanObjectManager.getConnectObject(connectId);
         switch (packetId) {
             case LoginProto.FROM_CLIENT.C2S_Login_VALUE: {
                 LoginProto.MC2S_Login msg = (LoginProto.MC2S_Login) data;
@@ -75,10 +75,10 @@ public class LoginMsgHandler {
                     LogCore.GameServer.error("recv msg, connectionId = {}, packetType = {}, packetId = {}, humanObject not found", connectId, TopicProto.TOPIC.TOPIC_TYPE_LOGIN, packetId);
                     return;
                 }
-                var humanLists = HumanObjectManger.uidPlays.get(connectObject.getUid());
+                var humanLists = HumanObjectManager.uidPlays.get(connectObject.getUid());
                 if (humanLists != null) {
                     // 已经加载过数据
-                    HumanObjectManger.getConnectObject(connectId).onLoadHumanList(humanLists);
+                    HumanObjectManager.getConnectObject(connectId).onLoadHumanList(humanLists);
                 } else {
                     // 加载此账号下的所有角色
                     loadHumanList(connectId, true);
@@ -97,7 +97,7 @@ public class LoginMsgHandler {
                 if (msg.getPos() < 0 || msg.getPos() > 2) {
                     return;
                 }
-                var humanLists = HumanObjectManger.uidPlays.get(connectObject.getUid());
+                var humanLists = HumanObjectManager.uidPlays.get(connectObject.getUid());
                 if (humanLists == null) {
                     return;
                 }
@@ -121,10 +121,10 @@ public class LoginMsgHandler {
                         });
                     }, "insert into `human_list` (uid, human_id, server_id, pos) values (?,?,?,?)", connectObject.getUid(), humanId, msg.getServerId(), msg.getPos());
 
-                    HumanObjectManger.humanIds.put(connectId, humanId);
+                    HumanObjectManager.humanIds.put(connectId, humanId);
                     // 创建玩家
                     createHumanObject(connectId, msg.getServerId(), humanId, true);
-                    HumanObject humanObject = HumanObjectManger.getHumanObject(humanId);
+                    HumanObject humanObject = HumanObjectManager.getHumanObject(humanId);
                     // 选择角色回包
                     connectObject.onSelectHuman();
                     humanObject.sendHumanData();
@@ -132,27 +132,27 @@ public class LoginMsgHandler {
                     DbManager.getDbService().executeAsync("insert into `human_info` (human_id, role_data) values (?,?)", humanId, JSON.toJSONBytes(humanObject.save()));
                 } else {
                     // 检测是否被封禁
-                    boolean ban = HumanObjectManger.banHumanQueue.contains(humanShowInfo.getHumanId());
+                    boolean ban = HumanObjectManager.banHumanQueue.contains(humanShowInfo.getHumanId());
                     // 根据玩家id 加载数据
                     // 重连无需加载
-                    HumanObject humanObject = HumanObjectManger.getHumanObject(humanShowInfo.getHumanId());
+                    HumanObject humanObject = HumanObjectManager.getHumanObject(humanShowInfo.getHumanId());
                     if (humanObject != null) {
                         // 清理旧的连接对象
                         humanObject.getConnectObject().kick("login elsewhere");
-                        HumanObjectManger.removeConnectObject(humanObject.getConnectObject().getConnectId());
-                        HumanObjectManger.humanIds.remove(humanObject.getConnectObject().getConnectId());
+                        HumanObjectManager.removeConnectObject(humanObject.getConnectObject().getConnectId());
+                        HumanObjectManager.humanIds.remove(humanObject.getConnectObject().getConnectId());
                         // 设置新的连接对象
                         humanObject.setConnectObject(connectObject);
-                        HumanObjectManger.humanIds.put(connectId, humanShowInfo.getHumanId());
+                        HumanObjectManager.humanIds.put(connectId, humanShowInfo.getHumanId());
                         // 选择角色回包
                         connectObject.onSelectHuman();
                         humanObject.sendHumanData();
                     } else {
                         if (ban) {
                             connectObject.kick("ban");
-                            HumanObjectManger.uidAccounts.remove(connectObject.getUid());
-                            HumanObjectManger.uidPlays.remove(connectObject.getUid());
-                            HumanObjectManger.removeConnectObject(connectId);
+                            HumanObjectManager.uidAccounts.remove(connectObject.getUid());
+                            HumanObjectManager.uidPlays.remove(connectObject.getUid());
+                            HumanObjectManager.removeConnectObject(connectId);
                             return;
                         }
                         loadHumanInfo(connectId, humanShowInfo.getServerId(), humanShowInfo.getHumanId());
@@ -162,11 +162,11 @@ public class LoginMsgHandler {
             }
 
             case LoginProto.FROM_CLIENT.C2S_ClientPing_VALUE: {
-                String humanId = HumanObjectManger.humanIds.get(connectId);
+                String humanId = HumanObjectManager.humanIds.get(connectId);
                 if (humanId == null) {
                     return;
                 }
-                HumanObject humanObject = HumanObjectManger.getHumanObject(humanId);
+                HumanObject humanObject = HumanObjectManager.getHumanObject(humanId);
                 if (humanObject == null) {
                     return;
                 }
@@ -193,14 +193,14 @@ public class LoginMsgHandler {
         }
         // 创建连接对象
         ConnectObject connectObject = new ConnectObject(connectId, uid, externalNodeId);
-        HumanObjectManger.addConnectObject(connectId, connectObject);
+        HumanObjectManager.addConnectObject(connectId, connectObject);
 
         // 删除缓存的绑定信息
         loginQueue.releaseConnect(connectId);
 
-        Long accountId = HumanObjectManger.uidAccounts.get(uid);
+        Long accountId = HumanObjectManager.uidAccounts.get(uid);
         if (accountId != null) {
-            HumanObjectManger.getConnectObject(connectId).onLoadAccount(accountId);
+            HumanObjectManager.getConnectObject(connectId).onLoadAccount(accountId);
         } else {
             loadAccount(connectId, uid);
         }
@@ -209,23 +209,23 @@ public class LoginMsgHandler {
     private static void loadAccount(long connectId, String uid) {
         DbManager.getDbService().queryGetOneByParamsAsync(result -> {
             AsyncEventManager.addAsyncEvent(() -> {
-                ConnectObject connectContext = HumanObjectManger.getConnectObject(connectId);
+                ConnectObject connectContext = HumanObjectManager.getConnectObject(connectId);
                 if (connectContext == null) {
                     return;
                 }
                 if (result != null) {
                     EntityAccount account = new EntityAccount(result);
                     connectContext.onLoadAccount(account.getId());
-                    HumanObjectManger.uidAccounts.put(connectContext.getUid(), (long) account.getId());
+                    HumanObjectManager.uidAccounts.put(connectContext.getUid(), (long) account.getId());
                 } else {
                     DbManager.getDbService().executeAsyncWithGeneratedKey(r -> {
                         AsyncEventManager.addAsyncEvent(() -> {
-                            ConnectObject ctx = HumanObjectManger.getConnectObject(connectId);
+                            ConnectObject ctx = HumanObjectManager.getConnectObject(connectId);
                             if (ctx == null) {
                                 return;
                             }
                             ctx.onLoadAccount((long) r);
-                            HumanObjectManger.uidAccounts.put(ctx.getUid(), (long) r);
+                            HumanObjectManager.uidAccounts.put(ctx.getUid(), (long) r);
                         });
                     }, "insert into `account` (uid) values (?)", uid);
                 }
@@ -234,11 +234,11 @@ public class LoginMsgHandler {
     }
 
     private static void loadHumanList(long connectId, boolean send) {
-        ConnectObject connectObject = HumanObjectManger.getConnectObject(connectId);
+        ConnectObject connectObject = HumanObjectManager.getConnectObject(connectId);
         DbManager.getDbService().queryGetAllByParamsAsync(result -> {
             // 将任务放入异步队列
             AsyncEventManager.addAsyncEvent(() -> {
-                ConnectObject contextObject = HumanObjectManger.getConnectObject(connectId);
+                ConnectObject contextObject = HumanObjectManager.getConnectObject(connectId);
                 if (contextObject == null) {
                     return;
                 }
@@ -251,7 +251,7 @@ public class LoginMsgHandler {
                 if (send) {
                     contextObject.onLoadHumanList(humanLists);
                 }
-                HumanObjectManger.uidPlays.put(contextObject.getUid(), humanLists);
+                HumanObjectManager.uidPlays.put(contextObject.getUid(), humanLists);
             });
         }, "select * from `human_list` where `uid` = ?", connectObject.getUid());
     }
@@ -262,11 +262,11 @@ public class LoginMsgHandler {
                 if (result != null) {
                     EntityHumanInfo entityHumanInfo = new EntityHumanInfo(result);
 
-                    HumanObjectManger.humanIds.put(connectId, entityHumanInfo.getHumanId());
+                    HumanObjectManager.humanIds.put(connectId, entityHumanInfo.getHumanId());
                     // 创建玩家 并解析数据
                     createHumanObject(connectId, serverId, entityHumanInfo.getHumanId(), false);
 
-                    HumanObject humanObject = HumanObjectManger.getHumanObject(entityHumanInfo.getHumanId());
+                    HumanObject humanObject = HumanObjectManager.getHumanObject(entityHumanInfo.getHumanId());
                     humanObject.getConnectObject().onSelectHuman();
                     humanObject.load(entityHumanInfo.getRoleData());
                     humanObject.checkAndRefresh();
@@ -281,6 +281,6 @@ public class LoginMsgHandler {
 
 
     private static void createHumanObject(long connectId, int serverId, String humanId, boolean newHumanObj) {
-        HumanObjectManger.addHumanObject(humanId, new HumanObject(humanId, serverId, HumanObjectManger.getConnectObject(connectId), newHumanObj));
+        HumanObjectManager.addHumanObject(humanId, new HumanObject(humanId, serverId, HumanObjectManager.getConnectObject(connectId), newHumanObj));
     }
 }
