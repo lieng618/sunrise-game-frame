@@ -107,15 +107,17 @@ rpc.connect.http=</code></pre>
 <h3>CallEnum</h3>
 <p>每个 RPC 方法对应一个 int 编号，定义在 <code>CallEnum.java</code> 中，在gen模块下genRpc包下新增服务接口，运行<code>GenRpcStartUp</code>自动生成</p>
 <pre><code class="language-java">public class CallEnum {
-    public static final int ChatRpcListenService_onChat = 1;
-    public static final int GlobalChatService_chat = 2;
-    public static final int GlobalChatService_history = 3;
-    public static final int ExternalRecvGameMessageService_recvMessage = 4;
-    public static final int FriendRpcListenService_onNewFriendRequest = 5;
-    public static final int FriendRpcListenService_onFriendAdded = 6;
-    public static final int FriendRpcListenService_onFriendDeleted = 7;
-    public static final int GlobalFriendService_handleFriendRequest = 8;
-    // ... 共 30 个方法
+    public static final int ExternalRecvGameMessageService_recvMessage = 1;
+    public static final int FriendRpcListenService_onFriendAdded = 2;
+    public static final int FriendRpcListenService_onFriendDeleted = 3;
+    public static final int FriendRpcListenService_onNewFriendRequest = 4;
+    public static final int GameRecvExternalMessageService_recvMessage = 5;
+    public static final int GameRecvGmBackMessageService_recvMessage = 6;
+    public static final int GameRpcListenService_sendToAllHuman = 7;
+    public static final int GameRpcListenService_sendToHuman = 8;
+    public static final int GlobalChatService_chat = 9;
+    public static final int GlobalChatService_history = 10;
+    // ... 共 35 个方法
 }</code></pre>
 
 <h3>CallUtils.init() 完整流程</h3>

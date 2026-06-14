@@ -110,13 +110,12 @@ registerPage('game-server', '游戏服', '玩家对象、模块系统、消息�
 <tbody>
 <tr><td>DataModule</td><td>角色基础信息</td><td>名字/等级/经验/头像/战斗力/性别</td></tr>
 <tr><td>ItemModule</td><td>背包系统</td><td>支持添加/删除/使用/出售/整理/堆叠</td></tr>
-<tr><td>MapModule</td><td>地图模块</td><td>当前地图 ID、坐标、朝向</td></tr>
+<tr><td>PlayerUnitModule</td><td>玩家场景单位</td><td>属性容器、当前位置、所在地图，整合了属性系统和地图相关数据</td></tr>
 <tr><td>TaskModule</td><td>任务系统</td><td>任务列表、状态、进度</td></tr>
 <tr><td>FriendModule</td><td>好友客户端侧</td><td>好友列表、申请列表</td></tr>
 <tr><td>MailModule</td><td>邮件客户端侧</td><td>邮件列表、已读/未读</td></tr>
-<tr><td>ActivityModule</td><td>活动系统</td><td>活动参与状态</td></tr>
-<tr><td>AttributeModule</td><td>属性系统</td><td>玩家属性值</td></tr>
-<tr><td>MinerModule</td><td>矿工玩法</td><td>挖矿状态</td></tr>
+<tr><td>ActivityModule</td><td>活动系统</td><td>活动参与状态（如签到活动）</td></tr>
+<tr><td>MinerModule</td><td>矿工玩法</td><td>绳子速度、钩子数量/力度、升级点数、关卡进度</td></tr>
 <tr><td>CdkModule</td><td>兑换码</td><td>usedCodes：该角色已兑换的码集合，每码仅可兑换一次</td></tr>
 </table>
 <h2>协议路由</h2>
@@ -275,7 +274,7 @@ public class GlobalChatService extends BaseService {
 <table>
 <thead><tr><th>CallEnum</th><th>说明</th><th>特殊说明</th></tr></thead>
 <tbody>
-<tr><td>GlobalMailService_sendMail</td><td>发送单人邮件</td><td>构建 proto 二进制，SendAll 广播 MailRpcListenService_onNewMail</td></tr>
+<tr><td>GlobalMailService_sendMail</td><td>发送单人邮件</td><td>构建 proto 二进制，通过 GameRpcListenService 通知目标玩家</td></tr>
 <tr><td>GlobalMailService_sendGroupMail</td><td>群发邮件</td><td>遍历 humanIds 逐个创建</td></tr>
 <tr><td>GlobalMailService_sendAllMail</td><td>全服发送邮件</td><td>先调 GlobalPlayerInfoService_getAllPlayerIds 获取所有玩家 ID</td></tr>
 <tr><td>GlobalMailService_getMailList</td><td>获取邮件列表</td><td>返回 proto 二进制</td></tr>
@@ -300,6 +299,7 @@ public class GlobalChatService extends BaseService {
 <p>Global 服处理完后，需要通知玩家所在的 Game 节点，使用 <code>SendAll</code> 广播给所有 Game 节点：</p>
 <p><code>CallEnum.GameRpcListenService_sendToAllHuman</code> 广播给所有游戏服所有玩家</p>
 <p><code>CallEnum.GameRpcListenService_sendToHuman</code> 广播给所有游戏服，每个游戏服各自判断是否持有目标玩家，进行发送</p>
+<p><code>CallEnum.FriendRpcListenService_onNewFriendRequest</code> / <code>onFriendAdded</code> / <code>onFriendDeleted</code> 好友事件通知游戏服</p>
 <div class="flow-diagram">
     <div class="flow-row">
         <span class="flow-node flow-node-secondary">Game A</span>

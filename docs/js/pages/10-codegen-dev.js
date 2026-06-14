@@ -16,7 +16,8 @@ registerPage('code-gen', '代码生成', 'Proto、RPC 枚举、DB 实体、Luban
 ├── friend.proto       # 好友协议
 ├── mail.proto         # 邮件协议
 ├── activity.proto     # 活动协议
-└── attribute.proto    # 属性协议</code></pre>
+├── rank.proto         # 排行榜协议
+└── drop.proto         # 掉落协议</code></pre>
 
 <h3>生成步骤</h3>
 <ol class="step-list">
@@ -43,36 +44,41 @@ gen.bat</code></pre>
 
 <h3>生成的 CallEnum 示例</h3>
 <pre><code class="language-java">public class CallEnum {
-    public static final int ChatRpcListenService_onChat = 1;
-    public static final int GlobalChatService_chat = 2;
-    public static final int GlobalChatService_history = 3;
-    public static final int ExternalRecvGameMessageService_recvMessage = 4;
-    public static final int FriendRpcListenService_onNewFriendRequest = 5;
-    public static final int FriendRpcListenService_onFriendAdded = 6;
-    public static final int FriendRpcListenService_onFriendDeleted = 7;
-    public static final int GlobalFriendService_handleFriendRequest = 8;
-    public static final int GlobalFriendService_getFriends = 9;
-    public static final int GlobalFriendService_sendFriendRequest = 10;
+    public static final int ExternalRecvGameMessageService_recvMessage = 1;
+    public static final int FriendRpcListenService_onFriendAdded = 2;
+    public static final int FriendRpcListenService_onFriendDeleted = 3;
+    public static final int FriendRpcListenService_onNewFriendRequest = 4;
+    public static final int GameRecvExternalMessageService_recvMessage = 5;
+    public static final int GameRecvGmBackMessageService_recvMessage = 6;
+    public static final int GameRpcListenService_sendToAllHuman = 7;
+    public static final int GameRpcListenService_sendToHuman = 8;
+    public static final int GlobalChatService_chat = 9;
+    public static final int GlobalChatService_history = 10;
     public static final int GlobalFriendService_deleteFriend = 11;
     public static final int GlobalFriendService_getFriendRequests = 12;
-    public static final int GameRecvGmBackService_recvMessage = 13;
-    public static final int GameRecvMessageService_recvMessage = 14;
-    public static final int GmBackRecvMessageService_recvMessage = 15;
-    public static final int HttpRecvMessageService_updateExternalRemoteData = 16;
-    public static final int HttpRecvMessageService_setExternalServerStatus = 17;
-    public static final int HttpRecvMessageService_setWhitelist = 18;
-    public static final int MailRpcListenService_onNewMail = 19;
-    public static final int GlobalMailService_claimAttachment = 20;
-    public static final int GlobalMailService_sendMail = 21;
-    public static final int GlobalMailService_readMail = 22;
-    public static final int GlobalMailService_deleteMail = 23;
-    public static final int GlobalMailService_sendGroupMail = 24;
-    public static final int GlobalMailService_sendAllMail = 25;
-    public static final int GlobalMailService_getMailList = 26;
-    public static final int GlobalPlayerInfoService_getPlayerInfo = 27;
-    public static final int GlobalPlayerInfoService_updatePlayerInfo = 28;
-    public static final int GlobalPlayerInfoService_getPlayerInfos = 29;
-    public static final int GlobalPlayerInfoService_getAllHumanIds = 30;
+    public static final int GlobalFriendService_getFriends = 13;
+    public static final int GlobalFriendService_handleFriendRequest = 14;
+    public static final int GlobalFriendService_sendFriendRequest = 15;
+    public static final int GlobalMailService_deleteMail = 16;
+    public static final int GlobalMailService_getPlayerMails = 17;
+    public static final int GlobalMailService_readMail = 18;
+    public static final int GlobalMailService_receiveMailAttachment = 19;
+    public static final int GlobalMailService_sendMail = 20;
+    public static final int GlobalMailService_sendMailToAll = 21;
+    public static final int GlobalMailService_sendMailToMultiple = 22;
+    public static final int GlobalPlayerInfoService_getAllPlayerIds = 23;
+    public static final int GlobalPlayerInfoService_getPlayerInfo = 24;
+    public static final int GlobalPlayerInfoService_getPlayerInfos = 25;
+    public static final int GlobalPlayerInfoService_updatePlayerInfo = 26;
+    public static final int GmBackRecvMessageService_recvMessage = 27;
+    public static final int HttpRecvMessageService_setAnnouncements = 28;
+    public static final int HttpRecvMessageService_setExternalServerStatus = 29;
+    public static final int HttpRecvMessageService_setWhitelist = 30;
+    public static final int HttpRecvMessageService_updateExternalRemoteData = 31;
+    public static final int GlobalRankService_getMyRank = 32;
+    public static final int GlobalRankService_getRankList = 33;
+    public static final int GlobalRankService_removeFromRank = 34;
+    public static final int GlobalRankService_updateRank = 35;
 }</code></pre>
 
 <h2>数据库实体生成</h2>

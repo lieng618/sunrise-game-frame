@@ -17,7 +17,7 @@ registerPage('architecture', '架构总览', '多进程架构、服务职责、�
     <div class="card">
         <div class="card-icon">🌐</div>
         <div class="card-title">ExternalServer</div>
-        <div class="card-desc">对外网关服。同时监听 TCP/WS/KCP 三种协议（端口依次 +1）、验证客户端首包认证、分配 connectionId、消息频率限制（300条/分钟，64KB上限）、转发消息到 Game 服、接收 Game 回包发回客户端</div>
+        <div class="card-desc">对外网关服。同时监听 TCP/WS/KCP 三种协议（端口依次 +1）、验证客户端首包认证、分配 connectionId、消息频率限制（默认1000条/分钟）、转发消息到 Game 服、接收 Game 回包发回客户端</div>
     </div>
     <div class="card">
         <div class="card-icon">🎮</div>
@@ -27,7 +27,7 @@ registerPage('architecture', '架构总览', '多进程架构、服务职责、�
     <div class="card">
         <div class="card-icon">🌍</div>
         <div class="card-title">GlobalServer</div>
-        <div class="card-desc">全局跨服服务。所有需要跨服共享的数据和逻辑都放在这里，目前实现了：聊天服务（GlobalChatService）、好友服务（GlobalFriendService）、邮件服务（GlobalMailService）、玩家简要信息查询（GlobalPlayerInfoService）</div>
+        <div class="card-desc">全局跨服服务。所有需要跨服共享的数据和逻辑都放在这里，目前实现了：聊天服务（GlobalChatService）、好友服务（GlobalFriendService）、邮件服务（GlobalMailService）、排行榜服务（GlobalRankService）、玩家简要信息查询（GlobalPlayerInfoService）</div>
     </div>
     <div class="card">
         <div class="card-icon">🔗</div>

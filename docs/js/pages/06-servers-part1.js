@@ -105,7 +105,7 @@ registerPage('external-server', '对外服', 'TCP/WS/KCP 网关、客户端连�
     <li>监听 TCP / WebSocket / KCP 端口（端口依次 +1）</li>
     <li>验证客户端首包认证（"CLIENT_CONNECT_"）</li>
     <li>为每个连接分配 connectionId</li>
-    <li>消息频率限制（300条/分钟，64KB上限）</li>
+    <li>消息频率限制（默认1000条/分钟，可在 external-config 中调整）</li>
     <li>将客户端消息转发到对应的 Game 节点（SendDesignated）</li>
     <li>接收 Game 服 RPC 返回，再发回客户端</li>
     <li>每5秒向 HttpServer 上报 External 地址</li>
@@ -131,8 +131,7 @@ registerPage('external-server', '对外服', 'TCP/WS/KCP 网关、客户端连�
 <h2>消息频率限制</h2>
 <p>ClientConnection.dataCheck() 内置消息频率限制，定义在Utils中。</p>
 <ul>
-    <li><strong>300 条/分钟</strong> - 超过限制的消息被丢弃</li>
-    <li><strong>64KB</strong> - 单条消息最大大小限制</li>
+    <li><strong>频率限制</strong> - 默认每分钟1000条（可在 external-config 中通过 <code>external.rate-limit.per-minute</code> 调整）</li>
 </ul>
 
 <h2>External 与 Game 的绑定</h2>

@@ -441,6 +441,10 @@ registerPage('api-reference', 'API 参考', 'RPC 服务 API、HTTP 接口、注�
 <tr><td>HttpRecvMessageService_setExternalServerStatus</td><td>Http</td><td>设置服务器开关</td></tr>
 <tr><td>HttpRecvMessageService_setWhitelist</td><td>Http</td><td>设置白名单</td></tr>
 <tr><td>HttpRecvMessageService_setAnnouncements</td><td>Http</td><td>设置当前生效公告列表</td></tr>
+<tr><td>GlobalRankService_updateRank</td><td>Global</td><td>更新排行榜分数</td></tr>
+<tr><td>GlobalRankService_getRankList</td><td>Global</td><td>获取排行榜列表</td></tr>
+<tr><td>GlobalRankService_getMyRank</td><td>Global</td><td>获取我的排名</td></tr>
+<tr><td>GlobalRankService_removeFromRank</td><td>Global</td><td>从排行中移除</td></tr>
 </tbody>
 </table>
 

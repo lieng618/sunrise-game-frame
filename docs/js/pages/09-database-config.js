@@ -92,12 +92,11 @@ registerPage('database', '数据库', 'MySQL 表结构、数据存储方式、Db
 <pre><code class="language-json">{
     "DataModule": "{\\"name\\":\\"test\\",\\"level\\":1,\\"exp\\":0,\\"headIcon\\":0,\\"fightPower\\":0,\\"sex\\":0}",
     "ItemModule": "{\\"items\\":[{\\"itemId\\":1,\\"count\\":99}],\\"capacity\\":100}",
-    "MapModule": "{\\"mapId\\":1001,\\"x\\":0,\\"y\\":0,\\"direction\\":0}",
+    "PlayerUnitModule": "{\\"mapId\\":1001,\\"x\\":0,\\"y\\":0,\\"attributes\\":{}}",
     "TaskModule": "{\\"tasks\\":[{\\"taskId\\":1,\\"status\\":2,\\"progress\\":0}]}",
     "FriendModule": "{\\"friends\\":[],\\"requests\\":[]}",
     "MailModule": "{\\"mails\\":[]}",
     "ActivityModule": "{\\"activities\\":[]}",
-    "AttributeModule": "{\\"attributes\\":{}}",
     "MinerModule": "{\\"minerData\\":{}}",
     "CdkModule": "{\\"usedCodes\\":[\\"VIP666\\",\\"ABCD1234EFGH\\"]}"
 }</code></pre>

@@ -94,7 +94,8 @@ public class ClientConnection {
 <tr><td>TOPIC_TYPE_FRIEND</td><td>7</td><td>FriendProto</td><td>好友</td></tr>
 <tr><td>TOPIC_TYPE_MAIL</td><td>8</td><td>MailProto</td><td>邮件</td></tr>
 <tr><td>TOPIC_TYPE_ACTIVITY</td><td>9</td><td>ActivityProto</td><td>活动</td></tr>
-<tr><td>TOPIC_TYPE_ATTRIBUTE</td><td>10</td><td>AttributeProto</td><td>属性</td></tr>
+<tr><td>TOPIC_TYPE_RANK</td><td>10</td><td>RankProto</td><td>排行榜</td></tr>
+<tr><td>TOPIC_TYPE_DROP</td><td>11</td><td>DropProto</td><td>掉落</td></tr>
 </tbody>
 </table>
 
@@ -231,6 +232,24 @@ message MTaskInfo {
 <tr><td>C→S</td><td>C2S_DeleteMail</td><td>mailId</td><td>删除邮件</td></tr>
 <tr><td>S→C</td><td>S2C_MailList</td><td>mails</td><td>邮件列表</td></tr>
 <tr><td>S→C</td><td>S2C_NewMail</td><td>mail</td><td>新邮件通知</td></tr>
+</tbody>
+</table>
+
+<h3>RankProto（TOPIC_TYPE_RANK = 10）</h3>
+<table>
+<thead><tr><th>方向</th><th>消息</th><th>字段</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>C→S</td><td>C2S_GetRankList</td><td>rankType, startRank, count</td><td>请求排行榜列表</td></tr>
+<tr><td>S→C</td><td>S2C_GetRankList</td><td>rankList, myRank</td><td>返回排行数据</td></tr>
+</tbody>
+</table>
+
+<h3>DropProto（TOPIC_TYPE_DROP = 11）</h3>
+<table>
+<thead><tr><th>方向</th><th>消息</th><th>字段</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>C→S</td><td>C2S_PickUpDrop</td><td>dropId</td><td>拾取掉落物</td></tr>
+<tr><td>S→C</td><td>S2C_DropUpdate</td><td>drops</td><td>掉落物更新通知</td></tr>
 </tbody>
 </table>
 `);
