@@ -1,12 +1,12 @@
 package org.sunrise.game.rpc.function;
 
-
 import org.sunrise.game.core.server.BaseServerManager;
 import org.sunrise.game.log.LogCore;
 import org.sunrise.game.rpc.annotation.RpcMethod;
 import org.sunrise.game.rpc.annotation.RpcService;
 import org.sunrise.game.rpc.service.BaseService;
 import org.sunrise.game.rpc.service.ServiceManager;
+import org.sunrise.game.startup.FatalStartupException;
 import org.sunrise.game.utils.Utils;
 
 import java.lang.reflect.Field;
@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 
 public class CallUtils {
 
@@ -23,86 +24,147 @@ public class CallUtils {
     private static String curNodeId;
 
     /**
-     * rpc初始化
-     * @param nodeId 当前rpc服务器节点id
-     * @param classPaths 要注册的rpc方法包路径
-     * @param callEnumClass 生成的调用方法枚举类
+     * RPC 服务扫描注册，由 {@link org.sunrise.game.rpc.node.RpcNodeManager} 在创建节点时自动调用。
+     *
+     * @param nodeId        当前 RPC 节点 ID，注入到各 {@link BaseService} 构造函数
+     * @param classPaths    要扫描的包列表（来自 {@code rpc.scan.packages} 或 nodeType 约定）
+     * @param callEnumClass 生成的 CallEnum，其 static int 字段名须与 {@code ServiceName_methodName} 缓存键一致
+     * @param strict        为 true 时任一服务注册失败抛出 {@link FatalStartupException}
      */
-    public static void init(String nodeId, List<String> classPaths, Class<?> callEnumClass) {
+    public static void init(String nodeId, List<String> classPaths, Class<?> callEnumClass, boolean strict) {
         if (callEnumClass == null) {
             return;
         }
         curNodeId = nodeId;
         long startTime = System.currentTimeMillis();
         Map<String, Method> methodsCache = new HashMap<>();
-        // 预先加载所有 classPaths 下的类和方法，并缓存
+        // 1. 扫描包内 @RpcService，实例化并缓存 @RpcMethod
+        RegistrationResult registration = registerServices(nodeId, classPaths, methodsCache);
+        // 2. 将 CallEnum 中的 rpcId 与 methodsCache 中的 Method 绑定
+        bindCallEnumMethods(callEnumClass, methodsCache);
+        // 3. 校验注册结果（strict 模式、至少一个服务）
+        validateRegistration(classPaths, strict, startTime, registration);
+        initCurRegisterCallIds();
+        ServiceManager.initAll();
+    }
+
+    /** 扫描阶段的注册成功/失败服务名列表，供汇总日志与 strict 校验 */
+    private record RegistrationResult(List<String> registered, List<String> failed) {
+    }
+
+    /** 遍历各扫描包，收集 @RpcService 类并尝试注册到 {@link ServiceManager} */
+    private static RegistrationResult registerServices(String nodeId, List<String> classPaths, Map<String, Method> methodsCache) {
+        List<String> registeredServices = new ArrayList<>();
+        List<String> failedServices = new ArrayList<>();
         for (String classPath : classPaths) {
             try {
-                // 获取 classPath 下的所有类
-                List<Class<?>> classes = Utils.findClasses(classPath); //获取包下的类
+                List<Class<?>> classes = Utils.findClasses(classPath);
                 for (Class<?> clazz : classes) {
-                    if (!clazz.isAnnotationPresent(RpcService.class)) {
-                        continue;
-                    }
-                    if (!BaseService.class.isAssignableFrom(clazz) || clazz == BaseService.class) {
-                        continue;
-                    }
-                    long classStartTime = System.currentTimeMillis();
-                    @SuppressWarnings("unchecked")
-                    Class<? extends BaseService> serviceClass = (Class<? extends BaseService>) clazz;
-
-                    String className = clazz.getSimpleName();
-                    Method[] methods = clazz.getDeclaredMethods();
-                    int classMethodCount = 0; // 记录类方法数
-                    if (methods != null) {
-                        for (Method method : methods) {
-                            if (method.isAnnotationPresent(RpcMethod.class)) {
-                                methodsCache.put(className + "_" + method.getName(), method);
-
-                                // 类方法数加1
-                                classMethodCount++;
-                            }
-                        }
-                    }
-                    try {
-                        // 实例化类
-                        ServiceManager.registerService(serviceClass.getConstructor(String.class).newInstance(nodeId));
-
-                        long classEndTime = System.currentTimeMillis();
-                        LogCore.RpcUtils.info("Load class end, name = { {} }, loaded {} methods, took {} ms", clazz.getName(), classMethodCount, classEndTime - classStartTime);
-                    } catch (Exception e) {
-                        LogCore.RpcUtils.warn("Failed to instantiate class: {} with nodeId: {}, error: {}", className, nodeId, e.getMessage());
-                    }
+                    registerServiceClass(nodeId, clazz, methodsCache, registeredServices, failedServices);
                 }
             } catch (Exception e) {
+                failedServices.add(classPath + ": " + e.getMessage());
                 LogCore.RpcUtils.warn("Failed to load classes from package: {}, error: {}", classPath, e.getMessage());
             }
         }
+        return new RegistrationResult(registeredServices, failedServices);
+    }
 
-        Field[] fields = callEnumClass.getDeclaredFields();
-        for (Field field : fields) {
+    /** 处理单个候选类：过滤非 Service 后实例化，失败时记入 failedServices 而非中断（由 validateRegistration 决定） */
+    private static void registerServiceClass(
+            String nodeId,
+            Class<?> clazz,
+            Map<String, Method> methodsCache,
+            List<String> registeredServices,
+            List<String> failedServices) {
+        if (!clazz.isAnnotationPresent(RpcService.class)) {
+            return;
+        }
+        if (!BaseService.class.isAssignableFrom(clazz) || clazz == BaseService.class) {
+            return;
+        }
+        long classStartTime = System.currentTimeMillis();
+        @SuppressWarnings("unchecked")
+        Class<? extends BaseService> serviceClass = (Class<? extends BaseService>) clazz;
+
+        String className = clazz.getSimpleName();
+        int classMethodCount = cacheRpcMethods(clazz, className, methodsCache);
+        try {
+            ServiceManager.registerService(serviceClass.getConstructor(String.class).newInstance(nodeId));
+            registeredServices.add(clazz.getName());
+            LogCore.RpcUtils.info(
+                    "Load class end, name = { {} }, loaded {} methods, took {} ms",
+                    clazz.getName(),
+                    classMethodCount,
+                    System.currentTimeMillis() - classStartTime);
+        } catch (Exception e) {
+            failedServices.add(clazz.getName() + ": " + e.getMessage());
+            LogCore.RpcUtils.warn("Failed to instantiate class: {} with nodeId: {}, error: {}", className, nodeId, e.getMessage());
+        }
+    }
+
+    /** 缓存键格式 {@code ClassSimpleName_methodName}，与 CallEnum 字段名一一对应 */
+    private static int cacheRpcMethods(Class<?> clazz, String className, Map<String, Method> methodsCache) {
+        int classMethodCount = 0;
+        for (Method method : clazz.getDeclaredMethods()) {
+            if (method.isAnnotationPresent(RpcMethod.class)) {
+                methodsCache.put(className + "_" + method.getName(), method);
+                classMethodCount++;
+            }
+        }
+        return classMethodCount;
+    }
+
+    /** 遍历 CallEnum 的 static int 字段，建立 rpcId → Method 映射 */
+    private static void bindCallEnumMethods(Class<?> callEnumClass, Map<String, Method> methodsCache) {
+        for (Field field : callEnumClass.getDeclaredFields()) {
             try {
-                if (field.getType() == int.class && Modifier.isStatic(field.getModifiers())) {
-                    int rpcId = field.getInt(null);
-                    if (rpcIdToMethodMap.get(rpcId) != null) {
-                        continue;
-                    }
-
-                    String fieldName = field.getName();
-                    Method method = methodsCache.get(fieldName);
-                    if (method != null) {
-                        rpcIdToMethodMap.put(rpcId, method);
-                    }
+                if (field.getType() != int.class || !Modifier.isStatic(field.getModifiers())) {
+                    continue;
+                }
+                int rpcId = field.getInt(null);
+                if (rpcIdToMethodMap.containsKey(rpcId)) {
+                    continue;
+                }
+                Method method = methodsCache.get(field.getName());
+                if (method != null) {
+                    rpcIdToMethodMap.put(rpcId, method);
                 }
             } catch (Exception e) {
                 LogCore.RpcUtils.warn("Error processing field: {}, error: {}", field.getName(), e.getLocalizedMessage());
             }
         }
+    }
 
-        LogCore.RpcUtils.info("CallUtils init end, took {} ms", System.currentTimeMillis() - startTime);
-        initCurRegisterCallIds();
-        // 初始化所有服务
-        ServiceManager.initAll();
+    /**
+     * 启动阶段校验：输出汇总日志；strict 模式下任一失败即退出；扫描结果为空一律视为配置错误。
+     */
+    private static void validateRegistration(
+            List<String> classPaths,
+            boolean strict,
+            long startTime,
+            RegistrationResult registration) {
+        List<String> registeredServices = registration.registered();
+        List<String> failedServices = registration.failed();
+        LogCore.RpcUtils.info(
+                "CallUtils init end, services = {}/{}, rpc methods = {}, scan packages = {}, took {} ms",
+                registeredServices.size(),
+                registeredServices.size() + failedServices.size(),
+                rpcIdToMethodMap.size(),
+                classPaths,
+                System.currentTimeMillis() - startTime);
+        if (!failedServices.isEmpty()) {
+            StringJoiner joiner = new StringJoiner("; ");
+            failedServices.forEach(joiner::add);
+            if (strict) {
+                throw new FatalStartupException("RPC service registration failed: " + joiner);
+            }
+            // 非 strict：仅告警，允许开发环境跳过个别无法实例化的服务
+            LogCore.RpcUtils.warn("RPC service registration failures (rpc.init.strict=false): {}", joiner);
+        }
+        if (registeredServices.isEmpty()) {
+            throw new FatalStartupException("No RPC services registered, scan packages = " + classPaths);
+        }
     }
 
     /**

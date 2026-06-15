@@ -1,63 +1,21 @@
 package org.sunrise.game.game.main;
 
 import org.sunrise.game.config.ConfigReader;
-import org.sunrise.game.game.logic.ConfigUtils;
-import org.sunrise.game.game.logic.LogicUtils;
-import org.sunrise.game.game.logic.ProtoParserUtils;
-import org.sunrise.game.game.logic.map.MapNavUtils;
-import org.sunrise.game.game.logic.system.GameSystemUtils;
-import org.sunrise.game.game.modules.ModuleUtils;
-import org.sunrise.game.genRpc.gen.CallEnum;
-import org.sunrise.game.graceful.GracefulShutdown;
+import org.sunrise.game.game.init.GameServerRuntime;
 import org.sunrise.game.jwt.JwtUtil;
-import org.sunrise.game.rpc.function.CallUtils;
 import org.sunrise.game.rpc.node.RpcNodeManager;
-import org.sunrise.game.utils.Utils;
 
-import java.util.Collections;
-import java.util.Properties;
-
+/**
+ * 游戏逻辑服入口。
+ * <p>
+ * RPC 通用启动见 {@link org.sunrise.game.rpc.node.RpcNodeManager#runMain}；
+ * {@code beforeListen} 中加载 Luban 表、协议处理器及 JWT（本进程鉴权用）。
+ */
 public class GameServerStartUp {
     public static void main(String[] args) {
-        if (args.length == 0) {
-            args = new String[]{ "./config/game-config.properties" };
-        }
-        ConfigReader.loadConfig(args[0]);
-        Properties properties = ConfigReader.getProp();
-        if (properties == null) {
-            return;
-        }
-        int serverId = Integer.parseInt(properties.getProperty("rpc.node.server-id"));
-        String nodeType = properties.getProperty("rpc.node.type");
-        System.setProperty("programName", "GameServer-" + serverId);
-        // 设置日志等级
-        Utils.setLogLevel(properties.getProperty("log.level"));
-
-        // 创建rpc节点
-        var rpcNode = RpcNodeManager.createRpcNode(serverId, nodeType);
-        // rpc初始化
-        CallUtils.init(rpcNode.getNodeId(), Collections.singletonList("org.sunrise.game.game.service"), CallEnum.class);
-
-        // 加载配置文件
-        ConfigUtils.load();
-        // 加载地图数据
-        MapNavUtils.load();
-        // 协议解析初始化
-        ProtoParserUtils.init();
-        // 协议处理函数初始化
-        LogicUtils.init(Collections.singletonList("org.sunrise.game.game.logic"));
-        // 玩家模块工厂初始化
-        ModuleUtils.init(Collections.singletonList("org.sunrise.game.game.modules"));
-        // 系统模块初始化
-        GameSystemUtils.init(Collections.singletonList("org.sunrise.game.game.logic.system"));
-        // 权限认证初始化
-        JwtUtil.init(properties);
-
-        rpcNode.start();
-
-        GracefulShutdown.scanAndInstall();
-
-        // 内存检测
-        Utils.startMemoryCheck();
+        RpcNodeManager.runMain(args, "./config/game-config.properties", () -> {
+            GameServerRuntime.init();
+            JwtUtil.init(ConfigReader.getProp());
+        });
     }
 }

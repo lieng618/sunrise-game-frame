@@ -33,7 +33,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * 一个完整的rpc服务节点
  * 包含：一个rpcServer服务、若干个连接到其他rpc服务的BaseClient、一个reportClient
- * 使用时通过 RpcNodeManager.createRpcNode(serverId, nodeType) 创建
+ * 使用时通过 RpcNodeManager.createRpcNode(serverId, nodeType) 创建（自动完成 RPC 服务注册）
  */
 @Getter
 @Setter
