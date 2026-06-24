@@ -10,6 +10,7 @@ import org.sunrise.game.game.logic.unit.GameUnit;
 import org.sunrise.game.game.logic.unit.MonsterUnit;
 import org.sunrise.game.game.logic.unit.PlayerUnit;
 import org.sunrise.game.game.logic.unit.UnitUtils;
+import org.sunrise.game.genProto.gen.BattleProto;
 import org.sunrise.game.genProto.gen.MapProto;
 import org.sunrise.game.genProto.gen.TopicProto;
 
@@ -177,6 +178,29 @@ public class GameMap {
                 MapProto.FROM_SERVER.S2C_UnitPositionUpdate_VALUE, builder);
     }
 
+    /** 向地图内所有玩家广播攻击动作 */
+    public void broadcastAttack(String attackerUnitId, String defenderUnitId) {
+        if (!hasPlayers()) {
+            return;
+        }
+        var builder = BattleProto.MS2C_Attack.newBuilder()
+                .setAttackUnitId(attackerUnitId)
+                .setDefenderUnitId(defenderUnitId);
+        broadcastBattle(BattleProto.FROM_SERVER.S2C_Attack_VALUE, builder);
+    }
+
+    /** 向地图内所有玩家广播伤害结果 */
+    public void broadcastDamage(String attackerUnitId, String defenderUnitId, long damage) {
+        if (!hasPlayers()) {
+            return;
+        }
+        var builder = BattleProto.MS2C_Damage.newBuilder()
+                .setAttackUnitId(attackerUnitId)
+                .setDefenderUnitId(defenderUnitId)
+                .setDamage(damage);
+        broadcastBattle(BattleProto.FROM_SERVER.S2C_Damage_VALUE, builder);
+    }
+
     /** 向地图内所有玩家广播单位属性变更 */
     public void broadcastUnitAttributeUpdate(String unitId, Map<Integer, Double> changed) {
         if (!hasPlayers() || changed == null || changed.isEmpty()) {
@@ -230,6 +254,15 @@ public class GameMap {
             HumanObject humanObject = HumanObjectManager.getHumanObject(player.getUnitId());
             if (humanObject != null) {
                 humanObject.sendMsg(TopicProto.TOPIC.TOPIC_TYPE_MAP_VALUE, packetId, builder);
+            }
+        }
+    }
+
+    private void broadcastBattle(int packetId, Message.Builder builder) {
+        for (PlayerUnit player : players.values()) {
+            HumanObject humanObject = HumanObjectManager.getHumanObject(player.getUnitId());
+            if (humanObject != null) {
+                humanObject.sendMsg(TopicProto.TOPIC.TOPIC_TYPE_BATTLE_VALUE, packetId, builder);
             }
         }
     }

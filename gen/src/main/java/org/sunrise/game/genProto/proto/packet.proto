@@ -16,6 +16,7 @@ enum TOPIC
   TOPIC_TYPE_ACTIVITY = 9 ;
   TOPIC_TYPE_RANK = 10 ;
   TOPIC_TYPE_DROP = 11 ;
+  TOPIC_TYPE_BATTLE = 12 ;
 }
 
 message MBasePacketData

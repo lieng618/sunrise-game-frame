@@ -1,0 +1,28 @@
+syntax = "proto3";
+option java_outer_classname = "BattleProto";
+package org.sunrise.game.genProto.gen;
+
+
+enum FROM_CLIENT {
+  C2S_Attack = 0; // 攻击目标
+}
+
+enum FROM_SERVER {
+  S2C_Attack = 0;
+  S2C_Damage = 1;
+}
+
+message MC2S_Attack {
+  string defender_unit_id = 1;
+}
+
+message MS2C_Attack {
+  string attack_unit_id = 1;
+  string defender_unit_id = 2;
+}
+
+message MS2C_Damage {
+  string attack_unit_id = 1;
+  string defender_unit_id = 2;
+  uint64 damage = 3;
+}

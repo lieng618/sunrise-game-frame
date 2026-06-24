@@ -38,7 +38,7 @@ public class MessageHandler {
     public static void LOGIN_S2C_HumanList(SocketClient client) {
         ByteString data = LoginProto.MC2S_SelectHuman.newBuilder()
                 .setPos(0)
-                .setServerId(1)
+                .setServerId(0)
                 .build()
                 .toByteString();
         client.sendMsg(TopicProto.TOPIC.TOPIC_TYPE_LOGIN, LoginProto.FROM_CLIENT.C2S_SelectHuman_VALUE, data);

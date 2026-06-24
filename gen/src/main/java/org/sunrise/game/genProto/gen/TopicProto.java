@@ -78,6 +78,10 @@ public final class TopicProto {
      * <code>TOPIC_TYPE_DROP = 11;</code>
      */
     TOPIC_TYPE_DROP(11),
+    /**
+     * <code>TOPIC_TYPE_BATTLE = 12;</code>
+     */
+    TOPIC_TYPE_BATTLE(12),
     UNRECOGNIZED(-1),
     ;
 
@@ -138,6 +142,10 @@ public final class TopicProto {
      * <code>TOPIC_TYPE_DROP = 11;</code>
      */
     public static final int TOPIC_TYPE_DROP_VALUE = 11;
+    /**
+     * <code>TOPIC_TYPE_BATTLE = 12;</code>
+     */
+    public static final int TOPIC_TYPE_BATTLE_VALUE = 12;
 
 
     public final int getNumber() {
@@ -176,6 +184,7 @@ public final class TopicProto {
         case 9: return TOPIC_TYPE_ACTIVITY;
         case 10: return TOPIC_TYPE_RANK;
         case 11: return TOPIC_TYPE_DROP;
+        case 12: return TOPIC_TYPE_BATTLE;
         default: return null;
       }
     }
@@ -938,14 +947,14 @@ public final class TopicProto {
       "o.gen\"t\n\017MBasePacketData\0229\n\013packet_type\030" +
       "\001 \001(\0162$.org.sunrise.game.genProto.gen.TO" +
       "PIC\022\021\n\tpacket_id\030\002 \001(\r\022\023\n\013packet_data\030\003 " +
-      "\001(\014*\213\002\n\005TOPIC\022\024\n\020TOPIC_TYPE_LOGIN\020\000\022\024\n\020T" +
+      "\001(\014*\242\002\n\005TOPIC\022\024\n\020TOPIC_TYPE_LOGIN\020\000\022\024\n\020T" +
       "OPIC_TYPE_HUMAN\020\001\022\023\n\017TOPIC_TYPE_CHAT\020\002\022\022" +
       "\n\016TOPIC_TYPE_MAP\020\003\022\024\n\020TOPIC_TYPE_MINER\020\004" +
       "\022\023\n\017TOPIC_TYPE_ITEM\020\005\022\023\n\017TOPIC_TYPE_TASK" +
       "\020\006\022\025\n\021TOPIC_TYPE_FRIEND\020\007\022\023\n\017TOPIC_TYPE_" +
       "MAIL\020\010\022\027\n\023TOPIC_TYPE_ACTIVITY\020\t\022\023\n\017TOPIC" +
-      "_TYPE_RANK\020\n\022\023\n\017TOPIC_TYPE_DROP\020\013B\014B\nTop" +
-      "icProtob\006proto3"
+      "_TYPE_RANK\020\n\022\023\n\017TOPIC_TYPE_DROP\020\013\022\025\n\021TOP" +
+      "IC_TYPE_BATTLE\020\014B\014B\nTopicProtob\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
