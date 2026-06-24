@@ -1,0 +1,92 @@
+[
+  {
+    "id": 1,
+    "monster_id": 10001,
+    "map_id": 10001,
+    "spawn_x": 401,
+    "spawn_y": 333,
+    "spawn_z": 0,
+    "respawn_time": 30
+  },
+  {
+    "id": 2,
+    "monster_id": 10001,
+    "map_id": 10001,
+    "spawn_x": 330,
+    "spawn_y": 300,
+    "spawn_z": 0,
+    "respawn_time": 30
+  },
+  {
+    "id": 3,
+    "monster_id": 10003,
+    "map_id": 10001,
+    "spawn_x": 380,
+    "spawn_y": 319,
+    "spawn_z": 0,
+    "respawn_time": 30
+  },
+  {
+    "id": 4,
+    "monster_id": 10004,
+    "map_id": 10001,
+    "spawn_x": 499,
+    "spawn_y": 247,
+    "spawn_z": 0,
+    "respawn_time": 30
+  },
+  {
+    "id": 5,
+    "monster_id": 10005,
+    "map_id": 10001,
+    "spawn_x": 456,
+    "spawn_y": 486,
+    "spawn_z": 0,
+    "respawn_time": 30
+  },
+  {
+    "id": 6,
+    "monster_id": 10006,
+    "map_id": 10001,
+    "spawn_x": 492,
+    "spawn_y": 461,
+    "spawn_z": 0,
+    "respawn_time": 30
+  },
+  {
+    "id": 7,
+    "monster_id": 10007,
+    "map_id": 10001,
+    "spawn_x": 604,
+    "spawn_y": 428,
+    "spawn_z": 0,
+    "respawn_time": 30
+  },
+  {
+    "id": 8,
+    "monster_id": 10008,
+    "map_id": 10001,
+    "spawn_x": 353,
+    "spawn_y": 373,
+    "spawn_z": 0,
+    "respawn_time": 30
+  },
+  {
+    "id": 9,
+    "monster_id": 10009,
+    "map_id": 10001,
+    "spawn_x": 345,
+    "spawn_y": 255,
+    "spawn_z": 0,
+    "respawn_time": 30
+  },
+  {
+    "id": 10,
+    "monster_id": 10010,
+    "map_id": 10001,
+    "spawn_x": 358,
+    "spawn_y": 153,
+    "spawn_z": 0,
+    "respawn_time": 30
+  }
+]

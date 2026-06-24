@@ -55,32 +55,24 @@ public final class AttributeType {
      */
     public static final int MAX_MP = 11;
     /**
-     * 生命回复（每秒）
-     */
-    public static final int HP_RECOVER = 12;
-    /**
-     * 法力回复（每秒）
-     */
-    public static final int MP_RECOVER = 13;
-    /**
      * 攻击力百分比加成（0.1表示+10%）
      */
-    public static final int ATTACK_PERCENT = 14;
+    public static final int ATTACK_PERCENT = 12;
     /**
      * 防御力百分比加成
      */
-    public static final int DEFENSE_PERCENT = 15;
+    public static final int DEFENSE_PERCENT = 13;
     /**
      * 生命值百分比加成
      */
-    public static final int HP_PERCENT = 16;
+    public static final int HP_PERCENT = 14;
     /**
      * 法力值百分比加成
      */
-    public static final int MP_PERCENT = 17;
+    public static final int MP_PERCENT = 15;
     /**
      * 速度百分比加成
      */
-    public static final int SPEED_PERCENT = 18;
+    public static final int SPEED_PERCENT = 16;
 }
 

@@ -42,8 +42,6 @@ public final class UnitUtils {
         container.setBaseValue(AttributeType.HIT, 1);
         container.setBaseValue(AttributeType.MAX_HP, 100);
         container.setBaseValue(AttributeType.MAX_MP, 100);
-        container.setBaseValue(AttributeType.HP_RECOVER, 1);
-        container.setBaseValue(AttributeType.MP_RECOVER, 1);
         container.setBaseValue(AttributeType.ATTACK_PERCENT, 0);
         container.setBaseValue(AttributeType.DEFENSE_PERCENT, 0);
         container.setBaseValue(AttributeType.HP_PERCENT, 0.01);
@@ -65,8 +63,6 @@ public final class UnitUtils {
         container.setBaseValue(AttributeType.ATTACK, cfg.attack);
         container.setBaseValue(AttributeType.DEFENSE, cfg.defense);
         container.setBaseValue(AttributeType.SPEED, cfg.speed);
-        container.setBaseValue(AttributeType.HP_RECOVER, cfg.hpRecover);
-        container.setBaseValue(AttributeType.MP_RECOVER, cfg.mpRecover);
         container.setBaseValue(AttributeType.ATTACK_PERCENT, cfg.attackPercent);
         container.setBaseValue(AttributeType.DEFENSE_PERCENT, cfg.defensePercent);
         container.setBaseValue(AttributeType.HP_PERCENT, cfg.hpPercent);

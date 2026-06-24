@@ -20,17 +20,11 @@ public final class TbMonster extends AbstractBean {
         name = _buf.get("name").getAsString();
         level = _buf.get("level").getAsInt();
         mapId = _buf.get("map_id").getAsInt();
-        spawnX = _buf.get("spawn_x").getAsInt();
-        spawnY = _buf.get("spawn_y").getAsFloat();
-        spawnZ = _buf.get("spawn_z").getAsFloat();
-        respawnTime = _buf.get("respawn_time").getAsInt();
         hp = _buf.get("hp").getAsDouble();
         mp = _buf.get("mp").getAsDouble();
         attack = _buf.get("attack").getAsDouble();
         defense = _buf.get("defense").getAsDouble();
         speed = _buf.get("speed").getAsDouble();
-        hpRecover = _buf.get("hp_recover").getAsDouble();
-        mpRecover = _buf.get("mp_recover").getAsDouble();
         attackPercent = _buf.get("attack_percent").getAsDouble();
         defensePercent = _buf.get("defense_percent").getAsDouble();
         hpPercent = _buf.get("hp_percent").getAsDouble();
@@ -53,10 +47,6 @@ public final class TbMonster extends AbstractBean {
     public final String name;
     public final int level;
     public final int mapId;
-    public final int spawnX;
-    public final float spawnY;
-    public final float spawnZ;
-    public final int respawnTime;
     /**
      * 生命值
      */
@@ -77,14 +67,6 @@ public final class TbMonster extends AbstractBean {
      * 速度
      */
     public final double speed;
-    /**
-     * 生命回复
-     */
-    public final double hpRecover;
-    /**
-     * 法力回复
-     */
-    public final double mpRecover;
     /**
      * 攻击力百分比加成
      */
@@ -122,17 +104,11 @@ public final class TbMonster extends AbstractBean {
         + "name:" + name + ","
         + "level:" + level + ","
         + "mapId:" + mapId + ","
-        + "spawnX:" + spawnX + ","
-        + "spawnY:" + spawnY + ","
-        + "spawnZ:" + spawnZ + ","
-        + "respawnTime:" + respawnTime + ","
         + "hp:" + hp + ","
         + "mp:" + mp + ","
         + "attack:" + attack + ","
         + "defense:" + defense + ","
         + "speed:" + speed + ","
-        + "hpRecover:" + hpRecover + ","
-        + "mpRecover:" + mpRecover + ","
         + "attackPercent:" + attackPercent + ","
         + "defensePercent:" + defensePercent + ","
         + "hpPercent:" + hpPercent + ","

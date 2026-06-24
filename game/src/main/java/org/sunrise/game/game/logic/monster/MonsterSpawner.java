@@ -2,93 +2,73 @@ package org.sunrise.game.game.logic.monster;
 
 import org.sunrise.game.game.config.Tables;
 import org.sunrise.game.game.config.monster.TbMonster;
-import org.sunrise.game.game.logic.drop.DropSystem;
+import org.sunrise.game.game.config.monsterRefresh.TbMonsterRefresh;
 import org.sunrise.game.game.logic.map.GameMap;
 import org.sunrise.game.game.logic.system.GameSystemUtils;
 import org.sunrise.game.game.logic.system.MapSystem;
 import org.sunrise.game.game.logic.unit.MonsterUnit;
-import org.sunrise.game.game.logic.unit.Position;
 import org.sunrise.game.game.logic.unit.UnitUtils;
 
 /**
- * 单个怪物配置点的刷怪与复活。
+ * 单个刷新点的刷怪与复活，对应 {@link TbMonsterRefresh} 一行配置。
  *
- * <p>与 {@link MonsterAi} 的分工：本类负责单位创建、属性初始化、进入/离开地图；
- * AI 的创建在 {@link #spawn} 中完成，之后由 {@link GameMap#pulsePer100Ms()} 驱动。
+ * <p>怪物模板属性来自 {@link TbMonster}，出生位置与复活时间来自刷新表。
+ * 与 {@link MonsterAi} 的分工：本类负责单位创建、进入地图；AI 在 {@link #spawn} 中挂载。
  */
 public class MonsterSpawner {
-    private final int monsterId;
-    private final int mapId;
+    private final int refreshId;
     private MonsterUnit current;
 
-    public MonsterSpawner(int monsterId, int mapId) {
-        this.monsterId = monsterId;
-        this.mapId = mapId;
-    }
-
-    /** 怪物死亡：生成掉落物，标记状态并从地图移除单位（AI 随单位一起失效） */
-    public void onDead() {
-        if (current == null) {
-            return;
-        }
-        current.setAlive(false);
-        current.setDeadTime(System.currentTimeMillis());
-
-        GameMap gameMap = getGameMap();
-        if (gameMap != null) {
-            // 生成掉落物（在移除怪物前，利用怪物当前位置）
-            TbMonster cfg = Tables.ConfigMonster.get(monsterId);
-            if (cfg != null && cfg.dropId > 0) {
-                DropSystem dropSystem = GameSystemUtils.getSystem(DropSystem.class);
-                if (dropSystem != null) {
-                    Position pos = current.getPosition();
-                    dropSystem.generateDrops(cfg.dropId, mapId, pos.getX(), pos.getY(), pos.getZ(), null);
-                }
-            }
-            gameMap.leaveUnit(current.getUnitId());
-        }
+    public MonsterSpawner(int refreshId) {
+        this.refreshId = refreshId;
     }
 
     /** 每秒检查一次是否满足复活条件，满足则重新刷怪 */
     public void tickRespawn() {
-        TbMonster cfg = Tables.ConfigMonster.get(monsterId);
-        if (cfg == null) {
+        TbMonsterRefresh refresh = getRefreshCfg();
+        if (refresh == null) {
             return;
         }
-        if (current != null && !canRespawn(cfg)) {
+        if (current != null && !canRespawn(refresh)) {
             return;
         }
-        GameMap gameMap = getGameMap();
+        GameMap gameMap = getGameMap(refresh.mapId);
         if (gameMap == null) {
             return;
         }
-        spawn(cfg, gameMap);
+        spawn(refresh, gameMap);
     }
 
-    private boolean canRespawn(TbMonster cfg) {
+    private boolean canRespawn(TbMonsterRefresh refresh) {
         if (current.getDeadTime() == 0) {
             return false;
         }
-        return System.currentTimeMillis() - current.getDeadTime() >= cfg.respawnTime * 1000L;
+        return System.currentTimeMillis() - current.getDeadTime() >= refresh.respawnTime * 1000L;
     }
 
     /**
      * 创建怪物实例、挂载 AI 并加入地图。
-     *
-     * <p>顺序：新建 {@link MonsterUnit} → 初始化属性与出生坐标 → 创建 {@link MonsterAi}
-     *（传入 mapId 与出生点作为巡逻锚点）→ {@link GameMap#enterUnit} 广播进场。
      */
-    private void spawn(TbMonster cfg, GameMap gameMap) {
-        current = new MonsterUnit(monsterId);
+    private void spawn(TbMonsterRefresh refresh, GameMap gameMap) {
+        TbMonster monsterCfg = Tables.ConfigMonster.get(refresh.monsterId);
+        if (monsterCfg == null) {
+            return;
+        }
+        current = new MonsterUnit(refresh.monsterId);
         UnitUtils.initMonsterAttributes(current);
-        current.getPosition().set(cfg.spawnX, cfg.spawnY, cfg.spawnZ, 0);
-        current.setMapId(mapId);
+        current.getPosition().set(refresh.spawnX, refresh.spawnY, refresh.spawnZ, 0);
+        current.setMapId(refresh.mapId);
         current.setAlive(true);
-        current.setAi(new MonsterAi(current, mapId, cfg.spawnX, cfg.spawnY));
+        current.setDeadTime(0L);
+        current.setAi(new MonsterAi(current, refresh.mapId, refresh.spawnX, refresh.spawnY));
         gameMap.enterUnit(current);
     }
 
-    private GameMap getGameMap() {
+    private TbMonsterRefresh getRefreshCfg() {
+        return Tables.ConfigMonsterRefresh.get(refreshId);
+    }
+
+    private GameMap getGameMap(int mapId) {
         return GameSystemUtils.getSystem(MapSystem.class).getMap(mapId);
     }
 }
