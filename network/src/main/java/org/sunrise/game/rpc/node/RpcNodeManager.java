@@ -25,8 +25,7 @@ public class RpcNodeManager {
      * 创建 RPC 节点并自动完成 RPC 服务扫描注册。
      * <p>
      * 扫描包与 CallEnum 类由 {@link RpcScanConfig} 从配置解析：
-     * {@code rpc.scan.packages}（缺省为 {@code org.sunrise.game.{nodeType}.service}）、
-     * {@code rpc.call-enum-class}、{@code rpc.init.strict}。
+     * {@code rpc.scan.packages}、{@code rpc.call-enum-class}。
      */
     public static RpcNode createRpcNode(int serverId, String nodeType) {
         rpcNode = new RpcNode(serverId, nodeType);
@@ -103,8 +102,8 @@ public class RpcNodeManager {
         if (ConfigReader.getProp() == null) {
             throw new FatalStartupException("Config not loaded before RPC registration");
         }
-        RpcScanConfig.Settings settings = RpcScanConfig.resolve(rpcNode.getNodeType());
-        CallUtils.init(rpcNode.getNodeId(), settings.scanPackages(), settings.callEnumClass(), settings.strict());
+        RpcScanConfig.Settings settings = RpcScanConfig.resolve();
+        CallUtils.init(rpcNode.getNodeId(), settings.scanPackages(), settings.callEnumClass());
     }
 
     /** 设置 {@code programName} 系统属性，供 logback.xml 区分各进程日志文件 */

@@ -27,11 +27,10 @@ public class CallUtils {
      * RPC 服务扫描注册，由 {@link org.sunrise.game.rpc.node.RpcNodeManager} 在创建节点时自动调用。
      *
      * @param nodeId        当前 RPC 节点 ID，注入到各 {@link BaseService} 构造函数
-     * @param classPaths    要扫描的包列表（来自 {@code rpc.scan.packages} 或 nodeType 约定）
+     * @param classPaths    要扫描的包列表（来自 {@code rpc.scan.packages}）
      * @param callEnumClass 生成的 CallEnum，其 static int 字段名须与 {@code ServiceName_methodName} 缓存键一致
-     * @param strict        为 true 时任一服务注册失败抛出 {@link FatalStartupException}
      */
-    public static void init(String nodeId, List<String> classPaths, Class<?> callEnumClass, boolean strict) {
+    public static void init(String nodeId, List<String> classPaths, Class<?> callEnumClass) {
         if (callEnumClass == null) {
             return;
         }
@@ -42,13 +41,13 @@ public class CallUtils {
         RegistrationResult registration = registerServices(nodeId, classPaths, methodsCache);
         // 2. 将 CallEnum 中的 rpcId 与 methodsCache 中的 Method 绑定
         bindCallEnumMethods(callEnumClass, methodsCache);
-        // 3. 校验注册结果（strict 模式、至少一个服务）
-        validateRegistration(classPaths, strict, startTime, registration);
+        // 3. 校验注册结果（至少一个服务、无注册失败）
+        validateRegistration(classPaths, startTime, registration);
         initCurRegisterCallIds();
         ServiceManager.initAll();
     }
 
-    /** 扫描阶段的注册成功/失败服务名列表，供汇总日志与 strict 校验 */
+    /** 扫描阶段的注册成功/失败服务名列表，供汇总日志与启动校验 */
     private record RegistrationResult(List<String> registered, List<String> failed) {
     }
 
@@ -70,7 +69,7 @@ public class CallUtils {
         return new RegistrationResult(registeredServices, failedServices);
     }
 
-    /** 处理单个候选类：过滤非 Service 后实例化，失败时记入 failedServices 而非中断（由 validateRegistration 决定） */
+    /** 处理单个候选类：过滤非 Service 后实例化，失败时记入 failedServices（由 validateRegistration 统一终止启动） */
     private static void registerServiceClass(
             String nodeId,
             Class<?> clazz,
@@ -137,11 +136,10 @@ public class CallUtils {
     }
 
     /**
-     * 启动阶段校验：输出汇总日志；strict 模式下任一失败即退出；扫描结果为空一律视为配置错误。
+     * 启动阶段校验：输出汇总日志；任一注册失败或未扫描到服务则终止启动。
      */
     private static void validateRegistration(
             List<String> classPaths,
-            boolean strict,
             long startTime,
             RegistrationResult registration) {
         List<String> registeredServices = registration.registered();
@@ -156,11 +154,7 @@ public class CallUtils {
         if (!failedServices.isEmpty()) {
             StringJoiner joiner = new StringJoiner("; ");
             failedServices.forEach(joiner::add);
-            if (strict) {
-                throw new FatalStartupException("RPC service registration failed: " + joiner);
-            }
-            // 非 strict：仅告警，允许开发环境跳过个别无法实例化的服务
-            LogCore.RpcUtils.warn("RPC service registration failures (rpc.init.strict=false): {}", joiner);
+            throw new FatalStartupException("RPC service registration failed: " + joiner);
         }
         if (registeredServices.isEmpty()) {
             throw new FatalStartupException("No RPC services registered, scan packages = " + classPaths);

@@ -12,45 +12,39 @@ import java.util.Properties;
  * <p>
  * 配置项：
  * <ul>
- *   <li>{@code rpc.scan.packages} — 逗号分隔的包名；未配置时按 {@code org.sunrise.game.{nodeType}.service} 约定推导</li>
+ *   <li>{@code rpc.scan.packages} — 必填，逗号分隔的 @RpcService 扫描包名</li>
  *   <li>{@code rpc.call-enum-class} — 生成的 CallEnum 全类名，用于 rpcId 与 @RpcMethod 绑定</li>
- *   <li>{@code rpc.init.strict} — 为 true 时任一 @RpcService 实例化失败则终止启动（默认 true）</li>
  * </ul>
- * 单进程 runallone 需显式配置更宽的 {@code rpc.scan.packages=org.sunrise.game}，以覆盖多子服务包。
+ * 单进程 runallone 需配置更宽的 {@code rpc.scan.packages=org.sunrise.game}，以覆盖多子服务包。
  */
 public final class RpcScanConfig {
     private static final String DEFAULT_CALL_ENUM_CLASS = "org.sunrise.game.genRpc.gen.CallEnum";
-    private static final String PACKAGE_PREFIX = "org.sunrise.game";
 
     private RpcScanConfig() {
     }
 
-    /** RPC 扫描注册所需的三个参数，由 {@link #resolve} 一次性解析 */
-    public record Settings(List<String> scanPackages, Class<?> callEnumClass, boolean strict) {
+    /** RPC 扫描注册所需的参数，由 {@link #resolve} 一次性解析 */
+    public record Settings(List<String> scanPackages, Class<?> callEnumClass) {
     }
 
-    /**
-     * 读取当前已加载的配置并解析 RPC 注册参数。
-     *
-     * @param nodeType {@code rpc.node.type}，用于推导默认扫描包
-     */
-    public static Settings resolve(String nodeType) {
+    /** 读取当前已加载的配置并解析 RPC 注册参数 */
+    public static Settings resolve() {
         Properties properties = ConfigReader.getProp();
         return new Settings(
-                resolveScanPackages(nodeType, properties),
-                resolveCallEnumClass(properties),
-                isStrictInit(properties));
+                resolveScanPackages(properties),
+                resolveCallEnumClass(properties));
     }
 
-    /** 优先使用显式配置的 {@code rpc.scan.packages}，否则按 nodeType 推导单包 */
-    private static List<String> resolveScanPackages(String nodeType, Properties properties) {
-        if (properties != null) {
-            String configured = properties.getProperty("rpc.scan.packages");
-            if (configured != null && !configured.isBlank()) {
-                return parsePackageList(configured);
-            }
+    /** 从 {@code rpc.scan.packages} 解析逗号分隔的包列表 */
+    private static List<String> resolveScanPackages(Properties properties) {
+        if (properties == null) {
+            throw new FatalStartupException("Config not loaded; cannot resolve rpc.scan.packages");
         }
-        return List.of(defaultPackageForNodeType(nodeType));
+        String configured = properties.getProperty("rpc.scan.packages");
+        if (configured == null || configured.isBlank()) {
+            throw new FatalStartupException("rpc.scan.packages is required");
+        }
+        return parsePackageList(configured);
     }
 
     /** 加载 CallEnum 类；类不存在时快速失败，避免启动后 RPC 调用全部找不到方法 */
@@ -64,19 +58,6 @@ public final class RpcScanConfig {
         } catch (ClassNotFoundException e) {
             throw new FatalStartupException("rpc.call-enum-class not found: " + className, e);
         }
-    }
-
-    /** {@code rpc.init.strict}，缺省 true：部分服务注册失败时不应带病启动 */
-    private static boolean isStrictInit(Properties properties) {
-        if (properties == null) {
-            return true;
-        }
-        return Boolean.parseBoolean(properties.getProperty("rpc.init.strict", "true"));
-    }
-
-    /** 约定：game 节点 → {@code org.sunrise.game.game.service}，external → {@code org.sunrise.game.external.service} */
-    private static String defaultPackageForNodeType(String nodeType) {
-        return PACKAGE_PREFIX + "." + nodeType.trim().toLowerCase() + ".service";
     }
 
     /** 解析逗号分隔的包列表，过滤空白项 */
