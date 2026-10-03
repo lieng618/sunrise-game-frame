@@ -55,6 +55,9 @@ public final class CombatUtils {
 
     /**
      * 扣减目标生命值，返回变更的属性（当前仅 HP）。
+     *
+     * <p>HP 的最终值 = (base + 附加) * (1 + HP_PERCENT)，扣血在最终值空间结算后
+     * 必须换算回 base 空间写回；直接把最终值写回 base 会被 recalculate 重复乘百分比/加附加。
      */
     public static Map<Integer, Double> applyDamage(GameUnit defender, long damage) {
         Map<Integer, Double> changed = new HashMap<>();
@@ -63,9 +66,12 @@ public final class CombatUtils {
         }
         AttributeContainer container = defender.getAttributeContainer();
         ensureRecalculated(container);
-        double hp = container.getFinalValue(AttributeType.HP);
-        double newHp = Math.max(0, hp - damage);
-        container.setBaseValue(AttributeType.HP, newHp);
+        double newHp = Math.max(0, container.getFinalValue(AttributeType.HP) - damage);
+
+        double denom = 1 + container.getFinalValue(AttributeType.HP_PERCENT);
+        double extra = container.getExtraValue(AttributeType.HP);
+        double newBaseHp = denom != 0 ? newHp / denom - extra : newHp;
+        container.setBaseValue(AttributeType.HP, newBaseHp);
         container.recalculate();
         changed.put(AttributeType.HP, newHp);
         return changed;

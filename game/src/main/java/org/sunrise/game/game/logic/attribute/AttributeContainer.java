@@ -70,6 +70,15 @@ public class AttributeContainer {
         return cachedFinalValues.getOrDefault(attributeType, 0.0);
     }
 
+    /** 所有 provider 对该属性的附加总和。final = (base + extra) * (1 + final[percent]) */
+    public double getExtraValue(int attributeType) {
+        double extra = 0;
+        for (AttributeProvider provider : providers) {
+            extra += provider.getExtraValues().getOrDefault(attributeType, 0.0);
+        }
+        return extra;
+    }
+
     public Map<Integer, Double> getAllFinalValues() {
         return new HashMap<>(cachedFinalValues);
     }
