@@ -89,14 +89,7 @@
                             <appendAssemblyId>false</appendAssemblyId>
                         </configuration>
                     </execution>
-                </executions>
-            </plugin>
-            
-            <!-- StressClient -->
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>3.6.0</version>
-                <executions>
+                    <!-- StressClient -->
                     <execution>
                         <id>make-assembly-stress</id>
                         <phase>package</phase>
@@ -117,14 +110,7 @@
                             <appendAssemblyId>false</appendAssemblyId>
                         </configuration>
                     </execution>
-                </executions>
-            </plugin>
-
-            <!-- SendMsgClient -->
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>3.6.0</version>
-                <executions>
+                    <!-- SendMsgClient -->
                     <execution>
                         <id>make-assembly-sendmsg</id>
                         <!-- 绑定到打包生命周期阶段上 -->
