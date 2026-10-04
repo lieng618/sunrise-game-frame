@@ -3,6 +3,8 @@ package org.sunrise.game.core.server;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.handler.timeout.IdleState;
+import io.netty.handler.timeout.IdleStateEvent;
 import lombok.Getter;
 import lombok.Setter;
 import org.sunrise.game.core.auth.RpcAuth;
@@ -76,6 +78,18 @@ public class BaseServerHandler extends SimpleChannelInboundHandler<SocketMessage
 
         } else {
             channel.close();
+        }
+    }
+
+    @Override
+    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+        if (evt instanceof IdleStateEvent state && state.state() == IdleState.READER_IDLE) {
+            // 对端每 10s 必有心跳，读空闲即无声死亡（断电/拔线/网络分区），
+            // close 走 channelInactive 释放 ConnectionManager 中的 nodeId，允许对端重连
+            LogCore.BaseServer.error("reader idle timeout, close zombie connection, connectNode = { {} }, remoteAddress = { {} }", connectNode, ctx.channel().remoteAddress());
+            ctx.close();
+        } else {
+            super.userEventTriggered(ctx, evt);
         }
     }
 

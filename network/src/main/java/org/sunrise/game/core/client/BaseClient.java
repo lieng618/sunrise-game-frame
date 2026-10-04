@@ -98,7 +98,7 @@ public class BaseClient {
                         pipeline.addLast(new SocketMessageEncoder());
                         pipeline.addLast(new SocketMessageDecoder());
                         // 添加心跳机制
-                        pipeline.addLast(new IdleStateHandler(0, 10, 0, TimeUnit.SECONDS));
+                        pipeline.addLast(new IdleStateHandler(0, Utils.RPC_HEARTBEAT_INTERVAL_SECONDS, 0, TimeUnit.SECONDS));
                         pipeline.addLast(pulseHandler.apply(nodeId));
                         // 添加自定义的业务处理器
                         pipeline.addLast(clientHandler.apply(nodeId));

@@ -12,6 +12,7 @@ import io.netty.channel.WriteBufferWaterMark;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import io.netty.handler.timeout.IdleStateHandler;
 import lombok.Data;
 import org.sunrise.game.core.coder.SocketMessageDecoder;
 import org.sunrise.game.core.coder.SocketMessageEncoder;
@@ -20,6 +21,8 @@ import org.sunrise.game.core.message.BaseMessageManager;
 import org.sunrise.game.core.message.ServerMessageManager;
 import org.sunrise.game.log.LogCore;
 import org.sunrise.game.utils.Utils;
+
+import java.util.concurrent.TimeUnit;
 
 @Data
 public class BaseServer {
@@ -67,6 +70,7 @@ public class BaseServer {
                     public void initChannel(SocketChannel ch) {
                         ch.pipeline().addLast(new SocketMessageEncoder());
                         ch.pipeline().addLast(new SocketMessageDecoder());
+                        ch.pipeline().addLast(new IdleStateHandler(Utils.RPC_READER_IDLE_SECONDS, 0, 0, TimeUnit.SECONDS));
                         ch.pipeline().addLast(pulseHandler.apply(nodeId));
                         ch.pipeline().addLast(serverHandler.apply(nodeId));
                     }

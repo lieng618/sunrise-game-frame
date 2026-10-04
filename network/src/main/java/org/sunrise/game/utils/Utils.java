@@ -39,6 +39,11 @@ public class Utils {
     /** 握手消息中 nodeId 与 token 的分隔符 */
     public static final char CLIENT_CONNECT_TOKEN_SEP = '|';
 
+    /** 内部 RPC 心跳间隔：客户端写空闲该秒数即发心跳 */
+    public static final int RPC_HEARTBEAT_INTERVAL_SECONDS = 10;
+    /** 服务端读空闲上限：超过 N 倍心跳间隔无数据即判定对端无声死亡并清理连接 */
+    public static final int RPC_READER_IDLE_SECONDS = RPC_HEARTBEAT_INTERVAL_SECONDS * 6;
+
     /** 解析 CLIENT_CONNECT 握手消息，返回 [nodeId, token?]，token 可为 null */
     public static String[] parseClientConnect(String message) {
         String body = message.substring(CLIENT_CONNECT.length());
