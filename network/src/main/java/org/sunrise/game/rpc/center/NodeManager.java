@@ -21,7 +21,11 @@ public class NodeManager {
     // 节点id-节点信息 所有rpc节点
     public static Map<String, NodeData> datasByNodeId = new ConcurrentHashMap<>();
 
+    private static volatile long lastCleanupTime = 0;
+
     public static void updateNode(BaseMessage reportMessage) {
+        cleanupDeadNodes();
+
         boolean isHaveNewNode = false;
 
         NodeData nodeData = datasByNodeId.get(reportMessage.getNodeId());
@@ -35,12 +39,12 @@ public class NodeManager {
             nodeData.setPort((Integer) data.get("port"));
             nodeData.setServerId((Integer) data.get("id"));
             nodeData.setNodeType((String) data.get("type"));
+            // 以进程实例变化为广播依据
+            String instanceId = (String) data.get("instanceId");
+            isHaveNewNode = instanceId == null || !instanceId.equals(nodeData.getInstanceId());
+            nodeData.setInstanceId(instanceId);
         }
-        long oldReportTime = nodeData.getReportTime();
         nodeData.setReportTime(System.currentTimeMillis());
-        if (nodeData.getReportTime() - oldReportTime >= INTERVAL_SIMPLE + 1000L) {
-            isHaveNewNode = true;
-        }
         datasByNodeId.put(reportMessage.getNodeId(), nodeData);
 
         // 有新增节点上报
@@ -49,6 +53,16 @@ public class NodeManager {
             // 广播节点信息
             broadcastToNode(nodeData);
         }
+    }
+
+    /** 清理失效节点：datasByNodeId 若只增不减，长期运行会累积死节点 */
+    private static void cleanupDeadNodes() {
+        long cur = System.currentTimeMillis();
+        if (cur - lastCleanupTime < INTERVAL_SIMPLE * 10L) {
+            return;
+        }
+        lastCleanupTime = cur;
+        datasByNodeId.values().removeIf(NodeManager::isNodeDead);
     }
 
     // 判断节点是否失效
@@ -132,6 +146,7 @@ public class NodeManager {
         data.put("ip", reportClient.getClientIp());
         data.put("port", reportClient.getClientPort());
         data.put("id", reportClient.getServerId());
+        data.put("instanceId", reportClient.getInstanceId());
         if (reportClient.getNodeType() != null && !reportClient.getNodeType().isEmpty()) {
             data.put("type", reportClient.getNodeType());
         }

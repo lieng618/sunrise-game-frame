@@ -5,6 +5,7 @@ import lombok.Setter;
 import org.sunrise.game.core.client.BaseClient;
 import org.sunrise.game.core.client.BaseClientManager;
 
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Getter
@@ -17,6 +18,8 @@ public class ReportClient {
     private int clientPort; //当前节点上报port
     private int serverId; //服务id
     private String nodeType; //节点类型
+    /** 进程实例身份，随进程创建生成；中心服据此识别节点重启并重新广播服务发现 */
+    private final String instanceId = UUID.randomUUID().toString();
 
     private String masterIp;
     private int masterPort;
