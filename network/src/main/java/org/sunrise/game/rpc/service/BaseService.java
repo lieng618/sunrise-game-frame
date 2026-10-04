@@ -20,7 +20,8 @@ public class BaseService {
 
     private final String nodeId;
 
-    private boolean isInitEnd = false; //是否初始化完成
+    // dbExecutor 回调线程写、启动主线程在 waitInitEnd 读，volatile 保证可见性
+    private volatile boolean isInitEnd = false; //是否初始化完成
     private Map<String, String> dataMap = new HashMap<>(); //每个模块要存储的数据
 
     public BaseService(String nodeId) {

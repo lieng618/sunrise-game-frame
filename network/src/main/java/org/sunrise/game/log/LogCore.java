@@ -15,6 +15,7 @@ public class LogCore {
     public static final Logger RpcClient = LoggerFactory.getLogger("RpcClient");
     public static final Logger RpcServer = LoggerFactory.getLogger("RpcServer");
     public static final Logger RpcUtils = LoggerFactory.getLogger("RpcUtils");
+    public static final Logger DB = LoggerFactory.getLogger("DB");
 
     public static final Logger CenterServer = LoggerFactory.getLogger("CenterServer");
     public static final Logger ReportClient = LoggerFactory.getLogger("ReportClient");

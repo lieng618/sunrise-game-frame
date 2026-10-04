@@ -3,6 +3,7 @@ package org.sunrise.game.db;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.sunrise.game.config.ConfigReader;
+import org.sunrise.game.log.LogCore;
 
 import java.math.BigInteger;
 import java.sql.*;
@@ -65,6 +66,13 @@ public class DbService {
         return dataSource.getConnection();
     }
 
+    /** 异步链路的异常若无人消费即被静默吞掉，且 thenAccept 的回调不会执行，必须在此记录 */
+    private static void logAsyncError(Throwable e) {
+        if (e != null) {
+            LogCore.DB.error("Async db operation failed: {}", e.getMessage(), e);
+        }
+    }
+
     // 同步：根据id查询单条记录
     public Map<String, Object> queryById(String sql, int id) {
         try (Connection connection = getConnection();
@@ -85,7 +93,8 @@ public class DbService {
     // 异步：根据id查询单条记录并使用回调
     public void queryByIdAsync(Consumer<Map<String, Object>> callback, String sql, int id) {
         CompletableFuture.supplyAsync(() -> queryById(sql, id), dbExecutor)
-                .thenAccept(callback);
+                .thenAccept(callback)
+                .whenComplete((r, e) -> logAsyncError(e));
     }
 
     // 同步：根据参数查询单条记录
@@ -110,7 +119,8 @@ public class DbService {
     // 异步：根据参数查询单条记录并使用回调
     public void queryGetOneByParamsAsync(Consumer<Map<String, Object>> callback, String sql, Object... params) {
         CompletableFuture.supplyAsync(() -> queryGetOneByParams(sql, params), dbExecutor)
-                .thenAccept(callback);
+                .thenAccept(callback)
+                .whenComplete((r, e) -> logAsyncError(e));
     }
 
     // 同步：根据参数查询所有记录
@@ -135,7 +145,8 @@ public class DbService {
     // 异步：根据参数查询所有记录并使用回调
     public void queryGetAllByParamsAsync(Consumer<List<Map<String, Object>>> callback, String sql, Object... params) {
         CompletableFuture.supplyAsync(() -> queryGetAllByParams(sql, params), dbExecutor)
-                .thenAccept(callback);
+                .thenAccept(callback)
+                .whenComplete((r, e) -> logAsyncError(e));
     }
 
     // 同步：查询所有记录
@@ -156,7 +167,8 @@ public class DbService {
     // 异步：查询所有记录并使用回调
     public void queryAllAsync(Consumer<List<Map<String, Object>>> callback, String sql) {
         CompletableFuture.supplyAsync(() -> queryAll(sql), dbExecutor)
-                .thenAccept(callback);
+                .thenAccept(callback)
+                .whenComplete((r, e) -> logAsyncError(e));
     }
 
     // 同步：查询单列
@@ -176,7 +188,9 @@ public class DbService {
 
     // 异步：查询单列并使用回调
     public void queryAllSingleColumnAsync(Consumer<List<String>> callback, String sql) {
-        CompletableFuture.supplyAsync(() -> queryAllSingleColumn(sql), dbExecutor).thenAccept(callback);
+        CompletableFuture.supplyAsync(() -> queryAllSingleColumn(sql), dbExecutor)
+                .thenAccept(callback)
+                .whenComplete((r, e) -> logAsyncError(e));
     }
 
     // 同步：执行更新
@@ -197,12 +211,13 @@ public class DbService {
         CompletableFuture.runAsync(() -> {
             execute(sql, params);
             callback.run(); // 在执行完更新操作后，调用回调函数
-        }, dbExecutor);
+        }, dbExecutor).whenComplete((r, e) -> logAsyncError(e));
     }
 
     // 异步：执行更新
     public void executeAsync(String sql, Object... params) {
-        CompletableFuture.runAsync(() -> execute(sql, params), dbExecutor);
+        CompletableFuture.runAsync(() -> execute(sql, params), dbExecutor)
+                .whenComplete((r, e) -> logAsyncError(e));
     }
 
     // 同步：执行更新并返回生成的主键
@@ -234,7 +249,7 @@ public class DbService {
             } else {
                 callback.accept(generatedKey);
             }
-        });
+        }).whenComplete((r, e) -> logAsyncError(e));
     }
 
     /**

@@ -9,10 +9,16 @@ import org.sunrise.game.log.LogCore;
 import org.sunrise.game.rpc.node.RpcNodeManager;
 import org.sunrise.game.utils.Utils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ServiceManager {
+    /** 服务初始化等待上限：DB 不可用/SQL 异常时异步回调永不执行，靠超时快速失败而非无限挂起 */
+    private static final long INIT_END_TIMEOUT_MILLIS = 60 * 1000L;
+    private static final long INIT_END_WARN_INTERVAL_MILLIS = 5 * 1000L;
+
     private static long initStartTime;
     private static long lastPulsePerMinTime = 0L; //上次系统每分钟心跳的时间
     private static long lastPulsePerSecTime = 0L; //上次系统每秒心跳的时间
@@ -41,18 +47,31 @@ public class ServiceManager {
      * 等待所有系统初始化完成
      */
     public static void waitInitEnd() {
+        long lastWarnTime = 0L;
         while (true) {
-            boolean allInitEnd = true;
+            List<String> pending = null;
             for (Map.Entry<String, BaseService> entry : services.entrySet()) {
                 if (!entry.getValue().isInitEnd()) {
-                    allInitEnd = false;
-                    break;
+                    if (pending == null) {
+                        pending = new ArrayList<>();
+                    }
+                    pending.add(entry.getKey());
                 }
             }
 
-            if (allInitEnd) {
-                LogCore.RpcUtils.info("Load All Service end, took {} ms", System.currentTimeMillis() - initStartTime);
+            long waited = System.currentTimeMillis() - initStartTime;
+            if (pending == null) {
+                LogCore.RpcUtils.info("Load All Service end, took {} ms", waited);
                 break;
+            }
+
+            if (waited >= INIT_END_TIMEOUT_MILLIS) {
+                LogCore.RpcUtils.error("Service init timeout after {} ms, pending: {}", waited, pending);
+                System.exit(1);
+            }
+            if (waited - lastWarnTime >= INIT_END_WARN_INTERVAL_MILLIS) {
+                lastWarnTime = waited;
+                LogCore.RpcUtils.warn("Waiting service init, took {} ms, pending: {}", waited, pending);
             }
 
             Utils.sleep(30);
