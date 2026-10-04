@@ -19,12 +19,19 @@ public final class Hotswap {
     }
 
     public static void reloadClasses(Map<String, HotswapScanner.JarEntryInfo> reloadEntries, String jarPath) throws IOException, ClassNotFoundException, UnmodifiableClassException {
+        if (inst == null) {
+            throw new IllegalStateException("hotswap agent 未加载，请以 -javaagent:hotswap-agent.jar 启动进程");
+        }
         try (JarFile jarFile = new JarFile(jarPath)) {
             Map<Class<?>, byte[]> reloadClassBytes = new HashMap<>();
 
             for (Map.Entry<String, HotswapScanner.JarEntryInfo> it : reloadEntries.entrySet()) {
                 try (InputStream stream = jarFile.getInputStream(jarFile.getEntry(it.getKey()))) {
-                    Class<?> clazz = Class.forName(it.getValue().getClazzName());
+                    // 不触发 static 初始化，目标类本就应已加载，redefine 只替换字节码
+                    Class<?> clazz = Class.forName(it.getValue().getClazzName(), false, Hotswap.class.getClassLoader());
+                    if (!inst.isModifiableClass(clazz)) {
+                        throw new UnmodifiableClassException("类不可修改: " + clazz.getName());
+                    }
                     reloadClassBytes.put(clazz, stream.readAllBytes());
                 }
             }

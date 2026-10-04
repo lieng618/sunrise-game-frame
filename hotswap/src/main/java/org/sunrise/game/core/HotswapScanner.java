@@ -2,6 +2,8 @@ package org.sunrise.game.core;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
@@ -13,8 +15,15 @@ import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 
 public class HotswapScanner {
+    /**
+     * 进程级基线：启动时运行中 jar 的条目快照，代表 JVM 当前已加载类对应的旧代码。
+     * 基线必须在 jar 被替换前记录，否则 diff 永远为空；成功重载后基线更新为本次重载来源 jar。
+     */
+    private static volatile HotswapScanner baseline;
+
     private final String jarPath;
     private String jarVersion = null;
+    private boolean freshBaseline = false;
     private final List<String> recentReloadLogs = new ArrayList<>(8);
     // jarEntry=>EntryInfo
     private Map<String, JarEntryInfo> clazzInfos = new HashMap<>();
@@ -43,7 +52,7 @@ public class HotswapScanner {
         }
     }
 
-    public HotswapScanner(String watchJarPath) {
+    private HotswapScanner(String watchJarPath) {
         try {
             this.jarPath = watchJarPath;
             File file = new File(jarPath);
@@ -54,7 +63,47 @@ public class HotswapScanner {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
 
+    /** 取进程级基线；尚不存在时以 jarPath 现建（首次 reload 会提示先替换 jar 再下发） */
+    public static HotswapScanner of(String jarPath) {
+        HotswapScanner b = baseline;
+        if (b != null) {
+            return b;
+        }
+        synchronized (HotswapScanner.class) {
+            if (baseline == null) {
+                HotswapScanner scanner = new HotswapScanner(jarPath);
+                scanner.freshBaseline = true;
+                baseline = scanner;
+            }
+            return baseline;
+        }
+    }
+
+    /**
+     * 启动时对进程运行中的 jar 建立热更基线，必须在 jar 被替换之前调用。
+     */
+    public static void registerRunningJar() {
+        try {
+            String location = HotswapScanner.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+            String path = URLDecoder.decode(location, StandardCharsets.UTF_8);
+            if (path.startsWith("file:")) {
+                path = path.substring("file:".length());
+            }
+            if (!path.endsWith(".jar")) {
+                System.err.println("hotswap skip baseline, not running from a jar: " + path);
+                return;
+            }
+            synchronized (HotswapScanner.class) {
+                if (baseline == null) {
+                    baseline = new HotswapScanner(path);
+                }
+            }
+            System.err.println("hotswap baseline registered: " + path);
+        } catch (Exception e) {
+            System.err.println("hotswap register running jar failed: " + e);
+        }
     }
 
     public boolean isInitialized() {
@@ -65,19 +114,31 @@ public class HotswapScanner {
         this.recentReloadLogs.add(new Date() + "===" + str);
     }
 
-    public synchronized void reloadClasses() {
+    /**
+     * 将 targetJarPath 与基线 diff，重载有变化的类（新字节码取自 targetJarPath）。
+     * targetJarPath 可以是基线 jar 本身（原地替换），也可以是放新 jar 的另一个路径；成功后基线更新为 targetJarPath。
+     */
+    public synchronized void reloadClasses(String targetJarPath) {
         this.recentReloadLogs.clear();
+        boolean firstRun = freshBaseline;
+        freshBaseline = false;
 
         if (!isInitialized()) {
             log("scanner未初始化.");
             return;
         }
+        File targetFile = new File(targetJarPath);
+        if (!targetFile.isFile()) {
+            log("目标 jar 不存在: " + targetJarPath);
+            return;
+        }
         // 保存旧的
         Map<String, JarEntryInfo> savedClazzInfos = new HashMap<>(this.clazzInfos);
+        String savedVersion = this.jarVersion;
         try {
-            List<String> changes = this.scanChanges();
+            List<String> changes = this.scanChanges(targetJarPath);
             if (changes == null || changes.isEmpty()) {
-                log("reloadClass 代码未改变.");
+                log(firstRun ? "已建立基线（当前 jar 记为基线），替换该 jar 或对新 jar 路径再次下发 hotswap 才会重载" : "reloadClass 代码未改变.");
                 return;
             }
             Map<String, JarEntryInfo> changedJarEntries = new HashMap<>();
@@ -87,17 +148,19 @@ public class HotswapScanner {
                 log("--changed class:" + entryInfo.clazzName);
             }
             log("reloadClass begin");
-            Hotswap.reloadClasses(changedJarEntries, jarPath);
+            Hotswap.reloadClasses(changedJarEntries, targetJarPath);
             log("reloadClass OK");
         } catch (Exception ex) {
             // 如果失败, 恢复
             this.clazzInfos = savedClazzInfos;
+            this.jarVersion = savedVersion;
             log("reloadClassError " + ex);
         }
     }
 
     private static String jarEntryNameToClassName(String entryName) {
-        return entryName.replaceAll(".class", "").replaceAll("/", ".");
+        String name = entryName.endsWith(".class") ? entryName.substring(0, entryName.length() - ".class".length()) : entryName;
+        return name.replace('/', '.');
     }
 
     private void scan() throws IOException {
@@ -125,9 +188,10 @@ public class HotswapScanner {
         return new StringBuilder(contentLength).append("-").append(lastModified).toString();
     }
 
-    private List<String> scanChanges() throws IOException {
-        String key = getJarFileVersion(new File(jarPath));
-        this.log(String.format("scanChanges jar=%s curVersion=%s,newVersion=%s", jarPath, key, jarVersion));
+    /** 对比 targetJarPath 与基线条目，把基线更新为 target 的内容，返回其中有变更且基线中已存在的条目（redefine 不能新增类） */
+    private List<String> scanChanges(String targetJarPath) throws IOException {
+        String key = getJarFileVersion(new File(targetJarPath));
+        this.log(String.format("scanChanges target=%s curVersion=%s,newVersion=%s", targetJarPath, key, jarVersion));
         if (key.equals(jarVersion)) return List.of();
 
         List<String> changedClassFiles = new ArrayList<>(32);
@@ -135,7 +199,7 @@ public class HotswapScanner {
         // 改变了则赋值
         jarVersion = key;
 
-        try (JarFile jarFile = new JarFile(jarPath)) {
+        try (JarFile jarFile = new JarFile(targetJarPath)) {
             Enumeration<JarEntry> entries = jarFile.entries();
             while (entries.hasMoreElements()) {
                 JarEntry jarEntry = entries.nextElement();

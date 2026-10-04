@@ -30,6 +30,13 @@ public class GameRecvGmBackMessageService extends BaseService {
         super(nodeId);
     }
 
+    @Override
+    public void init() {
+        super.init();
+        // 对运行中 jar 建立热更基线；基线必须在 jar 被替换之前记录，否则 diff 永远为空
+        HotswapScanner.registerRunningJar();
+    }
+
     @RpcMethod
     public void recvMessage(String operation, String data) {
         try {
@@ -103,8 +110,8 @@ public class GameRecvGmBackMessageService extends BaseService {
         }
         LogCore.GameServer.info("Received hotswapJar command, jarPath: {}", jarPath);
         try {
-            HotswapScanner scanner = new HotswapScanner(jarPath);
-            scanner.reloadClasses();
+            HotswapScanner scanner = HotswapScanner.of(jarPath);
+            scanner.reloadClasses(jarPath);
             LogCore.GameServer.info("Hotswap jar [{}] result:\n{}", jarPath, scanner.getRecentLogs());
         } catch (Exception e) {
             LogCore.GameServer.error("Hotswap jar [{}] failed", jarPath, e);
