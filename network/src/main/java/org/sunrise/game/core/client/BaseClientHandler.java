@@ -3,6 +3,7 @@ package org.sunrise.game.core.client;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.Getter;
+import org.sunrise.game.core.auth.RpcAuth;
 import org.sunrise.game.log.LogCore;
 import org.sunrise.game.core.message.MessageType;
 import org.sunrise.game.core.message.SocketMessage;
@@ -22,6 +23,10 @@ public class BaseClientHandler extends SimpleChannelInboundHandler<SocketMessage
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
         String connectMessage = Utils.CLIENT_CONNECT + nodeId;
+        String token = RpcAuth.getToken();
+        if (token != null) {
+            connectMessage += Utils.CLIENT_CONNECT_TOKEN_SEP + token;
+        }
         ctx.writeAndFlush(new SocketMessage(MessageType.biz, connectMessage.getBytes(StandardCharsets.UTF_8)));
     }
 
@@ -37,7 +42,9 @@ public class BaseClientHandler extends SimpleChannelInboundHandler<SocketMessage
                 onConnectSuccess();
                 BaseClientManager.getBaseClient(nodeId).getConnectFinish().set(true);
             } else {
-                LogCore.BaseClient.error("connected to server failed, cur NodeId = { {} }", nodeId);
+                LogCore.BaseClient.error("connected to server failed, cur NodeId = { {} }, remoteAddress = { {} }", nodeId, ctx.channel().remoteAddress());
+                // 认证失败/节点重复，主动断开等待重连，不留在半死连接上
+                ctx.close();
             }
             isAuthMessage = false;
         } else {

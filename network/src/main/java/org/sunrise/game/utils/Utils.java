@@ -36,6 +36,18 @@ public class Utils {
 
     public static final String CLIENT_CONNECT = "CLIENT_CONNECT_";
     public static final String CLIENT_CONNECT_RESPONSE = "CLIENT_CONNECT_RESPONSE_";
+    /** 握手消息中 nodeId 与 token 的分隔符 */
+    public static final char CLIENT_CONNECT_TOKEN_SEP = '|';
+
+    /** 解析 CLIENT_CONNECT 握手消息，返回 [nodeId, token?]，token 可为 null */
+    public static String[] parseClientConnect(String message) {
+        String body = message.substring(CLIENT_CONNECT.length());
+        int idx = body.lastIndexOf(CLIENT_CONNECT_TOKEN_SEP);
+        if (idx < 0) {
+            return new String[]{body, null};
+        }
+        return new String[]{body.substring(0, idx), body.substring(idx + 1)};
+    }
 
     public static final String SUCCESS = "SUCCESS";
     public static final String FAILED = "FAILED";

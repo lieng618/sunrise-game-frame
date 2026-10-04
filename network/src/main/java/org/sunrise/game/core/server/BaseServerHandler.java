@@ -5,6 +5,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.Getter;
 import lombok.Setter;
+import org.sunrise.game.core.auth.RpcAuth;
 import org.sunrise.game.log.LogCore;
 import org.sunrise.game.core.message.MessageType;
 import org.sunrise.game.core.message.SocketMessage;
@@ -48,7 +49,14 @@ public class BaseServerHandler extends SimpleChannelInboundHandler<SocketMessage
         isAuthMessage = false;
         String message = new String(data, StandardCharsets.UTF_8);
         if (message.startsWith(Utils.CLIENT_CONNECT)) {
-            connectNode = message.substring(Utils.CLIENT_CONNECT.length());
+            String[] parts = Utils.parseClientConnect(message);
+            String connectNodeId = parts[0];
+            if (RpcAuth.enabled() && !RpcAuth.verify(parts[1])) {
+                LogCore.BaseServer.error("rpc auth failed, connectNode = { {} }, remoteAddress = { {} }", connectNodeId, channel.remoteAddress());
+                channel.close();
+                return;
+            }
+            connectNode = connectNodeId;
 
             boolean exist = ConnectionManager.isConnectExist(connectNode);
             if (!exist) {
