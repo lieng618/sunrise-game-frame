@@ -20,7 +20,7 @@ public class CallEnum {
     public static final int GameRpcListenService_sendToAllHuman = 7;
     /** {@code org.sunrise.game.game.service.GameRpcListenService#sendToHuman(String,int,int,byte[])} */
     public static final int GameRpcListenService_sendToHuman = 8;
-    /** {@code org.sunrise.game.global.service.chat.GlobalChatService#chat(String,String)} */
+    /** {@code org.sunrise.game.global.service.chat.GlobalChatService#chat(String,String,String)} */
     public static final int GlobalChatService_chat = 9;
     /** {@code org.sunrise.game.global.service.chat.GlobalChatService#history(String)} */
     public static final int GlobalChatService_history = 10;
@@ -72,6 +72,6 @@ public class CallEnum {
     public static final int HttpRecvMessageService_setExternalServerStatus = 29;
     /** {@code org.sunrise.game.http.service.HttpRecvMessageService#setWhitelist(String)} */
     public static final int HttpRecvMessageService_setWhitelist = 30;
-    /** {@code org.sunrise.game.http.service.HttpRecvMessageService#updateExternalRemoteData(int,String,int,boolean,boolean,boolean)} */
+    /** {@code org.sunrise.game.http.service.HttpRecvMessageService#updateExternalRemoteData(int,String,int,int,int,boolean,boolean,boolean)} */
     public static final int HttpRecvMessageService_updateExternalRemoteData = 31;
 }

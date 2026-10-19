@@ -195,12 +195,17 @@ public class DbService {
 
     // 同步：执行更新
     public void execute(String sql, Object... params) {
+        executeUpdate(sql, params);
+    }
+
+    // 同步：执行更新并返回受影响行数
+    public int executeUpdate(String sql, Object... params) {
         try (Connection connection = getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             for (int i = 0; i < params.length; i++) {
                 statement.setObject(i + 1, params[i]);
             }
-            statement.executeUpdate();
+            return statement.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

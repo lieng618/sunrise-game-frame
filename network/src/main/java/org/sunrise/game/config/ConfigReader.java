@@ -57,4 +57,41 @@ public class ConfigReader {
         return path.normalize().toAbsolutePath();
     }
 
+    /**
+     * 读取字符串配置；未配置时返回默认值。
+     */
+    public static String getString(String key, String defaultValue) {
+        Properties properties = prop;
+        if (properties == null) {
+            return defaultValue;
+        }
+        return properties.getProperty(key, defaultValue);
+    }
+
+    /**
+     * 读取整数配置；未配置或空值时返回默认值。
+     */
+    public static int getInt(String key, int defaultValue) {
+        String raw = getString(key, null);
+        if (raw == null || raw.trim().isEmpty()) {
+            return defaultValue;
+        }
+        try {
+            return Integer.parseInt(raw.trim());
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("invalid int config: " + key + "=" + raw, e);
+        }
+    }
+
+    /**
+     * 读取布尔配置；未配置或空值时返回默认值。
+     */
+    public static boolean getBoolean(String key, boolean defaultValue) {
+        String raw = getString(key, null);
+        if (raw == null || raw.trim().isEmpty()) {
+            return defaultValue;
+        }
+        return Boolean.parseBoolean(raw.trim());
+    }
+
 }

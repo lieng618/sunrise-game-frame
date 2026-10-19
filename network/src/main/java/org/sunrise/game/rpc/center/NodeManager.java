@@ -1,7 +1,7 @@
 package org.sunrise.game.rpc.center;
 
 import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.TypeReference;
+import com.alibaba.fastjson2.JSONObject;
 import org.sunrise.game.core.client.BaseClientManager;
 import org.sunrise.game.core.message.BaseMessage;
 import org.sunrise.game.core.server.BaseServerManager;
@@ -34,13 +34,16 @@ public class NodeManager {
         }
         if (reportMessage.getMsg() != null) {
             String msg = (String) reportMessage.getMsg();
-            Map<String, Object> data = JSON.parseObject(msg, new TypeReference<Map<String, Object>>() {});
-            nodeData.setIp((String) data.get("ip"));
-            nodeData.setPort((Integer) data.get("port"));
-            nodeData.setServerId((Integer) data.get("id"));
-            nodeData.setNodeType((String) data.get("type"));
+            JSONObject data = JSON.parseObject(msg);
+            if (data == null) {
+                return;
+            }
+            nodeData.setIp(data.getString("ip"));
+            nodeData.setPort(data.getInteger("port"));
+            nodeData.setServerId(data.getInteger("id"));
+            nodeData.setNodeType(data.getString("type"));
             // 以进程实例变化为广播依据
-            String instanceId = (String) data.get("instanceId");
+            String instanceId = data.getString("instanceId");
             isHaveNewNode = instanceId == null || !instanceId.equals(nodeData.getInstanceId());
             nodeData.setInstanceId(instanceId);
         }

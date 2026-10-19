@@ -13,7 +13,6 @@ CREATE TABLE external_system
     create_time DATETIME     DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '创建时间',
     update_time DATETIME     DEFAULT CURRENT_TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     ip          VARCHAR(255) DEFAULT '127.0.0.1'       NOT NULL COMMENT 'ip',
-    port        INT          DEFAULT 10000             NOT NULL COMMENT 'port',
     status      INT          DEFAULT 0                 NOT NULL COMMENT '状态：0关闭1开启'
 )
     COMMENT '对外服务';

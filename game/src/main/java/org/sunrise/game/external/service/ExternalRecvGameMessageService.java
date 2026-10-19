@@ -16,7 +16,6 @@ import org.sunrise.game.utils.Utils;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 /**
  * 对外服从游戏服接收要发给客户端的数据，心跳中发给客户端
@@ -35,10 +34,7 @@ public class ExternalRecvGameMessageService extends BaseService {
         super.init();
         externalServer = new ExternalServer();
         externalServer.start();
-        Properties properties = ConfigReader.getProp();
-        if (properties != null) {
-            externalServer.setExternalHost(properties.getProperty("external.address"));
-        }
+        externalServer.setExternalHost(ConfigReader.getString("external.address", null));
     }
 
     @Override
@@ -50,11 +46,14 @@ public class ExternalRecvGameMessageService extends BaseService {
     @Override
     public void pulsePer5Sec() {
         super.pulsePer5Sec();
+        externalServer.renewLease();
         pulseRemoveClients();
         RpcFunction.newInstance().call(CallEnum.HttpRecvMessageService_updateExternalRemoteData,
                 RpcNodeManager.getRpcServerId(),
                 externalServer.getExternalHost(),
-                externalServer.getExternalPort(),
+                externalServer.getTcpPort(),
+                externalServer.getWsPort(),
+                externalServer.getKcpPort(),
                 externalServer.isTcpEnabled(),
                 externalServer.isWsEnabled(),
                 externalServer.isKcpEnabled());
@@ -129,7 +128,10 @@ public class ExternalRecvGameMessageService extends BaseService {
         dataMap.put("nodeId", RpcNodeManager.getRpcServerNodeId());
         dataMap.put("serverId", RpcNodeManager.getRpcServerId());
         dataMap.put("ip", Utils.getLocalIpAddress());
-        dataMap.put("port", externalServer.getExternalPort());
+        dataMap.put("port", externalServer.getTcpPort());
+        dataMap.put("tcpPort", externalServer.getTcpPort());
+        dataMap.put("wsPort", externalServer.getWsPort());
+        dataMap.put("kcpPort", externalServer.getKcpPort());
         dataMap.put("online", ExternalConnectionManager.getOnlineCount());
         dataMap.put("processId", Utils.getProcessId());
         dataMap.put("type", "ExternalServer");

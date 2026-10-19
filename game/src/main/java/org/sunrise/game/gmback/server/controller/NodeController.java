@@ -2,6 +2,7 @@ package org.sunrise.game.gmback.server.controller;
 
 import io.javalin.http.Context;
 import lombok.Data;
+import org.sunrise.game.utils.NodeTimeouts;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,10 +16,14 @@ public class NodeController extends BaseController {
         private int online;
         private String ip;
         private int port;
+        private int tcpPort;
+        private int wsPort;
+        private int kcpPort;
         private int serverId;
         private String nodeId;
         private String type;
         private long processId;
+        private long reportTime;
         private boolean tcpEnabled;
         private boolean wsEnabled;
         private boolean kcpEnabled;
@@ -27,10 +32,16 @@ public class NodeController extends BaseController {
     private final ConcurrentHashMap<String, NodeRemoteData> nodes = new ConcurrentHashMap<>();
 
     public void updateNodeData(String nodeId, int serverId, String ip, int port, int online, String type, long processId) {
-        updateNodeData(nodeId, serverId, ip, port, online, type, processId, false, false, false);
+        updateNodeData(nodeId, serverId, ip, port, port, 0, 0, online, type, processId, false, false, false);
     }
 
     public void updateNodeData(String nodeId, int serverId, String ip, int port, int online, String type, long processId,
+                               boolean tcpEnabled, boolean wsEnabled, boolean kcpEnabled) {
+        updateNodeData(nodeId, serverId, ip, port, port, 0, 0, online, type, processId, tcpEnabled, wsEnabled, kcpEnabled);
+    }
+
+    public void updateNodeData(String nodeId, int serverId, String ip, int port, int tcpPort, int wsPort, int kcpPort,
+                               int online, String type, long processId,
                                boolean tcpEnabled, boolean wsEnabled, boolean kcpEnabled) {
         NodeRemoteData nodeRemoteData = nodes.computeIfAbsent(type + nodeId, k -> new NodeRemoteData());
         nodeRemoteData.nodeId = nodeId;
@@ -38,14 +49,22 @@ public class NodeController extends BaseController {
         nodeRemoteData.type = type;
         nodeRemoteData.ip = ip;
         nodeRemoteData.port = port;
+        nodeRemoteData.tcpPort = tcpPort;
+        nodeRemoteData.wsPort = wsPort;
+        nodeRemoteData.kcpPort = kcpPort;
         nodeRemoteData.online = online;
         nodeRemoteData.processId = processId;
+        nodeRemoteData.reportTime = System.currentTimeMillis();
         nodeRemoteData.tcpEnabled = tcpEnabled;
         nodeRemoteData.wsEnabled = wsEnabled;
         nodeRemoteData.kcpEnabled = kcpEnabled;
     }
 
     public void list(Context ctx) {
+        long now = System.currentTimeMillis();
+        nodes.entrySet().removeIf(entry ->
+                now - entry.getValue().getReportTime() > NodeTimeouts.GM_NODE_LIST_STALE_TIMEOUT_MS);
+
         // 构建返回消息
         List<NodeRemoteData> nodes = new ArrayList<>(this.nodes.values());
 
@@ -56,6 +75,9 @@ public class NodeController extends BaseController {
             map.put("ip", node.getIp());
             map.put("type", node.getType());
             map.put("port", node.getPort());
+            map.put("tcpPort", node.getTcpPort());
+            map.put("wsPort", node.getWsPort());
+            map.put("kcpPort", node.getKcpPort());
             if ("ExternalServer".equals(node.getType())) {
                 map.put("tcpEnabled", node.isTcpEnabled());
                 map.put("wsEnabled", node.isWsEnabled());

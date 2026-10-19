@@ -77,7 +77,7 @@ rpc.node.server-id=200</code></pre>
 <table>
 <thead><tr><th>表名</th><th>说明</th><th>关键字段</th></tr></thead>
 <tbody>
-<tr><td>external_system</td><td>对外服地址管理，自动分配端口</td><td>id, ip, port, status</td></tr>
+<tr><td>external_system</td><td>对外服注册与启动状态</td><td>id, ip, status</td></tr>
 <tr><td>rpc_server_system</td><td>RPC 节点地址管理，自动分配端口</td><td>id, ip, port, status</td></tr>
 <tr><td>account</td><td>玩家账号表</td><td>id(accountId), uid</td></tr>
 <tr><td>human_list</td><td>玩家角色列表</td><td>id, uid, human_id, server_id, pos, name, level</td></tr>

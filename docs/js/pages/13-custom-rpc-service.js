@@ -160,7 +160,8 @@ public class HttpRecvMessageService extends BaseService {
     }
 
     @RpcMethod
-    public void updateExternalRemoteData(int serverId, String host, int port) { /* 更新地址池 */ }
+    public void updateExternalRemoteData(int serverId, String host, int tcpPort, int wsPort, int kcpPort,
+                                         boolean tcpEnabled, boolean wsEnabled, boolean kcpEnabled) { /* 更新地址池 */ }
 
     @RpcMethod
     public void setExternalServerStatus(boolean open) { /* GM 关服 */ }

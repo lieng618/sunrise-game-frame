@@ -116,12 +116,12 @@ registerPage('external-server', '对外服', 'TCP/WS/KCP 网关、客户端连�
 <table>
 <thead><tr><th>协议</th><th>端口</th><th>Pipeline</th><th>处理器</th></tr></thead>
 <tbody>
-<tr><td>TCP</td><td>port</td><td>SocketMessageEncoder → SocketMessageDecoder → ExternalServerHandler</td><td>ExternalServerHandler</td></tr>
-<tr><td>WebSocket</td><td>port + 1</td><td>HttpServerCodec → HttpObjectAggregator → WebSocketServerCompressionHandler → WebSocketMessageCodec → WebSocketServerProtocolHandler → ExternalServerHandler</td><td>ExternalServerHandler</td></tr>
-<tr><td>KCP</td><td>port + 2</td><td>KcpServerHandler</td><td>KcpServerHandler</td></tr>
+<tr><td>TCP</td><td>tcpPort</td><td>SocketMessageEncoder → SocketMessageDecoder → ExternalServerHandler</td><td>ExternalServerHandler</td></tr>
+<tr><td>WebSocket</td><td>wsPort</td><td>HttpServerCodec → HttpObjectAggregator → WebSocketServerCompressionHandler → WebSocketMessageCodec → WebSocketServerProtocolHandler → ExternalServerHandler</td><td>ExternalServerHandler</td></tr>
+<tr><td>KCP</td><td>kcpPort</td><td>KcpServerHandler</td><td>KcpServerHandler</td></tr>
 </tbody>
 </table>
-<p>端口自动分配：查询 external_system 表，已有记录则复用，否则从 10000 开始递增。</p>
+<p>端口分配：从 <code>external.listen.base-port</code> 开始向上探测连续 3 个端口（TCP/WS/KCP），也可用 <code>external.listen.port</code> 固定。绑定成功后三个端口各自上报给 HttpServer 和 GM 后台。</p>
 
 <h2>客户端连接认证</h2>
 <p>连接建立后首包不是 Protobuf，而是字符串认证，此字符串定义在Utils中。</p>
@@ -156,7 +156,7 @@ registerPage('external-server', '对外服', 'TCP/WS/KCP 网关、客户端连�
 <table>
 <thead><tr><th>类名</th><th>说明</th></tr></thead>
 <tbody>
-<tr><td>ExternalServer</td><td>同时启动 TCP/WS/KCP 三种协议监听，查询 external_system 表管理端口</td></tr>
+<tr><td>ExternalServer</td><td>同时启动 TCP/WS/KCP 三种协议监听，端口探测绑定后通过 RPC 上报</td></tr>
 <tr><td>ExternalServerHandler</td><td>TCP/WS 入站处理器，首包验证，后续消息加入 msgQueue</td></tr>
 <tr><td>KcpServerHandler</td><td>KCP 入站处理器</td></tr>
 <tr><td>ExternalConnectionManager</td><td>客户端连接管理器，维护 clients Map(connectionId → ClientConnection)</td></tr>

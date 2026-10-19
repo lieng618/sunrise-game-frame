@@ -15,19 +15,20 @@ registerPage('database', '数据库', 'MySQL 表结构、数据存储方式、Db
 
 <h2>表结构</h2>
 <h3>external_system（对外服地址管理）</h3>
-<p>管理所有 ExternalServer 的地址信息，ExternalServer 启动时查询此表获取端口分配。</p>
+<p>管理所有 ExternalServer 的注册与启动状态：启动时用于保证同一 serverId 唯一，端口由进程探测后通过 RPC / GM 实时上报。</p>
 <table>
 <thead><tr><th>字段</th><th>类型</th><th>说明</th></tr></thead>
 <tbody>
 <tr><td>id</td><td>INT AUTO_INCREMENT</td><td>主键</td></tr>
-<tr><td>ip</td><td>VARCHAR(50)</td><td>对外服 IP</td></tr>
-<tr><td>port</td><td>INT</td><td>对外服端口（TCP 端口，WS=port+1，KCP=port+2）</td></tr>
-<tr><td>status</td><td>TINYINT</td><td>状态（0=关闭，1=开启）</td></tr>
+<tr><td>ip</td><td>VARCHAR(255)</td><td>对外服 IP（启动时写入，便于排查）</td></tr>
+<tr><td>status</td><td>INT</td><td>状态（0=关闭，1=开启）</td></tr>
+<tr><td>update_time</td><td>DATETIME</td><td>租约心跳：运行中每 5 秒刷新</td></tr>
 </tbody>
 </table>
+<p>status=1 时以 <code>update_time</code> 作为租约：外部服每 5 秒续租，超过 30 秒未续租说明上次进程异常退出（崩溃、强杀、断电），新实例会直接接管，不会因为残留的 status=1 永久起不来。</p>
 
 <h3>rpc_server_system（RPC 节点地址管理）</h3>
-<p>管理所有 RPC 节点的地址信息，RpcNode 启动时查询此表确保 serverId 唯一并获取端口分配。</p>
+<p>管理所有 RPC 节点的地址信息，RpcNode 启动时查询此表确保 serverId 唯一并获取端口分配；同样以 <code>update_time</code> 作为租约（每 5 秒续租，30 秒过期后允许新实例抢占）。</p>
 <table>
 <thead><tr><th>字段</th><th>类型</th><th>说明</th></tr></thead>
 <tbody>

@@ -17,7 +17,6 @@ public class EntityExternalSystem {
     LocalDateTime createTime;
     LocalDateTime updateTime;
     String ip;
-    int port;
     int status;
 
     public EntityExternalSystem(Map<String, Object> dataMap) {
@@ -25,7 +24,6 @@ public class EntityExternalSystem {
         this.createTime = EntityConverter.convertToType(dataMap.get("create_time"), LocalDateTime.class);
         this.updateTime = EntityConverter.convertToType(dataMap.get("update_time"), LocalDateTime.class);
         this.ip = EntityConverter.convertToType(dataMap.get("ip"), String.class);
-        this.port = EntityConverter.convertToType(dataMap.get("port"), int.class);
         this.status = EntityConverter.convertToType(dataMap.get("status"), int.class);
     }
 }

@@ -1,6 +1,7 @@
 package org.sunrise.game.gmback.service;
 
 import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.TypeReference;
 import org.sunrise.game.gmback.server.AdminServer;
 import org.sunrise.game.gmback.server.controller.AnnouncementController;
@@ -17,7 +18,6 @@ import org.sunrise.game.rpc.annotation.RpcService;
 import org.sunrise.game.rpc.service.BaseService;
 
 import java.util.List;
-import java.util.Map;
 
 @RpcService
 public class GmBackRecvMessageService extends BaseService {
@@ -38,8 +38,7 @@ public class GmBackRecvMessageService extends BaseService {
     @RpcMethod
     public void recvMessage(String operation, String data) {
         try {
-            Map<String, Object> dataMap = JSON.parseObject(data, new TypeReference<Map<String, Object>>() {
-            });
+            JSONObject dataMap = JSON.parseObject(data);
             if (operation != null) {
                 switch (operation) {
                     case "reportNodeData":
@@ -61,19 +60,26 @@ public class GmBackRecvMessageService extends BaseService {
     /**
      * 处理其他节点发来的节点数据
      */
-    private void handleNodeData(Map<String, Object> data) {
-        String nodeId = (String) data.get("nodeId");
-        int serverId = (int) data.get("serverId");
-        String ip = (String) data.get("ip");
-        int port = (int) data.get("port");
-        int online = (int) data.get("online");
-        String type = (String) data.get("type");
-        long processId = ((Number) data.get("processId")).longValue();
-        boolean tcpEnabled = Boolean.TRUE.equals(data.get("tcpEnabled"));
-        boolean wsEnabled = Boolean.TRUE.equals(data.get("wsEnabled"));
-        boolean kcpEnabled = Boolean.TRUE.equals(data.get("kcpEnabled"));
-        List<String> humanIds = JSON.parseObject((String) data.get("humanIds"), new TypeReference<List<String>>() {});
-        ControllerManager.getController(NodeController.class).updateNodeData(nodeId, serverId, ip, port, online, type, processId, tcpEnabled, wsEnabled, kcpEnabled);
+    private void handleNodeData(JSONObject data) {
+        String nodeId = data.getString("nodeId");
+        int serverId = data.getIntValue("serverId");
+        String ip = data.getString("ip");
+        int port = data.getIntValue("port");
+        int tcpPort = data.getIntValue("tcpPort", port);
+        int wsPort = data.getIntValue("wsPort");
+        int kcpPort = data.getIntValue("kcpPort");
+        int online = data.getIntValue("online");
+        String type = data.getString("type");
+        long processId = data.getLongValue("processId");
+        boolean tcpEnabled = data.getBooleanValue("tcpEnabled");
+        boolean wsEnabled = data.getBooleanValue("wsEnabled");
+        boolean kcpEnabled = data.getBooleanValue("kcpEnabled");
+        String humanIdsJson = data.getString("humanIds");
+        List<String> humanIds = humanIdsJson == null ? null
+                : JSON.parseObject(humanIdsJson, new TypeReference<List<String>>() {
+        });
+        ControllerManager.getController(NodeController.class).updateNodeData(nodeId, serverId, ip, port,
+                tcpPort, wsPort, kcpPort, online, type, processId, tcpEnabled, wsEnabled, kcpEnabled);
         if (humanIds != null) {
             ControllerManager.getController(OnlinePlayerController.class).updateHumanData(serverId, humanIds);
         }
@@ -93,8 +99,8 @@ public class GmBackRecvMessageService extends BaseService {
         ControllerManager.getController(CdkController.class).syncCdkToGame();
     }
 
-    private void handleCdkRedeem(Map<String, Object> dataMap) {
-        String code = (String) dataMap.get("code");
+    private void handleCdkRedeem(JSONObject dataMap) {
+        String code = dataMap.getString("code");
         if (code != null && !code.isEmpty()) {
             ControllerManager.getController(CdkController.class).onRedeem(code);
         }

@@ -37,11 +37,11 @@
       <el-table-column label="网络地址" min-width="160">
         <template #default="scope">
                     <span class="address-badge">
-                        {{ scope.row.ip }}:{{ scope.row.port }}
+                        {{ scope.row.ip }}:{{ displayPort(scope.row) }}
                     </span>
         </template>
       </el-table-column>
-      <el-table-column label="开放协议" min-width="120" align="center">
+      <el-table-column label="开放协议（端口）" min-width="240" align="center">
         <template #default="scope">
           <span v-if="scope.row.type === 'ExternalServer'" class="address-badge listen-types">
             {{ formatExternalListenTypes(scope.row) }}
@@ -103,11 +103,13 @@ export default {
 
     const formatExternalListenTypes = (row) => {
       const types = [];
-      if (row.tcpEnabled) types.push('tcp');
-      if (row.wsEnabled) types.push('ws');
-      if (row.kcpEnabled) types.push('kcp');
-      return types.length ? types.join('|') : '-';
+      if (row.tcpEnabled) types.push(`tcp:${row.tcpPort || row.port || '-'}`);
+      if (row.wsEnabled) types.push(`ws:${row.wsPort || '-'}`);
+      if (row.kcpEnabled) types.push(`kcp:${row.kcpPort || '-'}`);
+      return types.length ? types.join(' | ') : '-';
     };
+
+    const displayPort = (row) => row.tcpPort || row.port || '-';
 
     // 获取数据
     const fetchNodes = async () => {
@@ -156,6 +158,7 @@ export default {
       fetchNodes,
       filteredTableData,
       formatExternalListenTypes,
+      displayPort,
     };
   }
 };

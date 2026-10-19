@@ -4,6 +4,7 @@ target/
 !**/src/test/**/target/
 
 ### IntelliJ IDEA ###
+.idea/
 .idea/modules.xml
 .idea/jarRepositories.xml
 .idea/compiler.xml
@@ -39,4 +40,13 @@ build/
 
 ### Local secrets ###
 start/docker/.env
+config/*.properties
+!config/*.example.properties
 config/local-*.properties
+
+### Local runtime outputs ###
+log/
+start/jar/
+
+### Local database migrations ###
+network/src/main/java/org/sunrise/game/db/sql/migration/

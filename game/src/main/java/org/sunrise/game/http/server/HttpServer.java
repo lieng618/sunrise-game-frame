@@ -184,41 +184,34 @@ public class HttpServer {
             }
             String type = ctx.queryParam("type");
             if (type == null) {
+                jsonResponse.put("error", "missing type");
+                ctx.result(jsonResponse.toJSONString());
                 return;
             }
             ConcurrentHashMap<Integer, String> address = externalAddress.get(type);
-            if (address == null) {
+            if (address == null || address.isEmpty()) {
+                jsonResponse.put("error", "no available external server");
+                ctx.result(jsonResponse.toJSONString());
                 return;
             }
             Integer oldExternalId = uidExternals.get(uid);
-            if (oldExternalId != null) {
-                // 有旧的地址
-                String s = address.get(oldExternalId);
-                if (s != null) {
-                    jsonResponse.put("address", s);
-                } else {
-                    // 旧地址已失效
-                    int randomId = random.nextInt(address.size());
-                    int i = 0;
-                    for (Integer key : address.keySet()) {
-                        if (i == randomId) {
-                            uidExternals.put(uid, key);
-                            jsonResponse.put("address", address.get(key));
-                        }
-                        ++i;
-                    }
+            String selected = oldExternalId == null ? null : address.get(oldExternalId);
+            if (selected == null) {
+                // 用 key 快照随机，避免并发增删导致 size 与 keySet 迭代不一致
+                List<Integer> keys = new ArrayList<>(address.keySet());
+                if (keys.isEmpty()) {
+                    jsonResponse.put("error", "no available external server");
+                    ctx.result(jsonResponse.toJSONString());
+                    return;
                 }
+                Integer key = keys.get(random.nextInt(keys.size()));
+                uidExternals.put(uid, key);
+                selected = address.get(key);
+            }
+            if (selected != null) {
+                jsonResponse.put("address", selected);
             } else {
-                // 没有旧地址 随机一个新的
-                int randomId = random.nextInt(address.size());
-                int i = 0;
-                for (Integer key : address.keySet()) {
-                    if (i == randomId) {
-                        uidExternals.put(uid, key);
-                        jsonResponse.put("address", address.get(key));
-                    }
-                    ++i;
-                }
+                jsonResponse.put("error", "no available external server");
             }
             ctx.result(jsonResponse.toJSONString());
         });

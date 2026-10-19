@@ -1,6 +1,7 @@
 package org.sunrise.game.game.service;
 
 import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.TypeReference;
 import org.sunrise.game.core.HotswapScanner;
 import org.sunrise.game.game.human.HumanObjectManager;
@@ -40,8 +41,7 @@ public class GameRecvGmBackMessageService extends BaseService {
     @RpcMethod
     public void recvMessage(String operation, String data) {
         try {
-            Map<String, Object> dataMap = JSON.parseObject(data, new TypeReference<Map<String, Object>>() {
-            });
+            JSONObject dataMap = JSON.parseObject(data);
             if (operation != null) {
                 switch (operation) {
                     case "reloadConfig":
@@ -81,8 +81,8 @@ public class GameRecvGmBackMessageService extends BaseService {
     /**
      * 处理玩家下线GM命令
      */
-    private void handleKickHuman(Map<String, Object> data) {
-        String humanId = (String) data.get("humanId");
+    private void handleKickHuman(JSONObject data) {
+        String humanId = data.getString("humanId");
         HumanObjectManager.deleteHumanQueue.add(humanId);
         LogCore.GameServer.debug("Received KickHuman command, humanId: {}", humanId);
     }
@@ -90,8 +90,8 @@ public class GameRecvGmBackMessageService extends BaseService {
     /**
      * 处理封禁人员名单
      */
-    private void handleBanHumanList(Map<String, Object> data) {
-        String humanIds = (String) data.get("humanIds");
+    private void handleBanHumanList(JSONObject data) {
+        String humanIds = data.getString("humanIds");
         List<String> bans = JSON.parseObject(humanIds, new TypeReference<List<String>>() {});
         HumanObjectManager.banHumanQueue.clear();
         HumanObjectManager.banHumanQueue.addAll(bans);
@@ -102,8 +102,8 @@ public class GameRecvGmBackMessageService extends BaseService {
     /**
      * 处理代码热更 JAR
      */
-    private void handleHotswapJar(Map<String, Object> data) {
-        String jarPath = (String) data.get("jarPath");
+    private void handleHotswapJar(JSONObject data) {
+        String jarPath = data.getString("jarPath");
         if (jarPath == null || jarPath.isEmpty()) {
             LogCore.GameServer.error("hotswapJar: jarPath is empty");
             return;
@@ -121,8 +121,8 @@ public class GameRecvGmBackMessageService extends BaseService {
     /**
      * 同步兑换码列表
      */
-    private void handleCdkList(Map<String, Object> data) {
-        String cdkListJson = (String) data.get("cdkList");
+    private void handleCdkList(JSONObject data) {
+        String cdkListJson = data.getString("cdkList");
         CdkSystem cdkSystem = GameSystemUtils.getSystem(CdkSystem.class);
         if (cdkSystem != null) {
             cdkSystem.syncFromGm(cdkListJson);
@@ -133,8 +133,8 @@ public class GameRecvGmBackMessageService extends BaseService {
     /**
      * 处理禁言人员名单
      */
-    private void handleMuteHumanList(Map<String, Object> data) {
-        String humanIds = (String) data.get("humanIds");
+    private void handleMuteHumanList(JSONObject data) {
+        String humanIds = data.getString("humanIds");
         List<String> bans = JSON.parseObject(humanIds, new TypeReference<List<String>>() {});
         HumanObjectManager.muteHumanQueue.clear();
         HumanObjectManager.muteHumanQueue.addAll(bans);
