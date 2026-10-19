@@ -43,16 +43,20 @@ services:
       JDBC_URL: jdbc:mysql://mysql:3306/sunrise
       MASTER_ADDRESS: center
       REPORT_ADDRESS: external
-      EXTERNAL_ADDRESS: 0.0.0.0
+      # Must be an address reachable by game clients (host IP or domain)
+      EXTERNAL_ADDRESS: ${EXTERNAL_ADDRESS:-127.0.0.1}
+      # Pin the gateway port so it matches the published ports below.
+      # TCP = port, WS = port + 1, KCP = port + 2 (UDP).
+      EXTERNAL_LISTEN_PORT: "10000"
     depends_on:
       mysql:
         condition: service_healthy
       center:
         condition: service_started
     ports:
-      - "10000:10000"
-      - "10001:10001"
-      - "10002:10002"
+      - "10000:10000/tcp"
+      - "10001:10001/tcp"
+      - "10002:10002/udp"
     volumes:
       - ../../config/external-config.properties:/app/config/external-config.properties:ro
 

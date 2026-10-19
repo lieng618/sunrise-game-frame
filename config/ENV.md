@@ -81,6 +81,8 @@ docker compose up -d --build
 
 - `.env`：各服务共享的密钥（`JDBC_PASSWORD` 同时作为 MySQL root 密码）
 - `docker-compose.yml` 的 `environment`：按服务注入地址差异（`MASTER_ADDRESS`、`REPORT_ADDRESS` 等），一般无需改
+- 对外服在 Docker 中固定使用 `external.listen.port=10000`，并映射 `10000/tcp`、`10001/tcp`、`10002/udp`；修改端口时配置和映射必须一起改
+- `EXTERNAL_ADDRESS` 填客户端能访问到的主机 IP 或域名
 
 改配置后重启对应容器；不支持热更新。
 
