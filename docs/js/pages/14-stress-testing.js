@@ -51,7 +51,7 @@ start\\windows\\stress.bat
     </div>
 </div>
 
-<p><code>external.rate-limit.per-minute</code>（对外服配置）设置单连接每分钟从客户端接收的最大消息数；压测时需按目标 TPS 调大，避免对外服限流拦截。</p>
+<p><code>external.rate-limit.refill-per-minute</code> 和 <code>external.rate-limit.burst</code>（对外服配置）分别设置单连接令牌桶的补充速度和最大突发；压测时需按目标 TPS 同时调大，并相应提高违规断开阈值，避免对外服限流拦截。</p>
 
 <h3>发包模式</h3>
 <table>

@@ -17,7 +17,7 @@ registerPage('architecture', '架构总览', '多进程架构、服务职责、�
     <div class="card">
         <div class="card-icon">🌐</div>
         <div class="card-title">ExternalServer</div>
-        <div class="card-desc">对外网关服。同时监听 TCP/WS/KCP 三种协议（端口依次 +1）、验证客户端首包认证、分配 connectionId、消息频率限制（默认1000条/分钟）、转发消息到 Game 服、接收 Game 回包发回客户端</div>
+        <div class="card-desc">对外网关服。同时监听 TCP/WS/KCP 三种协议（端口依次 +1）、验证客户端首包认证、分配 connectionId、令牌桶消息限流（默认长期1200条/分钟、突发120条）、转发消息到 Game 服、接收 Game 回包发回客户端</div>
     </div>
     <div class="card">
         <div class="card-icon">🎮</div>

@@ -8,31 +8,89 @@ import lombok.Data;
 import org.sunrise.game.config.ConfigReader;
 import org.sunrise.game.core.message.MessageType;
 import org.sunrise.game.core.message.SocketMessage;
+import org.sunrise.game.core.rate.TokenBucketRateLimiter;
 import org.sunrise.game.log.LogCore;
 import org.sunrise.game.utils.Utils;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.LongAdder;
 
 @Data
 public class ClientConnection {
+    private static final long NANOS_PER_SECOND = 1_000_000_000L;
+    private static final int DEFAULT_RATE_LIMIT_PER_MINUTE = 1200;
+    private static final int DEFAULT_RATE_LIMIT_BURST = 120;
+    private static final int DEFAULT_ABUSE_WINDOW_SECONDS = 5;
+    private static final int DEFAULT_ABUSE_REJECT_THRESHOLD = 600;
+    private static final int DEFAULT_REJECT_LOG_INTERVAL_MILLIS = 1000;
+
+    private static final LongAdder ACCEPTED_MESSAGE_TOTAL = new LongAdder();
+    private static final LongAdder RATE_LIMITED_MESSAGE_TOTAL = new LongAdder();
+    private static final LongAdder RATE_LIMIT_CLOSED_CONNECTION_TOTAL = new LongAdder();
+
+    private static int rateLimitPerMinute = -1;
+    private static int rateLimitBurst = -1;
+    private static int abuseWindowSeconds = -1;
+    private static int abuseRejectThreshold = -1;
+    private static int rejectLogIntervalMillis = -1;
+
     private long id;// 连接id
     private Channel channel;
     private Ukcp ukcp;
-    private int msgCount = 0;// 累积消息数量
-    private long msgCountStartTime = 0L;// 累积消息计数开始时间
-    private static final long MSG_COUNT_RESET_INTERVAL = 60 * 1000L; // 消息计数重置间隔（毫秒）
-    private static int msgCountPerMin = -1;
-
-    private static int msgCountPerMin() {
-        if (msgCountPerMin < 0) {
-            msgCountPerMin = ConfigReader.getInt("external.rate-limit.per-minute", 1000);
-        }
-        return msgCountPerMin;
-    }
+    private final TokenBucketRateLimiter inboundRateLimiter =
+            new TokenBucketRateLimiter(rateLimitBurst(), rateLimitPerMinute());
+    private long violationWindowStartNanos;
+    private int rejectedInViolationWindow;
+    private long lastRateLimitLogNanos;
+    private boolean rateLimitClosed;
     private final Queue<byte[]> msgQueue = new ConcurrentLinkedQueue<>();//待转发到游戏服的消息队列
     private boolean firstSend; // 是否为首次发消息
     private String gameNodeId; //记录此玩家当前在哪个game服
+
+    private static int rateLimitPerMinute() {
+        if (rateLimitPerMinute < 0) {
+            rateLimitPerMinute = positiveConfig(
+                    "external.rate-limit.refill-per-minute", DEFAULT_RATE_LIMIT_PER_MINUTE);
+        }
+        return rateLimitPerMinute;
+    }
+
+    private static int rateLimitBurst() {
+        if (rateLimitBurst < 0) {
+            rateLimitBurst = positiveConfig(
+                    "external.rate-limit.burst", DEFAULT_RATE_LIMIT_BURST);
+        }
+        return rateLimitBurst;
+    }
+
+    private static int abuseWindowSeconds() {
+        if (abuseWindowSeconds < 0) {
+            abuseWindowSeconds = positiveConfig(
+                    "external.rate-limit.abuse-window-seconds", DEFAULT_ABUSE_WINDOW_SECONDS);
+        }
+        return abuseWindowSeconds;
+    }
+
+    private static int abuseRejectThreshold() {
+        if (abuseRejectThreshold < 0) {
+            abuseRejectThreshold = positiveConfig(
+                    "external.rate-limit.abuse-threshold", DEFAULT_ABUSE_REJECT_THRESHOLD);
+        }
+        return abuseRejectThreshold;
+    }
+
+    private static int rejectLogIntervalMillis() {
+        if (rejectLogIntervalMillis < 0) {
+            rejectLogIntervalMillis = positiveConfig(
+                    "external.rate-limit.log-interval-ms", DEFAULT_REJECT_LOG_INTERVAL_MILLIS);
+        }
+        return rejectLogIntervalMillis;
+    }
+
+    private static int positiveConfig(String key, int defaultValue) {
+        return Math.max(1, ConfigReader.getInt(key, defaultValue));
+    }
 
     public ClientConnection(Channel channel) {
         this.channel = channel;
@@ -42,48 +100,63 @@ public class ClientConnection {
         this.ukcp = ukcp;
     }
 
-    public boolean dataCheck(byte[] data) {
+    public synchronized boolean dataCheck(byte[] data) {
         if (data.length > Utils.MSG_BYTE_LEN_MAX) {
             LogCore.BaseServer.error("recv from client, msg too large, connectionId = {}, size = {}, max = {}",
                     id, data.length, Utils.MSG_BYTE_LEN_MAX);
             return false;
         }
 
-        long now = System.currentTimeMillis();
-        
-        // 如果计数器为0，初始化开始时间
-        if (msgCount == 0) {
-            msgCountStartTime = now;
-        }
-        
-        // 增加计数
-        msgCount++;
-        
-        // 检查是否超过限制
-        if (msgCount > msgCountPerMin()) {
-            long elapsed = now - msgCountStartTime;
-            if (elapsed < MSG_COUNT_RESET_INTERVAL) {
-                // 在时间窗口内超过限制，拒绝消息并记录错误
-                LogCore.BaseServer.error("recv from client, msg too many, connectionId = {}, count = {}, elapsed = {}ms",
-                        id, msgCount, elapsed);
-                // 重置计数器，拒绝当前消息
-                resetCounter();
-                return false;
-            } else {
-                // 超过时间窗口，重置计数器（正常情况）
-                resetCounter();
-            }
+        if (rateLimitClosed) {
+            return false;
         }
 
+        long nowNanos = System.nanoTime();
+        if (!inboundRateLimiter.tryAcquire(nowNanos)) {
+            handleRateLimitRejection(nowNanos);
+            return false;
+        }
+
+        ACCEPTED_MESSAGE_TOTAL.increment();
         return true;
     }
-    
-    /**
-     * 重置消息计数器
-     */
-    private void resetCounter() {
-        msgCount = 0;
-        msgCountStartTime = 0L;
+
+    private void handleRateLimitRejection(long nowNanos) {
+        RATE_LIMITED_MESSAGE_TOTAL.increment();
+
+        long abuseWindowNanos = abuseWindowSeconds() * NANOS_PER_SECOND;
+        if (rejectedInViolationWindow == 0
+                || nowNanos - violationWindowStartNanos >= abuseWindowNanos) {
+            violationWindowStartNanos = nowNanos;
+            rejectedInViolationWindow = 0;
+        }
+
+        rejectedInViolationWindow++;
+        if (rejectedInViolationWindow >= abuseRejectThreshold()) {
+            rateLimitClosed = true;
+            RATE_LIMIT_CLOSED_CONNECTION_TOTAL.increment();
+            LogCore.ExternalServer.error(
+                    "closing abusive client, connectionId = {}, remoteAddress = {}, rejectedInWindow = {}, "
+                            + "window = {}s, acceptedTotal = {}, rejectedTotal = {}",
+                    id, getRemoteAddress(), rejectedInViolationWindow, abuseWindowSeconds(),
+                    ACCEPTED_MESSAGE_TOTAL.sum(), RATE_LIMITED_MESSAGE_TOTAL.sum());
+            close();
+            return;
+        }
+
+        long logIntervalNanos = rejectLogIntervalMillis() * 1_000_000L;
+        if (lastRateLimitLogNanos == 0L
+                || nowNanos - lastRateLimitLogNanos >= logIntervalNanos
+                || nowNanos < lastRateLimitLogNanos) {
+            lastRateLimitLogNanos = nowNanos;
+            LogCore.ExternalServer.warn(
+                    "client message rate limited, connectionId = {}, remoteAddress = {}, "
+                            + "refillPerMinute = {}, burst = {}, rejectedInWindow = {}, "
+                            + "acceptedTotal = {}, rejectedTotal = {}",
+                    id, getRemoteAddress(), rateLimitPerMinute(), rateLimitBurst(),
+                    rejectedInViolationWindow, ACCEPTED_MESSAGE_TOTAL.sum(),
+                    RATE_LIMITED_MESSAGE_TOTAL.sum());
+        }
     }
 
     public void sendMessage(byte[] data) {
@@ -123,5 +196,17 @@ public class ClientConnection {
             return ukcp.user().getRemoteAddress().toString();
         }
         return "unknown";
+    }
+
+    public static long getAcceptedMessageTotal() {
+        return ACCEPTED_MESSAGE_TOTAL.sum();
+    }
+
+    public static long getRateLimitedMessageTotal() {
+        return RATE_LIMITED_MESSAGE_TOTAL.sum();
+    }
+
+    public static long getRateLimitClosedConnectionTotal() {
+        return RATE_LIMIT_CLOSED_CONNECTION_TOTAL.sum();
     }
 }

@@ -177,7 +177,11 @@ registerPage('config', '配置参考', '各服务配置项说明', () => `
 <tr><td>external.listen.tcp</td><td>tcp协议是否启动</td><td>true</td></tr>
 <tr><td>external.listen.ws</td><td>ws协议是否启动</td><td>true</td></tr>
 <tr><td>external.listen.kcp</td><td>kcp协议是否启动</td><td>true</td></tr>
-<tr><td>external.rate-limit.per-minute</td><td>单客户端每分钟最大接收消息数</td><td>1000</td></tr>
+<tr><td>external.rate-limit.refill-per-minute</td><td>单连接令牌桶的长期补充速度</td><td>1200</td></tr>
+<tr><td>external.rate-limit.burst</td><td>单连接允许的最大突发消息数</td><td>120</td></tr>
+<tr><td>external.rate-limit.abuse-window-seconds</td><td>违规拒绝计数窗口</td><td>5</td></tr>
+<tr><td>external.rate-limit.abuse-threshold</td><td>窗口内达到该拒绝数后断开连接</td><td>600</td></tr>
+<tr><td>external.rate-limit.log-interval-ms</td><td>单连接限流告警最小间隔</td><td>1000</td></tr>
 </tbody>
 </table>
 

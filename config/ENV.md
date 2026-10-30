@@ -2,7 +2,7 @@
 
 配置文件在 `config/`，启动时作为 jar 的第一个参数传入。敏感项写成 `${ENV:default}`，由框架在启动时替换。
 
-**命名规范：** `service.category.name`，全小写点分，多词段用连字符（如 `jdbc.pool.maximum-size`、`external.rate-limit.per-minute`）。properties 文件统一 `key=value` 格式，等号两侧不加空格。各 `*-config.example.properties` 模板中附有字段说明注释。
+**命名规范：** `service.category.name`，全小写点分，多词段用连字符（如 `jdbc.pool.maximum-size`、`external.rate-limit.refill-per-minute`）。properties 文件统一 `key=value` 格式，等号两侧不加空格。各 `*-config.example.properties` 模板中附有字段说明注释。
 
 **解析顺序：** 环境变量 → JVM `-D` 参数 → 默认值
 
