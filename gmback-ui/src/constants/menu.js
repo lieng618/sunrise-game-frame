@@ -10,6 +10,7 @@ export const MENU_ITEMS = [
     {key: 'ban_player', path: '/ban-player', title: '玩家封禁'},
     {key: 'mute_player', path: '/mute-player', title: '玩家禁言'},
     {key: 'whitelist', path: '/whitelist', title: '白名单'},
+    {key: 'cheat_users', path: '/cheat-users', title: '金手指用户'},
     {key: 'announcement', path: '/announcement', title: '全服公告'},
     {key: 'cdk', path: '/cdk', title: '兑换码'},
     {key: 'operation_log', path: '/operation-log', title: '操作记录'},

@@ -33,6 +33,7 @@ public class PermissionHelper {
             "ban_player",
             "mute_player",
             "whitelist",
+            "cheat_users",
             "announcement",
             "cdk"
     );
@@ -50,6 +51,7 @@ public class PermissionHelper {
         PAGE_LABELS.put("ban_player", "玩家封禁");
         PAGE_LABELS.put("mute_player", "玩家禁言");
         PAGE_LABELS.put("whitelist", "白名单");
+        PAGE_LABELS.put("cheat_users", "金手指用户");
         PAGE_LABELS.put("announcement", "全服公告");
         PAGE_LABELS.put("cdk", "兑换码");
     }
@@ -76,6 +78,11 @@ public class PermissionHelper {
         addApiPermission("GET", "/api/whitelist", "whitelist");
         addApiPermission("POST", "/api/whitelist", "whitelist");
         addApiPermission("POST", "/api/whitelist/remove", "whitelist");
+        addApiPermission("GET", "/api/cheat-users", "cheat_users");
+        addApiPermission("GET", "/api/cheat-users/abilities", "cheat_users");
+        addApiPermission("POST", "/api/cheat-users", "cheat_users");
+        addApiPermission("POST", "/api/cheat-users/update", "cheat_users");
+        addApiPermission("POST", "/api/cheat-users/remove", "cheat_users");
         addApiPermission("GET", "/api/announcements", "announcement");
         addApiPermission("POST", "/api/announcements", "announcement");
         addApiPermission("POST", "/api/announcements/update", "announcement");

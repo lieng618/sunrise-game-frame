@@ -31,6 +31,7 @@ public class ControllerManager {
         controllers.put(OnlinePlayerController.class.getSimpleName(), new OnlinePlayerController());
         controllers.put(ServerStatusController.class.getSimpleName(), new ServerStatusController());
         controllers.put(WhitelistController.class.getSimpleName(), new WhitelistController());
+        controllers.put(CheatUserController.class.getSimpleName(), new CheatUserController());
         controllers.put(AnnouncementController.class.getSimpleName(), new AnnouncementController());
         controllers.put(CdkController.class.getSimpleName(), new CdkController());
         controllers.put(HotswapController.class.getSimpleName(), new HotswapController());

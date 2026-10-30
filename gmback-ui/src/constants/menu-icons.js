@@ -26,6 +26,7 @@ export const MENU_ICONS = {
     ban_player: Lock,
     mute_player: Mute,
     whitelist: Key,
+    cheat_users: Key,
     announcement: Bell,
     cdk: Ticket,
     operation_log: Document,

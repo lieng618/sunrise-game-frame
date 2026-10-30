@@ -11,6 +11,7 @@ import org.sunrise.game.gmback.server.controller.AuthController;
 import org.sunrise.game.gmback.server.controller.AnnouncementController;
 import org.sunrise.game.gmback.server.controller.BanHumanController;
 import org.sunrise.game.gmback.server.controller.CdkController;
+import org.sunrise.game.gmback.server.controller.CheatUserController;
 import org.sunrise.game.gmback.server.controller.ControllerManager;
 import org.sunrise.game.gmback.server.controller.GmController;
 import org.sunrise.game.gmback.server.controller.HotswapController;
@@ -115,6 +116,13 @@ public class AdminServer {
         app.get("/api/whitelist", ControllerManager.getController(WhitelistController.class)::list);
         app.post("/api/whitelist", ControllerManager.getController(WhitelistController.class)::add);
         app.post("/api/whitelist/remove", ControllerManager.getController(WhitelistController.class)::remove);
+
+        // 金手指用户路由
+        app.get("/api/cheat-users", ControllerManager.getController(CheatUserController.class)::list);
+        app.get("/api/cheat-users/abilities", ControllerManager.getController(CheatUserController.class)::listAbilities);
+        app.post("/api/cheat-users", ControllerManager.getController(CheatUserController.class)::add);
+        app.post("/api/cheat-users/update", ControllerManager.getController(CheatUserController.class)::update);
+        app.post("/api/cheat-users/remove", ControllerManager.getController(CheatUserController.class)::remove);
 
         // 公告路由
         app.get("/api/announcements", ControllerManager.getController(AnnouncementController.class)::list);

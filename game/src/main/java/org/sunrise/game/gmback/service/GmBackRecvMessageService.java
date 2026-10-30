@@ -7,6 +7,7 @@ import org.sunrise.game.gmback.server.AdminServer;
 import org.sunrise.game.gmback.server.controller.AnnouncementController;
 import org.sunrise.game.gmback.server.controller.BanHumanController;
 import org.sunrise.game.gmback.server.controller.CdkController;
+import org.sunrise.game.gmback.server.controller.CheatUserController;
 import org.sunrise.game.gmback.server.controller.ControllerManager;
 import org.sunrise.game.gmback.server.controller.MuteHumanController;
 import org.sunrise.game.gmback.server.controller.NodeController;
@@ -97,6 +98,8 @@ public class GmBackRecvMessageService extends BaseService {
         ControllerManager.getController(AnnouncementController.class).syncAnnouncementsToHttp();
         // 定时同步兑换码到GameServer
         ControllerManager.getController(CdkController.class).syncCdkToGame();
+        // 定时同步金手指用户到GameServer
+        ControllerManager.getController(CheatUserController.class).syncCheatUsersToGame();
     }
 
     private void handleCdkRedeem(JSONObject dataMap) {

@@ -42,10 +42,6 @@ public final class ConfigParam {
      */
      public int getMapInitId() { return _data.MapInitId; }
     /**
-     * gm指令开启状态
-     */
-     public int getGMCmdStatus() { return _data.GMCmdStatus; }
-    /**
      * 新角色默认头像
      */
      public int getDefaultHeadIcon() { return _data.DefaultHeadIcon; }

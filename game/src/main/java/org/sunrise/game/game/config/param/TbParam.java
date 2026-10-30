@@ -20,7 +20,6 @@ public final class TbParam extends AbstractBean {
         ItemMaxStack = _buf.get("ItemMaxStack").getAsInt();
         { com.google.gson.JsonArray _json0_ = _buf.get("TaskInitIds").getAsJsonArray(); TaskInitIds = new java.util.ArrayList<Integer>(_json0_.size()); for(JsonElement _e0 : _json0_) { int _v0;  _v0 = _e0.getAsInt();  TaskInitIds.add(_v0); }   }
         MapInitId = _buf.get("MapInitId").getAsInt();
-        GMCmdStatus = _buf.get("GMCmdStatus").getAsInt();
         DefaultHeadIcon = _buf.get("DefaultHeadIcon").getAsInt();
     }
 
@@ -45,10 +44,6 @@ public final class TbParam extends AbstractBean {
      */
     public final int MapInitId;
     /**
-     * gm指令开启状态
-     */
-    public final int GMCmdStatus;
-    /**
      * 新角色默认头像
      */
     public final int DefaultHeadIcon;
@@ -65,7 +60,6 @@ public final class TbParam extends AbstractBean {
         + "ItemMaxStack:" + ItemMaxStack + ","
         + "TaskInitIds:" + TaskInitIds + ","
         + "MapInitId:" + MapInitId + ","
-        + "GMCmdStatus:" + GMCmdStatus + ","
         + "DefaultHeadIcon:" + DefaultHeadIcon + ","
         + "}";
     }

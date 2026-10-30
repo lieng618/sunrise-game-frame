@@ -1,10 +1,13 @@
 package org.sunrise.game.game.service;
 
 import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.TypeReference;
 import org.sunrise.game.core.HotswapScanner;
 import org.sunrise.game.game.human.HumanObjectManager;
+import org.sunrise.game.game.logic.gm.GmCheatUser;
+import org.sunrise.game.game.logic.gm.GmCheatUserManager;
 import org.sunrise.game.game.logic.ConfigUtils;
 import org.sunrise.game.game.logic.system.CdkSystem;
 import org.sunrise.game.game.logic.system.GameSystemUtils;
@@ -61,6 +64,9 @@ public class GameRecvGmBackMessageService extends BaseService {
                         break;
                     case "cdkList":
                         handleCdkList(dataMap);
+                        break;
+                    case "cheatUserList":
+                        handleCheatUserList(dataMap);
                         break;
                     default:
                         LogCore.GameServer.warn("Unknown GM operation: {}", operation);
@@ -128,6 +134,18 @@ public class GameRecvGmBackMessageService extends BaseService {
             cdkSystem.syncFromGm(cdkListJson);
             LogCore.GameServer.debug("Received cdkList sync, data : {}", cdkListJson);
         }
+    }
+
+    /**
+     * 同步金手指用户
+     */
+    private void handleCheatUserList(JSONObject data) {
+        JSONArray usersJson = data.getJSONArray("users");
+        List<GmCheatUser> users = usersJson == null
+                ? List.of()
+                : usersJson.toJavaList(GmCheatUser.class);
+        GmCheatUserManager.replaceAll(users);
+        LogCore.GameServer.debug("Received cheat user list, count = {}", users.size());
     }
 
     /**
