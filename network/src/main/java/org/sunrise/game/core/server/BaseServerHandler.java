@@ -58,12 +58,10 @@ public class BaseServerHandler extends SimpleChannelInboundHandler<SocketMessage
                 channel.close();
                 return;
             }
-            connectNode = connectNodeId;
-
-            boolean exist = ConnectionManager.isConnectExist(connectNode);
-            if (!exist) {
+            boolean registered = ConnectionManager.createConnect(connectNodeId, channel);
+            if (registered) {
+                connectNode = connectNodeId;
                 String sendMsg = Utils.CLIENT_CONNECT_RESPONSE + Utils.SUCCESS + nodeId;
-                ConnectionManager.createConnect(connectNode, channel);
                 channel.writeAndFlush(new SocketMessage(MessageType.biz, sendMsg.getBytes(StandardCharsets.UTF_8)));
 
                 LogCore.BaseServer.info("recv connection success, connectNode = { {} }, remoteAddress = { {} }", connectNode, channel.remoteAddress());
@@ -73,7 +71,7 @@ public class BaseServerHandler extends SimpleChannelInboundHandler<SocketMessage
                 channel.writeAndFlush(new SocketMessage(MessageType.biz, sendMsg.getBytes(StandardCharsets.UTF_8)));
                 channel.close();
 
-                LogCore.BaseServer.info("recv connection failed, connectNode = { {} }, remoteAddress = { {} }", connectNode, channel.remoteAddress());
+                LogCore.BaseServer.info("recv connection failed, connectNode = { {} }, remoteAddress = { {} }", connectNodeId, channel.remoteAddress());
             }
 
         } else {
@@ -99,7 +97,7 @@ public class BaseServerHandler extends SimpleChannelInboundHandler<SocketMessage
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         if (connectNode != null) {
-            ConnectionManager.removeConnect(connectNode);
+            ConnectionManager.removeConnect(connectNode, ctx.channel());
         }
         LogCore.BaseServer.error("disconnected, connectNode = { {} }, remoteAddress = {}", connectNode, ctx.channel().remoteAddress());
         super.channelInactive(ctx);
