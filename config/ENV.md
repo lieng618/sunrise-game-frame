@@ -51,6 +51,7 @@ sh start/linux/server_run_allone.sh       # Linux 单进程
 $env:JDBC_PASSWORD = "your-db-pass"
 $env:ADMIN_PASSWORD = "your-gm-pass"
 $env:PLAYER_JWT_SECRET = "your-32-char-secret"
+$env:RPC_AUTH_TOKEN = "your-shared-rpc-token"
 .\start\windows\single\runallone.bat
 ```
 
@@ -58,6 +59,7 @@ $env:PLAYER_JWT_SECRET = "your-32-char-secret"
 # Linux
 export JDBC_PASSWORD=your-db-pass
 export ADMIN_PASSWORD=your-gm-pass
+export RPC_AUTH_TOKEN=your-shared-rpc-token
 sh start/linux/server_run_allone.sh
 ```
 
@@ -102,6 +104,7 @@ docker compose up -d --build
 | `ADMIN_USER` | `admin.user` | `admin` | GM 账号 |
 | `ADMIN_PASSWORD` | `admin.password` | `sunrise` | **生产必改** |
 | `PLAYER_JWT_SECRET` | `player.jwt.secret` | 见配置文件 | **生产必改** |
+| `RPC_AUTH_TOKEN` | `rpc.auth-token` | 见配置文件 | 内部 RPC 共享密钥，全部 RPC 实例必须一致；**生产必改** |
 | `MAIL_SMTP_USERNAME` | `mail.smtp.username` | — | 邮件（http/runallone） |
 | `MAIL_SMTP_PASSWORD` | `mail.smtp.password` | — | |
 | `CONFIG_PATH` | `config.path` | `../tables/json` | 策划表目录（相对 `config/`） |
