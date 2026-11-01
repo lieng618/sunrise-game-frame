@@ -173,12 +173,22 @@ public class GlobalMailService extends BaseService {
     }
 
     @RpcMethod
-    public void receiveMailAttachment(String humanId, long mailId) {
+    public void getMailAttachmentInfo(String humanId, long mailId) {
+        MailData mail = getPlayerMail(humanId, mailId);
+        if (mail != null && mail.getStatus() != 2 && mail.getAttachments() != null && !mail.getAttachments().isEmpty()) {
+            String attachmentsJson = JSON.toJSONString(mail.getAttachments());
+            returns("humanId", humanId, "mailId", mailId, "success", true, "attachmentsJson", attachmentsJson);
+        } else {
+            returns("humanId", humanId, "mailId", mailId, "success", false);
+        }
+    }
+
+    @RpcMethod
+    public void confirmMailAttachment(String humanId, long mailId) {
         MailData mail = getPlayerMail(humanId, mailId);
         if (mail != null && mail.getStatus() != 2 && mail.getAttachments() != null && !mail.getAttachments().isEmpty()) {
             mail.setStatus(2);
-            String attachmentsJson = JSON.toJSONString(mail.getAttachments());
-            returns("humanId", humanId, "mailId", mailId, "success", true, "attachmentsJson", attachmentsJson);
+            returns("humanId", humanId, "mailId", mailId, "success", true);
         } else {
             returns("humanId", humanId, "mailId", mailId, "success", false);
         }

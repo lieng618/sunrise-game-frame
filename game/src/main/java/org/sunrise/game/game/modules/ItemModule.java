@@ -125,13 +125,101 @@ public class ItemModule extends BaseModule {
      * @param notifyItemUpdate 是否需要通知变动
      */
     public void addItem(int itemId, int count, boolean notifyItemUpdate) {
-        // 1.尝试堆叠到现有格子
+        tryAddItems(Map.of(itemId, (long) count), notifyItemUpdate);
+    }
+
+    /**
+     * 检查背包是否能完整容纳一批物品。
+     *
+     * @param itemCounts itemId -> 数量，同一物品的数量需要先合并
+     * @return true 表示可以完整放入
+     */
+    public boolean canAddItems(Map<Integer, Long> itemCounts) {
+        if (itemCounts == null || itemCounts.isEmpty()) {
+            return true;
+        }
+
+        int maxStack = Tables.ConfigParam.getItemMaxStack();
+        if (maxStack <= 0) {
+            return false;
+        }
+
+        long emptySlots = Tables.ConfigParam.getItemBoxCapacity() - itemsList.size();
+        if (emptySlots < 0) {
+            return false;
+        }
+
+        for (Map.Entry<Integer, Long> entry : itemCounts.entrySet()) {
+            Integer itemId = entry.getKey();
+            Long count = entry.getValue();
+            if (itemId == null || count == null || itemId <= 0 || count < 0) {
+                return false;
+            }
+
+            long remaining = count;
+            List<ItemData> sameIdItems = itemsById.get(itemId);
+            if (sameIdItems != null) {
+                for (ItemData item : sameIdItems) {
+                    long space = maxStack - item.getCount();
+                    if (space > 0) {
+                        remaining -= Math.min(space, remaining);
+                        if (remaining == 0) {
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (remaining > 0) {
+                long slotsNeeded = remaining / maxStack + (remaining % maxStack == 0 ? 0 : 1);
+                if (slotsNeeded > emptySlots) {
+                    return false;
+                }
+                emptySlots -= slotsNeeded;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * 尝试完整添加一批物品。容量不足时不会修改背包。
+     *
+     * @param itemCounts       itemId -> 数量，同一物品的数量需要先合并
+     * @param notifyItemUpdate 是否需要通知变动
+     * @return true 表示全部添加成功
+     */
+    public boolean tryAddItems(Map<Integer, Long> itemCounts, boolean notifyItemUpdate) {
+        if (!canAddItems(itemCounts)) {
+            return false;
+        }
+        if (itemCounts == null || itemCounts.isEmpty()) {
+            return true;
+        }
+
         Set<Integer> changeIndexes = new HashSet<>();
+        for (Map.Entry<Integer, Long> entry : itemCounts.entrySet()) {
+            addItemInternal(entry.getKey(), entry.getValue(), changeIndexes);
+        }
+
+        if (!changeIndexes.isEmpty() && notifyItemUpdate) {
+            notifyItemUpdate(changeIndexes);
+        }
+        return true;
+    }
+
+    private void addItemInternal(int itemId, long count, Set<Integer> changeIndexes) {
+        if (count <= 0) {
+            return;
+        }
+
+        // 1.尝试堆叠到现有格子
         List<ItemData> sameIdItems = itemsById.get(itemId);
         if (sameIdItems != null && !sameIdItems.isEmpty()) {
             for (ItemData item : sameIdItems) {
                 int index = itemsList.indexOf(item);
-                int added = item.addCount(count);
+                int amount = (int) Math.min(count, Integer.MAX_VALUE);
+                int added = item.addCount(amount);
                 count -= added;
                 changeIndexes.add(index);
                 if (count <= 0) break; // 全部放入堆叠
@@ -140,13 +228,8 @@ public class ItemModule extends BaseModule {
 
         // 2.处理剩余数量 (循环开新格子)
         while (count > 0) {
-            // 检查背包是否已满
-            if (itemsList.size() >= Tables.ConfigParam.getItemBoxCapacity()) {
-                return;
-            }
-
             // 计算当前这个新格子能放多少 (取 剩余量 和 堆叠上限 的较小值)
-            int numToAdd = Math.min(count, Tables.ConfigParam.getItemMaxStack());
+            int numToAdd = (int) Math.min(count, Tables.ConfigParam.getItemMaxStack());
 
             // 创建新物品
             ItemData newItem = new ItemData(itemId, numToAdd);
@@ -159,12 +242,6 @@ public class ItemModule extends BaseModule {
             // 扣除已放入的数量
             count -= numToAdd;
         }
-
-        // 通知所有变动的格子
-        if (!changeIndexes.isEmpty() && notifyItemUpdate) {
-            notifyItemUpdate(changeIndexes);
-        }
-
     }
 
     /**
@@ -274,27 +351,7 @@ public class ItemModule extends BaseModule {
      * @return true 表示可以完全放入
      */
     public boolean canAddItem(int itemId, int count) {
-        if (count <= 0) return true;
-
-        int remaining = count;
-        int maxStack = Tables.ConfigParam.getItemMaxStack();
-
-        // 先扣现有堆叠的可堆叠空间
-        List<ItemData> sameIdItems = itemsById.get(itemId);
-        if (sameIdItems != null) {
-            for (ItemData item : sameIdItems) {
-                int space = maxStack - item.getCount();
-                if (space > 0) {
-                    remaining -= space;
-                    if (remaining <= 0) return true;
-                }
-            }
-        }
-
-        // 需要开新格子
-        int slotsNeeded = (int) Math.ceil((double) remaining / maxStack);
-        int emptySlots = Tables.ConfigParam.getItemBoxCapacity() - itemsList.size();
-        return slotsNeeded <= emptySlots;
+        return canAddItems(Map.of(itemId, (long) count));
     }
 
     /**

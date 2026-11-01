@@ -34,14 +34,16 @@ public class CallEnum {
     public static final int GlobalFriendService_handleFriendRequest = 14;
     /** {@code org.sunrise.game.global.service.friend.GlobalFriendService#sendFriendRequest(String,String)} */
     public static final int GlobalFriendService_sendFriendRequest = 15;
+    /** {@code org.sunrise.game.global.service.mail.GlobalMailService#confirmMailAttachment(String,long)} */
+    public static final int GlobalMailService_confirmMailAttachment = 36;
     /** {@code org.sunrise.game.global.service.mail.GlobalMailService#deleteMail(String,long)} */
     public static final int GlobalMailService_deleteMail = 16;
+    /** {@code org.sunrise.game.global.service.mail.GlobalMailService#getMailAttachmentInfo(String,long)} */
+    public static final int GlobalMailService_getMailAttachmentInfo = 37;
     /** {@code org.sunrise.game.global.service.mail.GlobalMailService#getPlayerMails(String)} */
     public static final int GlobalMailService_getPlayerMails = 17;
     /** {@code org.sunrise.game.global.service.mail.GlobalMailService#readMail(String,long)} */
     public static final int GlobalMailService_readMail = 18;
-    /** {@code org.sunrise.game.global.service.mail.GlobalMailService#receiveMailAttachment(String,long)} */
-    public static final int GlobalMailService_receiveMailAttachment = 19;
     /** {@code org.sunrise.game.global.service.mail.GlobalMailService#sendMail(String,int,String,String)} */
     public static final int GlobalMailService_sendMail = 20;
     /** {@code org.sunrise.game.global.service.mail.GlobalMailService#sendMailToAll(int,String,String)} */

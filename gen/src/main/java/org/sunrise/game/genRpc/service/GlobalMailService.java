@@ -5,7 +5,8 @@ public interface GlobalMailService {
     void sendMailToMultiple();
     void sendMailToAll();
     void getPlayerMails();
+    void getMailAttachmentInfo();
     void readMail();
-    void receiveMailAttachment();
+    void confirmMailAttachment();
     void deleteMail();
 }
