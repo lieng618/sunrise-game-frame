@@ -15,6 +15,7 @@ import org.sunrise.game.core.server.BaseServer;
 import org.sunrise.game.core.server.BaseServerManager;
 import org.sunrise.game.db.DbService;
 import org.sunrise.game.db.entity.EntityRpcServerSystem;
+import org.sunrise.game.graceful.GracefulShutdown;
 import org.sunrise.game.log.LogCore;
 import org.sunrise.game.rpc.function.RpcFunction;
 import org.sunrise.game.rpc.message.RpcClientMessageManager;
@@ -83,6 +84,7 @@ public class RpcNode {
             }
         };
         rpcServer.setMessageManager(new RpcServerMessageManager(rpcServer.getNodeId()));
+        GracefulShutdown.registerBusinessMessageManager(rpcServer.getMessageManager());
         rpcServer.setServerHandler(r -> new RpcServerHandler(rpcServer.getNodeId()));
         BaseServerManager.register(rpcServer);
         IdGenerator.init(serverId);

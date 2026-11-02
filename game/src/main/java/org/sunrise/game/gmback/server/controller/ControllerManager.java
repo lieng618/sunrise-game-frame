@@ -4,20 +4,24 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
 import org.sunrise.game.db.DbManager;
 import org.sunrise.game.db.entity.EntityServerData;
-import org.sunrise.game.graceful.OnShutdown;
 import org.sunrise.game.log.LogCore;
 import org.sunrise.game.thread.DispatchThread;
 import org.sunrise.game.utils.Utils;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.TimeUnit;
 
 public class ControllerManager {
     private static long initStartTime;
     private static final Map<String, BaseController> controllers = new HashMap<>();
     private static long lastSaveDbTime = System.currentTimeMillis(); //上次保存数据的时间
     public static ConcurrentLinkedQueue<Runnable> asyncQueue = new ConcurrentLinkedQueue<>();
+    private static final Object asyncQueueLock = new Object();
+    private static volatile DispatchThread saveThread;
+    private static volatile boolean stopping = false;
 
     public static void initController() {
         initStartTime = System.currentTimeMillis();
@@ -100,7 +104,6 @@ public class ControllerManager {
     /**
      * ControllerManager save db (同步)
      */
-    @OnShutdown(order = 60)
     public static void saveSync() {
         for (Map.Entry<String, BaseController> entry : controllers.entrySet()) {
             entry.getValue().save();
@@ -110,14 +113,26 @@ public class ControllerManager {
         }
     }
 
-    public static void startSaveDbPulse() {
-        DispatchThread checkThread = new DispatchThread(ControllerManager::pulse, "ControllerManagerPulse");
-        checkThread.setInterval(1000);
-        checkThread.start();
+    public static synchronized void startSaveDbPulse() {
+        if (saveThread != null) {
+            return;
+        }
+        saveThread = new DispatchThread(ControllerManager::pulse, "ControllerManagerPulse");
+        saveThread.setInterval(1000);
+        saveThread.start();
     }
 
     public static void addAsyncEvent(Runnable task) {
-        asyncQueue.add(task);
+        if (task == null) {
+            return;
+        }
+        synchronized (asyncQueueLock) {
+            if (stopping) {
+                LogCore.GmBackServer.warn("Controller async event rejected during shutdown");
+                return;
+            }
+            asyncQueue.add(task);
+        }
     }
 
     public static void pulse() {
@@ -129,11 +144,48 @@ public class ControllerManager {
             task.run();
         }
 
+        if (stopping) {
+            return;
+        }
+
         long cur = System.currentTimeMillis();
         // 每分钟保存一次数据库
         if (lastSaveDbTime + 60 * 1000L <= cur) {
             lastSaveDbTime = cur;
             save();
+        }
+    }
+
+    /**
+     * 冻结 Controller 异步入口，处理已入队事件后停止独立 pulse 线程。
+     * 最终 Controller 快照随后由 RPC DispatchThread 串行执行。
+     */
+    public static void prepareShutdown() {
+        DispatchThread thread;
+        CountDownLatch drained = new CountDownLatch(1);
+        synchronized (asyncQueueLock) {
+            stopping = true;
+            thread = saveThread;
+            if (thread == null) {
+                return;
+            }
+            asyncQueue.add(drained::countDown);
+        }
+
+        try {
+            if (!drained.await(5, TimeUnit.SECONDS)) {
+                thread.shutdown();
+                throw new IllegalStateException("Controller async queue did not drain within 5s");
+            }
+        } catch (InterruptedException e) {
+            thread.shutdown();
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException("Interrupted while draining Controller async queue", e);
+        }
+
+        thread.shutdown();
+        if (!thread.awaitTermination(5_000)) {
+            throw new IllegalStateException("ControllerManagerPulse did not terminate");
         }
     }
 }

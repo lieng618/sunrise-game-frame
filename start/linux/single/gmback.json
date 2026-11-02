@@ -12,5 +12,6 @@
   "out_file": "../log/gmback.log",
   "exec_interpreter": "",
   "exec_mode": "fork",
+  "kill_timeout": 240000,
   "restart": "none"
 }

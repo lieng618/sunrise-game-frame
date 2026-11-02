@@ -21,6 +21,7 @@ services:
       context: ../..
       dockerfile: Dockerfile
     command: ["java", "-Xms256m", "-Xmx1024m", "-jar", "jar/sunrise-center.jar", "config/center-config.properties"]
+    stop_grace_period: 4m
     env_file: .env
     environment:
       JDBC_URL: jdbc:mysql://mysql:3306/sunrise
@@ -38,6 +39,7 @@ services:
       context: ../..
       dockerfile: Dockerfile
     command: ["java", "-Xms256m", "-Xmx1024m", "-jar", "jar/sunrise-external.jar", "config/external-config.properties"]
+    stop_grace_period: 4m
     env_file: .env
     environment:
       JDBC_URL: jdbc:mysql://mysql:3306/sunrise
@@ -65,6 +67,7 @@ services:
       context: ../..
       dockerfile: Dockerfile
     command: ["java", "-Xms256m", "-Xmx1024m", "-jar", "jar/sunrise-game.jar", "config/game-config.properties"]
+    stop_grace_period: 4m
     env_file: .env
     environment:
       JDBC_URL: jdbc:mysql://mysql:3306/sunrise
@@ -85,6 +88,7 @@ services:
       context: ../..
       dockerfile: Dockerfile
     command: ["java", "-Xms256m", "-Xmx1024m", "-jar", "jar/sunrise-global.jar", "config/global-config.properties"]
+    stop_grace_period: 4m
     env_file: .env
     environment:
       JDBC_URL: jdbc:mysql://mysql:3306/sunrise
@@ -103,6 +107,7 @@ services:
       context: ../..
       dockerfile: Dockerfile
     command: ["java", "-Xms256m", "-Xmx1024m", "-jar", "jar/sunrise-http.jar", "config/http-config.properties"]
+    stop_grace_period: 4m
     env_file: .env
     environment:
       JDBC_URL: jdbc:mysql://mysql:3306/sunrise
@@ -123,6 +128,7 @@ services:
       context: ../..
       dockerfile: Dockerfile
     command: ["java", "-Xms256m", "-Xmx1024m", "-jar", "jar/sunrise-gmback.jar", "config/gmback-config.properties"]
+    stop_grace_period: 4m
     env_file: .env
     environment:
       JDBC_URL: jdbc:mysql://mysql:3306/sunrise

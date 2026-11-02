@@ -25,7 +25,6 @@ import org.sunrise.game.core.coder.SocketMessageDecoder;
 import org.sunrise.game.core.coder.SocketMessageEncoder;
 import org.sunrise.game.core.coder.WebSocketMessageCodec;
 import org.sunrise.game.db.DbManager;
-import org.sunrise.game.graceful.OnShutdown;
 import org.sunrise.game.log.LogCore;
 import org.sunrise.game.rpc.node.RpcNodeManager;
 import org.sunrise.game.utils.NodeTimeouts;
@@ -244,10 +243,7 @@ public class ExternalServer {
         return false;
     }
 
-    /**
-     * 优雅停机入口（静态方法，供 {@code @OnShutdown} 注解扫描）。
-     */
-    @OnShutdown(order = 70, timeoutMs = 15_000)
+    /** 关闭当前进程中的 ExternalServer（如已启动）。 */
     public static void shutdownInstance() {
         ExternalServer es = getInstance();
         if (es != null) es.onStop();

@@ -12,5 +12,6 @@
   "out_file": "../log/http.log",
   "exec_interpreter": "",
   "exec_mode": "fork",
+  "kill_timeout": 240000,
   "restart": "none"
 }

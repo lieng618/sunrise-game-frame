@@ -4,7 +4,6 @@ import org.sunrise.game.core.message.BaseMessage;
 import org.sunrise.game.core.message.MessageType;
 import org.sunrise.game.core.message.MessageUtils;
 import org.sunrise.game.core.message.SocketMessage;
-import org.sunrise.game.graceful.OnShutdown;
 import org.sunrise.game.log.LogCore;
 import org.sunrise.game.utils.Utils;
 
@@ -91,16 +90,30 @@ public class BaseServerManager {
     }
 
     /**
+     * 关闭监听入口并冻结入站队列。此时 DispatchThread 必须继续运行，
+     * 以便在原业务线程排空既有消息并执行最终快照。
+     */
+    public static void prepareShutdown() {
+        for (Map.Entry<String, BaseServer> entry : baseServers.entrySet()) {
+            try {
+                entry.getValue().prepareShutdown();
+            } catch (Exception e) {
+                throw new IllegalStateException(
+                        "BaseServer prepare shutdown failed, nodeId=" + entry.getKey(), e);
+            }
+        }
+    }
+
+    /**
      * 停机时关闭所有已注册的 BaseServer。
      */
-    @OnShutdown(order = 90)
     public static void shutdownAll() {
         for (Map.Entry<String, BaseServer> entry : baseServers.entrySet()) {
             try {
                 entry.getValue().onStop();
             } catch (Exception e) {
-                LogCore.BaseServer.error("BaseServerManager shutdownAll error, nodeId={}: {}",
-                        entry.getKey(), e.getMessage(), e);
+                throw new IllegalStateException(
+                        "BaseServerManager shutdown failed, nodeId=" + entry.getKey(), e);
             }
         }
         baseServers.clear();

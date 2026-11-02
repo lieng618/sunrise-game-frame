@@ -153,8 +153,8 @@ public class BaseClient {
     }
 
     /**
-     * 优雅停机：关闭 channel → 排空队列 → 关闭 DispatchThread → 关闭自有 EventLoopGroup。
-     * 由 {@code GracefulShutdown} 统一编排调用。
+     * 优雅停机：冻结入站队列 → 等待原 DispatchThread 完成当前 pulse →
+     * 关闭自有 EventLoopGroup。
      */
     public void onStop() {
         isShutdown = true;
@@ -166,11 +166,10 @@ public class BaseClient {
             serverChannel = null;
         }
         if (messageManager != null) {
-            // 停机前先排空队列
-            messageManager.drainRecvQueue(2000);
-            messageManager.drainSendQueue(3000);
-            messageManager.getDispatchThread().shutdown();
-            messageManager.getDispatchThread().awaitTermination(5000);
+            messageManager.freezeRecvQueue();
+            if (!messageManager.stopDispatch(5000)) {
+                throw new IllegalStateException("Client DispatchThread did not terminate, nodeId=" + nodeId);
+            }
             messageManager = null;
         }
         // 仅关闭自身创建的 EventLoopGroup

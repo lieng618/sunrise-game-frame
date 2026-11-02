@@ -4,7 +4,6 @@ import org.sunrise.game.core.message.BaseMessage;
 import org.sunrise.game.core.message.MessageType;
 import org.sunrise.game.core.message.MessageUtils;
 import org.sunrise.game.core.message.SocketMessage;
-import org.sunrise.game.graceful.OnShutdown;
 import org.sunrise.game.log.LogCore;
 import org.sunrise.game.utils.Utils;
 
@@ -96,16 +95,32 @@ public class BaseClientManager {
     }
 
     /**
+     * RPC Client 和 RPC Server 可能共享接收队列，因此必须在最终快照前
+     * 同时冻结客户端入口，避免冻结后仍向共享队列追加消息。
+     */
+    public static void prepareShutdown() {
+        for (Map.Entry<String, BaseClient> entry : baseClients.entrySet()) {
+            try {
+                if (entry.getValue().getMessageManager() != null) {
+                    entry.getValue().getMessageManager().freezeRecvQueue();
+                }
+            } catch (Exception e) {
+                throw new IllegalStateException(
+                        "BaseClient prepare shutdown failed, nodeId=" + entry.getKey(), e);
+            }
+        }
+    }
+
+    /**
      * 停机时关闭所有已注册的 BaseClient。
      */
-    @OnShutdown(order = 80)
     public static void shutdownAll() {
         for (Map.Entry<String, BaseClient> entry : baseClients.entrySet()) {
             try {
                 entry.getValue().onStop();
             } catch (Exception e) {
-                LogCore.BaseClient.error("BaseClientManager shutdownAll error, nodeId={}: {}",
-                        entry.getKey(), e.getMessage(), e);
+                throw new IllegalStateException(
+                        "BaseClientManager shutdown failed, nodeId=" + entry.getKey(), e);
             }
         }
         baseClients.clear();

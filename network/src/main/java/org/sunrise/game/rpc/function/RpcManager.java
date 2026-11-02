@@ -1,6 +1,7 @@
 package org.sunrise.game.rpc.function;
 
 import org.sunrise.game.graceful.OnShutdown;
+import org.sunrise.game.graceful.ShutdownPhase;
 import org.sunrise.game.log.LogCore;
 
 import java.util.Iterator;
@@ -110,11 +111,17 @@ public class RpcManager {
     }
 
     /**
-     * 优雅停机入口：等待 pending RPC 完成 → 强制清理超时回调。
+     * 在 DispatchThread 继续处理回调的同时等待 pending RPC 完成。
      */
-    @OnShutdown(order = 20)
+    @OnShutdown(phase = ShutdownPhase.DRAIN_RPC, timeoutMs = 10_000)
     public static void shutdownGracefully() {
         awaitPending(8000);
+    }
+
+    /**
+     * 残留 RPC 的超时回调可能修改业务状态，必须与最终快照在同一业务线程执行。
+     */
+    public static void cleanupPendingCalls() {
         shutdown();
     }
 }

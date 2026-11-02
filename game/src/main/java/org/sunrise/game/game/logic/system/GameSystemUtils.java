@@ -8,7 +8,6 @@ import org.sunrise.game.game.annotation.GameSystem;
 import org.sunrise.game.game.human.HumanObject;
 import org.sunrise.game.game.human.HumanObjectManager;
 import org.sunrise.game.game.logic.ToolsUtils;
-import org.sunrise.game.graceful.OnShutdown;
 import org.sunrise.game.log.LogCore;
 import org.sunrise.game.rpc.node.RpcNodeManager;
 import org.sunrise.game.utils.Utils;
@@ -122,7 +121,6 @@ public class GameSystemUtils {
     /**
      * GameSystem save db (同步)
      */
-    @OnShutdown(order = 50)
     public static void saveSync() {
         for (Map.Entry<String, BaseSystem> entry : systems.entrySet()) {
             entry.getValue().save();
@@ -135,7 +133,6 @@ public class GameSystemUtils {
     /**
      * 停机时强制保存全部在线玩家数据（同步）。
      */
-    @OnShutdown(order = 30, timeoutMs = 30_000)
     public static int saveAllHumansSync() {
         int saved = 0;
         int errors = 0;
@@ -152,6 +149,10 @@ public class GameSystemUtils {
         }
         LogCore.GameServer.info("saveAllHumansSync done: saved={}, errors={}, totalOnline={}",
                 saved, errors, HumanObjectManager.getOnlineCount());
+        if (errors > 0) {
+            throw new IllegalStateException(
+                    "Failed to save " + errors + " online human(s) during shutdown");
+        }
         return saved;
     }
 

@@ -12,13 +12,19 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class DbService {
 
+    private static final long EXECUTOR_DRAIN_TIMEOUT_SECONDS = 30L;
+    private static final long EXECUTOR_FORCE_TIMEOUT_SECONDS = 5L;
     private final HikariDataSource dataSource;
     private final ExecutorService dbExecutor;
+    private final AtomicInteger pendingAsyncTasks = new AtomicInteger();
+    private final Object pendingAsyncTasksMonitor = new Object();
 
     public DbService() {
         Properties properties = ConfigReader.getProp();
@@ -73,6 +79,52 @@ public class DbService {
         }
     }
 
+    private void runTrackedAsync(Supplier<CompletableFuture<?>> taskStarter) {
+        pendingAsyncTasks.incrementAndGet();
+        try {
+            taskStarter.get().whenComplete((result, error) -> {
+                try {
+                    logAsyncError(error);
+                } finally {
+                    completePendingTask();
+                }
+            });
+        } catch (RuntimeException e) {
+            completePendingTask();
+            throw e;
+        }
+    }
+
+    private void completePendingTask() {
+        if (pendingAsyncTasks.decrementAndGet() == 0) {
+            synchronized (pendingAsyncTasksMonitor) {
+                pendingAsyncTasksMonitor.notifyAll();
+            }
+        }
+    }
+
+    /**
+     * 等待当前已经提交的异步任务及其回调全部结束，但不关闭 executor。
+     */
+    public boolean awaitAsyncTasks(long timeoutMs) {
+        long deadline = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(timeoutMs);
+        synchronized (pendingAsyncTasksMonitor) {
+            while (pendingAsyncTasks.get() > 0) {
+                long remainingNanos = deadline - System.nanoTime();
+                if (remainingNanos <= 0) {
+                    return false;
+                }
+                try {
+                    TimeUnit.NANOSECONDS.timedWait(pendingAsyncTasksMonitor, remainingNanos);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    throw new IllegalStateException("Interrupted while waiting for async DB tasks", e);
+                }
+            }
+        }
+        return true;
+    }
+
     // 同步：根据id查询单条记录
     public Map<String, Object> queryById(String sql, int id) {
         try (Connection connection = getConnection();
@@ -92,9 +144,9 @@ public class DbService {
 
     // 异步：根据id查询单条记录并使用回调
     public void queryByIdAsync(Consumer<Map<String, Object>> callback, String sql, int id) {
-        CompletableFuture.supplyAsync(() -> queryById(sql, id), dbExecutor)
-                .thenAccept(callback)
-                .whenComplete((r, e) -> logAsyncError(e));
+        runTrackedAsync(() -> CompletableFuture
+                .supplyAsync(() -> queryById(sql, id), dbExecutor)
+                .thenAccept(callback));
     }
 
     // 同步：根据参数查询单条记录
@@ -118,9 +170,9 @@ public class DbService {
 
     // 异步：根据参数查询单条记录并使用回调
     public void queryGetOneByParamsAsync(Consumer<Map<String, Object>> callback, String sql, Object... params) {
-        CompletableFuture.supplyAsync(() -> queryGetOneByParams(sql, params), dbExecutor)
-                .thenAccept(callback)
-                .whenComplete((r, e) -> logAsyncError(e));
+        runTrackedAsync(() -> CompletableFuture
+                .supplyAsync(() -> queryGetOneByParams(sql, params), dbExecutor)
+                .thenAccept(callback));
     }
 
     // 同步：根据参数查询所有记录
@@ -144,9 +196,9 @@ public class DbService {
 
     // 异步：根据参数查询所有记录并使用回调
     public void queryGetAllByParamsAsync(Consumer<List<Map<String, Object>>> callback, String sql, Object... params) {
-        CompletableFuture.supplyAsync(() -> queryGetAllByParams(sql, params), dbExecutor)
-                .thenAccept(callback)
-                .whenComplete((r, e) -> logAsyncError(e));
+        runTrackedAsync(() -> CompletableFuture
+                .supplyAsync(() -> queryGetAllByParams(sql, params), dbExecutor)
+                .thenAccept(callback));
     }
 
     // 同步：查询所有记录
@@ -166,9 +218,9 @@ public class DbService {
 
     // 异步：查询所有记录并使用回调
     public void queryAllAsync(Consumer<List<Map<String, Object>>> callback, String sql) {
-        CompletableFuture.supplyAsync(() -> queryAll(sql), dbExecutor)
-                .thenAccept(callback)
-                .whenComplete((r, e) -> logAsyncError(e));
+        runTrackedAsync(() -> CompletableFuture
+                .supplyAsync(() -> queryAll(sql), dbExecutor)
+                .thenAccept(callback));
     }
 
     // 同步：查询单列
@@ -188,9 +240,9 @@ public class DbService {
 
     // 异步：查询单列并使用回调
     public void queryAllSingleColumnAsync(Consumer<List<String>> callback, String sql) {
-        CompletableFuture.supplyAsync(() -> queryAllSingleColumn(sql), dbExecutor)
-                .thenAccept(callback)
-                .whenComplete((r, e) -> logAsyncError(e));
+        runTrackedAsync(() -> CompletableFuture
+                .supplyAsync(() -> queryAllSingleColumn(sql), dbExecutor)
+                .thenAccept(callback));
     }
 
     // 同步：执行更新
@@ -213,16 +265,15 @@ public class DbService {
 
     // 异步：执行更新并使用回调
     public void executeAsync(Runnable callback, String sql, Object... params) {
-        CompletableFuture.runAsync(() -> {
+        runTrackedAsync(() -> CompletableFuture.runAsync(() -> {
             execute(sql, params);
             callback.run(); // 在执行完更新操作后，调用回调函数
-        }, dbExecutor).whenComplete((r, e) -> logAsyncError(e));
+        }, dbExecutor));
     }
 
     // 异步：执行更新
     public void executeAsync(String sql, Object... params) {
-        CompletableFuture.runAsync(() -> execute(sql, params), dbExecutor)
-                .whenComplete((r, e) -> logAsyncError(e));
+        runTrackedAsync(() -> CompletableFuture.runAsync(() -> execute(sql, params), dbExecutor));
     }
 
     // 同步：执行更新并返回生成的主键
@@ -248,24 +299,47 @@ public class DbService {
 
     // 异步：执行更新并返回生成的主键
     public void executeAsyncWithGeneratedKey(Consumer<Object> callback, String sql, Object... params) {
-        CompletableFuture.supplyAsync(() -> executeWithGeneratedKey(sql, params), dbExecutor).thenAccept(generatedKey -> {
+        runTrackedAsync(() -> CompletableFuture
+                .supplyAsync(() -> executeWithGeneratedKey(sql, params), dbExecutor)
+                .thenAccept(generatedKey -> {
             if (generatedKey instanceof BigInteger) {
                 callback.accept(((BigInteger) generatedKey).longValue());
             } else {
                 callback.accept(generatedKey);
             }
-        }).whenComplete((r, e) -> logAsyncError(e));
+        }));
     }
 
     /**
-     * 关闭数据库连接池。
+     * 先停止接收异步任务并等待队列排空，最后关闭连接池。
+     * 若任务无法在超时内结束，则保留连接池，交由停机编排判定失败。
      */
     public void close() {
+        if (dbExecutor != null) {
+            dbExecutor.shutdown();
+            boolean terminated;
+            try {
+                terminated = dbExecutor.awaitTermination(
+                        EXECUTOR_DRAIN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+                if (!terminated) {
+                    LogCore.DB.warn("DB executor drain timed out after {}s, interrupting remaining tasks",
+                            EXECUTOR_DRAIN_TIMEOUT_SECONDS);
+                    dbExecutor.shutdownNow();
+                    terminated = dbExecutor.awaitTermination(
+                            EXECUTOR_FORCE_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+                }
+            } catch (InterruptedException e) {
+                dbExecutor.shutdownNow();
+                Thread.currentThread().interrupt();
+                throw new IllegalStateException("Interrupted while draining DB executor", e);
+            }
+            if (!terminated) {
+                throw new IllegalStateException(
+                        "DB executor did not terminate; data source was left open");
+            }
+        }
         if (dataSource != null && !dataSource.isClosed()) {
             dataSource.close();
-        }
-        if (dbExecutor != null && !dbExecutor.isShutdown()) {
-            dbExecutor.shutdown();
         }
     }
 

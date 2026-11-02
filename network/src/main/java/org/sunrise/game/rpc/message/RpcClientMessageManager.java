@@ -15,6 +15,7 @@ public class RpcClientMessageManager extends ClientMessageManager {
     public void pulse() {
         try {
             pulseSender();
+            runPendingDispatchTask();
         } catch (Exception e) {
             LogCore.RpcClient.error("DispatchThread pulse, error : ", e);
         }

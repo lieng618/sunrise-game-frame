@@ -101,27 +101,32 @@ public class BaseServer {
     }
 
     /**
-     * 优雅停机：关闭 channel 拒绝新连接 → 排空消息队列 → 关闭 EventLoopGroup。
-     * 由 {@code GracefulShutdown} 统一编排调用，不应作为独立的 JVM shutdown hook 使用。
+     * 停机准备：关闭监听入口并冻结入站队列，但仍保留 DispatchThread
+     * 处理冻结前已经入队的消息。
+     */
+    public void prepareShutdown() {
+        isShutdown = true;
+        if (channel != null) {
+            LogCore.BaseServer.info("BaseServer stop accepting, nodeId = { {} }, localAddress = { {} }",
+                    nodeId, channel.localAddress());
+            channel.close();
+            channel = null;
+        }
+        if (messageManager != null) {
+            messageManager.freezeRecvQueue();
+        }
+    }
+
+    /**
+     * 关闭调度和网络资源。调用前所有业务快照必须已经在 DispatchThread 完成。
      */
     public void onStop() {
-        isShutdown = true;
-        if (startSuccess) {
-            // 1. 关闭监听 channel，拒绝新连接
-            if (channel != null) {
-                LogCore.BaseServer.info("BaseServer close, nodeId = { {} }, messageManager = { {} }, BaseServerHandler = { {} }, localAddress = { {} }",
-                        nodeId, messageManager.getClass().getSimpleName(), serverHandler.apply(nodeId).getClass().getSimpleName(), channel.localAddress());
-                channel.close();
-                channel = null;
+        prepareShutdown();
+        if (startSuccess && messageManager != null) {
+            if (!messageManager.stopDispatch(5000)) {
+                throw new IllegalStateException("DispatchThread did not terminate, nodeId=" + nodeId);
             }
-            // 2. 排空消息队列（最多等待 5 秒）
-            if (messageManager != null) {
-                messageManager.drainRecvQueue(2000);
-                messageManager.drainSendQueue(3000);
-                messageManager.getDispatchThread().shutdown();
-                messageManager.getDispatchThread().awaitTermination(5000);
-                messageManager = null;
-            }
+            messageManager = null;
         }
         shutdownEventLoopGroups();
     }

@@ -44,8 +44,11 @@ public class RpcServerMessageManager extends ServerMessageManager {
             senderProcessed = pulseSender();
             senderMs = System.currentTimeMillis() - phaseStart;
 
-            pulseListenRpcTimeout();
-            ServiceManager.pulse();
+            if (!isBusinessPaused()) {
+                pulseListenRpcTimeout();
+                ServiceManager.pulse();
+            }
+            runPendingDispatchTask();
 
             rpcRecvAfter = getRecvMsgQueue().size();
         } catch (Exception e) {

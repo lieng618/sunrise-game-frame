@@ -13,6 +13,9 @@ import org.sunrise.game.genProto.gen.TopicProto;
 import org.sunrise.game.log.LogCore;
 import org.sunrise.game.rpc.annotation.RpcService;
 import org.sunrise.game.rpc.service.BaseService;
+import org.sunrise.game.rpc.service.ServiceManager;
+
+import java.util.concurrent.TimeUnit;
 
 @RpcService
 public class GameMasterService extends BaseService {
@@ -52,6 +55,56 @@ public class GameMasterService extends BaseService {
         pulseHandlerHumanDbSave();
         // 系统心跳 每秒
         GameSystemUtils.pulsePerSec();
+    }
+
+    /**
+     * 最终快照前清空玩家协议队列和异步事件；DB 回调可能继续投递异步事件，
+     * 因此每轮结束后都等待 DB 任务并再次检查，直到业务队列稳定为空。
+     */
+    public static void prepareFinalSnapshot(long timeoutMs) {
+        BaseService service = ServiceManager.getService(GameMasterService.class.getSimpleName());
+        if (service instanceof GameMasterService gameMasterService) {
+            gameMasterService.drainBeforeSnapshot(timeoutMs);
+        }
+    }
+
+    private void drainBeforeSnapshot(long timeoutMs) {
+        long deadline = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(timeoutMs);
+        while (true) {
+            // 这些队列中的任务只能由当前业务线程串行执行。
+            pulseHandlerHumanMsg();
+            pulseHandlerHumanAsyncEvent();
+
+            long remainingNanos = deadline - System.nanoTime();
+            if (remainingNanos <= 0) {
+                break;
+            }
+
+            long waitMs = Math.max(1, TimeUnit.NANOSECONDS.toMillis(
+                    Math.min(remainingNanos, TimeUnit.MILLISECONDS.toNanos(250))));
+            // 分段等待而不是一次阻塞到超时：DB 回调可能在等待期间向
+            // AsyncEventManager 投递任务，下一轮可以及时把它们排空。
+            boolean dbIdle = DbManager.awaitIdle(waitMs);
+            // DB 为空不等于业务稳定；可能刚有回调入队，需要同时满足两个条件。
+            if (dbIdle && !hasPendingBusinessWork()) {
+                return;
+            }
+        }
+        throw new IllegalStateException(
+                "Business state did not settle within " + timeoutMs + "ms before the final snapshot");
+    }
+
+    private boolean hasPendingBusinessWork() {
+        // 当前最终快照只关心玩家消息和玩家异步事件这两类业务队列。
+        if (!AsyncEventManager.asyncQueue.isEmpty()) {
+            return true;
+        }
+        for (HumanObject humanObject : HumanObjectManager.getHumanObjects()) {
+            if (!humanObject.getMsgQueue().isEmpty()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
