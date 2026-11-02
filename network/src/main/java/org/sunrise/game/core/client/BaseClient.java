@@ -26,7 +26,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Data
 public class BaseClient {
     private String nodeId = this.getClass().getSimpleName() + "@" + System.currentTimeMillis();
-    private Channel serverChannel;
+    private volatile Channel serverChannel;
     private String serverNodeId;
     private volatile Boolean connectStatus = false;
     private BaseMessageManager messageManager;
@@ -38,6 +38,8 @@ public class BaseClient {
     private AtomicBoolean connectFinish = new AtomicBoolean(false);
     /** 是否自己创建了 group（需要在 onStop 时关闭），共享 group 不关闭 */
     private boolean groupOwned = true;
+    /** 是否拥有消息管理器；RpcNode 的多个连接共享节点级消息管理器 */
+    private boolean messageManagerOwned = true;
 
     public BaseClient() {
         this.messageManager = new ClientMessageManager(nodeId);
@@ -116,6 +118,11 @@ public class BaseClient {
         b.connect(ip, port).addListener((ChannelFutureListener) future -> {
             if (future.isSuccess()) {
                 this.serverChannel = future.channel();
+                if (isShutdown) {
+                    this.serverChannel = null;
+                    future.channel().close();
+                    return;
+                }
                 onStart();
             } else {
                 LogCore.BaseClient.error("server connection failed: ip = {}, port = {}", ip, port);
@@ -153,29 +160,57 @@ public class BaseClient {
     }
 
     /**
+     * 使用节点级共享消息管理器。
+     *
+     * <p>共享管理器只能由节点所有者停止，关闭单条连接时不能冻结或停止它。</p>
+     */
+    public void useSharedMessageManager(BaseMessageManager sharedMessageManager) {
+        if (sharedMessageManager == null) {
+            throw new IllegalArgumentException("sharedMessageManager must not be null");
+        }
+        this.messageManager = sharedMessageManager;
+        this.messageManagerOwned = false;
+    }
+
+    /**
+     * 释放单条连接拥有的资源。共享 group 和共享消息管理器不会在此关闭。
+     */
+    public void disconnect() {
+        isShutdown = true;
+        connectStatus = false;
+
+        Channel channel = serverChannel;
+        serverChannel = null;
+        if (channel != null) {
+            channel.close();
+        }
+
+        if (groupOwned && group != null) {
+            EventLoopGroup ownedGroup = group;
+            group = null;
+            boolean inEventLoop = ownedGroup.next().inEventLoop();
+            var shutdownFuture = ownedGroup.shutdownGracefully();
+            if (!inEventLoop) {
+                shutdownFuture.awaitUninterruptibly(5000);
+            }
+        }
+    }
+
+    /**
      * 优雅停机：冻结入站队列 → 等待原 DispatchThread 完成当前 pulse →
      * 关闭自有 EventLoopGroup。
      */
     public void onStop() {
         isShutdown = true;
-        if (serverChannel != null) {
-            connectStatus = false;
-            LogCore.BaseClient.info("BaseClient close, nodeId = { {} }, remoteAddress = { {} }",
-                    nodeId, serverChannel.remoteAddress());
-            serverChannel.close();
-            serverChannel = null;
-        }
-        if (messageManager != null) {
-            messageManager.freezeRecvQueue();
-            if (!messageManager.stopDispatch(5000)) {
+        disconnect();
+
+        BaseMessageManager manager = messageManager;
+        messageManager = null;
+        if (manager != null && messageManagerOwned) {
+            manager.freezeRecvQueue();
+            if (!manager.stopDispatch(5000)) {
                 throw new IllegalStateException("Client DispatchThread did not terminate, nodeId=" + nodeId);
             }
-            messageManager = null;
-        }
-        // 仅关闭自身创建的 EventLoopGroup
-        if (groupOwned && group != null) {
-            group.shutdownGracefully().awaitUninterruptibly(5000);
-            group = null;
         }
     }
 }

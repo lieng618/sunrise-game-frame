@@ -3,7 +3,6 @@ package org.sunrise.game.rpc.node;
 import ch.qos.logback.classic.Level;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
-import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.EventLoopGroup;
 import lombok.Getter;
 import lombok.Setter;
@@ -47,8 +46,8 @@ public class RpcNode {
     private int port; //绑定端口
     private DbService dbService = new DbService();
 
-    private EventLoopGroup group = null;
-    private Bootstrap b = null;
+    /** 当前 RPC 节点内所有 peer BaseClient 共享的事件循环。 */
+    private EventLoopGroup group;
     private BaseServer rpcServer;
     private final Map<Integer, BaseClient> connectToOthers = new ConcurrentHashMap<>();
     private RpcClientMessageManager fromOtherMessageManager = null;
@@ -71,12 +70,17 @@ public class RpcNode {
 
             @Override
             public void onStop() {
-                if (isStartSuccess()) {
-                    stopLeaseHeartbeat();
-                    try {
+                boolean started = isStartSuccess();
+                try {
+                    if (started) {
+                        stopLeaseHeartbeat();
                         super.onStop();
+                    }
+                } finally {
+                    try {
+                        shutdownSharedResources();
                     } finally {
-                        if (dbService != null) {
+                        if (started && dbService != null) {
                             releaseServerId();
                         }
                     }
@@ -87,6 +91,7 @@ public class RpcNode {
         GracefulShutdown.registerBusinessMessageManager(rpcServer.getMessageManager());
         rpcServer.setServerHandler(r -> new RpcServerHandler(rpcServer.getNodeId()));
         BaseServerManager.register(rpcServer);
+        this.group = Utils.createEventLoopGroup(1);
         IdGenerator.init(serverId);
         LogCore.setLogLevel("BasePulse", Level.INFO);
     }
@@ -222,6 +227,7 @@ public class RpcNode {
         }
 
         BaseClientManager.remove(removeClient.getNodeId());
+        removeClient.disconnect();
     }
 
     public void connectOther(BaseMessage message) {
@@ -239,35 +245,65 @@ public class RpcNode {
         if (otherServerId == null || ip == null || port == null) {
             return;
         }
-        BaseClient baseClient = connectToOthers.get(otherServerId);
-        if (baseClient != null) {
-            return;
-        }
-        var connectToOther = new BaseClient(this.getClass().getSimpleName() + serverId + "-ConnectTo-RpcNode" + otherServerId, group, b) {
-            @Override
-            public void onStart() {
-                super.onStart();
+        BaseClient connectToOther;
+        synchronized (connectLock) {
+            if (connectToOthers.containsKey(otherServerId)) {
+                return;
             }
+            connectToOther = new BaseClient(
+                    this.getClass().getSimpleName() + serverId + "-ConnectTo-RpcNode" + otherServerId,
+                    group,
+                    null) {
+                @Override
+                public void onStart() {
+                    super.onStart();
+                }
 
-            @Override
-            public void onFail() {
-                super.onFail();
-                otherOffline(otherServerId);
+                @Override
+                public void onFail() {
+                    super.onFail();
+                    otherOffline(otherServerId);
+                }
+            };
+
+            if (fromOtherMessageManager == null) {
+                // 同一 RpcNode 的所有 peer 客户端共享一个消息管理器和分发线程。
+                fromOtherMessageManager = new RpcClientMessageManager("");
+                // rpc客户端接收队列，设置为rpc服务器的接收队列，所有从远端rpc服务器发给rpc客户端的数据，也都会由当前节点的rpc服务器处理
+                fromOtherMessageManager.setRecvMsgQueue(rpcServer.getMessageManager().getRecvMsgQueue());
             }
-        };
-
-        if (fromOtherMessageManager == null) {
-            // 与rpc通信的客户端共用一个消息管理器
-            fromOtherMessageManager = new RpcClientMessageManager("");
-            // rpc客户端接收队列，设置为rpc服务器的接收队列，所有从远端rpc服务器发给rpc客户端的数据，也都会由当前节点的rpc服务器处理
-            fromOtherMessageManager.setRecvMsgQueue(rpcServer.getMessageManager().getRecvMsgQueue());
+            connectToOther.useSharedMessageManager(fromOtherMessageManager);
+            connectToOther.setClientHandler(r -> new ToOtherRpcNodeHandler(connectToOther.getNodeId()));
+            BaseClientManager.register(connectToOther);
+            connectToOthers.put(otherServerId, connectToOther);
         }
-        connectToOther.setMessageManager(fromOtherMessageManager);
-        connectToOther.setClientHandler(r -> new ToOtherRpcNodeHandler(connectToOther.getNodeId()));
-        BaseClientManager.register(connectToOther);
-
-        connectToOthers.put(otherServerId, connectToOther);
         connectToOther.connect(ip, port);
+    }
+
+    /**
+     * 关闭节点拥有的共享资源。单条 peer 连接断开时不能调用此方法。
+     */
+    private void shutdownSharedResources() {
+        synchronized (connectLock) {
+            RpcClientMessageManager manager = fromOtherMessageManager;
+            fromOtherMessageManager = null;
+
+            EventLoopGroup sharedGroup = group;
+            group = null;
+            try {
+                if (manager != null) {
+                    manager.freezeRecvQueue();
+                    if (!manager.stopDispatch(5000)) {
+                        throw new IllegalStateException(
+                                "RPC client DispatchThread did not terminate, nodeId=" + getNodeId());
+                    }
+                }
+            } finally {
+                if (sharedGroup != null) {
+                    sharedGroup.shutdownGracefully().awaitUninterruptibly(5000);
+                }
+            }
+        }
     }
 
     public void connectMaster() {

@@ -58,7 +58,10 @@ public class BaseClientHandler extends SimpleChannelInboundHandler<SocketMessage
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         super.channelInactive(ctx);
-        BaseClientManager.getBaseClient(nodeId).setServerChannel(null);
+        BaseClient baseClient = BaseClientManager.getBaseClient(nodeId);
+        if (baseClient != null) {
+            baseClient.setServerChannel(null);
+        }
         LogCore.BaseClient.error("server disconnected, cur NodeId = { {} }, remoteAddress = {}", nodeId, ctx.channel().remoteAddress());
     }
 
