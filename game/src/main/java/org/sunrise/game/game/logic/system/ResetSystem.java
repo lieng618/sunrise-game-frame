@@ -81,24 +81,32 @@ public class ResetSystem extends BaseSystem {
     }
 
     private void tryRefreshDaily(HumanObject humanObject) {
+        refreshDailyIfNeeded(humanObject, ToolsUtils.getTodayZeroTimeMillis());
+    }
+
+    void refreshDailyIfNeeded(HumanObject humanObject, long currentPeriodStartTime) {
         DataModule dataModule = humanObject.getModule(DataModule.class);
-        if (dataModule.getLastDailyRefreshTime() >= nextDailyRefreshTime) {
+        if (dataModule.getLastDailyRefreshTime() >= currentPeriodStartTime) {
             return;
         }
         for (Map.Entry<String, BaseModule> entry : humanObject.getModules().entrySet()) {
             entry.getValue().dailyReset();
         }
-        dataModule.setLastDailyRefreshTime(nextDailyRefreshTime);
+        dataModule.setLastDailyRefreshTime(currentPeriodStartTime);
     }
 
     private void tryRefreshWeek(HumanObject humanObject) {
+        refreshWeekIfNeeded(humanObject, ToolsUtils.getWeekZeroTimeMillis());
+    }
+
+    void refreshWeekIfNeeded(HumanObject humanObject, long currentPeriodStartTime) {
         DataModule dataModule = humanObject.getModule(DataModule.class);
-        if (dataModule.getLastWeekRefreshTime() >= nextWeekRefreshTime) {
+        if (dataModule.getLastWeekRefreshTime() >= currentPeriodStartTime) {
             return;
         }
         for (Map.Entry<String, BaseModule> entry : humanObject.getModules().entrySet()) {
             entry.getValue().weekReset();
         }
-        dataModule.setLastWeekRefreshTime(nextWeekRefreshTime);
+        dataModule.setLastWeekRefreshTime(currentPeriodStartTime);
     }
 }

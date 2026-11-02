@@ -23,9 +23,9 @@ public class DataModule extends BaseModule {
     private int fightPower;  //战斗力
     private int sex;  //性别
     @Setter
-    private long lastDailyRefreshTime; //上次跨天刷新的时间
+    private long lastDailyRefreshTime; //上次已完成每日刷新的周期起点
     @Setter
-    private long lastWeekRefreshTime; //上次跨周刷新的时间
+    private long lastWeekRefreshTime; //上次已完成每周刷新的周期起点
 
     public DataModule(String humanId) {
         super(humanId);
