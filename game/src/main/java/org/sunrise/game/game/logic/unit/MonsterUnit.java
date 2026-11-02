@@ -5,7 +5,7 @@ import lombok.Setter;
 import org.sunrise.game.game.config.Tables;
 import org.sunrise.game.game.config.monster.TbMonster;
 import org.sunrise.game.game.logic.attribute.AttributeContainer;
-import org.sunrise.game.game.logic.drop.DropSystem;
+import org.sunrise.game.game.logic.system.DropSystem;
 import org.sunrise.game.game.logic.map.GameMap;
 import org.sunrise.game.game.logic.monster.MonsterAi;
 import org.sunrise.game.game.logic.monster.MonsterSpawner;

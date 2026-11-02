@@ -1,11 +1,9 @@
-package org.sunrise.game.game.logic.drop;
+package org.sunrise.game.game.logic.system;
 
 import org.sunrise.game.game.annotation.GameSystem;
+import org.sunrise.game.game.logic.drop.DropCalculator;
 import org.sunrise.game.game.logic.drop.DropCalculator.DropResult;
 import org.sunrise.game.game.logic.map.GameMap;
-import org.sunrise.game.game.logic.system.BaseSystem;
-import org.sunrise.game.game.logic.system.GameSystemUtils;
-import org.sunrise.game.game.logic.system.MapSystem;
 import org.sunrise.game.game.logic.unit.DropItemUnit;
 import org.sunrise.game.log.LogCore;
 
