@@ -6,20 +6,23 @@ import org.sunrise.game.game.logic.mail.MailData;
 import org.sunrise.game.genProto.gen.MailProto;
 import org.sunrise.game.genProto.gen.TopicProto;
 import org.sunrise.game.genRpc.gen.CallEnum;
+import org.sunrise.game.log.LogCore;
 import org.sunrise.game.rpc.annotation.RpcMethod;
 import org.sunrise.game.rpc.annotation.RpcService;
 import org.sunrise.game.rpc.function.ErrorType;
 import org.sunrise.game.rpc.function.RpcFunction;
+import org.sunrise.game.rpc.function.RpcResult;
 import org.sunrise.game.rpc.service.BaseService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @RpcService
 public class GlobalMailService extends BaseService {
+    private static final int PLAYER_PAGE_SIZE = 1_000;
+
     private Map<String, List<MailData>> playerMails = new HashMap<>();
 
     public GlobalMailService(String nodeId) {
@@ -114,18 +117,119 @@ public class GlobalMailService extends BaseService {
 
     @RpcMethod
     public void sendMailToAll(int templateId, String attachmentsJson, String senderName) {
+        LogCore.GlobalServer.info(
+                "global mail broadcast started, templateId = {}, pageSize = {}",
+                templateId,
+                PLAYER_PAGE_SIZE);
+        requestPlayerPage(null, templateId, attachmentsJson, senderName, 1, 0);
+    }
+
+    private void requestPlayerPage(
+            String afterHumanId,
+            int templateId,
+            String attachmentsJson,
+            String senderName,
+            int pageNumber,
+            int sentCount) {
         RpcFunction rpcFunction = RpcFunction.newInstance();
-        rpcFunction.call(CallEnum.GlobalPlayerInfoService_getAllPlayerIds);
+        boolean called = rpcFunction.call(
+                CallEnum.GlobalPlayerInfoService_getAllPlayerIds,
+                afterHumanId,
+                PLAYER_PAGE_SIZE);
+        if (!called) {
+            LogCore.GlobalServer.error(
+                    "global mail broadcast failed: player page RPC unavailable, templateId = {}, cursor = {}",
+                    templateId,
+                    afterHumanId);
+            return;
+        }
+
         rpcFunction.listenResult(rpcResult -> {
             if (rpcResult.getResult() != ErrorType.SUCCESS) {
+                LogCore.GlobalServer.error(
+                        "global mail broadcast failed: player page RPC error, templateId = {}, page = {}, result = {}, cursor = {}",
+                        templateId,
+                        pageNumber,
+                        rpcResult.getResult(),
+                        afterHumanId);
                 return;
             }
-            @SuppressWarnings("unchecked")
-            Set<String> humanIds = (Set<String>) rpcResult.getData("humanIds");
+
+            List<String> humanIds;
+            try {
+                humanIds = extractHumanIds(rpcResult);
+            } catch (IllegalArgumentException e) {
+                LogCore.GlobalServer.error(
+                        "global mail broadcast failed: invalid player page, templateId = {}, page = {}, cursor = {}, reason = {}",
+                        templateId,
+                        pageNumber,
+                        afterHumanId,
+                        e.getMessage());
+                return;
+            }
+
             for (String humanId : humanIds) {
                 sendMail(humanId, templateId, attachmentsJson, senderName);
             }
+
+            int totalSent = sentCount + humanIds.size();
+            boolean hasMore = Boolean.TRUE.equals(rpcResult.getData("hasMore"));
+            String nextCursor = rpcResult.getData("nextCursor") instanceof String cursor ? cursor : null;
+            LogCore.GlobalServer.info(
+                    "global mail broadcast progress, templateId = {}, page = {}, pageCount = {}, sent = {}, cursor = {}, hasMore = {}",
+                    templateId,
+                    pageNumber,
+                    humanIds.size(),
+                    totalSent,
+                    nextCursor,
+                    hasMore);
+
+            if (!hasMore) {
+                LogCore.GlobalServer.info(
+                        "global mail broadcast completed, templateId = {}, sent = {}, pages = {}",
+                        templateId,
+                        totalSent,
+                        pageNumber);
+                return;
+            }
+            if (humanIds.isEmpty() || nextCursor == null || nextCursor.equals(afterHumanId)) {
+                LogCore.GlobalServer.error(
+                        "global mail broadcast stopped: invalid pagination cursor, templateId = {}, page = {}, sent = {}, cursor = {}",
+                        templateId,
+                        pageNumber,
+                        totalSent,
+                        nextCursor);
+                return;
+            }
+
+            requestPlayerPage(
+                    nextCursor,
+                    templateId,
+                    attachmentsJson,
+                    senderName,
+                    pageNumber + 1,
+                    totalSent);
         });
+    }
+
+    static List<String> extractHumanIds(RpcResult rpcResult) {
+        Object rawHumanIds = rpcResult.getData("humanIds");
+        if (rawHumanIds == null) {
+            return List.of();
+        }
+        if (!(rawHumanIds instanceof List<?> values)) {
+            throw new IllegalArgumentException(
+                    "humanIds must be a List, actual type = " + rawHumanIds.getClass().getName());
+        }
+
+        List<String> humanIds = new ArrayList<>(values.size());
+        for (Object value : values) {
+            if (!(value instanceof String humanId)) {
+                throw new IllegalArgumentException("humanIds contains a non-String value");
+            }
+            humanIds.add(humanId);
+        }
+        return humanIds;
     }
 
     @RpcMethod
