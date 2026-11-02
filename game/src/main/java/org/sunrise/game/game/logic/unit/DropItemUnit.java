@@ -30,7 +30,7 @@ public class DropItemUnit implements GameUnit {
     private String protectorHumanId;
 
     public DropItemUnit(int itemId, int count) {
-        this.unitId = String.valueOf(UnitUtils.genDropUnitId());
+        this.unitId = String.valueOf(UnitUtils.genUnitId());
         this.itemId = itemId;
         this.count = count;
         this.createTime = System.currentTimeMillis();

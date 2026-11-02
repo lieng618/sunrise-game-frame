@@ -14,20 +14,13 @@ import java.util.Map;
 
 public final class UnitUtils {
     public static final int ATTRIBUTE_SCALE = 1000;
-    private static long unitId = 0L;
-    private static long dropUnitId = 0L;
+    private static long nextUnitId = 0L;
 
     private UnitUtils() {
     }
 
-    public static long genMonsterUnitId() {
-        unitId++;
-        return unitId;
-    }
-
-    public static long genDropUnitId() {
-        dropUnitId++;
-        return dropUnitId;
+    public static long genUnitId() {
+        return ++nextUnitId;
     }
 
     public static void initPlayerDefaultAttributes(AttributeContainer container) {

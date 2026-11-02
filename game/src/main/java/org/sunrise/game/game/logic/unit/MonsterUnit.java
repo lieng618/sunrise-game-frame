@@ -37,7 +37,7 @@ public class MonsterUnit implements GameUnit {
 
     public MonsterUnit(int monsterId) {
         this.monsterId = monsterId;
-        this.unitId = String.valueOf(UnitUtils.genMonsterUnitId());
+        this.unitId = String.valueOf(UnitUtils.genUnitId());
     }
 
     /**
