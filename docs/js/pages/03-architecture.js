@@ -27,7 +27,7 @@ registerPage('architecture', '架构总览', '多进程架构、服务职责、�
     <div class="card">
         <div class="card-icon">🌍</div>
         <div class="card-title">GlobalServer</div>
-        <div class="card-desc">跨逻辑服共享服务，目前包含聊天、好友、邮件、排行榜与玩家简要信息。状态当前保存在进程内存并周期性写入 server_data；多实例部署必须按玩家分片或保持单写者，不能让同一份状态被多个实例随机读写。</div>
+        <div class="card-desc">跨逻辑服共享服务，目前包含聊天、好友、邮件、排行榜与玩家简要信息。状态当前保存在进程内存并周期性写入 server_data；多实例部署时，必须按玩家或状态键分片，确保每份状态只有一个写入实例，不能由多个实例随机读写。</div>
     </div>
     <div class="card">
         <div class="card-icon">🔗</div>

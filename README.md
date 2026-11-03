@@ -27,10 +27,10 @@ docs: 补充部署说明</code></pre>
 
 <h2>核心特性</h2>
 
-- 分布式多节点架构，不同服务可组合拆分为多进程或单进程部署；RPC 节点可动态发现，有状态业务需保持单写者或分片
+- 分布式多节点架构，不同服务可组合拆分为多进程或单进程部署；RPC 节点可动态发现，有状态业务需保证每份状态只有一个写入方，多实例部署时按玩家或状态键分片
 - RPC 框架，支持随机/广播/定向三种调用模式，含参数类型转换、回调、超时与内部握手认证；中心服可配置连接策略，内置拓扑可视化面板
 - 不依赖 Redis / ZooKeeper / MQ，仅需 JDK、Maven 与 MySQL
-- 同一套业务代码可通过 `server_id` 与部署组合支持通服和分区模式；有状态服务仍应保持单写者或按玩家分片
+- 同一套业务代码可通过 `server_id` 与部署组合支持通服和分区模式；有状态服务必须保证同一份状态只由一个实例写入，多实例部署时应按玩家或状态键分片，确保每个分片只有一个写入方
 - 每个 RPC 节点的业务消息由独立 `DispatchThread` 串行消费，玩家状态无需额外业务锁；Netty I/O、HTTP、数据库执行器仍在各自线程中运行
 - 对外服同时支持 TCP / WebSocket / KCP 三种协议
 - 完善的 GM 后台管理，实现节点监控、策划表格与代码热更、运营服务、权限管理等
@@ -119,7 +119,7 @@ npm run dev</code></pre>
     </div>
     <div class="card">
     <h4>GlobalServer</h4>
-        <div class="card-desc">全局跨服服务，目前包含聊天（GlobalChatService）、好友（GlobalFriendService）、邮件（GlobalMailService）、玩家简要信息（GlobalPlayerInfoService）与排行榜（GlobalRankService）。上述服务当前把状态保存在进程内存并周期性写入 server_data，因此状态型服务应保持单写者或按玩家分片。</div>
+        <div class="card-desc">全局跨服服务，目前包含聊天（GlobalChatService）、好友（GlobalFriendService）、邮件（GlobalMailService）、玩家简要信息（GlobalPlayerInfoService）与排行榜（GlobalRankService）。上述服务当前把状态保存在进程内存并周期性写入 server_data；多实例部署时，必须按玩家或状态键分片，确保每份状态只有一个写入实例，不能由多个实例随机读写。</div>
     </div>
     <div class="card">
     <h4>HttpServer</h4>

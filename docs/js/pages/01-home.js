@@ -18,10 +18,10 @@ registerPage('home', '项目概览', 'Sunrise Game Frame 分布式游戏服务�
 
 <h2>核心特性</h2>
 <div class="feature-grid">
-    <div class="feature-item"><span class="feature-icon">🏗️</span><span class="feature-text">分布式多节点架构，可组合为多进程或单进程；RPC 节点可动态发现，有状态服务需单写者或分片</span></div>
+    <div class="feature-item"><span class="feature-icon">🏗️</span><span class="feature-text">分布式多节点架构，可组合为多进程或单进程；RPC 节点可动态发现，有状态服务需保证每份状态只有一个写入方，多实例部署时按玩家或状态键分片</span></div>
     <div class="feature-item"><span class="feature-icon">📡</span><span class="feature-text">RPC 支持随机/广播/定向调用、参数类型转换、回调、超时与内部握手认证；中心服可配置连接策略</span></div>
     <div class="feature-item"><span class="feature-icon">📭</span><span class="feature-text">无需 Redis / ZooKeeper / MQ，仅需 JDK、Maven 与 MySQL</span></div>
-    <div class="feature-item"><span class="feature-icon">🚀</span><span class="feature-text">通过 server_id 与部署组合支持通服和分区模式；有状态 Global 服务需单写者或分片</span></div>
+    <div class="feature-item"><span class="feature-icon">🚀</span><span class="feature-text">通过 server_id 与部署组合支持通服和分区模式；有状态 Global 服务需保证每份状态只有一个写入方，多实例部署时按玩家或状态键分片</span></div>
     <div class="feature-item"><span class="feature-icon">🔒</span><span class="feature-text">每个 RPC 节点的业务消息由 DispatchThread 串行消费；网络 I/O、HTTP 与 DB 执行器独立运行</span></div>
     <div class="feature-item"><span class="feature-icon">🔌</span><span class="feature-text">对外服同时支持TCP / WebSocket / KCP 三种协议</span></div>
     <div class="feature-item"><span class="feature-icon">🛠️</span><span class="feature-text">GM 后台（gmback API + gmback-ui SPA）：节点监控、配置/代码热更、运营工具等</span></div>
