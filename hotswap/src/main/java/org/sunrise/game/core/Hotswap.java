@@ -15,31 +15,23 @@ public final class Hotswap {
     private static Instrumentation inst = null;
 
     public static void premain(String agentArgs, Instrumentation i) {
-        inst = i;
+        install(i);
     }
 
-    public static void reloadClasses(Map<String, HotswapScanner.JarEntryInfo> reloadEntries, String jarPath) throws IOException, ClassNotFoundException, UnmodifiableClassException {
-        if (inst == null) {
-            throw new IllegalStateException("hotswap agent 未加载，请以 -javaagent:hotswap-agent.jar 启动进程");
-        }
-        try (JarFile jarFile = new JarFile(jarPath)) {
-            Map<Class<?>, byte[]> reloadClassBytes = new HashMap<>();
+    public static synchronized void install(Instrumentation instrumentation) {
+        inst = instrumentation;
+    }
 
-            for (Map.Entry<String, HotswapScanner.JarEntryInfo> it : reloadEntries.entrySet()) {
-                try (InputStream stream = jarFile.getInputStream(jarFile.getEntry(it.getKey()))) {
-                    // 不触发 static 初始化，目标类本就应已加载，redefine 只替换字节码
-                    Class<?> clazz = Class.forName(it.getValue().getClazzName(), false, Hotswap.class.getClassLoader());
-                    if (!inst.isModifiableClass(clazz)) {
-                        throw new UnmodifiableClassException("类不可修改: " + clazz.getName());
-                    }
-                    reloadClassBytes.put(clazz, stream.readAllBytes());
-                }
-            }
-            reloadClasses(reloadClassBytes);
-        }
+    public static Instrumentation getInstrumentation() {
+        return inst;
+    }
+
+    public static boolean isAgentLoaded() {
+        return inst != null;
     }
 
     public static void reload(Class<?> cls, File file) throws IOException, ClassNotFoundException, UnmodifiableClassException {
+        requireInstrumentation();
         byte[] code = loadBytes(cls, file);
         if (code == null) {
             throw new IOException("Unknown File");
@@ -51,6 +43,7 @@ public final class Hotswap {
     }
 
     public static void reloadClasses(Map<Class<?>, byte[]> classBytes) throws ClassNotFoundException, UnmodifiableClassException {
+        requireInstrumentation();
         if (classBytes.isEmpty()) return;
 
         List<ClassDefinition> clazzDefs = new ArrayList<>(classBytes.size());
@@ -64,6 +57,25 @@ public final class Hotswap {
             defs[i] = clazzDefs.get(i);
         }
         inst.redefineClasses(defs);
+    }
+
+    /**
+     * 重定义调用方已经从 Instrumentation 找到的 Class 实例和补丁字节码。
+     * 不再通过名称和猜测的 ClassLoader 二次加载，避免重定义到错误类身份。
+     */
+    public static void redefine(ClassDefinition[] definitions)
+            throws ClassNotFoundException, UnmodifiableClassException {
+        requireInstrumentation();
+        if (definitions == null || definitions.length == 0) {
+            return;
+        }
+        inst.redefineClasses(definitions);
+    }
+
+    private static void requireInstrumentation() {
+        if (inst == null) {
+            throw new IllegalStateException("hotswap agent 未加载，请以 -javaagent:hotswap-agent.jar 启动进程");
+        }
     }
 
     private static byte[] loadBytes(Class<?> cls, File file) throws IOException, ClassNotFoundException {

@@ -1,11 +1,13 @@
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 function init() {
-    const savedTheme = localStorage.getItem('theme') || 'light';
+    const savedTheme = readStorage('theme') || 'light';
     document.documentElement.setAttribute('data-theme', savedTheme);
 
-    window.addEventListener('hashchange', handleRoute);
+    // 先渲染正文，避免 file:// 或隐私模式下主题存储异常导致整页空白。
     handleRoute();
+
+    window.addEventListener('hashchange', handleRoute);
 
     document.getElementById('themeToggle').addEventListener('click', toggleTheme);
     document.getElementById('sidebarToggle').addEventListener('click', toggleSidebar);
@@ -173,12 +175,28 @@ function toggleTheme() {
     const current = document.documentElement.getAttribute('data-theme');
     const next = current === 'dark' ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', next);
-    localStorage.setItem('theme', next);
+    writeStorage('theme', next);
 
     const hljsTheme = document.getElementById('hljs-theme');
     hljsTheme.href = next === 'dark'
         ? 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css'
         : 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-light.min.css';
+}
+
+function readStorage(key) {
+    try {
+        return window.localStorage.getItem(key);
+    } catch {
+        return null;
+    }
+}
+
+function writeStorage(key, value) {
+    try {
+        window.localStorage.setItem(key, value);
+    } catch {
+        // file://、禁 Cookie 或隐私策略下仍允许文档正常浏览和切换当前会话主题。
+    }
 }
 
 function toggleSidebar() {

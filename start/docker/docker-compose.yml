@@ -20,7 +20,7 @@ services:
     build:
       context: ../..
       dockerfile: Dockerfile
-    command: ["java", "-Xms256m", "-Xmx1024m", "-jar", "jar/sunrise-center.jar", "config/center-config.properties"]
+    command: ["java", "-Xms256m", "-Xmx1024m", "-javaagent:jar/hotswap-agent.jar", "-jar", "jar/sunrise-center.jar", "config/center-config.properties"]
     stop_grace_period: 4m
     env_file: .env
     environment:
@@ -33,12 +33,13 @@ services:
       - "8088:8088"
     volumes:
       - ../../config/center-config.properties:/app/config/center-config.properties:ro
+      - hotfix_data:/app/hotfix:ro
 
   external:
     build:
       context: ../..
       dockerfile: Dockerfile
-    command: ["java", "-Xms256m", "-Xmx1024m", "-jar", "jar/sunrise-external.jar", "config/external-config.properties"]
+    command: ["java", "-Xms256m", "-Xmx1024m", "-javaagent:jar/hotswap-agent.jar", "-jar", "jar/sunrise-external.jar", "config/external-config.properties"]
     stop_grace_period: 4m
     env_file: .env
     environment:
@@ -61,12 +62,13 @@ services:
       - "10002:10002/udp"
     volumes:
       - ../../config/external-config.properties:/app/config/external-config.properties:ro
+      - hotfix_data:/app/hotfix:ro
 
   game:
     build:
       context: ../..
       dockerfile: Dockerfile
-    command: ["java", "-Xms256m", "-Xmx1024m", "-jar", "jar/sunrise-game.jar", "config/game-config.properties"]
+    command: ["java", "-Xms256m", "-Xmx1024m", "-javaagent:jar/hotswap-agent.jar", "-jar", "jar/sunrise-game.jar", "config/game-config.properties"]
     stop_grace_period: 4m
     env_file: .env
     environment:
@@ -82,12 +84,13 @@ services:
         condition: service_started
     volumes:
       - ../../config/game-config.properties:/app/config/game-config.properties:ro
+      - hotfix_data:/app/hotfix:ro
 
   global:
     build:
       context: ../..
       dockerfile: Dockerfile
-    command: ["java", "-Xms256m", "-Xmx1024m", "-jar", "jar/sunrise-global.jar", "config/global-config.properties"]
+    command: ["java", "-Xms256m", "-Xmx1024m", "-javaagent:jar/hotswap-agent.jar", "-jar", "jar/sunrise-global.jar", "config/global-config.properties"]
     stop_grace_period: 4m
     env_file: .env
     environment:
@@ -101,12 +104,13 @@ services:
         condition: service_started
     volumes:
       - ../../config/global-config.properties:/app/config/global-config.properties:ro
+      - hotfix_data:/app/hotfix:ro
 
   http:
     build:
       context: ../..
       dockerfile: Dockerfile
-    command: ["java", "-Xms256m", "-Xmx1024m", "-jar", "jar/sunrise-http.jar", "config/http-config.properties"]
+    command: ["java", "-Xms256m", "-Xmx1024m", "-javaagent:jar/hotswap-agent.jar", "-jar", "jar/sunrise-http.jar", "config/http-config.properties"]
     stop_grace_period: 4m
     env_file: .env
     environment:
@@ -122,18 +126,21 @@ services:
       - "8090:8090"
     volumes:
       - ../../config/http-config.properties:/app/config/http-config.properties:ro
+      - hotfix_data:/app/hotfix:ro
 
   gmback:
     build:
       context: ../..
       dockerfile: Dockerfile
-    command: ["java", "-Xms256m", "-Xmx1024m", "-jar", "jar/sunrise-gmback.jar", "config/gmback-config.properties"]
+    command: ["java", "-Xms256m", "-Xmx1024m", "-javaagent:jar/hotswap-agent.jar", "-jar", "jar/sunrise-gmback.jar", "config/gmback-config.properties"]
     stop_grace_period: 4m
     env_file: .env
     environment:
       JDBC_URL: jdbc:mysql://mysql:3306/sunrise
       MASTER_ADDRESS: center
       REPORT_ADDRESS: gmback
+      HOTSWAP_UPLOAD_DIR: /app/hotfix/uploaded
+      CENTER_DASHBOARD_URL: http://center:8088
     depends_on:
       mysql:
         condition: service_healthy
@@ -143,6 +150,8 @@ services:
       - "8010:8010"
     volumes:
       - ../../config/gmback-config.properties:/app/config/gmback-config.properties:ro
+      - hotfix_data:/app/hotfix
 
 volumes:
   mysql_data:
+  hotfix_data:

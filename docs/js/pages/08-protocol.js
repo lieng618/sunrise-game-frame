@@ -96,8 +96,12 @@ public class ClientConnection {
 <tr><td>TOPIC_TYPE_ACTIVITY</td><td>9</td><td>ActivityProto</td><td>活动</td></tr>
 <tr><td>TOPIC_TYPE_RANK</td><td>10</td><td>RankProto</td><td>排行榜</td></tr>
 <tr><td>TOPIC_TYPE_DROP</td><td>11</td><td>DropProto</td><td>掉落</td></tr>
+<tr><td>TOPIC_TYPE_BATTLE</td><td>12</td><td>BattleProto</td><td>战斗</td></tr>
 </tbody>
 </table>
+
+<h2>公共包装消息</h2>
+<p><code>define.proto</code> 提供嵌入嵌套 <code>oneof</code> 时使用的基础包装类型：<code>IntValue</code>、<code>IntValueList</code>、<code>LongValue</code>、<code>LongValueList</code>、<code>StringValue</code>、<code>StringValueList</code>、<code>BoolValue</code>、<code>BoolValueList</code>。它们没有独立 TOPIC/packetId，只作为字段值使用。</p>
 
 <h2>命名规则</h2>
 <div class="callout callout-danger">
@@ -129,9 +133,12 @@ public class ClientConnection {
 <pre><code class="language-text">TOPIC_TYPE_TASK → 提取 "TASK" → 首字母大写 + "Proto" → "TaskProto"
 C2S_AcceptTask  → 加 "M" 前缀 → MC2S_AcceptTask（消息体类名）
 
-ProtoParserUtils.init() 注册解析器：
+ProtoParserUtils.init() 注册客户端请求解析器：
 key = packetType * 100000 + packetId
-value = XxxProto.MC2S_Xxx.parseFrom 方法</code></pre>
+value = XxxProto.MC2S_Xxx.parseFrom 方法
+
+LogicUtils 的消息处理器路由使用：
+key = packetType * 10000 + packetId</code></pre>
 
 <h2>协议定义示例</h2>
 <pre><code class="language-protobuf">syntax = "proto3";
@@ -173,10 +180,26 @@ message MTaskInfo {
 <tr><td>C→S</td><td>C2S_SelectHuman</td><td>pos, server_id</td><td>选择角色</td></tr>
 <tr><td>C→S</td><td>C2S_ClientPing</td><td>time</td><td>客户端心跳（60秒超时）</td></tr>
 <tr><td>S→C</td><td>S2C_Login</td><td>account_id</td><td>登录响应</td></tr>
-<tr><td>S→C</td><td>S2C_Queue</td><td>pos, queues, need_time</td><td>排队信息）</td></tr>
+<tr><td>S→C</td><td>S2C_Queue</td><td>pos, queues, need_time</td><td>排队位置、队列总人数、预计秒数</td></tr>
 <tr><td>S→C</td><td>S2C_HumanList</td><td>human_list</td><td>角色列表</td></tr>
 <tr><td>S→C</td><td>S2C_SelectHuman</td><td>（空）</td><td>选角响应</td></tr>
+<tr><td>S→C</td><td>S2C_ClientPing</td><td>time</td><td>心跳回包</td></tr>
+<tr><td>S→C</td><td>S2C_ServerInfo</td><td>server_time, time_zone, server_open_time</td><td>服务器时间信息</td></tr>
 <tr><td>S→C</td><td>S2C_Kick</td><td>reason</td><td>被踢下线</td></tr>
+</tbody>
+</table>
+
+<h3>HumanProto（TOPIC_TYPE_HUMAN = 1）</h3>
+<table>
+<thead><tr><th>方向</th><th>消息</th><th>字段</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>C→S</td><td>C2S_ChangeName</td><td>name</td><td>修改角色名</td></tr>
+<tr><td>C→S</td><td>C2S_ChangeHeadIcon</td><td>head_icon_id</td><td>修改头像</td></tr>
+<tr><td>C→S</td><td>C2S_ChangeSex</td><td>sex</td><td>修改性别</td></tr>
+<tr><td>S→C</td><td>S2C_HumanInfo</td><td>uid, name, human_id, level, server_id, exp, account_id, head_icon, fight_power, sex</td><td>登录角色基础数据</td></tr>
+<tr><td>S→C</td><td>S2C_SendInfoEnd</td><td>（空）</td><td>所有模块初始数据发送完毕</td></tr>
+<tr><td>S→C</td><td>S2C_HumanInfoChange</td><td>level, exp, fight_power</td><td>基础数值变化</td></tr>
+<tr><td>S→C</td><td>S2C_ChangeName / ChangeHeadIcon / ChangeSex</td><td>与请求对应</td><td>修改成功回包</td></tr>
 </tbody>
 </table>
 
@@ -186,10 +209,12 @@ message MTaskInfo {
 <tbody>
 <tr><td>C→S</td><td>C2S_GetItemList</td><td>（空）</td><td>请求背包列表</td></tr>
 <tr><td>C→S</td><td>C2S_UseItem</td><td>itemId, count</td><td>使用物品</td></tr>
+<tr><td>C→S</td><td>C2S_RemoveItem</td><td>index, count</td><td>按格子删除物品</td></tr>
+<tr><td>C→S</td><td>C2S_RemoveItemById</td><td>itemId, count</td><td>按物品 ID 删除物品</td></tr>
 <tr><td>C→S</td><td>C2S_SortItem</td><td>（空）</td><td>整理背包</td></tr>
 <tr><td>C→S</td><td>C2S_SellItem</td><td>itemId, count</td><td>出售物品</td></tr>
 <tr><td>S→C</td><td>S2C_ItemList</td><td>items, capacity</td><td>背包数据</td></tr>
-<tr><td>S→C</td><td>S2C_ItemUpdate</td><td>items</td><td>物品更新</td></tr>
+<tr><td>S→C</td><td>S2C_ItemUpdate</td><td>items</td><td>发生变化的格子；itemId、count、index</td></tr>
 </tbody>
 </table>
 
@@ -198,13 +223,18 @@ message MTaskInfo {
 <thead><tr><th>方向</th><th>消息</th><th>字段</th><th>说明</th></tr></thead>
 <tbody>
 <tr><td>C→S</td><td>C2S_GetFriendList</td><td>（空）</td><td>请求好友列表</td></tr>
-<tr><td>C→S</td><td>C2S_SearchPlayer</td><td>keyword</td><td>搜索玩家</td></tr>
+<tr><td>C→S</td><td>C2S_SearchPlayer</td><td>keyword</td><td>搜索玩家；当前服务端示例把 keyword 当 humanId 查询</td></tr>
 <tr><td>C→S</td><td>C2S_AddFriendRequest</td><td>targetHumanId</td><td>发送好友申请</td></tr>
 <tr><td>C→S</td><td>C2S_HandleFriendRequest</td><td>applicantHumanId, action</td><td>处理好友申请</td></tr>
 <tr><td>C→S</td><td>C2S_DeleteFriend</td><td>friendHumanId</td><td>删除好友</td></tr>
+<tr><td>C→S</td><td>C2S_GetFriendRequestList</td><td>（空）</td><td>获取申请列表</td></tr>
+<tr><td>C→S</td><td>C2S_GetFriendRecommendationList</td><td>（空）</td><td>获取在线玩家推荐</td></tr>
 <tr><td>S→C</td><td>S2C_GetFriendList</td><td>friends</td><td>好友列表</td></tr>
+<tr><td>S→C</td><td>S2C_SearchPlayer</td><td>players</td><td>搜索结果</td></tr>
 <tr><td>S→C</td><td>S2C_FriendUpdate</td><td>friend, updateType</td><td>好友更新</td></tr>
-<tr><td>S→C</td><td>S2C_FriendRequestUpdate</td><td>request</td><td>好友申请通知</td></tr>
+<tr><td>S→C</td><td>S2C_FriendRequestUpdate</td><td>request</td><td>协议可携带申请；当前新增申请通知发送空 request，客户端应重新拉取申请列表</td></tr>
+<tr><td>S→C</td><td>S2C_GetFriendRequestList</td><td>requests</td><td>申请列表</td></tr>
+<tr><td>S→C</td><td>S2C_GetFriendRecommendationList</td><td>players</td><td>推荐好友</td></tr>
 </tbody>
 </table>
 
@@ -213,11 +243,12 @@ message MTaskInfo {
 <thead><tr><th>方向</th><th>消息</th><th>字段</th><th>说明</th></tr></thead>
 <tbody>
 <tr><td>C→S</td><td>C2S_Chat</td><td>msg</td><td>发送聊天</td></tr>
-<tr><td>C→S</td><td>C2S_Horn</td><td>（空）</td><td>喇叭</td></tr>
-<tr><td>C→S</td><td>C2S_GetHistory</td><td>（空）</td><td>请求聊天历史</td></tr>
+<tr><td>C→S</td><td>C2S_Horn</td><td>（空）</td><td>当前处理器回推空的 S2C_Horn，示例占位</td></tr>
+<tr><td>C→S</td><td>C2S_GetHistory</td><td>count（请求消息体定义字段）</td><td>请求聊天历史</td></tr>
 <tr><td>C→S</td><td>C2S_CDK</td><td>code</td><td>使用兑换码，成功/失败均 S2C_Tips 提示，成功发邮件</td></tr>
-<tr><td>S→C</td><td>S2C_Chat</td><td>id, msg, time</td><td>聊天消息推送</td></tr>
-<tr><td>S→C</td><td>S2C_History</td><td>records</td><td>聊天历史</td></tr>
+<tr><td>S→C</td><td>S2C_Chat</td><td>id, msg, time, name</td><td>聊天消息推送</td></tr>
+<tr><td>S→C</td><td>S2C_Horn</td><td>（空）</td><td>喇叭消息，当前无独立消息体</td></tr>
+<tr><td>S→C</td><td>S2C_History</td><td>history（MS2C_Chat 列表）</td><td>聊天历史</td></tr>
 <tr><td>S→C</td><td>S2C_Tips</td><td>id, msg</td><td>Tips 提示</td></tr>
 </tbody>
 </table>
@@ -228,10 +259,11 @@ message MTaskInfo {
 <tbody>
 <tr><td>C→S</td><td>C2S_GetMailList</td><td>（空）</td><td>请求邮件列表</td></tr>
 <tr><td>C→S</td><td>C2S_ReadMail</td><td>mailId</td><td>标记已读</td></tr>
-<tr><td>C→S</td><td>C2S_ClaimAttachment</td><td>mailId</td><td>领取附件</td></tr>
+<tr><td>C→S</td><td>C2S_ReceiveMailAttachment</td><td>mailId</td><td>领取附件</td></tr>
 <tr><td>C→S</td><td>C2S_DeleteMail</td><td>mailId</td><td>删除邮件</td></tr>
-<tr><td>S→C</td><td>S2C_MailList</td><td>mails</td><td>邮件列表</td></tr>
+<tr><td>S→C</td><td>S2C_GetMailList</td><td>mails</td><td>邮件列表</td></tr>
 <tr><td>S→C</td><td>S2C_NewMail</td><td>mail</td><td>新邮件通知</td></tr>
+<tr><td>S→C</td><td>S2C_MailUpdate</td><td>mailId, status</td><td>status：1 已读、2 已领取、3 已删除</td></tr>
 </tbody>
 </table>
 
@@ -239,8 +271,70 @@ message MTaskInfo {
 <table>
 <thead><tr><th>方向</th><th>消息</th><th>字段</th><th>说明</th></tr></thead>
 <tbody>
-<tr><td>C→S</td><td>C2S_GetRankList</td><td>rankType, startRank, count</td><td>请求排行榜列表</td></tr>
-<tr><td>S→C</td><td>S2C_GetRankList</td><td>rankList, myRank</td><td>返回排行数据</td></tr>
+<tr><td>C→S</td><td>C2S_GetRankList</td><td>rank_type, page, page_size</td><td>页码从 1 开始；page_size 默认 20、最大 100</td></tr>
+<tr><td>C→S</td><td>C2S_GetMyRank</td><td>rank_type</td><td>查询自己的名次</td></tr>
+<tr><td>S→C</td><td>S2C_GetRankList</td><td>rank_type, entries, total_count</td><td>分页排行条目</td></tr>
+<tr><td>S→C</td><td>S2C_GetMyRank</td><td>rank_type, rank, my_entry</td><td>未上榜 rank=0 且无 my_entry</td></tr>
+</tbody>
+</table>
+
+<h3>TaskProto（TOPIC_TYPE_TASK = 6）</h3>
+<table>
+<thead><tr><th>方向</th><th>消息</th><th>字段</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>C→S</td><td>C2S_GetTaskList</td><td>（空）</td><td>获取任务列表</td></tr>
+<tr><td>C→S</td><td>C2S_AcceptTask</td><td>taskId</td><td>接受任务</td></tr>
+<tr><td>C→S</td><td>C2S_SubmitTask</td><td>taskId</td><td>提交任务</td></tr>
+<tr><td>S→C</td><td>S2C_GetTaskList</td><td>tasks</td><td>taskId、progress、status</td></tr>
+<tr><td>S→C</td><td>S2C_TaskUpdate</td><td>task</td><td>单任务更新</td></tr>
+</tbody>
+</table>
+
+<h3>MapProto（TOPIC_TYPE_MAP = 3）</h3>
+<table>
+<thead><tr><th>方向</th><th>消息</th><th>字段</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>C→S</td><td>C2S_Enter</td><td>id</td><td>进入地图</td></tr>
+<tr><td>C→S</td><td>C2S_Move</td><td>mapPostX/Y/Z, Orientation</td><td>上报位置与朝向</td></tr>
+<tr><td>C→S</td><td>C2S_Leave</td><td>id</td><td>离开地图</td></tr>
+<tr><td>S→C</td><td>S2C_SceneSync</td><td>units, positions, unit_attributes</td><td>进图全量同步</td></tr>
+<tr><td>S→C</td><td>S2C_UnitEnter / Leave</td><td>unit / unit_id</td><td>单位进出地图广播</td></tr>
+<tr><td>S→C</td><td>S2C_UnitPositionUpdate</td><td>position</td><td>单位位置变化</td></tr>
+<tr><td>S→C</td><td>S2C_UnitAttributeUpdate</td><td>attributes</td><td>单位属性变化</td></tr>
+<tr><td>S→C</td><td>S2C_LastMap</td><td>id</td><td>登录时下发的上次地图</td></tr>
+</tbody>
+</table>
+
+<h3>MinerProto（TOPIC_TYPE_MINER = 4）</h3>
+<table>
+<thead><tr><th>方向</th><th>消息</th><th>字段</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>C→S</td><td>C2S_SyncData</td><td>level_index, upgrade_points, stats, upgrade_counts</td><td>客户端同步矿场状态</td></tr>
+<tr><td>C→S</td><td>C2S_RankList</td><td>（空）</td><td>请求矿场排行</td></tr>
+<tr><td>S→C</td><td>S2C_SyncData</td><td>与同步数据结构一致</td><td>登录/数据同步时下发</td></tr>
+<tr><td>S→C</td><td>S2C_RankList</td><td>infos(name, level_index)</td><td>矿场排行</td></tr>
+</tbody>
+</table>
+
+<h3>ActivityProto（TOPIC_TYPE_ACTIVITY = 9）</h3>
+<table>
+<thead><tr><th>方向</th><th>消息</th><th>字段</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>C→S</td><td>C2S_GetActivityList</td><td>（空）</td><td>获取活动列表</td></tr>
+<tr><td>C→S</td><td>C2S_ActivityAction</td><td>id, action_id, data</td><td>活动行为，data 由活动逻辑解析</td></tr>
+<tr><td>S→C</td><td>S2C_GetActivityList</td><td>activities(id, status, beginTime, endTime)</td><td>活动列表</td></tr>
+<tr><td>S→C</td><td>S2C_ActivityUpdate</td><td>activity</td><td>活动状态推送</td></tr>
+<tr><td>S→C</td><td>S2S_ActivityAction</td><td>id, action_id, data</td><td>现存枚举拼写；当前消息类名为 MS2C_ActivityAction，实际代码未见发送路径</td></tr>
+</tbody>
+</table>
+
+<h3>BattleProto（TOPIC_TYPE_BATTLE = 12）</h3>
+<table>
+<thead><tr><th>方向</th><th>消息</th><th>字段</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>C→S</td><td>C2S_Attack</td><td>defender_unit_id</td><td>攻击目标</td></tr>
+<tr><td>S→C</td><td>S2C_Attack</td><td>attack_unit_id, defender_unit_id</td><td>攻击广播</td></tr>
+<tr><td>S→C</td><td>S2C_Damage</td><td>attack_unit_id, defender_unit_id, damage</td><td>伤害结果</td></tr>
 </tbody>
 </table>
 
@@ -248,8 +342,8 @@ message MTaskInfo {
 <table>
 <thead><tr><th>方向</th><th>消息</th><th>字段</th><th>说明</th></tr></thead>
 <tbody>
-<tr><td>C→S</td><td>C2S_PickUpDrop</td><td>dropId</td><td>拾取掉落物</td></tr>
-<tr><td>S→C</td><td>S2C_DropUpdate</td><td>drops</td><td>掉落物更新通知</td></tr>
+<tr><td>C→S</td><td>C2S_PickupDrop</td><td>unit_id</td><td>拾取地图中的掉落物 unitId</td></tr>
+<tr><td>S→C</td><td>S2C_DropPickupResult</td><td>unit_id, success</td><td>拾取结果；成功时另发 MAP.UnitLeave 与 ITEM.ItemUpdate</td></tr>
 </tbody>
 </table>
 `);

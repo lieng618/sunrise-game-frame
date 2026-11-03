@@ -10,29 +10,20 @@ registerPage('game-server', '游戏服', '玩家对象、模块系统、消息�
     <li>玩家模块生命周期管理（init/load/save/sendToClient）</li>
     <li>定时保存玩家数据（每分钟）</li>
     <li>调用 Global 服完成跨服业务</li>
-    <li>响应 GM 后台命令（reloadConfig/hotswapJar/kick/ban/mute/cdkList）</li>
+    <li>响应 GM 后台命令（reloadConfig/kick/ban/mute/cdkList/cheatUserList）</li>
     <li>兑换码校验与发奖（CdkSystem + CdkModule + ChatMsgHandler）</li>
 </ul>
 
 <h2>GameServerStartUp 启动流程</h2>
 <pre><code class="language-java">public class GameServerStartUp {
     public static void main(String[] args) {
-        ConfigReader.loadConfig(args[0]); // 默认 game-config.properties
-        Properties properties = ConfigReader.getProp();
-        int serverId = Integer.parseInt(properties.getProperty("rpc.node.server-id"));
-        String nodeType = properties.getProperty("rpc.node.type");
-        RpcNode rpcNode = RpcNodeManager.createRpcNode(serverId, nodeType);
-        ConfigUtils.load();           // 加载 Luban 配置表
-        ProtoParserUtils.init();      // 注册协议解析器（TOPIC → parseFrom）
-        LogicUtils.init("org.sunrise.game.game.logic");  // 扫描 @MsgHandler
-        ModuleUtils.init("org.sunrise.game.game.modules"); // 扫描 @HumanModule
-        GameSystemUtils.init("org.sunrise.game.game.logic.system"); // 扫描 @GameSystem
-        CallUtils.init(rpcNode.getNodeId(),
-            Collections.singletonList("org.sunrise.game.game.service"),
-            CallEnum.class);
-        rpcNode.start();
+        RpcNodeManager.runMain(args, "./config/game-config.properties", () -> {
+            GameServerRuntime.init();
+            JwtUtil.init(ConfigReader.getProp());
+        });
     }
 }</code></pre>
+<p><code>RpcNodeManager.runMain()</code> 统一完成配置加载、RPC 节点创建、服务扫描、监听、优雅停机装配和内存日志。GameServerRuntime 固定按以下顺序初始化：Luban JSON → 地图导航 → ProtoParserUtils → LogicUtils → ModuleUtils → GameSystemUtils。</p>
 
 <h2>玩家对象</h2>
 <h3>HumanObject</h3>
@@ -40,11 +31,11 @@ registerPage('game-server', '游戏服', '玩家对象、模块系统、消息�
 <table>
 <thead><tr><th>字段</th><th>类型</th><th>说明</th></tr></thead>
 <tbody>
-<tr><td>connectObject</td><td>ConnectObject</td><td>连接上下文，负责把消息发回 External</td></tr>
+<tr><td>connectObject</td><td>ConnectObject</td><td>连接上下文，负责把消息发回 External；connectId 为 long</td></tr>
 <tr><td>humanId</td><td>String</td><td>角色唯一 ID（雪花算法生成）</td></tr>
 <tr><td>serverId</td><td>int</td><td>所在服务器 ID</td></tr>
 <tr><td>roleData</td><td>Map&lt;String,String&gt;</td><td>角色存档数据（模块名 → JSON 字符串）</td></tr>
-<tr><td>modules</td><td>Map&lt;String,BaseModule&gt;</td><td>模块 Map（类名 → 模块实例）</td></tr>
+<tr><td>modules</td><td>Map&lt;String,BaseModule&gt;</td><td>模块 Map（简单类名 → 模块实例）</td></tr>
 <tr><td>msgQueue</td><td>Queue</td><td>消息队列，等待处理的消息</td></tr>
 <tr><td>isCalling</td><td>boolean</td><td>RPC 锁，RPC 返回前消息排队</td></tr>
 <tr><td>lastPingTime</td><td>long</td><td>最后一次 Ping 时间</td></tr>
@@ -55,18 +46,23 @@ registerPage('game-server', '游戏服', '玩家对象、模块系统、消息�
 <h3>ConnectObject</h3>
 <p>连接对象，封装 connectId、uid、accountId、externalNodeId。通过 RPC 调用 ExternalRecvGameMessageService_recvMessage 发送消息给客户端。</p>
 <pre><code class="language-java">public class ConnectObject {
-    private String connectId;
+    private long connectId;
     private String externalId;
     private String uid;
     private int accountId;
     private boolean firstSend;       // 是否首次发送（首次带 gameNodeId）
     private String externalNodeId;   // 绑定的 External 节点 ID
 
-    public void sendMsg(int packetType, int packetId, ByteString data) {
+    public void sendMsg(int packetType, int packetId, Message.Builder builder) {
         RpcFunction.newInstance(externalNodeId).call(
             CallEnum.ExternalRecvGameMessageService_recvMessage,
-            connectId, bytes,
-            firstSend ? "" : RpcNodeManager.getRpcServerNodeId()  // 首次发送带 gameNodeId
+            connectId,
+            TopicProto.MBasePacketData.newBuilder()
+                .setPacketType(TopicProto.TOPIC.forNumber(packetType))
+                .setPacketId(packetId)
+                .setPacketData(builder.build().toByteString())
+                .build().toByteArray(),
+            firstSend ? "" : RpcNodeManager.getRpcServerNodeId()
         );
     }
 }</code></pre>
@@ -95,7 +91,7 @@ registerPage('game-server', '游戏服', '玩家对象、模块系统、消息�
 <thead><tr><th>方法</th><th>触发时机</th><th>说明</th></tr></thead>
 <tbody>
 <tr><td>init()</td><td>新角色创建时</td><td>初始化默认值，不能发协议</td></tr>
-<tr><td>load()</td><td>老角色上线时</td><td>从 dataMap 恢复数据（getDbData 异步读取）</td></tr>
+<tr><td>load()</td><td>老角色上线时</td><td>角色数据已从 DB 读入模块 dataMap，再从 dataMap 解析字段</td></tr>
 <tr><td>save()</td><td>定时存库或下线时</td><td>把内存数据写回 dataMap（putDbData）</td></tr>
 <tr><td>sendToClient()</td><td>登录完成后</td><td>把模块数据同步给客户端</td></tr>
 <tr><td>pulse()</td><td>每帧</td><td>模块定时逻辑</td></tr>
@@ -108,22 +104,39 @@ registerPage('game-server', '游戏服', '玩家对象、模块系统、消息�
 <table>
 <thead><tr><th>模块</th><th>说明</th><th>关键数据</th></tr></thead>
 <tbody>
-<tr><td>DataModule</td><td>角色基础信息</td><td>名字/等级/经验/头像/战斗力/性别</td></tr>
-<tr><td>ItemModule</td><td>背包系统</td><td>支持添加/删除/使用/出售/整理/堆叠</td></tr>
-<tr><td>PlayerUnitModule</td><td>玩家场景单位</td><td>属性容器、当前位置、所在地图，整合了属性系统和地图相关数据</td></tr>
-<tr><td>TaskModule</td><td>任务系统</td><td>任务列表、状态、进度</td></tr>
-<tr><td>FriendModule</td><td>好友客户端侧</td><td>好友列表、申请列表</td></tr>
-<tr><td>MailModule</td><td>邮件客户端侧</td><td>邮件列表、已读/未读</td></tr>
-<tr><td>ActivityModule</td><td>活动系统</td><td>活动参与状态（如签到活动）</td></tr>
-<tr><td>MinerModule</td><td>矿工玩法</td><td>绳子速度、钩子数量/力度、升级点数、关卡进度</td></tr>
-<tr><td>CdkModule</td><td>兑换码</td><td>usedCodes：该角色已兑换的码集合，每码仅可兑换一次</td></tr>
+<tr><td>DataModule</td><td>角色基础信息与刷新周期</td><td>名字、等级、经验、头像、战斗力、性别、日/周刷新时间</td></tr>
+<tr><td>ItemModule</td><td>背包系统</td><td>格子列表、itemId 索引、容量预检、堆叠合并与增减；使用/出售处理是示例占位</td></tr>
+<tr><td>PlayerUnitModule</td><td>场景单位与属性</td><td>属性容器、当前位置、所在地图；运行时地图与持久化字段分离</td></tr>
+<tr><td>TaskModule</td><td>任务系统</td><td>任务接取、进度、提交与后续任务；奖励逻辑是示例占位</td></tr>
+<tr><td>FriendModule</td><td>好友客户端侧</td><td>好友列表、申请、推荐与实时更新；关系数据由 GlobalFriendService 持有</td></tr>
+<tr><td>MailModule</td><td>邮件客户端侧</td><td>邮件列表、已读、附件领取、删除；附件采用查询→入包→确认流程</td></tr>
+<tr><td>ActivityModule</td><td>活动状态</td><td>从配置创建活动逻辑，执行开始/结束切换与 ActivityAction 分发</td></tr>
+<tr><td>MinerModule</td><td>矿工玩法示例</td><td>绳子速度、钩子数量/力度、升级次数、关卡与升级点；当前由客户端同步数据</td></tr>
+<tr><td>CdkModule</td><td>兑换码角色记录</td><td>usedCodes：当前角色已兑换的码集合</td></tr>
 </table>
+
+<h3>已有服务器级系统</h3>
+<table>
+<thead><tr><th>系统</th><th>职责</th></tr></thead>
+<tbody>
+<tr><td>ActivitySystem</td><td>按活动配置创建并管理活动逻辑实例</td></tr>
+<tr><td>CdkSystem</td><td>保存 GM 同步的有效兑换码、剩余数量并扣减本节点名额</td></tr>
+<tr><td>DropSystem / MonsterSystem</td><td>掉落物生成、过期清理，以及按刷新表驱动刷怪和复活</td></tr>
+<tr><td>MapSystem</td><td>维护 GameMap 实例与地图单位心跳</td></tr>
+<tr><td>MinerSystem</td><td>矿场排行榜内存数据与排序</td></tr>
+<tr><td>LoginQueueSystem</td><td>按每秒上限放行登录，发送排队位置/预计等待，超时踢出</td></tr>
+<tr><td>ResetSystem</td><td>在线玩家跨天/跨周刷新，并在角色登录时补偿离线期间错过的周期</td></tr>
+</tbody>
+</table>
+<div class="callout callout-warn">
+    <p><strong>兑换码一致性：</strong>CdkSystem 的剩余数量是各 Game 节点内存中的副本，tryConsume 只做节点内扣减，CdkModule.usedCodes 也只存在单个角色存档中。多 Game 节点同时兑换时可能超额，且发邮件失败时兑换码已经标记使用；需要全局唯一领取记录或集中式原子扣减。</p>
+</div>
 <h2>协议路由</h2>
 <h3>自动注册机制</h3>
 <p>游戏服启动时执行两个初始化：</p>
 <ol class="step-list">
     <li><code>ProtoParserUtils.init()</code> - 自动从 TOPIC 枚举提取 Proto 类名（TOPIC_TYPE_LOGIN → LoginProto），注册 FROM_CLIENT 枚举对应的 parseFrom 方法。key = packetType * 100000 + packetId</li>
-    <li><code>LogicUtils.init()</code> - 扫描 @MsgHandlerClass + @MsgHandlerMethod，建立 packetType*10000+packetId → Method 映射</li>
+    <li><code>LogicUtils.init()</code> - 扫描 @MsgHandlerClass + @MsgHandlerMethod，建立 <code>packetType * 10000 + packetId</code> → Method 映射；ProtoParserUtils 使用 <code>packetType * 100000 + packetId</code></li>
 </ol>
 
 <h3>消息处理注解</h3>
@@ -137,7 +150,7 @@ public class ItemMsgHandler {
 
     @MsgHandlerMethod(packetId = ItemProto.FROM_CLIENT.C2S_GetItemList_VALUE)
     public static void getList(HumanObject humanObject) {
-        humanObject.getModule(ItemModule.class).sendAll();
+        humanObject.getModule(ItemModule.class).sendItemList();
     }
 }</code></pre>
 
@@ -167,11 +180,12 @@ public class ItemMsgHandler {
     <li>客户端发送 <code>C2S_HumanList</code></li>
     <li>Game 查询 human_list 表，返回 <code>S2C_HumanList</code>（角色列表）</li>
     <li>客户端发送 <code>C2S_SelectHuman(pos, serverId)</code></li>
-    <li>新角色：插入 human_list 表 (uid, human_id, server_id, pos) → 创建 HumanObject → moduleInit() 新角色首次初始化 → S2C_SelectHuman() → sendHumanData() -> 插入 human_info 表 (human_id, role_data)</li>
+    <li>新角色：提交 human_list 异步插入请求，同时创建 HumanObject、执行 moduleInit()、发送 S2C_SelectHuman 和模块数据，并异步插入 human_info；human_list 插入回调完成后重新加载角色列表</li>
     <li>老角色：匹配 human_list 表找到 human_id  → 检测 human_id 是否被封禁 → 重连 / 加载 human_info 表 → 创建 HumanObject → load(roleData) 加载所有模块数据 → sendHumanData()</li>
     <li>sendHumanData() 发送：S2C_HumanInfo + 各模块 sendToClient() + S2C_SendInfoEnd</li>
     <li>登录完成，需客户端定时发送 <code>C2S_ClientPing</code>（60秒超时判定玩家掉线，进行数据清理）</li>
 </ol>
+<p>新角色创建使用两条独立异步 SQL（human_list、human_info），当前没有数据库事务包裹；需要严格一致性时应在业务层增加事务或补偿流程。</p>
 
 <h2>GameMasterService 心跳</h2>
 <table>
@@ -198,8 +212,9 @@ public class ItemMsgHandler {
 <tr><td>kickHuman</td><td>踢玩家下线（加入下线队列）</td></tr>
 <tr><td>banHumanList</td><td>更新封禁名单（加入 banHumanQueue）</td></tr>
 <tr><td>muteHumanList</td><td>更新禁言名单（加入 muteHumanQueue）</td></tr>
-<tr><td>hotswapJar</td><td>代码热更 JAR（HotswapScanner）</td></tr>
 <tr><td>cdkList</td><td>同步当前有效兑换码列表到 CdkSystem</td></tr>
+<tr><td>cheatUserList</td><td>同步金手指用户及其允许执行的聊天指令</td></tr>
+<tr><td>hotswapJar</td><td>兼容分支：直接调用本节点 HotswapScanner；GM 页面的标准热更流程改用 HotswapControlService</td></tr>
 </tbody>
 </table>
 `);
@@ -217,31 +232,32 @@ registerPage('global-server', '全局服', '聊天、好友、邮件、玩家信
 
 <h2>已有服务</h2>
 <div class="card-grid">
-    <div class="card"><div class="card-icon">💬</div><div class="card-title">GlobalChatService</div><div class="card-desc">聊天历史与广播。维护最多50条聊天记录，game 调用后返回已编码的 protobuf 二进制，game 直接转发给客户端</div></div>
-    <div class="card"><div class="card-icon">👥</div><div class="card-title">GlobalFriendService</div><div class="card-desc">好友关系与申请。处理好友申请、获取列表、发送申请、删除好友。7天过期清理申请</div></div>
-    <div class="card"><div class="card-icon">📬</div><div class="card-title">GlobalMailService</div><div class="card-desc">邮件与附件。支持单发、群发、全服发、领取附件、读取、删除。未领取附件不可删除</div></div>
+    <div class="card"><div class="card-icon">💬</div><div class="card-title">GlobalChatService</div><div class="card-desc">聊天历史与广播。维护最多 50 条记录，广播 S2C_Chat；历史查询返回已编码的 Protobuf 二进制</div></div>
+    <div class="card"><div class="card-icon">👥</div><div class="card-title">GlobalFriendService</div><div class="card-desc">好友关系与申请。最多 100 个好友，发送/处理申请、获取列表与申请、删除好友，7 天过期清理</div></div>
+    <div class="card"><div class="card-icon">📬</div><div class="card-title">GlobalMailService</div><div class="card-desc">邮件与附件。支持单发、群发、分页全服发、读取、查询附件、确认领取、删除；未领取附件不可删除</div></div>
     <div class="card"><div class="card-icon">👤</div><div class="card-title">GlobalPlayerInfoService</div><div class="card-desc">玩家简要信息。获取/更新/批量获取玩家信息（名字/等级/头像/战斗力/性别）</div></div>
+    <div class="card"><div class="card-icon">🏆</div><div class="card-title">GlobalRankService</div><div class="card-desc">战力/等级/分数榜；按页查询 TopN，异步补全玩家展示信息，并支持查询自己的名次</div></div>
 </div>
 
 <h2>GlobalChatService 详解</h2>
 <table>
 <thead><tr><th>CallEnum</th><th>方法签名</th><th>说明</th></tr></thead>
 <tbody>
-<tr><td>GlobalChatService_chat</td><td>chat(humanId, message)</td><td>发送聊天消息，添加到历史（最多50条），SendAll 广播 GameRpcListenService_sendToAllHuman</td></tr>
+<tr><td>GlobalChatService_chat</td><td>chat(humanId, name, message)</td><td>添加到历史（最多 50 条），SendAll 广播 S2C_Chat</td></tr>
 <tr><td>GlobalChatService_history</td><td>history(humanId)</td><td>获取聊天历史，返回已编码的 protobuf 二进制（game 直接转发给客户端）</td></tr>
 </tbody>
 </table>
 <pre><code class="language-java">@RpcService
 public class GlobalChatService extends BaseService {
-    private List&lt;ChatRecord&gt; chatHistory = new ArrayList&lt;&gt;();
+    private List&lt;ChatData&gt; messages = new LinkedList&lt;&gt;();
     private static final int MAX_HISTORY = 50;
 
     @RpcMethod
-    public void chat(String humanId, String message) {
-        ChatRecord record = new ChatRecord(humanId, message, System.currentTimeMillis());
-        chatHistory.add(record);
-        if (chatHistory.size() > MAX_HISTORY) {
-            chatHistory.remove(0);
+    public void chat(String humanId, String name, String message) {
+        long time = System.currentTimeMillis();
+        messages.add(new ChatData(humanId, name, time, message));
+        if (messages.size() > MAX_HISTORY) {
+            messages.removeFirst();
         }
         // 广播给所有 Game 节点
         RpcFunction.newInstance(RpcFunction.RpcCallType.SendAll)
@@ -251,9 +267,16 @@ public class GlobalChatService extends BaseService {
 
     @RpcMethod
     public void history(String humanId) {
-        // 构建 protobuf 二进制
-        byte[] protoData = buildChatHistoryProto(chatHistory);
-        returns("info", protoData);
+        ChatProto.MS2C_History.Builder builder = ChatProto.MS2C_History.newBuilder();
+        for (ChatData message : messages) {
+            builder.addHistory(ChatProto.MS2C_Chat.newBuilder()
+                    .setId(message.getHumanId())
+                    .setName(message.getName())
+                    .setMsg(message.getMessage())
+                    .setTime(message.getSendTime())
+                    .build());
+        }
+        returns("humanId", humanId, "info", builder.build().toByteArray());
     }
 }</code></pre>
 
@@ -261,11 +284,11 @@ public class GlobalChatService extends BaseService {
 <table>
 <thead><tr><th>CallEnum</th><th>说明</th><th>校验逻辑</th></tr></thead>
 <tbody>
-<tr><td>GlobalFriendService_sendFriendRequest</td><td>发送好友申请</td><td>检查：不能加自己、不能重复申请、已是好友、申请列表上限</td></tr>
+<tr><td>GlobalFriendService_sendFriendRequest</td><td>发送好友申请</td><td>检查不能加自己、重复申请、已是好友及申请方好友数上限 100</td></tr>
 <tr><td>GlobalFriendService_handleFriendRequest</td><td>处理好友申请（同意/拒绝）</td><td>同意后双向广播 FriendRpcListenService_onFriendAdded</td></tr>
 <tr><td>GlobalFriendService_deleteFriend</td><td>删除好友</td><td>双向广播 FriendRpcListenService_onFriendDeleted</td></tr>
-<tr><td>GlobalFriendService_getFriends</td><td>获取好友列表</td><td>返回好友 humanId 列表</td></tr>
-<tr><td>GlobalFriendService_getFriendRequests</td><td>获取好友申请列表</td><td>返回待处理的申请</td></tr>
+<tr><td>GlobalFriendService_getFriends</td><td>获取好友列表</td><td>返回 <code>friends</code> humanId 列表</td></tr>
+<tr><td>GlobalFriendService_getFriendRequests</td><td>获取好友申请列表</td><td>返回 <code>requestsJson</code></td></tr>
 </tbody>
 </table>
 <p>pulse() 中自动清理超过 7 天的好友申请（cleanExpiredRequests）。</p>
@@ -274,13 +297,14 @@ public class GlobalChatService extends BaseService {
 <table>
 <thead><tr><th>CallEnum</th><th>说明</th><th>特殊说明</th></tr></thead>
 <tbody>
-<tr><td>GlobalMailService_sendMail</td><td>发送单人邮件</td><td>构建 proto 二进制，通过 GameRpcListenService 通知目标玩家</td></tr>
-<tr><td>GlobalMailService_sendGroupMail</td><td>群发邮件</td><td>遍历 humanIds 逐个创建</td></tr>
-<tr><td>GlobalMailService_sendAllMail</td><td>全服发送邮件</td><td>先调 GlobalPlayerInfoService_getAllPlayerIds 获取所有玩家 ID</td></tr>
-<tr><td>GlobalMailService_getMailList</td><td>获取邮件列表</td><td>返回 proto 二进制</td></tr>
-<tr><td>GlobalMailService_readMail</td><td>标记已读</td><td>-</td></tr>
-<tr><td>GlobalMailService_claimAttachment</td><td>领取附件</td><td>返回附件 JSON，标记已领取</td></tr>
-<tr><td>GlobalMailService_deleteMail</td><td>删除邮件</td><td>未领取附件不可删除</td></tr>
+<tr><td>GlobalMailService_sendMail</td><td>发送单人邮件</td><td>保存邮件并通过 GameRpcListenService_sendToHuman 推送 S2C_NewMail</td></tr>
+<tr><td>GlobalMailService_sendMailToMultiple</td><td>群发邮件</td><td>遍历 humanIds 逐个发送</td></tr>
+<tr><td>GlobalMailService_sendMailToAll</td><td>全服发送邮件</td><td>按游标每页最多 1000 个 humanId 分页调用 getAllPlayerIds</td></tr>
+<tr><td>GlobalMailService_getPlayerMails</td><td>获取邮件列表</td><td>返回 <code>protoData</code>（S2C_GetMailList）</td></tr>
+<tr><td>GlobalMailService_readMail</td><td>标记已读</td><td>状态 0 → 1</td></tr>
+<tr><td>GlobalMailService_getMailAttachmentInfo</td><td>查询可领取附件</td><td>不改变状态，返回 attachmentsJson</td></tr>
+<tr><td>GlobalMailService_confirmMailAttachment</td><td>确认附件已入包</td><td>状态改为 2，防止重复领取</td></tr>
+<tr><td>GlobalMailService_deleteMail</td><td>删除邮件</td><td>有未领取附件时拒绝</td></tr>
 </tbody>
 </table>
 
@@ -291,9 +315,21 @@ public class GlobalChatService extends BaseService {
 <tr><td>GlobalPlayerInfoService_getPlayerInfo</td><td>获取单个玩家信息（名字/等级/头像/战斗力/性别）</td></tr>
 <tr><td>GlobalPlayerInfoService_updatePlayerInfo</td><td>更新玩家信息（Game 服登录/变化时调用）</td></tr>
 <tr><td>GlobalPlayerInfoService_getPlayerInfos</td><td>批量获取玩家信息（好友列表场景）</td></tr>
-<tr><td>GlobalPlayerInfoService_getAllHumanIds</td><td>获取所有角色 ID（全服邮件场景）</td></tr>
+<tr><td>GlobalPlayerInfoService_getAllPlayerIds</td><td>按 afterHumanId + limit 获取角色 ID 分页及 hasMore/nextCursor</td></tr>
 </tbody>
 </table>
+
+<h2>GlobalRankService 详解</h2>
+<table>
+<thead><tr><th>CallEnum</th><th>方法签名</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>GlobalRankService_updateRank</td><td>updateRank(rankType, humanId, score)</td><td>更新分数；同分按达成时间与 humanId 稳定排序</td></tr>
+<tr><td>GlobalRankService_removeFromRank</td><td>removeFromRank(rankType, humanId)</td><td>从指定榜移除</td></tr>
+<tr><td>GlobalRankService_getRankList</td><td>getRankList(rankType, page, pageSize)</td><td>页码从 1 开始，默认 20、最大 100，返回分页 Protobuf</td></tr>
+<tr><td>GlobalRankService_getMyRank</td><td>getMyRank(rankType, humanId)</td><td>未上榜 rank=0，无 myEntry</td></tr>
+</tbody>
+</table>
+<p>当前内置榜型：战力、等级、通用分数，各榜最多 100 人。</p>
 
 <h2>跨服通知机制</h2>
 <p>Global 服处理完后，需要通知玩家所在的 Game 节点，使用 <code>SendAll</code> 广播给所有 Game 节点：</p>
@@ -355,10 +391,16 @@ registerPage('http-server', 'HTTP 服务', '邮箱注册登录、对外服地址
         <span class="flow-node flow-node-secondary">GameServer</span>
     </div>
 </div>
-<p>注册成功后由http服务生成 uid 并绑定邮箱。重置密码会使该用户历史 Token 失效。</p>
+<p>注册成功后由 Http 服务生成 uid 并绑定邮箱。重置密码会调用当前 Http 进程的 <code>invalidateUserTokens</code>，但该黑名单只在进程内存中，不会同步到独立 Game 进程，也不会跨重启保存；同用户下一次成功登录又会清除黑名单。因此需要真正的全局撤销能力时，应改成持久化的 token 版本号、jti 黑名单或短期 access + refresh token 方案。</p>
+<div class="callout callout-warn">
+    <p><strong>入口边界：</strong><code>/server_status</code> 与白名单目前只控制 Http 服务的地址分发接口，Game 的 C2S_Login 和 External 首包握手不会再次检查这两个状态。客户端若已知对外服地址，可以直接连接网关；生产环境需要把开关/白名单校验前移到 External 或 Game 登录链路。</p>
+</div>
 
 <h2>HTTP 接口</h2>
 <h3>玩家认证（POST，Query 参数）</h3>
+<div class="callout callout-warn">
+    <p><strong>当前接口约束：</strong>邮箱、密码和验证码通过 URL query 传递，容易进入代理/访问日志；内置密码哈希是不加盐 SHA-256，验证码也没有失败次数锁定。生产部署应改用 HTTPS + JSON body，并重新设计密码哈希与验证码防爆破策略。</p>
+</div>
 <table>
 <thead><tr><th>接口</th><th>方法</th><th>参数</th><th>返回</th><th>说明</th></tr></thead>
 <tbody>
@@ -407,8 +449,8 @@ KCP 要在 UDP 之上实现类似 TCP 的可靠传输（确认、重传、流量
 <thead><tr><th>类名</th><th>说明</th></tr></thead>
 <tbody>
 <tr><td>HttpServer</td><td>基于 Javalin 的 HTTP 服务，注册认证与地址分配接口</td></tr>
-<tr><td>HttpServer.AuthUser</td><td>玩家账户（uid、email、passwordHash），内存 Map 按邮箱索引</td></tr>
-<tr><td>HttpRecvMessageService</td><td>@RpcService，管理对外服地址与 authUsers 持久化，每 5 秒更新地址映射</td></tr>
+<tr><td>HttpServer.AuthUser</td><td>玩家账户（uid、email、passwordHash），运行中以 email 为索引</td></tr>
+<tr><td>HttpRecvMessageService</td><td>@RpcService；通过 BaseService.dataMap 持久化 authUsers，并维护对外服地址与过期清理</td></tr>
 <tr><td>MailUtil</td><td>SMTP 验证码发送与校验（network 模块）</td></tr>
 <tr><td>PasswordUtil</td><td>密码 SHA-256 哈希（network 模块）</td></tr>
 </tbody>
@@ -438,7 +480,10 @@ KCP 要在 UDP 之上实现类似 TCP 的可靠传输（确认、重传、流量
 </tbody>
 </table>
 <div class="callout callout-info">
-    <p><strong>💡 启动初始化</strong>：<code>HttpServerStartUp</code> 与 <code>RunAllOneServerStartUp</code> 启动时调用 <code>JwtUtil.init(properties)</code> 加载玩家 JWT 配置；<code>GameServerStartUp</code> 同样需初始化以便校验 <code>C2S_Login</code> Token。</p>
+    <p><strong>💡 启动初始化</strong>：<code>HttpServerStartUp</code>、<code>GameServerStartUp</code> 与 <code>RunAllOneServerStartUp</code> 都在监听前调用 <code>JwtUtil.init(properties)</code>。独立部署 Http 与 Game 时必须保证 <code>player.jwt.secret</code> 完全一致。</p>
+</div>
+<div class="callout callout-warn">
+    <p><strong>RunAllOne 当前实现：</strong>GM 与玩家登录共用 <code>JwtUtil</code> 静态密钥和黑名单。AdminServer 先初始化后，RunAllOne 的 beforeListen 又会用 <code>player.jwt.secret</code> 覆盖它，因此单进程部署下两类 JWT 实际共享密钥。需要两个独立信任域时，应拆分 JWT 实例或分别部署；不要把默认玩家密钥用于生产。</p>
 </div>
 `);
 
@@ -472,14 +517,15 @@ registerPage('gmback-server', 'GM 后台', 'gmback API、gmback-ui SPA、权限�
 <ul>
     <li>JWT 登录与会话（<code>/api/login</code>、<code>/api/auth/info</code>）</li>
     <li>节点监控（<code>/api/nodes</code>）</li>
-    <li>配置热更（<code>/api/config/reload</code> → 广播 reloadConfig）</li>
-    <li>代码热更（<code>/api/hotswap/jar</code> → 广播 hotswapJar，详见 <a href="#/hotswap">代码热更</a>）</li>
-    <li>运营：发邮件、踢人、封禁/禁言、在线玩家、服务器开关、白名单、公告、兑换码</li>
+    <li>配置热更（<code>/api/config/reload</code> → 广播 reloadConfig；接口成功表示 RPC 已提交，不汇总各 Game 节点的重载结果）</li>
+    <li>代码热更（<code>/api/hotswap/upload</code> 或 <code>/api/hotswap/jar</code> → HotswapControlService → 等待各节点结果，详见 <a href="#/hotswap">代码热更完整指南</a>）</li>
+    <li>运营：发邮件、踢人、封禁/禁言、在线玩家、服务器开关、白名单、金手指、公告、兑换码</li>
     <li>后台用户、页面权限、操作日志</li>
 </ul>
 
 <h2>REST API（GmBackServer）</h2>
 <p>以下与 <code>AdminServer.java</code> 注册路由一致。鉴权列「需要」表示需有效 JWT（<code>Authorization</code> 头）。</p>
+<p>登录请求 JSON 为 <code>{"user":"admin","pass":"sunrise"}</code>；成功响应包含 <code>token</code>、<code>permissions</code> 和 <code>isAdmin</code>。Javalin 全局请求体上限当前为 100 MiB，热更上传仍应在服务端和反向代理两侧设置合理限制。</p>
 <table>
 <thead><tr><th>接口</th><th>方法</th><th>说明</th><th>鉴权</th></tr></thead>
 <tbody>
@@ -488,6 +534,7 @@ registerPage('gmback-server', 'GM 后台', 'gmback API、gmback-ui SPA、权限�
 <tr><td>/api/nodes</td><td>GET</td><td>所有 RPC 节点状态</td><td>需要</td></tr>
 <tr><td>/api/config/reload</td><td>POST</td><td>热更 Luban 配置（广播 reloadConfig）</td><td>需要</td></tr>
 <tr><td>/api/hotswap/jar</td><td>POST</td><td>代码热更 JAR 路径</td><td>需要</td></tr>
+<tr><td>/api/hotswap/upload</td><td>POST</td><td>上传全量业务补丁并执行热更</td><td>需要</td></tr>
 <tr><td>/api/gm/send-mail</td><td>POST</td><td>发送邮件</td><td>需要</td></tr>
 <tr><td>/api/gm/kick</td><td>POST</td><td>踢玩家下线</td><td>需要</td></tr>
 <tr><td>/api/ban/list</td><td>GET</td><td>封禁列表</td><td>需要</td></tr>
@@ -500,6 +547,10 @@ registerPage('gmback-server', 'GM 后台', 'gmback API、gmback-ui SPA、权限�
 <tr><td>/api/server-status</td><td>GET/POST</td><td>服务器开关</td><td>需要</td></tr>
 <tr><td>/api/whitelist</td><td>GET/POST</td><td>白名单列表 / 添加</td><td>需要</td></tr>
 <tr><td>/api/whitelist/remove</td><td>POST</td><td>移除白名单</td><td>需要</td></tr>
+<tr><td>/api/cheat-users</td><td>GET/POST</td><td>金手指用户列表 / 添加</td><td>需要</td></tr>
+<tr><td>/api/cheat-users/abilities</td><td>GET</td><td>可选金手指指令列表</td><td>需要</td></tr>
+<tr><td>/api/cheat-users/update</td><td>POST</td><td>修改金手指用户与能力</td><td>需要</td></tr>
+<tr><td>/api/cheat-users/remove</td><td>POST</td><td>移除金手指用户</td><td>需要</td></tr>
 <tr><td>/api/announcements</td><td>GET/POST</td><td>公告列表 / 发布</td><td>需要</td></tr>
 <tr><td>/api/announcements/update</td><td>POST</td><td>修改公告</td><td>需要</td></tr>
 <tr><td>/api/announcements/remove</td><td>POST</td><td>删除公告</td><td>需要</td></tr>
@@ -512,12 +563,12 @@ registerPage('gmback-server', 'GM 后台', 'gmback API、gmback-ui SPA、权限�
 <tr><td>/api/users/{username}/password</td><td>PUT</td><td>修改密码</td><td>需要（管理员）</td></tr>
 <tr><td>/api/users/{username}/permissions</td><td>GET/PUT</td><td>页面权限</td><td>需要（管理员）</td></tr>
 <tr><td>/api/permission/pages</td><td>GET</td><td>可分配的页面列表</td><td>需要（管理员）</td></tr>
-<tr><td>/api/logs</td><td>GET</td><td>操作日志</td><td>需要</td></tr>
+<tr><td>/api/logs</td><td>GET</td><td>操作日志（当前权限仅管理员可访问）</td><td>需要（管理员）</td></tr>
 </tbody>
 </table>
 
 <h2>GM 指令广播</h2>
-<p>部分运营操作在 GmBack 收到 REST 请求后，通过 RPC <code>SendAll</code> 或定向调用下发到 Game 节点（如 reloadConfig、hotswapJar、kickHuman、banHumanList、muteHumanList、cdkList）：</p>
+<p>部分运营操作在 GmBack 收到 REST 请求后，通过 RPC <code>SendAll</code> 或定向调用下发到 Game 节点（如 reloadConfig、kickHuman、banHumanList、muteHumanList、cdkList）。代码热更使用独立的 <code>HotswapControlService_command</code>，覆盖所有服务进程：</p>
 <div class="flow-diagram">
     <div class="flow-row">
         <span class="flow-node flow-node-danger">gmback-ui</span>
@@ -529,7 +580,7 @@ registerPage('gmback-server', 'GM 后台', 'gmback API、gmback-ui SPA、权限�
         <span class="flow-node flow-node-secondary">Game C</span>
     </div>
 </div>
-<p>每个 Game 节点在 <code>GameRecvGmBackMessageService</code> 中处理指令；兑换码兑换成功后 Game 可反向上报 <code>cdkRedeem</code> 至 GmBack。</p>
+<p>Game 运营指令在 <code>GameRecvGmBackMessageService</code> 中处理；普通 UserController 权限映射使用页面权限 key，后台用户/权限与日志接口由 Controller 再检查 admin。代码热更由各 RPC 进程的 <code>HotswapControlService</code> 返回真实重定义报告；Center 通过 Dashboard HTTP 接口单独纳入。兑换码兑换成功后 Game 反向上报 <code>cdkRedeem</code> 至 GmBack。</p>
 
 <h2>gmback-ui 前端</h2>
 <p>独立 npm 工程，技术栈：<strong>Vue 3 + Vue Router + Element Plus + Tailwind CSS + Vite</strong></p>
@@ -614,9 +665,10 @@ server {
 <tr><td>/ban-player</td><td>ban_player</td><td>玩家封禁</td></tr>
 <tr><td>/mute-player</td><td>mute_player</td><td>玩家禁言</td></tr>
 <tr><td>/whitelist</td><td>whitelist</td><td>白名单</td></tr>
+<tr><td>/cheat-users</td><td>cheat_users</td><td>金手指用户</td></tr>
 <tr><td>/announcement</td><td>announcement</td><td>全服公告</td></tr>
 <tr><td>/cdk</td><td>cdk</td><td>兑换码</td></tr>
-<tr><td>/operation-log</td><td>operation_log</td><td>操作记录</td></tr>
+<tr><td>/operation-log</td><td>operation_log</td><td>操作记录（当前不在可分配给普通用户的页面列表中）</td></tr>
 <tr><td>/user-manager</td><td>user_manager</td><td>用户管理（仅管理员）</td></tr>
 </tbody>
 </table>
@@ -664,7 +716,8 @@ server {
 <tr><td>admin.port</td><td>GM 后台端口</td><td>8010</td></tr>
 <tr><td>admin.user</td><td>登录用户名</td><td>admin</td></tr>
 <tr><td>admin.password</td><td>登录密码</td><td>sunrise</td></tr>
-<tr><td>admin.jwt.expiration</td><td>JWT 过期时间（毫秒）</td><td>86400000</td></tr>
+<tr><td>admin.jwt.expiration</td><td>JWT 过期时间（毫秒）</td><td>864000000</td></tr>
 </tbody>
 </table>
+<p>独立 GmBack 进程调用 <code>JwtUtil.init(expirationMs)</code>，每次启动生成随机 HS256 密钥，因此重启后旧 GM Token 全部失效。RunAllOne 会在后续玩家鉴权初始化时覆盖该静态密钥，详见 HTTP 服务章节的警告。</p>
 `);

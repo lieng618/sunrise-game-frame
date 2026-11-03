@@ -19,6 +19,7 @@ import java.util.Properties;
  */
 public final class RpcScanConfig {
     private static final String DEFAULT_CALL_ENUM_CLASS = "org.sunrise.game.genRpc.gen.CallEnum";
+    private static final String HOTSWAP_CONTROL_PACKAGE = "org.sunrise.game.rpc.hotswap";
 
     private RpcScanConfig() {
     }
@@ -72,6 +73,9 @@ public final class RpcScanConfig {
         }
         if (packages.isEmpty()) {
             throw new FatalStartupException("rpc.scan.packages is empty");
+        }
+        if (!packages.contains(HOTSWAP_CONTROL_PACKAGE)) {
+            packages.add(HOTSWAP_CONTROL_PACKAGE);
         }
         return packages;
     }

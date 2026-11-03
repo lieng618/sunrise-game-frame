@@ -1,6 +1,6 @@
 registerPage('database', '数据库', 'MySQL 表结构、数据存储方式、DbService API', () => `
 <h1>数据库</h1>
-<p class="page-desc">Sunrise Game Frame 使用 MySQL 作为数据持久化存储，共 6 张核心表，字符集 utf8mb4</p>
+<p class="page-desc">Sunrise Game Frame 使用 MySQL 作为数据持久化存储，共 6 张核心表；初始化脚本会删除并重建 sunrise 数据库</p>
 
 <h2>数据库信息</h2>
 <table>
@@ -9,7 +9,7 @@ registerPage('database', '数据库', 'MySQL 表结构、数据存储方式、Db
 <tr><td>数据库名</td><td>sunrise</td></tr>
 <tr><td>连接池</td><td>HikariCP（默认最大连接数 5）</td></tr>
 <tr><td>字符集</td><td>utf8mb4</td></tr>
-<tr><td>初始化脚本</td><td>start/windows/create_sql_table.bat 或 start/linux/create_sql_table.sh</td></tr>
+<tr><td>初始化脚本</td><td>gen/.../genDb/sql/sunrise.sql；Windows/Linux 各有一个包装脚本</td></tr>
 </tbody>
 </table>
 
@@ -20,6 +20,7 @@ registerPage('database', '数据库', 'MySQL 表结构、数据存储方式、Db
 <thead><tr><th>字段</th><th>类型</th><th>说明</th></tr></thead>
 <tbody>
 <tr><td>id</td><td>INT AUTO_INCREMENT</td><td>主键</td></tr>
+<tr><td>create_time</td><td>DATETIME</td><td>创建时间</td></tr>
 <tr><td>ip</td><td>VARCHAR(255)</td><td>对外服 IP（启动时写入，便于排查）</td></tr>
 <tr><td>status</td><td>INT</td><td>状态（0=关闭，1=开启）</td></tr>
 <tr><td>update_time</td><td>DATETIME</td><td>租约心跳：运行中每 5 秒刷新</td></tr>
@@ -33,9 +34,11 @@ registerPage('database', '数据库', 'MySQL 表结构、数据存储方式、Db
 <thead><tr><th>字段</th><th>类型</th><th>说明</th></tr></thead>
 <tbody>
 <tr><td>id</td><td>INT AUTO_INCREMENT</td><td>主键</td></tr>
-<tr><td>ip</td><td>VARCHAR(50)</td><td>RPC 节点 IP</td></tr>
+<tr><td>create_time</td><td>DATETIME</td><td>创建时间</td></tr>
+<tr><td>update_time</td><td>DATETIME</td><td>租约续期时间</td></tr>
+<tr><td>ip</td><td>VARCHAR(255)</td><td>RPC 节点 IP</td></tr>
 <tr><td>port</td><td>INT</td><td>RPC 节点端口</td></tr>
-<tr><td>status</td><td>TINYINT</td><td>状态（0=关闭，1=开启）</td></tr>
+<tr><td>status</td><td>INT</td><td>状态（0=关闭，1=开启）</td></tr>
 </tbody>
 </table>
 
@@ -45,7 +48,8 @@ registerPage('database', '数据库', 'MySQL 表结构、数据存储方式、Db
 <thead><tr><th>字段</th><th>类型</th><th>说明</th></tr></thead>
 <tbody>
 <tr><td>id</td><td>INT AUTO_INCREMENT</td><td>主键（accountId）</td></tr>
-<tr><td>uid</td><td>VARCHAR(50)</td><td>用户唯一标识（邮箱注册时由http服务生成；开发模式可由客户端直接传入）</td></tr>
+<tr><td>create_time / update_time</td><td>DATETIME</td><td>创建与更新时间</td></tr>
+<tr><td>uid</td><td>VARCHAR(255)</td><td>用户唯一标识（邮箱注册时由 Http 服务生成；开发模式可由客户端直接传入）</td></tr>
 </tbody>
 </table>
 
@@ -55,11 +59,12 @@ registerPage('database', '数据库', 'MySQL 表结构、数据存储方式、Db
 <thead><tr><th>字段</th><th>类型</th><th>说明</th></tr></thead>
 <tbody>
 <tr><td>id</td><td>INT AUTO_INCREMENT</td><td>主键</td></tr>
-<tr><td>uid</td><td>VARCHAR(50)</td><td>用户 UID</td></tr>
-<tr><td>human_id</td><td>VARCHAR(50)</td><td>角色 ID（雪花算法生成）</td></tr>
+<tr><td>create_time / update_time</td><td>DATETIME</td><td>创建与更新时间</td></tr>
+<tr><td>uid</td><td>VARCHAR(255)</td><td>用户 UID</td></tr>
+<tr><td>human_id</td><td>VARCHAR(255)</td><td>角色 ID（雪花算法生成）</td></tr>
 <tr><td>server_id</td><td>INT</td><td>服务器 ID</td></tr>
 <tr><td>pos</td><td>INT</td><td>角色位置（0, 1, 2...）</td></tr>
-<tr><td>name</td><td>VARCHAR(50)</td><td>角色名</td></tr>
+<tr><td>name</td><td>VARCHAR(255)</td><td>角色名</td></tr>
 <tr><td>level</td><td>INT</td><td>等级</td></tr>
 </tbody>
 </table>
@@ -70,7 +75,8 @@ registerPage('database', '数据库', 'MySQL 表结构、数据存储方式、Db
 <thead><tr><th>字段</th><th>类型</th><th>说明</th></tr></thead>
 <tbody>
 <tr><td>id</td><td>INT AUTO_INCREMENT</td><td>主键</td></tr>
-<tr><td>human_id</td><td>VARCHAR(50) UNIQUE</td><td>角色 ID</td></tr>
+<tr><td>create_time / update_time</td><td>DATETIME</td><td>创建与更新时间</td></tr>
+<tr><td>human_id</td><td>VARCHAR(255) UNIQUE</td><td>角色 ID</td></tr>
 <tr><td>role_data</td><td>MEDIUMBLOB</td><td>角色存档数据（JSON 格式，模块名→JSON字符串）</td></tr>
 </tbody>
 </table>
@@ -81,69 +87,93 @@ registerPage('database', '数据库', 'MySQL 表结构、数据存储方式、Db
 <thead><tr><th>字段</th><th>类型</th><th>说明</th></tr></thead>
 <tbody>
 <tr><td>id</td><td>INT AUTO_INCREMENT</td><td>主键</td></tr>
+<tr><td>create_time / update_time</td><td>DATETIME</td><td>创建与更新时间</td></tr>
 <tr><td>server_id</td><td>INT</td><td>服务 ID</td></tr>
-<tr><td>name</td><td>VARCHAR(50)</td><td>服务名称（@RpcService 类名）</td></tr>
+<tr><td>name</td><td>VARCHAR(255)</td><td>服务或 GameSystem 名称</td></tr>
 <tr><td>data</td><td>MEDIUMBLOB</td><td>服务存档数据（JSON 格式）</td></tr>
 </tbody>
 </table>
+<div class="callout callout-warn">
+    <p><strong>当前 DDL 的唯一约束：</strong>只有 <code>human_info.human_id</code> 声明了 UNIQUE。<code>account.uid</code>、<code>human_list(uid, server_id, pos)</code>、<code>server_data(server_id, name)</code> 都没有唯一约束；并发创建或重复部署时可能产生重复业务记录，应用层的单行查询与 Map 缓存不能替代数据库约束。</p>
+</div>
 
 <h2>数据存储方式</h2>
 <h3>玩家数据</h3>
-<p>每个模块通过 <code>putDbData(key, value)</code> / <code>getDbData(key, typeRef, callback)</code> 把数据存到 <code>human_info.role_data</code> 字段：</p>
+<p>模块内先通过 <code>putDbData(key, value)</code> 把各字段写入自己的 <code>dataMap</code>。玩家存档时 <code>HumanObject.save()</code> 收集为“模块简单类名 → dataMap”，再整体序列化到 <code>human_info.role_data</code>：</p>
 <pre><code class="language-json">{
-    "DataModule": "{\\"name\\":\\"test\\",\\"level\\":1,\\"exp\\":0,\\"headIcon\\":0,\\"fightPower\\":0,\\"sex\\":0}",
-    "ItemModule": "{\\"items\\":[{\\"itemId\\":1,\\"count\\":99}],\\"capacity\\":100}",
-    "PlayerUnitModule": "{\\"mapId\\":1001,\\"x\\":0,\\"y\\":0,\\"attributes\\":{}}",
-    "TaskModule": "{\\"tasks\\":[{\\"taskId\\":1,\\"status\\":2,\\"progress\\":0}]}",
-    "FriendModule": "{\\"friends\\":[],\\"requests\\":[]}",
-    "MailModule": "{\\"mails\\":[]}",
-    "ActivityModule": "{\\"activities\\":[]}",
-    "MinerModule": "{\\"minerData\\":{}}",
-    "CdkModule": "{\\"usedCodes\\":[\\"VIP666\\",\\"ABCD1234EFGH\\"]}"
+  "DataModule": {
+    "name": "\"test\"",
+    "level": "1",
+    "exp": "0",
+    "headIcon": "\"1\"",
+    "fightPower": "0",
+    "sex": "1",
+    "ld": "1793632000000",
+    "lw": "1793632000000"
+  },
+  "ItemModule": {
+    "items": "[{\"itemId\":1,\"count\":99}]"
+  },
+  "PlayerUnitModule": {
+    "baseValues": "{\"1\":100}",
+    "id": "10001",
+    "mapPostX": "0.0",
+    "mapPostY": "0.0",
+    "mapPostZ": "0.0",
+    "Orientation": "0.0"
+  },
+  "CdkModule": {
+    "usedCodes": "[\"VIP666\"]"
+  }
 }</code></pre>
+<p>上例只展示代表字段；实际模块和字段以各 Module 的 <code>save()</code> 为准。每个内部值仍是 JSON 文本字符串，读取时由 <code>getDbData()</code> 配合 <code>TypeReference</code> 还原。</p>
 
 <h3>服务数据</h3>
 <p>RPC 服务通过 <code>BaseService</code> 的 <code>dataMap</code> 存到 <code>server_data.data</code> 字段，格式类似。ServiceManager.initAll() 时异步加载，save() 时异步写入。</p>
 
 <h2>DbService API</h2>
-<pre><code class="language-java">DbService dbService = DbManager.getDbService();
+<pre><code class="language-java">DbService db = DbManager.getDbService();
 
-// ===== 同步查询 =====
-List&lt;Map&lt;String, Object&gt;&gt; all = dbService.queryAll("account");
-Map&lt;String, Object&gt; one = dbService.queryById("account", accountId, "id");
-List&lt;Map&lt;String, Object&gt;&gt; list = dbService.queryGetAllByParams("human_list", "uid", uid);
-Map&lt;String, Object&gt; single = dbService.queryGetOneByParams("human_list", "human_id", humanId);
-List&lt;Object&gt; column = dbService.queryAllSingleColumn("human_list", "human_id", String.class);
+// 同步查询（参数是完整 SQL）
+Map&lt;String, Object&gt; one = db.queryGetOneByParams(
+    "select * from \`account\` where \`id\` = ?", accountId);
+List&lt;Map&lt;String, Object&gt;&gt; list = db.queryGetAllByParams(
+    "select * from \`human_list\` where \`uid\` = ?", uid);
+List&lt;String&gt; ids = db.queryAllSingleColumn(
+    "select \`human_id\` from \`human_list\`");
 
-// ===== 异步查询（回调在主线程执行）=====
-dbService.queryGetAllByParamsAsync("human_list", "uid", uid, results -> {
-    // 处理结果
-});
+// 异步查询：回调运行在 DbService 线程池
+db.queryGetAllByParamsAsync(results -&gt; {
+    AsyncEventManager.addAsyncEvent(() -&gt; {
+        // 游戏业务状态修改应回到业务线程
+    });
+}, "select * from \`human_list\` where \`uid\` = ?", uid);
 
-// ===== 同步执行 =====
-dbService.execute("INSERT INTO account (uid) VALUES (?)", uid);
-int generatedId = dbService.executeWithGeneratedKey("INSERT INTO human_list ...", params);
+// 同步写入
+db.execute("update \`account\` set \`update_time\` = now() where \`uid\` = ?", uid);
+Object id = db.executeWithGeneratedKey(
+    "insert into \`account\` (\`uid\`) values (?)", uid);
 
-// ===== 异步执行 =====
-dbService.executeAsync("UPDATE human_info SET role_data = ? WHERE human_id = ?", data, humanId);
-dbService.executeAsync(callback, "DELETE FROM human_list WHERE human_id = ?", humanId);
-dbService.executeAsyncWithGeneratedKey("INSERT INTO ...", params, id -> {
-    // 获取自增 ID
-});</code></pre>
+// 异步写入
+db.executeAsync("update \`human_info\` set \`role_data\` = ? where \`human_id\` = ?",
+    data, humanId);
+db.executeAsyncWithGeneratedKey(id -&gt; { /* 自增 ID 回调 */ },
+    "insert into \`human_list\` (\`uid\`, \`human_id\`, \`server_id\`, \`pos\`) values (?, ?, ?, ?)",
+    uid, humanId, serverId, pos);</code></pre>
 `);
 
 registerPage('config', '配置参考', '各服务配置项说明', () => `
 <h1>配置参考</h1>
-<p class="page-desc">所有服务都从 config/ 目录读取 .properties 配置文件，通过 ConfigReader 加载</p>
+<p class="page-desc">服务以命令行第一个参数读取 properties 文件。仓库提交的是模板，使用 reset-config 脚本生成本地实际配置。</p>
 
-<h2>通用配置项</h2>
-<p>以下配置项在所有服务的配置文件中都有：</p>
+<h2>数据库与可观测配置</h2>
+<p>中心服与所有 RPC 业务进程都使用以下 JDBC、日志和内部认证配置：</p>
 <table>
 <thead><tr><th>配置键</th><th>说明</th><th>示例</th></tr></thead>
 <tbody>
-<tr><td>jdbc.url</td><td>MySQL 连接地址</td><td>jdbc:mysql://127.0.0.1:3306/sunrise?useUnicode=true&characterEncoding=utf8mb4</td></tr>
+<tr><td>jdbc.url</td><td>MySQL 连接地址</td><td>jdbc:mysql://127.0.0.1:3306/sunrise</td></tr>
 <tr><td>jdbc.user</td><td>数据库用户</td><td>root</td></tr>
-<tr><td>jdbc.password</td><td>数据库密码</td><td>666666</td></tr>
+<tr><td>jdbc.password</td><td>数据库密码（模板默认仅供本地开发，生产必须覆盖）</td><td>123456</td></tr>
 <tr><td>jdbc.pool.maximum-size</td><td>连接池最大连接数</td><td>5</td></tr>
 <tr><td>jdbc.pool.minimum-idle</td><td>连接池最小空闲连接数</td><td>3</td></tr>
 <tr><td>jdbc.pool.connection-timeout</td><td>获取连接超时（毫秒）</td><td>30000</td></tr>
@@ -153,9 +183,20 @@ registerPage('config', '配置参考', '各服务配置项说明', () => `
 <tr><td>master.address</td><td>中心服地址</td><td>127.0.0.1</td></tr>
 <tr><td>master.port</td><td>中心服端口</td><td>8000</td></tr>
 <tr><td>report.address</td><td>本机上报 IP</td><td>127.0.0.1</td></tr>
-<tr><td>rpc.node.type</td><td>RPC 节点类型，用于连接策略与拓扑展示（external/game/global/http/gmback 等）</td><td>game</td></tr>
-<tr><td>rpc.node.server-id</td><td>RPC 节点 ID，写入 rpc_server_system，集群内唯一</td><td>200</td></tr>
 <tr><td>log.level</td><td>日志级别</td><td>DEBUG</td></tr>
+<tr><td>rpc.auth-token</td><td>内部 RPC 握手共享密钥；所有 RPC 节点与中心服必须相同</td><td>随机长字符串</td></tr>
+</tbody>
+</table>
+
+<h2>RPC 节点配置</h2>
+<table>
+<thead><tr><th>配置键</th><th>说明</th><th>示例</th></tr></thead>
+<tbody>
+<tr><td>rpc.node.type</td><td>节点类型，用于连接策略与拓扑</td><td>game</td></tr>
+<tr><td>rpc.node.server-id</td><td>集群内唯一节点 ID，写入 rpc_server_system</td><td>200</td></tr>
+<tr><td>rpc.scan.packages</td><td>必填，逗号分隔的 @RpcService 扫描包；运行时自动加入热更控制包</td><td>org.sunrise.game.game.service</td></tr>
+<tr><td>rpc.call-enum-class</td><td>生成 RPC ID 的 CallEnum 全类名</td><td>org.sunrise.game.genRpc.gen.CallEnum</td></tr>
+<tr><td>hotswap.include.packages</td><td>允许热更的类包前缀</td><td>org.sunrise.game</td></tr>
 </tbody>
 </table>
 
@@ -177,6 +218,9 @@ registerPage('config', '配置参考', '各服务配置项说明', () => `
 <tr><td>external.listen.tcp</td><td>tcp协议是否启动</td><td>true</td></tr>
 <tr><td>external.listen.ws</td><td>ws协议是否启动</td><td>true</td></tr>
 <tr><td>external.listen.kcp</td><td>kcp协议是否启动</td><td>true</td></tr>
+<tr><td>external.listen.port</td><td>固定 TCP 起始端口；WS=p+1，KCP=p+2；留空自动探测</td><td>10000</td></tr>
+<tr><td>external.listen.base-port</td><td>自动探测的起始端口</td><td>10000</td></tr>
+<tr><td>external.listen.port-range</td><td>最多扫描的端口数，必须 ≥3</td><td>100</td></tr>
 <tr><td>external.rate-limit.refill-per-minute</td><td>单连接令牌桶的长期补充速度</td><td>1200</td></tr>
 <tr><td>external.rate-limit.burst</td><td>单连接允许的最大突发消息数</td><td>120</td></tr>
 <tr><td>external.rate-limit.abuse-window-seconds</td><td>违规拒绝计数窗口</td><td>5</td></tr>
@@ -189,7 +233,8 @@ registerPage('config', '配置参考', '各服务配置项说明', () => `
 <table>
 <thead><tr><th>配置键</th><th>说明</th><th>示例</th></tr></thead>
 <tbody>
-<tr><td>config.path</td><td>Luban 配置 JSON 路径</td><td>E:/sunrise-game-frame/tables/json</td></tr>
+<tr><td>config.path</td><td>Luban 配置 JSON 目录；相对路径相对配置文件目录</td><td>../tables/json</td></tr>
+<tr><td>config.nav.path</td><td>地图导航 JSON 目录</td><td>../tables/mapjson</td></tr>
 <tr><td>login.queue.max-per-second</td><td>登录排队：每秒允许放行的最大登录数（含直通与出队），超出则入队等待</td><td>100</td></tr>
 <tr><td>player.auth.enabled</td><td>游戏服是否强制校验 C2S_Login Token</td><td>false</td></tr>
 <tr><td>player.jwt.secret</td><td>玩家 JWT 密钥（须与 http-config 一致）</td><td>sunrise-player-jwt-secret-change-me-in-production-32b</td></tr>
@@ -218,7 +263,9 @@ registerPage('config', '配置参考', '各服务配置项说明', () => `
 <tr><td>admin.port</td><td>GM 后台 API 端口（非前端页面端口）</td><td>8010</td></tr>
 <tr><td>admin.user</td><td>登录用户名</td><td>admin</td></tr>
 <tr><td>admin.password</td><td>登录密码</td><td>sunrise</td></tr>
-<tr><td>admin.jwt.expiration</td><td>JWT 过期时间（毫秒）</td><td>86400000</td></tr>
+<tr><td>admin.jwt.expiration</td><td>GM JWT 过期时间（毫秒）</td><td>864000000</td></tr>
+<tr><td>hotswap.upload-dir</td><td>GM 上传热更 JAR 的保存目录</td><td>/data/sunrise/hotfix/uploaded</td></tr>
+<tr><td>hotswap.center-dashboard-url</td><td>Center Dashboard HTTP 地址；配置后纳入批量热更</td><td>http://127.0.0.1:8088</td></tr>
 </tbody>
 </table>
 
@@ -238,19 +285,26 @@ registerPage('config', '配置参考', '各服务配置项说明', () => `
 <thead><tr><th>配置键</th><th>说明</th><th>示例</th></tr></thead>
 <tbody>
 <tr><td>master.id</td><td>中心服 ID，合服固定为 0（不连 Center）</td><td>0</td></tr>
+<tr><td>rpc.node.type</td><td>单进程节点类型；当前模板为 runallone</td><td>runallone</td></tr>
+<tr><td>rpc.node.server-id</td><td>单进程 RPC 节点 ID，仍写入 rpc_server_system</td><td>100</td></tr>
+<tr><td>rpc.scan.packages</td><td>必须覆盖所有内置服务包，模板使用完整前缀</td><td>org.sunrise.game</td></tr>
+<tr><td>rpc.call-enum-class</td><td>CallEnum 全类名</td><td>org.sunrise.game.genRpc.gen.CallEnum</td></tr>
 <tr><td>external.address</td><td>对外暴露 IP（客户端连接、Http 注册 External 地址）</td><td>127.0.0.1</td></tr>
-<tr><td>config.path</td><td>Luban 配置 JSON 路径</td><td>E:/sunrise-game-frame/tables/json</td></tr>
+<tr><td>external.listen.* / external.rate-limit.*</td><td>对外服协议开关、端口块与单连接限流，含义同 external-config</td><td>见模板</td></tr>
+<tr><td>config.path</td><td>Luban 配置 JSON 目录；相对路径相对配置文件目录</td><td>../tables/json</td></tr>
+<tr><td>config.nav.path</td><td>地图导航 JSON 目录</td><td>../tables/mapjson</td></tr>
 <tr><td>http.port</td><td>合服内嵌 Http 服务端口</td><td>8090</td></tr>
 <tr><td>admin.port</td><td>合服内嵌 GM API 端口</td><td>8010</td></tr>
 <tr><td>admin.user</td><td>GM 登录用户名（gmback-ui 登录）</td><td>admin</td></tr>
 <tr><td>admin.password</td><td>GM 登录密码</td><td>sunrise</td></tr>
-<tr><td>admin.jwt.expiration</td><td>JWT 过期时间（毫秒）</td><td>864000000</td></tr>
+<tr><td>admin.jwt.expiration</td><td>GM JWT 过期时间（毫秒）</td><td>864000000</td></tr>
 <tr><td>login.queue.max-per-second</td><td>登录排队每秒放行上限（与 game-config 含义相同）</td><td>100</td></tr>
 <tr><td>player.auth.enabled</td><td>玩家 Token 鉴权开关（Http + Game 须一致）</td><td>false</td></tr>
 <tr><td>player.jwt.secret</td><td>玩家 JWT 密钥</td><td>sunrise-player-jwt-secret-change-me-in-production-32b</td></tr>
 <tr><td>player.jwt.expiration</td><td>玩家 JWT 过期时间（毫秒）</td><td>86400000</td></tr>
 <tr><td>mail.smtp.username</td><td>SMTP 发件邮箱</td><td>your@qq.com</td></tr>
 <tr><td>mail.smtp.password</td><td>SMTP 授权码</td><td>xxxx</td></tr>
+<tr><td>hotswap.*</td><td>热更包扫描、上传目录等配置</td><td>见模板</td></tr>
 </tbody>
 </table>
 
@@ -259,6 +313,9 @@ registerPage('config', '配置参考', '各服务配置项说明', () => `
     <li><code>player.auth.enabled=false</code>（默认）：压测机器人、消息发送工具等可直接用任意 uid 登录；HTTP 地址接口也可通过 query <code>uid</code> 访问</li>
     <li><code>player.auth.enabled=true</code>：须先邮箱登录获取 Token，HTTP 请求带 <code>Authorization</code> Header，游戏登录发 <code>C2S_Login(token)</code></li>
 </ul>
+
+<h2>占位符解析顺序</h2>
+<p>配置文件中的 <code>\${ENV}</code> / <code>\${ENV:default}</code> 按“环境变量 → JVM <code>-D</code> 系统属性 → 默认值”解析。无默认值且找不到时启动失败。该规则由 <code>ConfigPlaceholderResolver</code> 实现。</p>
 
 <h2>Docker 配置差异</h2>
 <table>

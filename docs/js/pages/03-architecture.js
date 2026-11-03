@@ -1,10 +1,10 @@
 registerPage('architecture', '架构总览', '多进程架构、服务职责、数据流、单线程设计', () => `
 <h1>架构总览</h1>
-<p class="page-desc">Sunrise Game Frame 采用"中心服 + 对外服 + 游戏服 + 全局服 + HTTP 服务 + GM 后台"的多进程架构，所有业务节点支持动态扩容</p>
+<p class="page-desc">Sunrise Game Frame 采用"中心服 + 对外服 + 游戏服 + 全局服 + HTTP 服务 + GM 后台 + 可扩展 RPC 服务"的架构，可多进程拆分，也可组合为单进程。RPC 链接可动态发现，但有状态业务仍需遵守所有权约束。</p>
 
 <h2>架构图</h2>
 <div class="arch-diagram">
-    <img src="https://files.seeusercontent.com/2026/04/27/Im3e/sunrise-game-frame.png" alt="架构图" style="max-width:100%;border-radius:8px;" />
+    <img src="img/sunrise-game-frame.png" alt="架构图" style="max-width:100%;border-radius:8px;" />
 </div>
 
 <h2>各服务职责</h2>
@@ -12,12 +12,12 @@ registerPage('architecture', '架构总览', '多进程架构、服务职责、�
     <div class="card">
         <div class="card-icon">⚙️</div>
         <div class="card-title">CenterServer</div>
-        <div class="card-desc">所有 RPC 节点的注册中心。接收节点上报（ip/port/serverId/nodeId/nodeType）、按 rpc.connect.* 连接策略决定向谁广播地址（未配置则全量互连）、维护在线节点信息。内置 Dashboard（默认 8088）展示 RPC 拓扑。不执行业务 RPC。6 秒无上报视为失效</div>
+        <div class="card-desc">RPC 节点的发现中心。接收 ip/port/serverId/nodeId/nodeType/instanceId 上报，按 rpc.connect.* 决定向谁广播对端地址（未配置则全量互连），3 秒心跳，6 秒无上报视为失效。内置 Dashboard（默认 8088）展示拓扑并提供 Center 热更 HTTP 入口。不执行业务 RPC。</div>
     </div>
     <div class="card">
         <div class="card-icon">🌐</div>
         <div class="card-title">ExternalServer</div>
-        <div class="card-desc">对外网关服。同时监听 TCP/WS/KCP 三种协议（端口依次 +1）、验证客户端首包认证、分配 connectionId、令牌桶消息限流（默认长期1200条/分钟、突发120条）、转发消息到 Game 服、接收 Game 回包发回客户端</div>
+        <div class="card-desc">客户端网关。TCP/WS/KCP 可通过配置独立启停，启用时占用连续端口块（base、base+1、base+2）。校验首包前缀、分配 connectionId、执行每连接令牌桶限流，把业务包转发到 Game 节点并把回包写回客户端。</div>
     </div>
     <div class="card">
         <div class="card-icon">🎮</div>
@@ -27,7 +27,7 @@ registerPage('architecture', '架构总览', '多进程架构、服务职责、�
     <div class="card">
         <div class="card-icon">🌍</div>
         <div class="card-title">GlobalServer</div>
-        <div class="card-desc">全局跨服服务。所有需要跨服共享的数据和逻辑都放在这里，目前实现了：聊天服务（GlobalChatService）、好友服务（GlobalFriendService）、邮件服务（GlobalMailService）、排行榜服务（GlobalRankService）、玩家简要信息查询（GlobalPlayerInfoService）</div>
+        <div class="card-desc">跨逻辑服共享服务，目前包含聊天、好友、邮件、排行榜与玩家简要信息。状态当前保存在进程内存并周期性写入 server_data；多实例部署必须按玩家分片或保持单写者，不能让同一份状态被多个实例随机读写。</div>
     </div>
     <div class="card">
         <div class="card-icon">🔗</div>
@@ -37,7 +37,7 @@ registerPage('architecture', '架构总览', '多进程架构、服务职责、�
     <div class="card">
         <div class="card-icon">🛡️</div>
         <div class="card-title">GmBackServer</div>
-        <div class="card-desc">GM 后台 API（Javalin + JWT，端口 admin.port）。运营指令、节点监控、配置/代码热更、用户权限与操作日志。浏览器页面由前端工程 gmback-ui（Vue 3 SPA）提供</div>
+        <div class="card-desc">GM 后台 API（Javalin + JWT，端口 admin.port）。提供节点监控、运营指令、金手指、配置重载、代码热更、用户权限与操作日志。浏览器页面由前端工程 gmback-ui（Vue 3 SPA）提供，API 与页面分进程部署。</div>
     </div>
 </div>
 
@@ -122,19 +122,19 @@ registerPage('architecture', '架构总览', '多进程架构、服务职责、�
         <span class="flow-node flow-node-secondary">Game A/B/C</span>
     </div>
 </div>
-<p>GM 后台通过 <code>GameRecvGmBackMessageService_recvMessage</code> 广播指令（reloadConfig/hotswapJar/kickHuman/banHumanList/muteHumanList/cdkList），每个 Game 节点根据本地在线玩家情况执行对应动作。兑换码兑换成功后 Game 反向上报 <code>cdkRedeem</code> 至 GmBack。</p>
+<p>GM 后台通过 <code>GameRecvGmBackMessageService_recvMessage</code> 下发 Game 运营指令（reloadConfig/kickHuman/banHumanList/muteHumanList/cdkList），每个 Game 节点根据本地在线玩家情况执行对应动作。代码热更使用所有 RPC 服务共同注册的 <code>HotswapControlService_command</code>，由 GM 逐个节点调用并等待真实结果。兑换码兑换成功后 Game 反向上报 <code>cdkRedeem</code> 至 GmBack。</p>
 
 <h2>单线程无锁设计</h2>
-<p>本项目采用 <strong>单线程 DispatchThread + 消息队列</strong> 模型：</p>
+<p>每个 RPC 节点采用 <strong>单业务 DispatchThread + 消息队列</strong> 模型：</p>
 <ul>
-    <li>每个服务进程内的消息管理器运行独立的 DispatchThread（5ms 间隔心跳）</li>
-    <li>所有业务逻辑在单线程内顺序执行，无需加锁</li>
-    <li>DB 异步操作通过 <code>AsyncEventManager</code> 将回调投递回主线程</li>
+    <li>RPC Server 的消息管理器以 5ms 间隔执行接收、发送、RPC 超时检测和 ServiceManager 心跳</li>
+    <li>客户端协议、RPC 回调、玩家消息队列和 GameSystem 在同一业务线程上串行推进，玩家内存状态无需业务锁</li>
+    <li>Netty EventLoop、Javalin/Jetty 和数据库线程池是独立线程；DB 回调通过 <code>AsyncEventManager</code> 再投递回游戏业务线程</li>
     <li>RPC 调用通过 <code>messageId</code> 实现异步回调，不阻塞主线程</li>
     <li>玩家消息队列<code>HumanObject.msgQueue</code>客户端发来的消息包，在队列中单线程处理</li>
 </ul>
 <div class="callout callout-tip">
-    <p><strong>💡 设计理念</strong>：游戏服务器中玩家操作天然串行，单线程模型避免了多线程并发问题（无需 synchronized / volatile / ConcurrentHashMap），同时通过异步 IO 保证吞吐量。</p>
+    <p><strong>💡 线程归属</strong>：业务串行并不等于整个 JVM 单线程。编写 HTTP、DB 回调、Controller 或热更逻辑时仍必须明确线程归属；跨线程进入游戏状态应通过消息或异步事件回到业务 DispatchThread。</p>
 </div>
 
 <h2>BaseMessageManager 消息驱动核心</h2>
@@ -164,4 +164,5 @@ registerPage('architecture', '架构总览', '多进程架构、服务职责、�
 <tr><td>RPC服务</td><td>20000+ 自动分配</td><td>TCP</td><td>RPC 服务端口，所有RPC节点都会占用一个端口</td></tr>
 </tbody>
 </table>
+<p>端口均可通过对应配置文件调整。External 的 TCP/WS/KCP 可以按需关闭，关闭的协议端口上报为 0；RPC 端口保存在 <code>rpc_server_system</code>，相同 serverId 重启时优先复用原端口。</p>
 `);

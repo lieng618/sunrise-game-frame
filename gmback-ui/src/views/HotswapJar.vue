@@ -8,8 +8,17 @@
             clearable>
         </el-input>
         <div class="form-hint">
-          填写 Game 服进程可访问的 JAR 绝对路径
+          推荐使用构建生成的 sunrise-hotfix.jar；所有节点必须能访问同一路径
         </div>
+      </el-form-item>
+      <el-form-item label="上传并热更">
+        <el-upload
+            :show-file-list="false"
+            :http-request="uploadAndHotswap"
+            :disabled="uploading"
+            accept=".jar">
+          <el-button :loading="uploading">选择 JAR 并执行</el-button>
+        </el-upload>
       </el-form-item>
     </el-form>
     <div class="flex justify-end">
@@ -30,13 +39,42 @@
     </div>
   </el-card>
 
+  <el-card v-if="lastResult" shadow="never" class="page-card rounded-lg mb-4">
+    <template #header>
+      <div class="flex items-center justify-between">
+        <span>最近一次热更结果</span>
+        <span>
+          成功 {{ lastResult.succeeded }} / {{ lastResult.total }}，失败 {{ lastResult.failed }}
+        </span>
+      </div>
+    </template>
+    <el-table :data="lastResult.results" stripe class="table-full">
+      <el-table-column prop="nodeId" label="Node ID" width="220"/>
+      <el-table-column prop="nodeType" label="节点类型" width="150"/>
+      <el-table-column prop="status" label="状态" width="150">
+        <template #default="scope">
+          <el-tag :type="statusTagType(scope.row.status)">{{ scope.row.status }}</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column label="重定义" width="110" align="center">
+        <template #default="scope">{{ resultCount(scope.row.redefinedClasses) }}</template>
+      </el-table-column>
+      <el-table-column label="未加载" width="110" align="center">
+        <template #default="scope">{{ resultCount(scope.row.skippedNotLoadedClasses) }}</template>
+      </el-table-column>
+      <el-table-column label="结果" min-width="280">
+        <template #default="scope">{{ scope.row.message }}</template>
+      </el-table-column>
+    </el-table>
+  </el-card>
+
   <el-card shadow="never" class="page-card rounded-lg">
     <el-table :data="filteredData" stripe class="table-full" v-loading="loading">
       <template #empty>
         <TableEmpty
             :error="loadError"
             empty-title="暂无可热更节点"
-            empty-hint="需要至少一个在线的 GameServer 节点"
+            empty-hint="需要至少一个在线的服务节点"
             @retry="fetchNodes"
         />
       </template>
@@ -85,6 +123,7 @@ import TableEmpty from '@/components/feedback/TableEmpty.vue';
 
 import {
   apiFetch, handleApiResult, safeArray, apiMsg, confirmDialog, isUserCancel, MSG,
+  getAuthToken, handleLoginExpired,
 } from '@/utils';
 
 export default {
@@ -96,15 +135,15 @@ export default {
       allReloading: false,
       allNodes: [],
       jarPath: '',
+      lastResult: null,
+      uploading: false,
     });
 
-    const filteredData = computed(() =>
-        state.allNodes.filter((node) => node.type === 'GameServer')
-    );
+    const filteredData = computed(() => state.allNodes);
 
     const allReloadDisabledReason = computed(() => {
       if (!state.jarPath.trim()) return '请先填写 JAR 包路径';
-      if (filteredData.value.length === 0) return '当前没有可热更的 GameServer 节点';
+      if (filteredData.value.length === 0) return '当前没有可热更的服务节点';
       return '';
     });
 
@@ -144,7 +183,14 @@ export default {
       });
       if (result.unauthorized) return false;
       if (handleApiResult(result, {errorMsg: '代码热更失败'}) === 'ok') {
-        ElementPlus.ElMessage.success('代码热更指令已发送');
+        state.lastResult = result.data?.data;
+        const failed = Number(state.lastResult?.failed || 0);
+        if (failed > 0) {
+          ElementPlus.ElMessage.warning(`热更完成，${failed} 个节点失败`);
+        } else {
+          ElementPlus.ElMessage.success('热更完成，已收到所有节点结果');
+        }
+        await fetchNodes();
         return true;
       }
       return false;
@@ -157,7 +203,7 @@ export default {
       }
       try {
         await confirmDialog(
-            `确定要对所有 GameServer 节点执行代码热更吗？\nJAR: ${state.jarPath}\n共 ${filteredData.value.length} 个节点。`,
+            `确定要对所有在线服务节点执行代码热更吗？\nJAR: ${state.jarPath}\n共 ${filteredData.value.length} 个节点。`,
             '操作确认'
         );
         state.allReloading = true;
@@ -189,6 +235,44 @@ export default {
       }
     };
 
+    const uploadAndHotswap = async ({file}) => {
+      if (!file) return;
+      state.uploading = true;
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+        const response = await fetch('/api/hotswap/upload', {
+          method: 'POST',
+          headers: {Authorization: getAuthToken() || ''},
+          body: formData,
+        });
+        if (response.status === 401) {
+          handleLoginExpired();
+          return;
+        }
+        let data = null;
+        try {
+          data = await response.json();
+        } catch {
+          data = null;
+        }
+        const result = {ok: response.ok, status: response.status, data};
+        if (handleApiResult(result, {errorMsg: '上传热更失败'}) === 'ok') {
+          state.lastResult = data.data;
+          state.jarPath = data.data?.targetJar || state.jarPath;
+          const failed = Number(data.data?.failed || 0);
+          ElementPlus.ElMessage[failed > 0 ? 'warning' : 'success'](
+              failed > 0 ? `热更完成，${failed} 个节点失败` : '上传完成，已收到所有节点结果'
+          );
+          await fetchNodes();
+        }
+      } catch {
+        ElementPlus.ElMessage.error(MSG.NETWORK);
+      } finally {
+        state.uploading = false;
+      }
+    };
+
     onMounted(fetchNodes);
 
     return {
@@ -196,10 +280,24 @@ export default {
       filteredData,
       allReloadDisabledReason,
       nodeDisabledReason,
+      uploadAndHotswap,
+      statusTagType,
+      resultCount,
       fetchNodes,
       hotswapAll,
       hotswapNode,
     };
   },
 };
+
+function statusTagType(status) {
+  if (status === 'FAILED') return 'danger';
+  if (status === 'PARTIAL' || status === 'NO_APPLICABLE') return 'warning';
+  if (status === 'SUCCESS') return 'success';
+  return 'info';
+}
+
+function resultCount(value) {
+  return Array.isArray(value) ? value.length : 0;
+}
 </script>

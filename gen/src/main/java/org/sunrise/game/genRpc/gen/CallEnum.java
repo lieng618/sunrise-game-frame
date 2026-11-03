@@ -76,4 +76,6 @@ public class CallEnum {
     public static final int HttpRecvMessageService_setWhitelist = 30;
     /** {@code org.sunrise.game.http.service.HttpRecvMessageService#updateExternalRemoteData(int,String,int,int,int,boolean,boolean,boolean)} */
     public static final int HttpRecvMessageService_updateExternalRemoteData = 31;
+    /** {@code org.sunrise.game.rpc.hotswap.HotswapControlService#command(String)} */
+    public static final int HotswapControlService_command = 38;
 }

@@ -1,6 +1,6 @@
 registerPage('custom-rpc-service', '可扩展 RPC 服务', '新建 RPC 进程、接入中心服、编写 Service 与调用', () => `
 <h1>可扩展 RPC 服务</h1>
-<p class="page-desc">除中心服、对外服、游戏服、全局服、HTTP、GM 后台等内置进程外，框架支持按同一套模式新增任意 RPC 业务进程：创建 RpcNode、向中心服注册、与其他节点互连，并通过 @RpcService 暴露/调用远程方法。</p>
+<p class="page-desc">除内置进程外，可新增独立 RPC 进程：读取配置创建 RpcNode、扫描 @RpcService、向中心服注册，并通过 CallEnum 暴露和调用远程方法。</p>
 
 <h2>适用场景</h2>
 <table>
@@ -22,49 +22,31 @@ registerPage('custom-rpc-service', '可扩展 RPC 服务', '新建 RPC 进程、
 <tr><td>3 ~ 99</td><td>预留：HTTP 及同类扩展 RPC 服务</td><td>HttpServer 默认 3</td></tr>
 <tr><td>100 ~ 199</td><td>对外服</td><td>External 默认 100</td></tr>
 <tr><td>200 ~ 3999</td><td>游戏服</td><td>Game 默认 200</td></tr>
-<tr><td>4000 ~ 4096</td><td>全局服</td><td>Global 默认 4000</td></tr>
+<tr><td>4000 ~ 4095</td><td>全局服</td><td>Global 默认 4000</td></tr>
 </tbody>
 </table>
 <p>新增自定义服务时，请在 <strong>3~99</strong>（或你们重新划分的空闲段）选取未占用的 id，配置唯一的 <code>rpc.node.type</code>（如 <code>notify</code>），且全集群唯一。</p>
 
 <h2>第一步：启动类（创建 RpcNode 并接入中心服）</h2>
-<p>所有业务 RPC 进程启动模板一致，参考 <code>HttpServerStartUp</code>：</p>
+<p>所有业务 RPC 进程启动模板一致，参考当前 <code>HttpServerStartUp</code>。服务包由配置驱动，不需要在 main 里手写 <code>CallUtils.init</code>：</p>
 <pre><code class="language-java">public class HttpServerStartUp {
     public static void main(String[] args) {
-        if (args.length == 0) {
-            args = new String[]{"./config/http-config.properties"};
-        }
-        ConfigReader.loadConfig(args[0]);
-        Properties properties = ConfigReader.getProp();
-        if (properties == null) {
-            return;
-        }
-        int serverId = Integer.parseInt(properties.getProperty("rpc.node.server-id"));
-        String nodeType = properties.getProperty("rpc.node.type");
-        System.setProperty("programName", "HttpServer-" + serverId);
-        Utils.setLogLevel(properties.getProperty("log.level"));
-
-        var rpcNode = RpcNodeManager.createRpcNode(serverId, nodeType);
-        CallUtils.init(rpcNode.getNodeId(),
-            Collections.singletonList("org.sunrise.game.http.service"),
-            CallEnum.class);
-        rpcNode.start();
-
-        Utils.startMemoryCheck();
+        RpcNodeManager.runMain(args, "./config/http-config.properties", () -&gt;
+            JwtUtil.init(ConfigReader.getProp()));
     }
 }</code></pre>
 
 <h3>rpcNode.start() 做了什么</h3>
 <ol class="step-list">
-    <li>查询/插入 <code>rpc_server_system</code>：同一 serverId 已在运行则退出；否则复用或分配 RPC 监听端口（默认从 20000 递增）</li>
+    <li>查询/插入 <code>rpc_server_system</code>：按租约抢占 serverId；同 ID 已存活则退出，否则复用原端口或从当前最大端口之后分配</li>
     <li>启动本机 <code>BaseServer</code>（RpcServer），对外提供 RPC 调用入口</li>
     <li>读取配置 <code>master.id / master.address / master.port</code>，创建 <code>ReportClient</code> 连接中心服；<code>report.address</code> 为上报给集群的 IP</li>
-    <li>中心服将符合连接策略的在线节点地址广播过来，本节点 <code>connectOther()</code> 建立 BaseClient，握手后交换 CallEnum 列表</li>
+    <li>中心服把符合连接策略的在线节点地址广播过来；本节点创建 BaseClient，携带 RPC token 握手后交换 callId 列表</li>
 </ol>
 <p>此后即可使用 <code>RpcFunction</code> 调用任意已注册方法（随机/广播/定向），详见 <a href="#/rpc">RPC 框架</a>。</p>
 
 <h2>第二步：配置文件</h2>
-<p>在 <code>config/</code> 下复制一份现有 RPC 进程配置（如 <code>http-config.properties</code>），按服务改名，例如 <code>my-service-config.properties</code>：</p>
+<p>在 <code>config/</code> 下复制一份现有模板（如 <code>http-config.example.properties</code>），按服务改名，例如 <code>my-service-config.properties</code>：</p>
 <pre><code class="language-properties">jdbc.url=jdbc:mysql://127.0.0.1:3306/sunrise
 jdbc.user=root
 jdbc.password=123456
@@ -82,14 +64,19 @@ master.port=8000
 report.address=127.0.0.1
 
 # RPC 节点身份（必填）
-rpc.node.type=http
-rpc.node.server-id=3
+rpc.node.type=notify
+rpc.node.server-id=50
+rpc.scan.packages=org.sunrise.game.myservice.service
+rpc.call-enum-class=org.sunrise.game.genRpc.gen.CallEnum
 
-# 本服务特有项（示例：HTTP 端口）
-http.port=8090
+# 本服务特有项（示例）
+my.service.enabled=true
 
-log.level=DEBUG</code></pre>
-<p>通用项说明见 <a href="#/config">配置参考</a>。启动命令：<code>java -jar sunrise-xxx.jar config/my-service-config.properties</code>。</p>
+log.level=DEBUG
+
+# 所有 RPC 节点与中心服必须一致
+rpc.auth-token=\${RPC_AUTH_TOKEN:replace-with-random-secret}</code></pre>
+<p>通用项说明见 <a href="#/config">配置参考</a>。若构建产物位于 <code>start/jar/</code>，可在仓库根目录执行：<code>java -javaagent:start/jar/hotswap-agent.jar -jar start/jar/sunrise-my-service.jar config/my-service-config.properties</code>。</p>
 
 <h2>第三步：在 gen 模块声明 RPC 接口（Stub）</h2>
 <p>框架用 <strong>接口 Stub + 实现类</strong> 分离：genRpc/service 下只声明方法名（无参），用于生成 <code>CallEnum</code>；真实参数写在 <code>game</code> 模块的实现类上。</p>
@@ -108,7 +95,7 @@ public interface MyNotifyService {
 <p>在 IDE 中运行主类 <code>org.sunrise.game.genRpc.GenRpcStartUp</code>（工作目录为项目根目录）。生成物：</p>
 <ul>
     <li><code>gen/src/main/java/org/sunrise/game/genRpc/gen/CallEnum.java</code></li>
-    <li>常量名格式：<code>类名_方法名</code>，如 <code>MyNotifyService_ping = 31</code></li>
+    <li>常量名格式：<code>类名_方法名</code>；以当前最大 ID 38 为例，新方法会从 39 开始分配</li>
     <li>已有 id 保持不变，新方法自动递增；实现类若在 game 模块，会附带 <code>{@code 全限定类#方法(参数类型)}</code> 注释</li>
 </ul>
 <p>更多说明见 <a href="#/code-gen">代码生成 · RPC 枚举</a>。</p>
@@ -170,16 +157,17 @@ public class HttpRecvMessageService extends BaseService {
 
 <h2>第五步：注册包路径与编译部署</h2>
 <ol class="step-list">
-    <li>启动类 <code>CallUtils.init</code> 的第二个参数改为你的 service 包，例如 <code>Collections.singletonList("org.sunrise.game.myservice.service")</code></li>
-    <li>修改/新增 <code>game/pom.xml</code> 中 <code>maven-assembly-plugin</code> 条目（可复制 HttpServer 段），指定 <code>mainClass</code> 与 <code>finalName</code></li>
-    <li><code>mvn clean package -pl game</code>，产物输出到 <code>start/jar/</code></li>
-    <li>编写启动脚本，例如 <code>start/windows/single/my-service.bat</code>：<br/>
-        <code>java -jar ../../jar/sunrise-my-service.jar ../../../config/my-service-config.properties 50</code></li>
+    <li>把启动配置的 <code>rpc.scan.packages</code> 设置为你的 service 包，例如 <code>org.sunrise.game.myservice.service</code></li>
+    <li>修改/新增所在模块 <code>pom.xml</code> 中的 <code>maven-assembly-plugin</code> 条目（可参考 game 模块的 HttpServer 段），指定 <code>mainClass</code> 与 <code>finalName</code></li>
+    <li>构建对应模块及其依赖，例如 <code>mvn -pl game -am package</code>；启动和依赖产物输出到 <code>start/jar/</code></li>
+    <li>编写启动脚本，例如放在 <code>start/windows/single/my-service.bat</code>，使用与现有脚本相同的相对目录和 Agent 参数：<br/>
+        <code>java -javaagent:../../jar/hotswap-agent.jar -jar ../../jar/sunrise-my-service.jar ../../../config/my-service-config.properties</code></li>
     <li>先启动 CenterServer，再启动新服务；查看 <code>rpc_server_system</code> 是否插入对应 id/port</li>
 </ol>
+<p>如果自定义服务也需要代码热更，类包应位于 <code>hotswap.include.packages</code> 覆盖范围内，并确保补丁产物包含对应模块；不在默认 <code>org.sunrise.game</code> 前缀下时要显式扩展配置。</p>
 
 <h2>第六步：从其他节点调用</h2>
-<p>调用方任意已接入集群的进程（Game、External、GmBack 等）均可使用 <code>RpcFunction</code> + <code>CallEnum</code>。</p>
+<p>调用方任意已接入集群的进程（Game、External、GmBack 等）均可使用 <code>RpcFunction</code> + <code>CallEnum</code>。所有节点都要先编译包含新 CallEnum 的 shared lib 并重启，或者使用与当前 CallEnum 一致的版本化运行包。</p>
 
 <h3>随机调用（默认）</h3>
 <p>在注册了该方法的节点中随机选一个；若本机也注册了该方法则优先本地执行。</p>

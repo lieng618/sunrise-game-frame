@@ -1,6 +1,7 @@
 package org.sunrise.game.main;
 
 import org.sunrise.game.config.ConfigReader;
+import org.sunrise.game.core.HotswapScanner;
 import org.sunrise.game.dashboard.CenterDashboardServer;
 import org.sunrise.game.rpc.center.CenterServerManager;
 import org.sunrise.game.utils.Utils;
@@ -19,6 +20,9 @@ public class CenterServerStartUp {
         }
         System.setProperty("programName", "CenterServer-" + properties.getProperty("master.id"));
         Utils.setLogLevel(properties.getProperty("log.level"));
+        HotswapScanner.initialize(
+                properties.getProperty("hotswap.include.packages"),
+                properties.getProperty("hotswap.exclude.classes"));
 
         int id = Integer.parseInt(properties.getProperty("master.id"));
         String ip = properties.getProperty("master.address");

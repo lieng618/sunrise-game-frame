@@ -239,6 +239,12 @@ public class RpcFunction {
         }
     }
 
+    /** 返回当前已注册指定 RPC 方法的节点，用于管理面广播和在线节点核对。 */
+    public static List<String> getCallNodes(int callId) {
+        List<String> nodes = callIdNodes.get(callId);
+        return nodes == null ? List.of() : List.copyOf(nodes);
+    }
+
     private static String getCurNodeByServerNode(String serverNode) {
         return RpcNodeManager.getClientNodeIdByServerNodeId(serverNode);
     }

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.sunrise.game</groupId>
+        <artifactId>sunrise-game-frame</artifactId>
+        <version>1.0</version>
+    </parent>
+
+    <artifactId>hotfix</artifactId>
+    <version>${project.sunrise.version}</version>
+    <packaging>jar</packaging>
+    <name>hotfix</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.sunrise.game</groupId>
+            <artifactId>game</artifactId>
+            <version>${project.sunrise.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.sunrise.game</groupId>
+            <artifactId>center</artifactId>
+            <version>${project.sunrise.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.4.1</version>
+                <configuration>
+                    <skipIfEmpty>true</skipIfEmpty>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.6.0</version>
+                <executions>
+                    <execution>
+                        <id>make-business-hotfix</id>
+                        <phase>package</phase>
+                        <goals><goal>single</goal></goals>
+                        <configuration>
+                            <finalName>sunrise-hotfix</finalName>
+                            <outputDirectory>${project.basedir}/../start/jar</outputDirectory>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <descriptors>
+                                <descriptor>src/main/assembly/hotfix.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

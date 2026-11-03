@@ -30,6 +30,8 @@ import java.util.Properties;
 
 public class AdminServer {
 
+    private Javalin app;
+
     public void start() {
         Properties properties = ConfigReader.getProp();
         if (properties == null) {
@@ -41,19 +43,22 @@ public class AdminServer {
         long jwtExpiration = Long.parseLong(properties.getProperty("admin.jwt.expiration", "3600000"));
         JwtUtil.init(jwtExpiration);
 
-        Javalin app = Javalin.create(config -> config.jsonMapper(new JsonMapper() {
-            @NotNull
-            @Override
-            public String toJsonString(@NotNull Object obj, @NotNull Type type) {
-                return JSON.toJSONString(obj);
-            }
+        app = Javalin.create(config -> {
+            config.http.maxRequestSize = 100L * 1024L * 1024L;
+            config.jsonMapper(new JsonMapper() {
+                @NotNull
+                @Override
+                public String toJsonString(@NotNull Object obj, @NotNull Type type) {
+                    return JSON.toJSONString(obj);
+                }
 
-            @NotNull
-            @Override
-            public <T> T fromJsonString(@NotNull String json, @NotNull Type targetType) {
-                return JSON.parseObject(json, targetType);
-            }
-        }));
+                @NotNull
+                @Override
+                public <T> T fromJsonString(@NotNull String json, @NotNull Type targetType) {
+                    return JSON.parseObject(json, targetType);
+                }
+            });
+        });
 
         // 初始化控制器
         ControllerManager.initController();
@@ -83,6 +88,7 @@ public class AdminServer {
         app.get("/api/nodes", ControllerManager.getController(NodeController.class)::list);
         app.post("/api/config/reload", ControllerManager.getController(NodeController.class)::reloadConfig);
         app.post("/api/hotswap/jar", ControllerManager.getController(HotswapController.class)::hotswapJar);
+        app.post("/api/hotswap/upload", ControllerManager.getController(HotswapController.class)::uploadJar);
         app.post("/api/gm/send-mail", ControllerManager.getController(GmController.class)::sendMail);
         app.post("/api/gm/kick", ControllerManager.getController(GmController.class)::kick);
         app.get("/api/logs", ControllerManager.getController(OperationLogController.class)::list);

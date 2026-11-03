@@ -2,16 +2,23 @@ registerPage('stress-testing', '压测统计', '分阶段登录耗时、发包 T
 <h1>压测工具与统计</h1>
 <p class="page-desc">压测客户端（<code>sunrise-stress.jar</code>），支持批量建连登录的分阶段耗时统计，以及以<strong>服务器回包</strong>为准的发包 TPS 压测。</p>
 
+<div class="callout callout-warn">
+    <p><strong>鉴权限制：</strong>内置压测客户端只发送 <code>C2S_Login(uid)</code>，不发送玩家 Token。它只适用于 <code>player.auth.enabled=false</code>；开启生产鉴权后需要扩展登录流程。</p>
+</div>
+
 <div class="callout callout-tip">
     <p><strong>与压测机器人的区别</strong>：<a href="#/client-tools">压测机器人</a>（<code>bot.bat</code>）侧重批量在线、定时 Ping、向所有机器人广播自定义包；本工具侧重<strong>登录各阶段耗时</strong>与<strong>可重复的发包 TPS 基准</strong>。二者共用 <code>client-config.properties</code> 与同一套登录流程。</p>
 </div>
 
 <h2>启动</h2>
 <pre><code class="language-bash"># 先启动服务器（推荐本地单进程调试）
-start\\windows\\single\\runallone.bat
+cd start\\windows\\single
+.\\runallone.bat
 
 # 压测工具（Windows）
-start\\windows\\stress.bat
+cd ..\\..
+cd start\\windows
+.\\stress.bat
 
 # 或在 IDE 中运行主类
 # stress.main.StressStartUp</code></pre>
@@ -85,6 +92,7 @@ start\\windows\\stress.bat
 <p>进度日志每 5 秒输出一次；发送完毕 30 秒仍未收齐会提示等待；连续 10 秒 <code>received</code> 不增长或超时（默认 30 分钟）会输出<strong>客户端诊断</strong>并建议对照服务端日志。</p>
 
 <h2>本机测试记录</h2>
+<p><strong>以下为历史基准记录，不代表当前提交在任意机器上的保证结果。</strong>发布前应在目标硬件、目标协议、目标限流配置和当前构建上重新测量。</p>
 <p> Windows 10，Intel i7-8700，6 核 12 线程 @ 3.20GHz，内存 约 64 GB。</p>
 <p>启动 RunAllOne 单进程、客户端连接方式为 TCP。启动服务器后不再关闭，一次运行内连续压测各档位（压测多次求平均）。</p>
 <p>以下测试为客户端进行了完整的登录流程，登录成功后再进行发包。由对外服务接收到消息，转发到游戏服处理。</p>

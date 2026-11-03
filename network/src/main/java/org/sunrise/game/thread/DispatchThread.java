@@ -28,8 +28,11 @@ public class DispatchThread {
         while (!stopped) {
             try {
                 task.run();
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 LogCore.ServerStartUp.error("DispatchThread pulse, error : ", e);
+                if (e instanceof VirtualMachineError fatal) {
+                    throw fatal;
+                }
             }
             // sleep 被中断或在 stopped 已为 true 时快速退出
             if (!Utils.sleep(interval) && stopped) {

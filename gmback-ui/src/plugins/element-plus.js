@@ -32,6 +32,7 @@ import {
     ElTableColumn,
     ElTag,
     ElTooltip,
+    ElUpload,
     ElAlert,
 } from 'element-plus';
 import {
@@ -94,6 +95,7 @@ const elementComponents = [
     ElTableColumn,
     ElTag,
     ElTooltip,
+    ElUpload,
     ElAlert,
 ];
 

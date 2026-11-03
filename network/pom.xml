@@ -20,6 +20,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.sunrise.game</groupId>
+            <artifactId>hotswap</artifactId>
+            <version>${project.sunrise.version}</version>
+        </dependency>
+        <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>1.5.28</version>

@@ -17,7 +17,9 @@ registerPage('code-gen', '代码生成', 'Proto、RPC 枚举、DB 实体、Luban
 ├── mail.proto         # 邮件协议
 ├── activity.proto     # 活动协议
 ├── rank.proto         # 排行榜协议
-└── drop.proto         # 掉落协议</code></pre>
+├── drop.proto         # 掉落协议
+├── battle.proto       # 战斗协议
+└── define.proto       # 公共定义</code></pre>
 
 <h3>生成步骤</h3>
 <ol class="step-list">
@@ -27,7 +29,7 @@ registerPage('code-gen', '代码生成', 'Proto、RPC 枚举、DB 实体、Luban
 </ol>
 <pre><code class="language-bash">cd gen/src/main/java/org/sunrise/game/genProto
 gen.bat</code></pre>
-<p>生成后的 Java 类位于 <code>gen/src/main/java/org/sunrise/game/genProto/gen/</code>。</p>
+<p><code>gen.bat</code> 会先删除 <code>genProto/gen</code> 下的旧 Java 文件，再逐个调用随仓库提供的 <code>protoc.exe</code>。生成后的 Java 类位于同一目录的 <code>gen/</code>。脚本末行会暂停，CI 中需要另行移除交互或直接调用 protoc。</p>
 
 <h2>RPC 枚举生成</h2>
 <h3>运行方式</h3>
@@ -36,11 +38,11 @@ gen.bat</code></pre>
 <h3>生成逻辑</h3>
 <ol class="step-list">
     <li>扫描 <code>gen/src/main/java/org/sunrise/game/genRpc/service/</code> 下所有 Stub 接口（<code>void 方法名();</code>）</li>
-    <li>按 <code>类名_方法名</code> 格式生成 <code>CallEnum</code> 常量（已有 id 保留，新方法递增）</li>
+    <li>按 <code>类名_方法名</code> 格式生成 <code>CallEnum</code> 常量；读取旧文件并保留已有 ID，新方法从当前 maxId 继续递增</li>
     <li>扫描 <code>game</code> 模块中带 <code>@RpcService</code> 的实现类，为常量补充 <code>{@code 实现类#方法}</code> 注释</li>
     <li>输出到 <code>gen/src/main/java/org/sunrise/game/genRpc/gen/CallEnum.java</code></li>
 </ol>
-<p>新增 RPC 方法时：先在 <code>genRpc/service</code> 增加 Stub 方法 → 在 game 实现 <code>@RpcMethod</code> → 运行 GenRpcStartUp → 各节点用新常量调用。完整流程见 <a href="#/custom-rpc-service">可扩展 RPC 服务</a>。</p>
+<p>新增 RPC 方法时：先在 <code>genRpc/service</code> 增加 Stub 方法 → 在 game 实现 <code>@RpcMethod</code> → 运行 GenRpcStartUp → 各节点用新常量调用。完整流程见 <a href="#/custom-rpc-service">可扩展 RPC 服务</a>。当前 CallEnum 有 37 个常量，ID 19 未使用，最大 ID 为 38。</p>
 
 <h3>生成的 CallEnum 示例</h3>
 <pre><code class="language-java">public class CallEnum {
@@ -62,7 +64,7 @@ gen.bat</code></pre>
     public static final int GlobalMailService_deleteMail = 16;
     public static final int GlobalMailService_getPlayerMails = 17;
     public static final int GlobalMailService_readMail = 18;
-    public static final int GlobalMailService_receiveMailAttachment = 19;
+    // 19 当前未使用
     public static final int GlobalMailService_sendMail = 20;
     public static final int GlobalMailService_sendMailToAll = 21;
     public static final int GlobalMailService_sendMailToMultiple = 22;
@@ -79,18 +81,24 @@ gen.bat</code></pre>
     public static final int GlobalRankService_getRankList = 33;
     public static final int GlobalRankService_removeFromRank = 34;
     public static final int GlobalRankService_updateRank = 35;
+    public static final int GlobalMailService_confirmMailAttachment = 36;
+    public static final int GlobalMailService_getMailAttachmentInfo = 37;
+    public static final int HotswapControlService_command = 38;
 }</code></pre>
 
 <h2>数据库实体生成</h2>
 <h3>运行方式</h3>
-<p>运行主类 <code>org.sunrise.game.genDb.GenDbStartUp</code></p>
+<p>运行主类 <code>org.sunrise.game.genDb.GenDbStartUp</code>，工作目录为仓库根目录。它会读取固定的 <code>gen/.../genDb/db-config.properties</code>，因此先保证 MySQL 可连接且该文件中的账号密码正确。</p>
 
 <h3>生成逻辑</h3>
 <ol class="step-list">
     <li>连接数据库，读取表结构</li>
-    <li>自动生成 Lombok @Data 实体类</li>
+    <li>生成 <code>@Value</code> 不可变实体、Map 参数构造器与 EntityConverter</li>
     <li>输出到 <code>gen/src/main/java/org/sunrise/game/genDb/gen/</code></li>
 </ol>
+<div class="callout callout-warn">
+    <p>生成器不会自动覆盖 network 模块中供运行时使用的 <code>org.sunrise.game.db.entity</code> 类。修改表结构后，除了运行 GenDbStartUp，还要确认运行时实体是否需要同步更新。</p>
+</div>
 
 <h2>配置表生成（Luban）</h2>
 <h3>Excel 配置表位置</h3>
@@ -99,15 +107,19 @@ gen.bat</code></pre>
 ├── __enums__.xlsx     # 枚举定义
 ├── __tables__.xlsx    # 表定义
 ├── activity.xlsx      # 活动配置
+├── drop.xlsx          # 掉落配置
+├── dropGroup.xlsx     # 掉落组配置
 ├── item.xlsx          # 物品配置
 ├── map.xlsx           # 地图配置
+├── monster.xlsx       # 怪物配置
+├── monsterRefresh.xlsx # 刷怪配置
 ├── param.xlsx         # 参数配置（背包容量等）
 └── task.xlsx          # 任务配置</code></pre>
 
 <h3>生成步骤</h3>
 <pre><code class="language-bash">cd tables
 gen.bat</code></pre>
-<p>生成后的 JSON 配置位于 <code>tables/json/</code>，Java 配置类位于 <code>game/.../config/Tables.java</code>。</p>
+<p><code>tables/gen.bat</code> 需要 .NET 运行环境，通过仓库内 <code>Tools/Luban/Luban.dll</code> 执行 <code>-t all -c java-json -d json</code>。生成的 JSON 位于 <code>tables/json/</code>；Java 代码先写入临时 <code>tables/src</code>，随后脚本删除并替换 <code>game/.../game/config/</code> 下的生成类。脚本末尾会暂停，失败时保留原生成目录。</p>
 
 <h3>运行时读取</h3>
 <pre><code class="language-java">// 获取单个配置
@@ -121,7 +133,7 @@ Tables.ConfigItem.getDataList().forEach(item -> {
 });</code></pre>
 
 <h3>热更配置</h3>
-<p>gmback-ui「配置更新」会调用 <code>/api/config/reload</code>，GmBack 广播 <code>reloadConfig</code>，Game 服收到后执行 <code>ConfigUtils.load()</code> 重新加载配置。新增功能如果走 Tables，天然支持热更。</p>
+<p>gmback-ui「配置更新」会调用 <code>/api/config/reload</code>，GmBack 默认广播 <code>reloadConfig</code>，Game 服收到后执行 <code>ConfigUtils.load()</code> 重新读取 <code>config.path</code>。该接口只重载 JSON，不会运行 Luban、生成 Java 类或重新扫描模块。</p>
 <p>业务代码热更请使用 gmback-ui「代码热更」（<code>/hotswap-jar</code>），详见 <a href="#/hotswap">代码热更文档</a>。</p>
 `);
 
@@ -157,20 +169,21 @@ registerPage('development', '开发指南', '新增业务模块的完整开发�
     <li><strong>设计协议</strong> - 新建 .proto 文件，定义 FROM_CLIENT / FROM_SERVER 枚举和消息体</li>
     <li><strong>注册 TOPIC</strong> - 在 packet.proto 中注册新的 TOPIC_TYPE_XXX</li>
     <li><strong>生成协议代码</strong> - 执行 gen.bat 生成 Java 协议类</li>
-    <li><strong>创建玩家模块</strong> - 新建 XxxModule extends BaseModule，实现 init/load/save/sendToClient</li>
-    <li><strong>注册模块</strong> - 在 HumanObject.createModules() 中注册新模块，@HumanModule注解自动注册</li>
+    <li><strong>创建玩家模块</strong> - 新建 XxxModule extends BaseModule，标注 @HumanModule，实现 init/load/save/sendToClient</li>
+    <li><strong>自动注册模块</strong> - ModuleUtils 扫描 <code>org.sunrise.game.game.modules</code>，不要再手工修改 HumanObject.modules</li>
     <li><strong>创建消息处理器</strong> - 新建 XxxMsgHandler，使用 @MsgHandlerClass + @MsgHandlerMethod</li>
     <li><strong>跨服逻辑</strong>（如需）- 新增 global @RpcService</li>
     <li><strong>回推需求</strong>（如需）- 新增 game RpcListenService</li>
     <li><strong>配置表</strong>（如需）- 补充 Excel / Luban / Config 读取</li>
     <li><strong>接入系统层</strong>（如需）- 新增 BaseSystem 子类，注册到 GameSystem，@GameSystem注解自动注册</li>
-    <li><strong>客户端适配</strong> - sunrise-client 中添加 Handler</li>
-    <li><strong>编译联调</strong> - mvn clean package，启动服务，用 sunrise-client 测试</li>
+    <li><strong>客户端适配</strong> - 在正式客户端或 <code>client</code> 工程中增加消息处理器</li>
+    <li><strong>编译联调</strong> - <code>mvn clean package</code>，启动服务，用客户端工具或独立客户端测试</li>
 </ol>
 
 <h2>模块开发详解</h2>
 <h3>创建 Module</h3>
-<pre><code class="language-java">@Getter
+<pre><code class="language-java">@HumanModule
+@Getter
 @Setter
 public class AchievementModule extends BaseModule {
     private Map&lt;Integer, Integer&gt; progress = new HashMap&lt;&gt;();
@@ -208,9 +221,9 @@ public class AchievementModule extends BaseModule {
                 AchievementProto.MAchievementInfo.newBuilder()
                     .setId(id).setProgress(val).build());
         });
-        sendMsg(TopicProto.TOPIC.TOPIC_TYPE_ACHIEVEMENT_VALUE,
+        getHuman().sendMsg(TopicProto.TOPIC.TOPIC_TYPE_ACHIEVEMENT_VALUE,
             AchievementProto.FROM_SERVER.S2C_AchievementList_VALUE,
-            builder.build().toByteString());
+            builder);
     }
 
     public void addProgress(int achievementId, int value) {
@@ -219,9 +232,13 @@ public class AchievementModule extends BaseModule {
 }</code></pre>
 
 <h3>注册到 HumanObject</h3>
-<pre><code class="language-java">// HumanObject.createModules() 中添加
-modules.put(AchievementModule.class.getSimpleName(),
-    new AchievementModule(humanId));</code></pre>
+<pre><code class="language-java">@HumanModule
+public class AchievementModule extends BaseModule {
+    public AchievementModule(String humanId) {
+        super(humanId);
+    }
+}</code></pre>
+<p>ModuleUtils 只接受带 <code>@HumanModule</code>、继承 BaseModule 且提供 <code>public Xxx(String humanId)</code> 构造器的类。扫描发生在 GameServer 启动阶段，新增模块需要重启；代码热更不会重新执行扫描。</p>
 
 <h3>创建消息处理器</h3>
 <pre><code class="language-java">@MsgHandlerClass(packetType = TopicProto.TOPIC.TOPIC_TYPE_ACHIEVEMENT_VALUE)
@@ -287,6 +304,9 @@ public class AchievementRpcListenService extends BaseService {
 </div>
 <div class="callout callout-warn">
     <p><strong>⚠️ load() 没处理老数据兼容</strong>：老号升级后空指针，新增字段默认值异常。建议 load 时对 null 做兜底</p>
+</div>
+<div class="callout callout-warn">
+    <p><strong>⚠️ 老角色不会调用新模块的 init()</strong>：BaseModule 的注释已明确这一点。新增模块必须用字段初始值或 load() 中的缺失数据处理老角色，不能只依赖 init()。</p>
 </div>
 <div class="callout callout-warn">
     <p><strong>⚠️ RPC 参数顺序写错</strong>：方法能调到，但数据乱位，返回结果异常。参数顺序必须和目标方法参数顺序一致</p>

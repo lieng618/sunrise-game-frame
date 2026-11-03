@@ -15,6 +15,7 @@
         <module>game</module>
         <module>client</module>
         <module>hotswap</module>
+        <module>hotfix</module>
     </modules>
 
     <properties>

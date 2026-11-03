@@ -37,8 +37,6 @@ public class GameRecvGmBackMessageService extends BaseService {
     @Override
     public void init() {
         super.init();
-        // 对运行中 jar 建立热更基线；基线必须在 jar 被替换之前记录，否则 diff 永远为空
-        HotswapScanner.registerRunningJar();
     }
 
     @RpcMethod
@@ -116,9 +114,12 @@ public class GameRecvGmBackMessageService extends BaseService {
         }
         LogCore.GameServer.info("Received hotswapJar command, jarPath: {}", jarPath);
         try {
-            HotswapScanner scanner = HotswapScanner.of(jarPath);
-            scanner.reloadClasses(jarPath);
-            LogCore.GameServer.info("Hotswap jar [{}] result:\n{}", jarPath, scanner.getRecentLogs());
+            HotswapScanner scanner = HotswapScanner.getInstance();
+            if (scanner == null) {
+                throw new IllegalStateException("热更基线尚未初始化");
+            }
+            HotswapScanner.Report report = scanner.reload(jarPath);
+            LogCore.GameServer.info("Hotswap jar [{}] result: {}", jarPath, JSON.toJSONString(report));
         } catch (Exception e) {
             LogCore.GameServer.error("Hotswap jar [{}] failed", jarPath, e);
         }

@@ -16,8 +16,9 @@
 | 文件 | 说明 |
 |------|------|
 | `*-config.properties` | 实际配置，本地可直接用 |
-| `*-config.example.properties` | 模板，可复制为 `local-*.properties` |
+| `*-config.example.properties` | 模板，可复制为同名 `*-config.properties` |
 | `reset-config.sh` / `reset-config.bat` | 从模板批量覆盖所有 `*-config.properties` |
+| `start/docker/.env` | Docker 密钥，从 `.env.example` 复制 |
 
 从模板重置全部配置（**会覆盖现有修改**）：
 
@@ -30,7 +31,6 @@ sh config/reset-config.sh
 REM Windows CMD
 config\reset-config.bat
 ```
-| `start/docker/.env` | Docker 密钥，从 `.env.example` 复制 |
 
 ---
 
@@ -40,8 +40,8 @@ config\reset-config.bat
 
 ```bash
 mvn clean package
-start\windows\single\runallone.bat          # Windows 单进程
-sh start/linux/server_run_allone.sh       # Linux 单进程
+cd start/windows/single && ./runallone.bat   # Windows 单进程（Git Bash）
+sh start/linux/server_run_allone.sh          # Linux 单进程
 ```
 
 生产或多机部署时，启动前注入环境变量（**同一终端窗口**内设置后启动）：
@@ -52,7 +52,8 @@ $env:JDBC_PASSWORD = "your-db-pass"
 $env:ADMIN_PASSWORD = "your-gm-pass"
 $env:PLAYER_JWT_SECRET = "your-32-char-secret"
 $env:RPC_AUTH_TOKEN = "your-shared-rpc-token"
-.\start\windows\single\runallone.bat
+cd .\start\windows\single
+.\runallone.bat
 ```
 
 ```bash
@@ -71,13 +72,13 @@ sh start/linux/server_run_allone.sh
 
 ## Docker
 
-统一挂载仓库 `config/`，不再维护 `start/docker/config/` 副本。
+统一挂载仓库根目录的 `config/`；`start/docker/` 不保存配置副本。
 
 ```bash
 mvn clean package
 cd start/docker
-cp .env.example .env    # Windows: copy .env.example .env
-# 编辑 .env：JDBC_PASSWORD、ADMIN_PASSWORD、PLAYER_JWT_SECRET
+cp .env.example .env    # Windows PowerShell: Copy-Item .env.example .env
+# 编辑 .env：JDBC_PASSWORD、ADMIN_PASSWORD、PLAYER_JWT_SECRET、RPC_AUTH_TOKEN
 docker compose up -d --build
 ```
 
@@ -100,6 +101,7 @@ docker compose up -d --build
 | `MASTER_ADDRESS` | `master.address` | `127.0.0.1` | 中心服地址 |
 | `REPORT_ADDRESS` | `report.address` | `127.0.0.1` | 本节点上报地址 |
 | `EXTERNAL_ADDRESS` | `external.address` | `127.0.0.1` | 网关对外地址 |
+| `EXTERNAL_LISTEN_PORT` | `external.listen.port` | 空（自动探测） | Docker 中固定为 `10000` |
 | `HTTP_ADDRESS` | `http.address` | `127.0.0.1` | 客户端工具用 |
 | `ADMIN_USER` | `admin.user` | `admin` | GM 账号 |
 | `ADMIN_PASSWORD` | `admin.password` | `sunrise` | **生产必改** |
@@ -109,3 +111,5 @@ docker compose up -d --build
 | `MAIL_SMTP_PASSWORD` | `mail.smtp.password` | — | |
 | `CONFIG_PATH` | `config.path` | `../tables/json` | 策划表目录（相对 `config/`） |
 | `CONFIG_NAV_PATH` | `config.nav.path` | `../tables/mapjson` | 地图导航 |
+| `HOTSWAP_UPLOAD_DIR` | `hotswap.upload-dir` | `../../../hotfix/uploaded` | GM 热更上传目录 |
+| `CENTER_DASHBOARD_URL` | `hotswap.center-dashboard-url` | 空 | 独立 Center 的热更 HTTP 地址 |

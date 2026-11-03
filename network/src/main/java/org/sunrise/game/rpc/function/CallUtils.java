@@ -1,6 +1,8 @@
 package org.sunrise.game.rpc.function;
 
 import org.sunrise.game.core.server.BaseServerManager;
+import org.sunrise.game.config.ConfigReader;
+import org.sunrise.game.core.HotswapScanner;
 import org.sunrise.game.log.LogCore;
 import org.sunrise.game.rpc.annotation.RpcMethod;
 import org.sunrise.game.rpc.annotation.RpcService;
@@ -39,9 +41,18 @@ public class CallUtils {
         Map<String, Method> methodsCache = new HashMap<>();
         // 1. 扫描包内 @RpcService，实例化并缓存 @RpcMethod
         RegistrationResult registration = registerServices(nodeId, classPaths, methodsCache);
-        // 2. 将 CallEnum 中的 rpcId 与 methodsCache 中的 Method 绑定
+        // 2. 在任何服务 init 之前记录实际类来源，防止管理端口先于基线开放。
+        HotswapScanner.initialize(
+                ConfigReader.getString("hotswap.include.packages", "org.sunrise.game"),
+                ConfigReader.getString("hotswap.exclude.classes",
+                        "org.sunrise.game.core.Hotswap,"
+                                + "org.sunrise.game.core.HotswapScanner,"
+                                + "org.sunrise.game.core.AgentBootstrap,"
+                                + "org.sunrise.game.rpc.hotswap,"
+                                + "org.sunrise.game.genRpc.gen.CallEnum"));
+        // 3. 将 CallEnum 中的 rpcId 与 methodsCache 中的 Method 绑定
         bindCallEnumMethods(callEnumClass, methodsCache);
-        // 3. 校验注册结果（至少一个服务、无注册失败）
+        // 4. 校验注册结果（至少一个服务、无注册失败）
         validateRegistration(classPaths, startTime, registration);
         initCurRegisterCallIds();
         ServiceManager.initAll();

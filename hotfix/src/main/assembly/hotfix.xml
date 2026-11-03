@@ -1,0 +1,30 @@
+<assembly xmlns="http://maven.apache.org/ASSEMBLY/2.2.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.2.0 http://maven.apache.org/xsd/assembly-2.2.0.xsd">
+    <id>business-hotfix</id>
+    <formats><format>jar</format></formats>
+    <includeBaseDirectory>false</includeBaseDirectory>
+
+    <fileSets>
+        <fileSet>
+            <directory>${project.basedir}/../game/target/classes</directory>
+            <outputDirectory>/</outputDirectory>
+            <includes><include>org/sunrise/game/**</include></includes>
+        </fileSet>
+        <fileSet>
+            <directory>${project.basedir}/../network/target/classes</directory>
+            <outputDirectory>/</outputDirectory>
+            <includes><include>org/sunrise/game/**</include></includes>
+        </fileSet>
+        <fileSet>
+            <directory>${project.basedir}/../gen/target/classes</directory>
+            <outputDirectory>/</outputDirectory>
+            <includes><include>org/sunrise/game/**</include></includes>
+        </fileSet>
+        <fileSet>
+            <directory>${project.basedir}/../center/target/classes</directory>
+            <outputDirectory>/</outputDirectory>
+            <includes><include>org/sunrise/game/**</include></includes>
+        </fileSet>
+    </fileSets>
+</assembly>

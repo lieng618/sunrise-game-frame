@@ -2,18 +2,18 @@ registerPage('center-server', '中心服', '节点注册中心、发现与广播
 <h1>中心服</h1>
 <p class="page-desc">CenterServer 是所有 RPC 节点的注册中心，负责节点发现与信息广播，不执行任何业务 RPC，只做"节点通讯录同步"。各节点上报时携带 <code>nodeType</code>，中心服根据 <code>RpcConnectPolicy</code>（<code>center-config.properties</code> 中的 <code>rpc.connect.*</code>）决定向谁广播对端地址；未配置策略时保持全量互连。另提供 HTTP Dashboard 实时查看在线节点与 RPC 连接拓扑。
 中心服挂掉不影响已互连的节点间通信，但新节点无法加入。支持断线重连，中心服重新启动后，所有节点都会重新注册。</p>
-<p>目前最大支持4096个节点服务id，服务id的上限受限于雪花算法生成器控制，可根据需求进行配置，目前为：</p>
+<p>ID 生成器使用 12 位 workerId，取值范围是 0–4095，共 4096 个编号。业务配置中不要把 <code>rpc.node.server-id</code> 设置为 4095 以上。</p>
 <pre><code class="language-java">public static void init(int WorkerId) {
     if (options == null) {
-        options = new IdGeneratorOptions((short) WorkerId); // 节点id 限制为1-4096
-        options.WorkerIdBitLength = 12; // 2^12-1，即最多支持4096个节点。
+        options = new IdGeneratorOptions((short) WorkerId); // 有效范围 0-4095
+        options.WorkerIdBitLength = 12; // 最大 workerId = 2^12-1 = 4095
         options.SeqBitLength = 10; // 限制每毫秒生成的ID个数。若生成速度超过5万个/秒，建议加大 SeqBitLength 到 10。
         options.BaseTime = 1727712000000L; // 基础时间，设定为2024-10-01 00:00:00
         YitIdHelper.setIdGenerator(options);
         LogCore.RpcUtils.info("IdGenerator init, WorkerId = { {} }", WorkerId);
     }
 }</code></pre>
-<p> 为了方便管理，将 <strong>serverId</strong> 进行分组，并在配置中用 <strong>nodeType</strong> 标识进程角色（用于连接策略）：中心服 id=1；GM 后台 <code>gmback</code> 默认 2；Http <code>http</code> 默认 3（预留到 99）；对外服 <code>external</code> 默认 100（预留到 199）；游戏服 <code>game</code> 默认 200（预留到 3999）；全局服 <code>global</code> 默认 4000（预留到 4096）。id 与 type 均可按需求调整，详见 <a href="#/config">配置参考</a>。</p>
+<p> 为了方便管理，将 <strong>serverId</strong> 进行分组，并在配置中用 <strong>nodeType</strong> 标识进程角色：中心服 id=1；GM 后台 <code>gmback</code> 默认 2；Http <code>http</code> 默认 3（预留到 99）；对外服 <code>external</code> 默认 100（预留到 199）；游戏服 <code>game</code> 默认 200（预留到 3999）；全局服 <code>global</code> 默认 4000（预留到 4095）。id 与 type 均可按需求调整，详见 <a href="#/config">配置参考</a>。</p>
 <h2>核心职责</h2>
 <ul>
     <li>接收各节点上报（ip/port/serverId/nodeId/nodeType）</li>
@@ -34,7 +34,7 @@ registerPage('center-server', '中心服', '节点注册中心、发现与广播
 <tr><td>NodeManager</td><td>维护所有 RPC 节点信息</td><td>updateNode(), broadcastToNode(), isNodeDead(), reportFull(), reportSimple()</td></tr>
 <tr><td>NodeData</td><td>节点数据</td><td>nodeId, ip, port, reportTime, serverId, nodeType</td></tr>
 <tr><td>RpcConnectPolicy</td><td>RPC 连接策略（读取 center-config）</td><td>init(), shouldConnect(fromType, toType)</td></tr>
-<tr><td>CenterDashboardServer</td><td>拓扑可视化 HTTP 服务（Javalin）</td><td>GET / ，GET /api/topology</td></tr>
+<tr><td>CenterDashboardServer</td><td>拓扑可视化与 Center 热更 HTTP 服务（Javalin）</td><td>GET /、GET /api/topology、GET /api/hotswap/status、POST /api/hotswap/reload</td></tr>
 </tbody>
 </table>
 
@@ -49,6 +49,9 @@ registerPage('center-server', '中心服', '节点注册中心、发现与广播
         Properties properties = ConfigReader.getProp();
         System.setProperty("programName", "CenterServer-" + properties.getProperty("master.id"));
         Utils.setLogLevel(properties.getProperty("log.level"));
+        HotswapScanner.initialize(
+            properties.getProperty("hotswap.include.packages"),
+            properties.getProperty("hotswap.exclude.classes"));
 
         var centerServer = CenterServerManager.createCenterServer(
             Integer.parseInt(properties.getProperty("master.id")),
@@ -63,7 +66,7 @@ registerPage('center-server', '中心服', '节点注册中心、发现与广播
         }
     }
 }</code></pre>
-<p>命令行示例：<code>java -jar sunrise-center.jar config/center-config.properties</code></p>
+<p>从仓库根目录启动的命令行示例：<code>java -javaagent:start/jar/hotswap-agent.jar -jar start/jar/sunrise-center.jar config/center-config.properties</code>。启动 JAR 会从自身所在目录解析 Manifest 中的 <code>sunrise-lib.jar</code>。</p>
 
 <h2>节点上报机制</h2>
 <h3>全量上报（首次连接）</h3>
@@ -73,7 +76,7 @@ registerPage('center-server', '中心服', '节点注册中心、发现与广播
 <p>ReportClientMessageManager.pulseReport() 每 3 秒调用 NodeManager.reportSimple()，仅发送 nodeId 保持心跳。</p>
 
 <h3>节点失效检测</h3>
-<p>NodeManager 维护每个节点的 <code>reportTime</code>，<code>isNodeDead()</code> 判断超过 2 倍上报间隔（INTERVAL_SIMPLE * 2 = 6秒）没有收到心跳上报，则视为节点失效，从 datasByNodeId 中移除。</p>
+<p>NodeManager 维护每个节点的 <code>reportTime</code>，<code>isNodeDead()</code> 在超过 2 倍上报间隔（约 6 秒）时判定离线。物理清理会做节流，最多约每 30 秒扫描一次 <code>datasByNodeId</code>；在这之前 Dashboard 已按 6 秒阈值显示为 offline。</p>
 
 <h2>配置项</h2>
 <table>
@@ -83,6 +86,7 @@ registerPage('center-server', '中心服', '节点注册中心、发现与广播
 <tr><td>master.address</td><td>中心服监听地址</td><td>127.0.0.1</td></tr>
 <tr><td>master.port</td><td>中心服监听端口</td><td>8000</td></tr>
 <tr><td>dashboard.port</td><td>拓扑 Dashboard 端口；设为 0 关闭</td><td>8088</td></tr>
+<tr><td>hotswap.include.packages</td><td>Center 进程允许热更新的包前缀</td><td>org.sunrise.game</td></tr>
 <tr><td>rpc.connect.*</td><td>各 nodeType 的出站连接白名单，见 <a href="#/rpc">RPC 框架 · 连接策略</a></td><td>rpc.connect.game=external,global,gmback</td></tr>
 </tbody>
 </table>
@@ -94,25 +98,26 @@ registerPage('center-server', '中心服', '节点注册中心、发现与广播
     <li>是否启用连接策略、规则列表</li>
     <li>按策略推导的节点间连接边（有向）</li>
 </ul>
+<p>Center 不是普通 RPC 节点，GM 通过 Dashboard 的 <code>/api/hotswap/*</code> 接口把它纳入批量热更。GM 侧通过 <code>hotswap.center-dashboard-url</code> 找到该地址。</p>
 `);
 
 registerPage('external-server', '对外服', 'TCP/WS/KCP 网关、客户端连接管理', () => `
 <h1>对外服</h1>
-<p class="page-desc">ExternalServer 是客户端接入网关，同时支持 TCP、WebSocket、KCP 三种协议，是客户端与服务器之间的唯一入口</p>
+<p class="page-desc">ExternalServer 是客户端接入网关，可按配置启用 TCP、WebSocket、KCP，是客户端业务消息与游戏服之间的转发层</p>
 
 <h2>核心职责</h2>
 <ul>
-    <li>监听 TCP / WebSocket / KCP 端口（端口依次 +1）</li>
-    <li>验证客户端首包认证（"CLIENT_CONNECT_"）</li>
+    <li>按配置启用 TCP / WebSocket / KCP；三种协议共用一个连续端口块（base、base+1、base+2）</li>
+    <li>检查客户端首包是否以 <code>CLIENT_CONNECT_</code> 开头；这不是账号鉴权，玩家身份由后续 C2S_Login 验证</li>
     <li>为每个连接分配 connectionId</li>
     <li>消息频率限制（令牌桶默认长期 1200 条/分钟、突发 120 条，可在 external-config 中调整）</li>
     <li>将客户端消息转发到对应的 Game 节点（SendDesignated）</li>
     <li>接收 Game 服 RPC 返回，再发回客户端</li>
-    <li>每5秒向 HttpServer 上报 External 地址</li>
+    <li>每 5 秒向 HttpServer 上报地址，并续租 external_system 记录</li>
 </ul>
 
 <h2>多协议支持</h2>
-<p>ExternalServer 同时启动三种协议监听，共享同一个 ExternalConnectionManager：</p>
+<p>ExternalServer 根据 <code>external.listen.tcp/ws/kcp</code> 启动协议监听，共享同一个 ExternalConnectionManager：</p>
 <table>
 <thead><tr><th>协议</th><th>端口</th><th>Pipeline</th><th>处理器</th></tr></thead>
 <tbody>
@@ -121,17 +126,19 @@ registerPage('external-server', '对外服', 'TCP/WS/KCP 网关、客户端连�
 <tr><td>KCP</td><td>kcpPort</td><td>KcpServerHandler</td><td>KcpServerHandler</td></tr>
 </tbody>
 </table>
-<p>端口分配：从 <code>external.listen.base-port</code> 开始向上探测连续 3 个端口（TCP/WS/KCP），也可用 <code>external.listen.port</code> 固定。绑定成功后三个端口各自上报给 HttpServer 和 GM 后台。</p>
+<p>端口分配：设置 <code>external.listen.port</code> 时只尝试该端口，要求 TCP=p、WS=p+1、KCP=p+2 均可用；未设置时从 <code>external.listen.base-port</code> 开始扫描 <code>external.listen.port-range</code> 个候选起始端口。未启用的协议端口为 0。Docker 固定 TCP=10000，并映射 10000/tcp、10001/tcp、10002/udp。</p>
 
 <h2>客户端连接认证</h2>
-<p>连接建立后首包不是 Protobuf，而是字符串认证，此字符串定义在Utils中。</p>
+<p>连接建立后首包不是 Protobuf，而是 UTF-8 字符串，此字符串定义在 Utils 中。</p>
 <pre><code class="language-text">客户端发送: "CLIENT_CONNECT_"
 服务端验证通过后分配 connectionId，创建 ClientConnection 对象</code></pre>
 
 <h2>消息频率限制</h2>
-<p>ClientConnection.dataCheck() 内置消息频率限制，定义在Utils中。</p>
+<p><code>ClientConnection.dataCheck()</code> 在首包之后、入转发队列之前执行大小与频率检查。</p>
 <ul>
-    <li><strong>频率限制</strong> - 默认长期 1200 条/分钟、突发 120 条（可在 external-config 中调整 <code>external.rate-limit.refill-per-minute</code> 和 <code>external.rate-limit.burst</code>）</li>
+    <li><strong>业务包大小</strong>：单条客户端业务数据最大 64 KiB（<code>Utils.MSG_BYTE_LEN_MAX</code>）</li>
+    <li><strong>频率限制</strong>：每连接令牌桶默认补充 1200 条/分钟、初始/最大突发 120 条</li>
+    <li><strong>违规断开</strong>：默认 5 秒窗口内拒绝 600 次后关闭连接，可通过四项 <code>external.rate-limit.*</code> 配置调整</li>
 </ul>
 
 <h2>External 与 Game 的绑定</h2>
@@ -161,7 +168,7 @@ registerPage('external-server', '对外服', 'TCP/WS/KCP 网关、客户端连�
 <tr><td>KcpServerHandler</td><td>KCP 入站处理器</td></tr>
 <tr><td>ExternalConnectionManager</td><td>客户端连接管理器，维护 clients Map(connectionId → ClientConnection)</td></tr>
 <tr><td>ClientConnection</td><td>客户端连接对象，支持 Channel(TCP/WS) 和 Ukcp(KCP)，含消息频率限制</td></tr>
-<tr><td>ExternalRecvGameMessageService</td><td>@RpcService，核心服务：消息转发、地址上报</td></tr>
+<tr><td>ExternalRecvGameMessageService</td><td>@RpcService：转发客户端上行、接收 Game 下行、续租与地址上报</td></tr>
 </tbody>
 </table>
 
@@ -180,6 +187,10 @@ registerPage('external-server', '对外服', 'TCP/WS/KCP 网关、客户端连�
 <thead><tr><th>配置键</th><th>说明</th><th>示例</th></tr></thead>
 <tbody>
 <tr><td>external.address</td><td>对外暴露的 IP（客户端连接地址）</td><td>127.0.0.1</td></tr>
+<tr><td>external.listen.tcp/ws/kcp</td><td>协议开关</td><td>true / true / true</td></tr>
+<tr><td>external.listen.port</td><td>固定 TCP 起始端口；留空自动探测</td><td>10000</td></tr>
+<tr><td>external.listen.base-port</td><td>自动扫描起始端口</td><td>10000</td></tr>
+<tr><td>external.listen.port-range</td><td>扫描范围，至少 3</td><td>100</td></tr>
 </tbody>
 </table>
 `);

@@ -63,6 +63,7 @@ public class PermissionHelper {
         addApiPermission("GET", "/api/nodes", "monitor", "config_update", "hotswap_jar");
         addApiPermission("POST", "/api/config/reload", "config_update");
         addApiPermission("POST", "/api/hotswap/jar", "hotswap_jar");
+        addApiPermission("POST", "/api/hotswap/upload", "hotswap_jar");
         addApiPermission("POST", "/api/gm/send-mail", "send_mail");
         addApiPermission("POST", "/api/gm/kick", "kick_human");
         addApiPermission("GET", "/api/logs", "operation_log");

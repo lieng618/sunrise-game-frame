@@ -1,6 +1,6 @@
 <div class="hero">
     <p align="center"><img src="docs/img/logo_big.png" alt="Sunrise Game Frame" width="380"></p>
-    <p class="subtitle">基于 Java 21 实现的轻量级分布式游戏服务器框架，采用"中心服 + 对外服 + 游戏服 + 全局服 + HTTP 服务 + GM 后台 + 可扩展RPC服务"的多服务多进程架构，也可部署为多服务单进程，不同服务支持随意的拆分和组合，支持全球通服模式和滚服模式（一套业务代码，仅修改部署方式），框架不依赖任何第三方中间件，仅需Java环境即可运行，代码简洁规范、易理解、易扩展。</p>
+    <p class="subtitle">基于 Java 21 实现的轻量级分布式游戏服务器框架，采用"中心服 + 对外服 + 游戏服 + 全局服 + HTTP 服务 + GM 后台 + 可扩展 RPC 服务"的多进程架构，也可组合为单进程运行。框架不依赖 Redis、ZooKeeper 或 MQ，仅使用 JDK、Maven 和 MySQL；支持面向无区服场景的组合部署，也支持按 server_id 隔离角色的区服模式。</p>
 </div>
 
 <h2>项目文档</h2>
@@ -27,11 +27,11 @@ docs: 补充部署说明</code></pre>
 
 <h2>核心特性</h2>
 
-- 分布式多节点架构，不同服务可随意组合拆分为多进程或单进程部署，支持动态扩容
-- RPC 框架，支持随机/广播/定向三种调用模式，含回调与超时机制；中心服可配置连接策略，内置拓扑可视化面板
-- 零中间件依赖，无需 Redis / ZooKeeper / MQ，真正做到轻量级
-- 业务代码无需修改，仅修改部署方式，即可支持全球通服与滚服模式
-- RPC服与游戏服单线程处理业务，无需加锁，无需考虑线程安全问题
+- 分布式多节点架构，不同服务可组合拆分为多进程或单进程部署；RPC 节点可动态发现，有状态业务需保持单写者或分片
+- RPC 框架，支持随机/广播/定向三种调用模式，含参数类型转换、回调、超时与内部握手认证；中心服可配置连接策略，内置拓扑可视化面板
+- 不依赖 Redis / ZooKeeper / MQ，仅需 JDK、Maven 与 MySQL
+- 同一套业务代码可通过 `server_id` 与部署组合支持通服和分区模式；有状态服务仍应保持单写者或按玩家分片
+- 每个 RPC 节点的业务消息由独立 `DispatchThread` 串行消费，玩家状态无需额外业务锁；Netty I/O、HTTP、数据库执行器仍在各自线程中运行
 - 对外服同时支持 TCP / WebSocket / KCP 三种协议
 - 完善的 GM 后台管理，实现节点监控、策划表格与代码热更、运营服务、权限管理等
 - 消息发送工具、压测机器人与压测统计工具，便于联调与性能基准
@@ -44,16 +44,17 @@ docs: 补充部署说明</code></pre>
 <pre><code class="language-bash">git clone https://gitee.com/lieng618/sunrise-game-frame.git
 或 git clone https://github.com/lieng618/sunrise-game-frame.git
 cd sunrise-game-frame
-mvn install
 mvn clean package</code></pre>
-<p>编译完成后，会在<code>start/jar/</code> 目录下生成可执行 jar包</p>
+<p>在仓库根目录执行一次聚合构建即可；需要跳过测试时使用 <code>mvn clean package -DskipTests</code>。产物位于 <code>start/jar/</code>，包含各服务启动 JAR、<code>sunrise-lib.jar</code>、<code>hotswap-agent.jar</code> 和 <code>sunrise-hotfix.jar</code>。</p>
 
 <h4>2. 初始化数据库</h4>
-<p>执行建表脚本，需先修改脚本内的 MySQL 连接信息</p>
+<p>执行前先修改脚本内的 MySQL 连接信息。当前 SQL 会删除并重建 <code>sunrise</code> 数据库，不要在已有生产数据的库上直接执行。</p>
 <pre><code class="language-bash"># Windows
-start\windows\create_sql_table.bat</code></pre>
+cd start\windows
+.\create_sql_table.bat</code></pre>
 <pre><code class="language-bash"># Linux
-sh start/linux/create_sql_table.sh</code></pre>
+cd start/linux
+sh create_sql_table.sh</code></pre>
 
 <h4>3. 配置与环境变量</h4>
 <p>各服务配置文件位于 <code>config/</code>，模板见 <code>config/*.example.properties</code>。敏感项支持 <code>${ENV_NAME:default}</code> 占位符，生产环境请通过环境变量注入密码与密钥，详见 <a href="config/ENV.md">config/ENV.md</a>。</p>
@@ -61,10 +62,11 @@ sh start/linux/create_sql_table.sh</code></pre>
 
 <h4>4. 单进程启动（RunAllOneServerStartUp）</h4>
 <p>将对外服、游戏服、全局服、HTTP 服务、GM 后台合并到一个进程中运行，无需单独启动中心服，适合本地开发调试</p>
-<p>修改配置文件： <code>config/runallone-config.properties</code>
+<p>从模板创建配置文件 <code>config/runallone-config.properties</code>（可先运行 <code>config/reset-config.bat</code> 批量复制全部模板）
 <a href="https://sunrise-game-frame.pages.dev/#/config">配置参考</a></p>
 <pre><code class="language-bash"># Windows
-start\windows\single\runallone.bat</code></pre>
+cd start\windows\single
+.\runallone.bat</code></pre>
 <pre><code class="language-bash"># Linux
 sh start/linux/server_run_allone.sh</code></pre>
 
@@ -78,15 +80,23 @@ npm run dev</code></pre>
 <h4>6. 客户端启动</h4>
 <p>Godot 游戏客户端：独立仓库 <a href="https://gitee.com/lieng618/sunrise-game-frame-client">sunrise-game-frame-client</a>，Godot 4.6 + C# 实现的 2D 像素风 RPG 完整示例，覆盖登录、地图探索、多人同步、聊天/背包/邮件等玩法（详见 <a href="https://sunrise-game-frame.pages.dev/#/client-example">客户端示例文档</a>）</p>
 <pre><code class="language-bash">git clone https://gitee.com/lieng618/sunrise-game-frame-client.git</code></pre>
-<p>消息发送工具：支持多标签页，每标签页一个玩家连接，可向服务器发送消息包</p>
-<pre><code class="language-bash">start/windows/client.bat</code></pre>
+<p>仓库内的 Java 联调工具使用 UID 登录，仅适用于 <code>player.auth.enabled=false</code> 的开发/压测场景；开启玩家 Token 鉴权后，这些工具没有 Token 输入流程。</p>
+<p>消息发送工具：支持多标签页，每标签页一个玩家连接，可根据 Proto 描述自动生成消息输入界面。</p>
+<pre><code class="language-bash">cd start/windows
+.\client.bat</code></pre>
 <p>压测机器人工具：支持批量创建客户端、一键登录、批量定时向服务器发消息包</p>
-<pre><code class="language-bash">start/windows/bot.bat</code></pre>
+<pre><code class="language-bash">cd start/windows
+.\bot.bat</code></pre>
 <p>压测统计工具：登录耗时 + 以服务器回包为准的发包 TPS，含端到端诊断（详见 <a href="https://sunrise-game-frame.pages.dev/#/stress-testing">压测统计文档</a>）</p>
-<pre><code class="language-bash">start/windows/stress.bat</code></pre>
+<pre><code class="language-bash">cd start/windows
+.\stress.bat</code></pre>
 
 <h4>7. 生产环境部署</h4>
 <p>生产环境建议多服务多进程运行，根据需求拆分与合并服务。详见文档：<a href="https://sunrise-game-frame.pages.dev/#/deployment">部署指南</a></p>
+
+<h2>代码热更</h2>
+<p>构建会生成 <code>hotswap-agent.jar</code>、<code>sunrise-lib.jar</code> 和全量业务补丁 <code>sunrise-hotfix.jar</code>。仓库启动脚本已经配置 <code>-javaagent</code>，GM 代码热更时选择 <code>sunrise-hotfix.jar</code> 即可。</p>
+<p>支持的修改范围、构建命令、多机共享目录、Center 接入、节点结果与回滚说明，请查看<a href="https://sunrise-game-frame.pages.dev/#/hotswap">代码热更完整指南</a>。</p>
 
 <h2>架构图</h2>
 <div class="arch-diagram">
@@ -109,7 +119,7 @@ npm run dev</code></pre>
     </div>
     <div class="card">
     <h4>GlobalServer</h4>
-        <div class="card-desc">全局跨服服务，所有需要跨服共享的数据和逻辑都放在这里，目前实现了：聊天服务（GlobalChatService）、好友服务（GlobalFriendService）、邮件服务（GlobalMailService）、玩家简要信息查询（GlobalPlayerInfoService）。</div>
+        <div class="card-desc">全局跨服服务，目前包含聊天（GlobalChatService）、好友（GlobalFriendService）、邮件（GlobalMailService）、玩家简要信息（GlobalPlayerInfoService）与排行榜（GlobalRankService）。上述服务当前把状态保存在进程内存并周期性写入 server_data，因此状态型服务应保持单写者或按玩家分片。</div>
     </div>
     <div class="card">
     <h4>HttpServer</h4>
@@ -117,7 +127,7 @@ npm run dev</code></pre>
     </div>
     <div class="card">
     <h4>GmBackServer</h4>
-        <div class="card-desc">GM 后台 API服务，提供 REST API 并与 Game 服同步 GM 指令。前后端分离，浏览器页面由前端工程 gmback-ui独立部署。提供运营指令（发邮件、踢人、封禁/禁言、在线玩家、服务器开关、白名单、公告、兑换码）、节点监控、配置与代码热更、用户权限与操作日志。</div>
+        <div class="card-desc">GM 后台 API 服务，提供 REST API 并与 Game 服同步 GM 指令。前后端分离，浏览器页面由前端工程 gmback-ui 独立部署。提供运营指令（发邮件、踢人、封禁/禁言、在线玩家、服务器开关、白名单、金手指用户、公告、兑换码）、节点监控、配置与代码热更、用户权限与操作日志。</div>
     </div>
     <div class="card">
         <h4>可扩展的 RPC 服务</h4>
@@ -128,23 +138,20 @@ npm run dev</code></pre>
 <h2>项目结构</h2>
 <pre><code class="language-bash">sunrise-game-frame/
 ├─ pom.xml                     # Maven 聚合工程（父 POM）
-├─ config/                     # 各服务 .properties 配置文件
-│   ├─ center-config.properties
-│   ├─ external-config.properties
-│   ├─ game-config.properties
-│   ├─ global-config.properties
-│   ├─ http-config.properties
-│   ├─ gmback-config.properties
-│   ├─ client-config.properties
-│   └─ runallone-config.properties
+├─ config/                     # 配置模板、环境变量说明与重置脚本
+│   ├─ *-config.example.properties
+│   ├─ ENV.md
+│   └─ reset-config.bat / reset-config.sh
 ├─ center/                     # 中心服启动模块
 ├─ network/                    # 网络层、DB、RPC、基础工具（所有服务依赖）
 │   └─ src/main/java/org/sunrise/game/
-│       ├─ core/               # BaseServer / BaseClient / 消息 / 编解码
-│       ├─ rpc/                # RPC 框架（注解/节点/调用/服务管理/policy 连接策略）
-│       ├─ db/                 # DbService（HikariCP）/ 实体类
-│       ├─ config/             # ConfigReader 配置加载
-│       └─ utils/              # IdGenerator / LogCore / JwtUtil / Utils
+│       ├─ core/               # 网络、消息、编解码与 RPC 握手认证
+│       ├─ rpc/                # 注解、节点发现、调用、服务生命周期、连接策略
+│       ├─ db/                 # DbService（HikariCP）与运行时实体
+│       ├─ config/             # 配置加载与 ${ENV:default} 解析
+│       ├─ graceful/           # 有序优雅停机
+│       ├─ jwt/                # JWT、密码与邮件验证码
+│       └─ utils/              # ID、超时常量、线程与通用工具
 ├─ gen/                        # 协议 / RPC 枚举 / DB 实体 生成代码
 │   └─ src/main/java/org/sunrise/game/
 │       ├─ genProto/           # .proto 文件 + 生成的 Java 协议类
@@ -154,16 +161,17 @@ npm run dev</code></pre>
 │   └─ src/main/java/org/sunrise/game/
 │       ├─ external/           # 对外服（TCP/WS/KCP 网关）
 │       ├─ game/               # 游戏服（玩家对象/模块/协议路由/系统）
-│       ├─ global/             # 全局服（聊天/好友/邮件/玩家信息）
+│       ├─ global/             # 全局服（聊天/好友/邮件/玩家信息/排行榜）
 │       ├─ http/               # HTTP 服务（地址分发 + 邮箱注册登录）
 │       ├─ gmback/             # GM 后台（REST API）
 │       └─ runone/             # 单进程部署（将所有模块集成到一个进程中运行）
 ├─ gmback-ui/                  # GM 后台前端（Vite + Vue 3 SPA）
-├─ hotswap/                    # java代码热更新支持
+├─ hotswap/                    # Java Agent 与类重定义内核
+├─ hotfix/                     # sunrise-hotfix.jar 聚合工程
 ├─ client/                     # 客户端工具
 │   └─ src/main/java/
-│       ├─ core/               # SocketClient / TcpClient / WsClient / KcpClient
-│       ├─ swing/              # MainFrame / SendMsgFrame（消息发送工具）
+│       ├─ core/               # 客户端网络、登录、协议路由与压测管理
+│       ├─ sendmsg/            # 消息发送工具
 │       ├─ bot/                # BotManager / BotFrame（压测机器人工具）
 │       └─ stress/             # StressManager / StressFrame（压测统计工具）
 ├─ start/                      # 启动脚本
@@ -173,7 +181,7 @@ npm run dev</code></pre>
 ├─ tables/                     # Excel 配置表 + Luban 生成配置
 │   ├─ Datas/                  # .xlsx 配置源文件
 │   └─ json/                   # Luban 生成的 JSON 配置
-└─ docs/                       # 架构文档 </code></pre>
+└─ docs/                       # 静态架构文档站点 </code></pre>
 
 <h2>技术栈</h2>
 <table>
@@ -182,12 +190,14 @@ npm run dev</code></pre>
 <tr><td>Java</td><td>21</td><td>运行时必备环境</td><td>全局</td></tr>
 <tr><td>Maven</td><td>3.8+</td><td>聚合工程构建</td><td>根 pom.xml</td></tr>
 <tr><td>slf4j</td><td>2.0.13</td><td>日志输出与记录</td><td>全局</td></tr>
+<tr><td>Logback</td><td>1.5.28</td><td>日志实现</td><td>network</td></tr>
 <tr><td>Netty</td><td>4.2.12.Final</td><td>高性能网络框架</td><td>network</td></tr>
 <tr><td>java-Kcp</td><td>1.6</td><td>KCP 传输协议支持</td><td>network</td></tr>
 <tr><td>Protobuf</td><td>4.28.2</td><td>客户端业务消息序列化</td><td>gen</td></tr>
 <tr><td>MessagePack</td><td>0.9.11</td><td>RPC 消息序列化</td><td>network</td></tr>
 <tr><td>FastJSON</td><td>2.0.32</td><td>JSON 序列化</td><td>network/game</td></tr>
 <tr><td>MySQL</td><td>5.7+</td><td>数据持久化</td><td>network</td></tr>
+<tr><td>MySQL Connector/J</td><td>9.6.0</td><td>JDBC 驱动</td><td>network</td></tr>
 <tr><td>HikariCP</td><td>5.0.1</td><td>数据库连接池</td><td>network</td></tr>
 <tr><td>Javalin</td><td>6.7.0</td><td>轻量级 Web 框架</td><td>game</td></tr>
 <tr><td>Luban</td><td>4.x</td><td>游戏配置工作流（Excel → JSON）</td><td>tables</td></tr>
@@ -202,16 +212,19 @@ npm run dev</code></pre>
 <table>
 <thead><tr><th>模块</th><th>artifactId</th><th>职责</th><th>关键包 / 说明</th></tr></thead>
 <tbody>
-<tr><td>network</td><td>network</td><td>核心网络/RPC/DB 基础设施</td><td>org.sunrise.game.network</td></tr>
-<tr><td>center</td><td>center</td><td>中心服（节点发现与注册）</td><td>org.sunrise.game.center</td></tr>
+<tr><td>network</td><td>network</td><td>核心网络/RPC/DB 基础设施</td><td>org.sunrise.game.core/rpc/db/config</td></tr>
+<tr><td>center</td><td>center</td><td>中心服（节点发现、拓扑与热更入口）</td><td>org.sunrise.game.main/dashboard</td></tr>
 <tr><td>game</td><td>game</td><td>业务逻辑（支持多进程或单进程部署）</td><td>org.sunrise.game.game/external/global/gmback/http</td></tr>
 <tr><td>gmback-ui</td><td>-</td><td>GM 后台前端</td><td>/gmback-ui</td></tr>
 <tr><td>gen</td><td>gen</td><td>代码生成（RPC 枚举、DB 实体、Proto）</td><td>org.sunrise.game.gen*</td></tr>
-<tr><td>client</td><td>client</td><td>客户端工具（消息发送器、压测机器人、压测统计）</td><td>org.sunrise.game.client</td></tr>
+<tr><td>hotswap</td><td>hotswap</td><td>Agent 引导与进程级类重定义</td><td>org.sunrise.game.core</td></tr>
+<tr><td>hotfix</td><td>hotfix</td><td>聚合 game/network/gen/center 的热更补丁</td><td>sunrise-hotfix.jar</td></tr>
+<tr><td>client</td><td>client</td><td>客户端工具（消息发送器、压测机器人、压测统计）</td><td>core.* / sendmsg.* / bot.* / stress.*</td></tr>
 </tbody>
 </table>
 
 <h2>测试机压测记录</h2>
+<p><strong>以下为历史基准记录，不代表当前提交在任意机器上的保证结果。</strong>发布前应在目标硬件、目标协议、目标限流配置和当前构建上重新测量。</p>
 <p> Windows 10，Intel i7-8700，6 核 12 线程 @ 3.20GHz，内存 64 GB</p>
 <p>启动 RunAllOne 单进程、客户端连接方式为 TCP。启动服务器后不再关闭，一次运行内连续压测各档位（压测多次求平均）。</p>
 <p>以下测试为客户端进行了完整的登录流程，登录成功后再进行发包。由对外服务接收到消息，转发到游戏服处理。消息包结构为Ping包（<code>C2S_ClientPing</code> / <code>S2C_ClientPing</code>）</p>

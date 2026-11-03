@@ -25,30 +25,42 @@
 
     <build>
         <plugins>
-            <!-- 核心：配置JAR插件生成符合Agent规范的MANIFEST.MF -->
+            <!-- 热更内核仍作为普通依赖进入共享库；Agent 包只包含最小引导类 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.4.1</version>
-                <configuration>
-                    <archive>
-                        <!-- 自动生成MANIFEST.MF并添加Agent必需的属性 -->
-                        <manifestEntries>
-                            <!-- 指定Agent入口类（必须和Hotswap.java的全类名一致） -->
-                            <Premain-Class>org.sunrise.game.core.Hotswap</Premain-Class>
-                            <!-- 声明允许类重定义（核心权限，缺一不可） -->
-                            <Can-Redefine-Classes>true</Can-Redefine-Classes>
-                            <Can-Retransform-Classes>true</Can-Retransform-Classes>
-                            <!-- 可选：添加版本信息方便排查 -->
-                            <Implementation-Title>Hotswap Agent</Implementation-Title>
-                            <Implementation-Version>${project.version}</Implementation-Version>
-                        </manifestEntries>
-                    </archive>
-                    <!-- 可选：输出到和业务Jar相同的目录，方便部署 -->
-                    <outputDirectory>${project.basedir}/../start/jar</outputDirectory>
-                    <!-- 最终生成的Agent Jar名称 -->
-                    <finalName>hotswap-agent</finalName>
-                </configuration>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.6.0</version>
+                <executions>
+                    <execution>
+                        <id>make-hotswap-agent</id>
+                        <phase>package</phase>
+                        <goals><goal>single</goal></goals>
+                        <configuration>
+                            <finalName>hotswap-agent</finalName>
+                            <outputDirectory>${project.basedir}/../start/jar</outputDirectory>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <!-- Agent 是独立发布件，不能替换 hotswap 主依赖 JAR。 -->
+                            <attach>false</attach>
+                            <archive>
+                                <manifestEntries>
+                                    <Premain-Class>org.sunrise.game.core.AgentBootstrap</Premain-Class>
+                                    <Can-Redefine-Classes>true</Can-Redefine-Classes>
+                                    <Can-Retransform-Classes>true</Can-Retransform-Classes>
+                                    <Implementation-Title>Hotswap Agent</Implementation-Title>
+                                    <Implementation-Version>${project.version}</Implementation-Version>
+                                </manifestEntries>
+                            </archive>
+                            <descriptors>
+                                <descriptor>src/main/assembly/agent.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

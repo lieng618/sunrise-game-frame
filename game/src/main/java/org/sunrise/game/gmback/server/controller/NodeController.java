@@ -61,9 +61,7 @@ public class NodeController extends BaseController {
     }
 
     public void list(Context ctx) {
-        long now = System.currentTimeMillis();
-        nodes.entrySet().removeIf(entry ->
-                now - entry.getValue().getReportTime() > NodeTimeouts.GM_NODE_LIST_STALE_TIMEOUT_MS);
+        removeStaleNodes();
 
         // 构建返回消息
         List<NodeRemoteData> nodes = new ArrayList<>(this.nodes.values());
@@ -92,6 +90,16 @@ public class NodeController extends BaseController {
         success(ctx, voList);
     }
 
+    /** 返回当前仍然在线且可接收管理命令的服务节点。 */
+    public List<String> getActiveNodeIds() {
+        removeStaleNodes();
+        return nodes.values().stream()
+                .map(NodeRemoteData::getNodeId)
+                .filter(nodeId -> nodeId != null && !nodeId.isBlank())
+                .distinct()
+                .toList();
+    }
+
     public void reloadConfig(Context ctx) {
         String nodeId = getBodyParam(ctx, "nodeId", String.class);
         String logNodeId = nodeId;
@@ -105,5 +113,11 @@ public class NodeController extends BaseController {
         success(ctx, null, "Reload config message sent");
 
         ControllerManager.getController(OperationLogController.class).recordLog(ctx, OperationLogController.OperationType.RELOAD_CONFIG, "热更配置(节点ID:" + logNodeId + ")");
+    }
+
+    private void removeStaleNodes() {
+        long now = System.currentTimeMillis();
+        nodes.entrySet().removeIf(entry ->
+                now - entry.getValue().getReportTime() > NodeTimeouts.GM_NODE_LIST_STALE_TIMEOUT_MS);
     }
 }

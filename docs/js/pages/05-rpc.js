@@ -4,17 +4,17 @@ registerPage('rpc', 'RPC 框架', '节点发现、方法注册、调用模式、
 
 <h2>核心角色</h2>
 <div class="card-grid">
-    <div class="card"><div class="card-icon">⚙️</div><div class="card-title">CenterServer</div><div class="card-desc">节点注册中心，不执行业务 RPC，只负责节点发现与广播。NodeManager 维护 datasByNodeId，3秒上报间隔，6秒无上报视为失效</div></div>
+    <div class="card"><div class="card-icon">⚙️</div><div class="card-title">CenterServer</div><div class="card-desc">节点注册中心，不执行业务 RPC。节点每 3 秒上报，6 秒无上报即判定离线；datasByNodeId 的物理清理扫描最多约每 30 秒执行一次</div></div>
     <div class="card"><div class="card-icon">🖥️</div><div class="card-title">RpcNode</div><div class="card-desc">每个服务进程的 RPC 节点，包含一个 RpcServer(BaseServer) + 若干 BaseClient(connectToOthers) + 一个 ReportClient。通过 rpc_server_system 表保证 serverId 唯一</div></div>
-    <div class="card"><div class="card-icon">📝</div><div class="card-title">@RpcService / @RpcMethod</div><div class="card-desc">标记 RPC 服务类（继承于 BaseService）和 RPC 方法。使用CallUtils.init() 注册本进程提供的 RPC 方法，通过gen模块将服务名生成到 CallEnum</div></div>
+<div class="card"><div class="card-icon">📝</div><div class="card-title">@RpcService / @RpcMethod</div><div class="card-desc">标记 RPC 服务类（继承 BaseService）和方法。RpcNode 创建时读取 rpc.scan.packages 与 rpc.call-enum-class，自动扫描并绑定 CallEnum 字段与 @RpcMethod</div></div>
     <div class="card"><div class="card-icon">📞</div><div class="card-title">RpcFunction</div><div class="card-desc">调用侧统一入口。维护 callIdNodes（方法ID→注册了该方法的节点列表），屏蔽节点选择、本地/远程调用、回调注册、超时控制</div></div>
 </div>
 
 <h2>节点启动与发现</h2>
 <h3>1. RpcNode 启动流程</h3>
 <ol class="step-list">
-    <li>查询 <code>rpc_server_system</code> 表，确保 serverId 唯一（已有则复用端口，否则新增）</li>
-    <li>自动分配或复用端口（查询表中已有记录）</li>
+    <li>查询 <code>rpc_server_system</code>，计算新的监听端口；已有同 ID 记录时优先复用原端口</li>
+    <li>以租约原子抢占 serverId：仅当 status=0 或租约超过 30 秒时可接管</li>
     <li>启动本地 RPC Server（BaseServer）</li>
     <li>创建 ReportClient 连接 CenterServer（连接失败 5 秒后自动重连）</li>
     <li>连接成功后全量上报自身信息（ip/port/serverId/nodeId/nodeType）</li>
@@ -22,12 +22,14 @@ registerPage('rpc', 'RPC 框架', '节点发现、方法注册、调用模式、
 <pre><code class="language-java">// RpcNode.start() 核心逻辑
 public void start() {
     // 1. 查询 rpc_server_system 表
-    Map&lt;String, Object&gt; serverInfo = dbService.queryGetOneByParams(
-        "rpc_server_system", "server_id", serverId);
+    List&lt;Map&lt;String, Object&gt;&gt; rows = dbService.queryAll(
+        "select * from \`rpc_server_system\`");
+    // 从中找到 id == serverId 的行，并计算 maxPort + 1
     if (serverInfo == null) {
         // 新节点：插入记录，自动分配端口
-        port = dbService.executeWithGeneratedKey(
-            "INSERT INTO rpc_server_system (ip, port, status) VALUES (?, ?, 1)", ip, port);
+        dbService.execute(
+            "insert into \`rpc_server_system\` (\`id\`, \`ip\`, \`port\`) values (?, ?, ?) " +
+            "on duplicate key update \`id\` = \`id\`", serverId, localIp, port);
     } else {
         // 旧节点：复用端口
         port = (int) serverInfo.get("port");
@@ -44,7 +46,7 @@ public void start() {
 <ul>
     <li>如果是新节点 → 调用 <code>broadcastToNode()</code> 双向广播：把旧节点信息同步给新节点，把新节点信息同步给所有旧节点</li>
     <li>如果是旧节点（心跳上报）→ 更新 <code>reportTime</code>，不做广播</li>
-    <li>节点失效检测：<code>isNodeDead()</code> 判断超过 2 倍上报间隔（6秒）无上报则视为失效，从列表移除</li>
+    <li>节点失效检测：<code>isNodeDead()</code> 以 6 秒为离线阈值；中心服约每 30 秒扫描并删除失效记录，Dashboard 则会立即按 6 秒阈值显示 offline</li>
 </ul>
 
 <h3>3. 节点互连</h3>
@@ -60,7 +62,7 @@ public void start() {
 <h3>4. RPC 连接策略（RpcConnectPolicy）</h3>
 <p>多进程部署时，默认各节点会尽量全量互连。若希望减少不必要的 TCP 连接（例如 HTTP 服只需被访问、不必主动连所有 Game），可在<strong>中心服配置</strong> <code>center-config.properties</code> 中声明出站连接规则。中心服在 <code>NodeManager.broadcastToNode()</code> 时按策略过滤：仅当 <code>shouldConnect(接收方类型, 目标类型)</code> 为 true 时才把目标地址广播给接收方。</p>
 <div class="callout callout-info">
-    <p>未配置任何 <code>rpc.connect.*</code> 项时，策略关闭，保持全量互连。</p>
+    <p>未配置任何 <code>rpc.connect.*</code> 项时，策略关闭，保持全量互连。策略启用后，未出现的接收方 nodeType 默认不主动连接任何目标。</p>
 </div>
 <p>配置格式：</p>
 <pre><code class="language-properties"># rpc.connect.&lt;本节点类型&gt;=&lt;允许主动连接的目标类型&gt;，逗号分隔
@@ -105,7 +107,7 @@ rpc.connect.http=</code></pre>
 
 <h2>方法注册机制</h2>
 <h3>CallEnum</h3>
-<p>每个 RPC 方法对应一个 int 编号，定义在 <code>CallEnum.java</code> 中，在gen模块下genRpc包下新增服务接口，运行<code>GenRpcStartUp</code>自动生成</p>
+<p>每个 RPC 方法对应一个 int 编号。接口 Stub 位于 <code>gen/.../genRpc/service</code>，运行 <code>GenRpcStartUp</code> 生成 <code>CallEnum</code>。生成器保留已有常量的 ID，只为新方法追加 maxId+1；当前有 37 个常量，历史最大 ID 为 38。</p>
 <pre><code class="language-java">public class CallEnum {
     public static final int ExternalRecvGameMessageService_recvMessage = 1;
     public static final int FriendRpcListenService_onFriendAdded = 2;
@@ -117,21 +119,22 @@ rpc.connect.http=</code></pre>
     public static final int GameRpcListenService_sendToHuman = 8;
     public static final int GlobalChatService_chat = 9;
     public static final int GlobalChatService_history = 10;
-    // ... 共 35 个方法
+    // ... 当前共 37 个常量（最大 ID 为 38），完整列表见「API 参考」
 }</code></pre>
 
 <h3>CallUtils.init() 完整流程</h3>
 <ol class="step-list">
-    <li>扫描指定包路径下所有 <code>@RpcService</code> 类</li>
+    <li>从 <code>rpc.scan.packages</code> 读取扫描包，并自动追加 <code>org.sunrise.game.rpc.hotswap</code></li>
     <li>实例化服务类（构造参数为 nodeId）</li>
     <li>注册到 <code>ServiceManager</code>（类名 → 实例映射）</li>
     <li>扫描所有 <code>@RpcMethod</code> 方法</li>
-    <li>建立 <code>rpcId → Method</code> 映射（rpcIdToMethodMap）</li>
+    <li>按“类简单名_方法名”绑定 <code>CallEnum</code> 字段与 <code>@RpcMethod</code>，建立 <code>rpcId → Method</code> 映射</li>
     <li>把当前节点支持的 callId 写入 <code>RpcFunction.callIdNodes</code></li>
     <li>调用 <code>ServiceManager.initAll()</code> 启动所有服务生命周期</li>
 </ol>
 
 <h2>RPC 调用模式</h2>
+<p><code>RpcFunction.call()</code> 返回 boolean：停机中、没有任何节点注册该方法，或指定节点已失联时返回 false。业务代码在需要回调前应先检查返回值，避免注册一个永远不会完成的调用。</p>
 <h3>SendRandom（随机调用）</h3>
 <p>默认模式。如果当前节点自己注册了此方法，优先本地处理（不经过网络）；否则从远端节点随机选一个。</p>
 <pre><code class="language-java">// 示例：发送聊天消息（随机选一个 Global 节点处理）
@@ -140,13 +143,14 @@ RpcFunction.newInstance().call(CallEnum.GlobalChatService_chat,
 
 <h3>SendAll（广播调用）</h3>
 <p>给所有注册了该方法的节点都发一份。</p>
+<p><code>SendAll</code> 的所有子调用共用同一个 <code>messageId</code>。如果随后调用 <code>listenResult()</code>，回调在第一个返回结果到达时就会从 pending Map 中移除，因此不能把该模式当作“收集所有节点返回值”的 API；需要汇总时请逐个节点使用定向调用。</p>
 <pre><code class="language-java">// 示例：通知所有 Game 节点有新好友申请
 RpcFunction.newInstance(RpcFunction.RpcCallType.SendAll).call(
     CallEnum.FriendRpcListenService_onNewFriendRequest,
     targetHumanId);</code></pre>
 
 <h3>SendDesignated（定向调用）</h3>
-<p>按指定 serverNodeId 发给某一个目标节点。如果目标节点无效，退化为 SendRandom。External ↔ Game 之间的消息转发大量使用此模式。</p>
+<p>按指定 serverNodeId 发给某一个目标节点。创建调用器时若目标当前无效，会退化为 SendRandom；调用器创建后目标变为不可达，则本次调用返回 false。External ↔ Game 的消息转发使用此模式。</p>
 <pre><code class="language-java">// 示例：Game 向指定 External 节点发送消息
 RpcFunction.newInstance(externalNodeId).call(
     CallEnum.ExternalRecvGameMessageService_recvMessage,
@@ -173,7 +177,7 @@ private static Object[] parseCallArgs(Call call, Method method) {
     return args;
 }
 </code></pre>
-<p>通过 <code>call.getData(i)</code> 按位置取出数据，作为参数传递给服务方法。调用侧只需保证<strong>参数个数与顺序</strong>与 <code>@RpcMethod</code> 方法签名一致（由 <code>CallEnum</code> 绑定到具体 Method）。</p>
+<p>通过 <code>call.getData(i)</code> 按位置取出数据，再由 <code>RpcArgConverter</code> 转换到目标参数类型。调用侧需保证参数个数与顺序一致；整数、浮点等 Number 可按目标基础类型转换，类型不兼容时返回 <code>RPC_ARG_TYPE_MISMATCH</code>。</p>
 <p><strong>注意</strong>：<code>returns()</code> 与 <code>listenResult()</code> 的 context 仍使用键值对；仅 <code>call()</code> 请求参数改为按位置传值。</p>
 
 <pre><code class="language-java">@RpcService
@@ -195,7 +199,7 @@ public class GlobalMailService extends BaseService {
         returns("humanId", humanId, "info", data);
     }</code></pre>
 <h3>调用方注册回调</h3>
-<p>可以看到<code>rpcFunction.listenResult(Callback<RpcResult> callback, Object... contexts)</code>第一个参数为回调函数，第二个参数为上下文（非必须，但处理玩家数据时一定要把玩家id做为上下文传递，
+<p>可以看到<code>rpcFunction.listenResult(Callback&lt;RpcResult&gt; callback, Map&lt;String,Object&gt; contexts)</code>第一个参数为回调函数，第二个参数为可选的上下文 Map（处理玩家数据时建议把 humanId 作为上下文传递，
 回调里通过上下文获取玩家id，再根据id获取humanObject， 避免Lambda 持有 this引用，导致内存泄露问题）。
 那么在回调执行时，可以通过<code>rpcResult.getContext("humanId")</code>取出传递的数据。通过<code>rpcResult.getResult()</code>判断本次回调的错误码，通过<code>rpcResult.getData()</code>获取远端返回的数据。
 注意调用<code>rpcResult.getData()</code>方法传递的参数名一定要和远端返回时所用的参数名保持一致。</p>
@@ -210,13 +214,13 @@ public class GlobalMailService extends BaseService {
             if (rpcResult.getResult() != ErrorType.SUCCESS) return;
             byte[] protoData = (byte[]) rpcResult.getData("info");
             humanObj.sendMsg(TopicProto.TOPIC.TOPIC_TYPE_CHAT_VALUE, ChatProto.FROM_SERVER.S2C_History_VALUE, protoData);
-        }, "humanId", humanObject.getHumanId());
+        }, Map.of("humanId", humanObject.getHumanId()));
     }</code></pre>
 
 <h3>超时机制</h3>
 <ul>
-    <li>默认超时：<strong>10 秒</strong>（RpcManager.registerCallback 设置）</li>
-    <li>自定义超时：<code>rpcFunction.setTimeOut(millis)</code></li>
+    <li>默认超时：<strong>10 秒</strong>（<code>RpcManager.DEFAULT_TIMEOUT_MS</code>）</li>
+    <li>自定义超时：先调用 <code>listenResult()</code>，再调用 <code>setTimeOut(millis)</code>；传入 0 或负数恢复默认值</li>
     <li>超时检测：<code>RpcServerMessageManager.pulseListenRpcTimeout()</code> 持续扫描 checkTimeout Map</li>
     <li>超时后：移除回调，构造 <code>RPC_TIMEOUT</code> 错误码，触发回调</li>
 </ul>
@@ -230,11 +234,14 @@ public class GlobalMailService extends BaseService {
 <tr><td>toNodeId</td><td>String</td><td>目标节点 ID</td></tr>
 <tr><td>messageId</td><td>long</td><td>唯一消息 ID（用于回调匹配）</td></tr>
 <tr><td>rpcId</td><td>int</td><td>RPC 方法编号（对应 CallEnum）</td></tr>
-<tr><td>type</td><td>CallType</td><td>Call（业务调用）或 Update（方法列表更新）</td></tr>
+<tr><td>type</td><td>int</td><td>保存 CallType 的 ordinal：Call / CallResult / Update</td></tr>
 <tr><td>data</td><td>Object[]</td><td>请求参数数组（按位置对应方法参数）</td></tr>
 <tr><td>result</td><td>int</td><td>调用结果码（0=成功，100+=错误）</td></tr>
 </tbody>
 </table>
+
+<h2>请求参数白名单</h2>
+<p><code>RpcDataSanitizer</code> 会在序列化前递归检查 RPC 参数：允许 null、Boolean、String、byte[]、数字、List、Map，以及会被转换为 List 的 Set/Collection；Map key 必须是 String。最大嵌套深度 16，单集合最多 10000 项，拒绝 <code>@class</code>/<code>@type</code> 多态元数据。</p>
 
 <h2>错误码</h2>
 <table>
@@ -247,6 +254,8 @@ public class GlobalMailService extends BaseService {
 <tr><td>103</td><td>RPC_ARGS_NOT_MATCH</td><td>参数数量不匹配</td><td>call() 传的参数个数 ≠ 方法参数个数</td></tr>
 <tr><td>104</td><td>RPC_CALL_CATCH</td><td>调用异常</td><td>方法执行抛出异常</td></tr>
 <tr><td>105</td><td>RPC_NOT_REGISTER</td><td>方法未注册</td><td>callIdNodes 中没有节点注册了该方法</td></tr>
+<tr><td>106</td><td>RPC_ARG_TYPE_MISMATCH</td><td>参数类型不匹配</td><td>Number、List 或 Boolean 无法转换为目标参数类型</td></tr>
+<tr><td>107</td><td>RPC_SHUTDOWN</td><td>停机中断</td><td>停机清理时仍有未完成的 RPC 回调</td></tr>
 </tbody>
 </table>
 
@@ -273,13 +282,14 @@ Call currentCall = CallContext.getLastCall();  // 取栈顶</code></pre>
 <table>
 <thead><tr><th>方法</th><th>频率</th><th>说明</th></tr></thead>
 <tbody>
-<tr><td>initAll()</td><td>启动时一次</td><td>执行 service.init()，异步从 server_data 表加载数据，等待初始化完成，注册 shutdown hook 做同步保存</td></tr>
+<tr><td>initAll()</td><td>启动时一次</td><td>执行 service.init()，异步从 server_data 加载数据；60 秒内未完成则进程退出</td></tr>
 <tr><td>pulse()</td><td>每帧（5ms）</td><td>驱动所有服务的 pulse()</td></tr>
+<tr><td>pulsePer100Ms()</td><td>每 100 毫秒</td><td>驱动服务、系统和玩家模块的 100ms 心跳</td></tr>
 <tr><td>pulsePerSec()</td><td>每秒</td><td>驱动所有服务的 pulsePerSec()</td></tr>
 <tr><td>pulsePer5Sec()</td><td>每 5 秒</td><td>驱动所有服务的 pulsePer5Sec()</td></tr>
 <tr><td>pulsePerMin()</td><td>每分钟</td><td>驱动所有服务的 pulsePerMin() + save()（异步保存到 server_data 表）</td></tr>
 <tr><td>save()</td><td>按需/每分钟</td><td>异步保存所有服务数据到 server_data 表</td></tr>
-<tr><td>saveSync()</td><td>关闭时</td><td>同步保存（shutdown hook 调用）</td></tr>
+<tr><td>saveSync()</td><td>停机最终快照</td><td>同步保存；全局优雅停机由 <code>GracefulShutdown</code> 统一编排</td></tr>
 </tbody>
 </table>
 

@@ -24,25 +24,28 @@ registerPage('deployment', '部署指南', '本地部署、Docker 部署、Linux
 <pre><code class="language-bash"># 1. 编译
 mvn clean package -DskipTests
 
-# 2. 初始化数据库
-start\\windows\\create_sql_table.bat
+# 2. 初始化数据库（先修改脚本内的连接信息）
+cd start\\windows
+.\\create_sql_table.bat
 
 # 3. 一键启动所有服务
-start\\windows\\server_run_all.bat
+cd ..\\..
+.\\start\\windows\\server_run_all.bat
 
-# 或手动逐个启动（推荐调试时使用）
-start\\windows\\center.bat      # 1. 先启动中心服
-start\\windows\\external.bat    # 2. 启动对外服
-start\\windows\\game.bat        # 3. 启动游戏服
-start\\windows\\global.bat      # 4. 启动全局服
-start\\windows\\http.bat        # 5. 启动 HTTP 服务
-start\\windows\\gmback.bat      # 6. 启动 GM 后台
-
-# 或在编译器内运行启动
+# 或进入 single 目录逐个启动
+cd start\\windows\\single
+.\\center.bat
+.\\external.bat
+.\\game.bat
+.\\global.bat
+.\\http.bat
+.\\gmback.bat
 </code></pre>
+<p><code>server_run_all.bat</code> 会自行切换到 <code>single</code> 目录；单独执行 <code>center.bat</code> 等脚本时，必须从 <code>start/windows/single</code> 启动，否则相对 JAR 路径会失效。</p>
 
 <h3>Windows 单进程</h3>
-<pre><code class="language-bash">start\\windows\\single\\runallone.bat</code></pre>
+<pre><code class="language-bash">cd start\\windows\\single
+.\\runallone.bat</code></pre>
 
 <h3>Linux 部署</h3>
 <pre><code class="language-bash"># 1. 安装 pm2 进程管理器
@@ -51,8 +54,10 @@ npm install -g pm2
 # 2. 编译
 mvn clean package -DskipTests
 
-# 3. 初始化数据库
-sh start/linux/create_sql_table.sh
+# 3. 初始化数据库（脚本使用相对路径，应先进入目录）
+cd start/linux
+sh create_sql_table.sh
+cd ../..
 
 # 4. 多进程启动
 sh start/linux/server_run_all.sh
@@ -70,8 +75,10 @@ sh start/linux/server_run_allone.sh</code></pre>
 <h3>部署步骤</h3>
 <ol class="step-list">
     <li>编译项目：<code>mvn clean package -DskipTests</code></li>
-    <li>修改 <code>start/docker/config/external-config.properties</code> 中的 external.address（必须改为客户端能访问到的 IP）</li>
-    <li>构建并启动：<code>cd start/docker && docker compose up -d --build</code></li>
+    <li>在仓库根目录运行 <code>config/reset-config.bat</code> 或 <code>sh config/reset-config.sh</code>，确认 compose 要挂载的 <code>config/*-config.properties</code> 已存在</li>
+    <li>进入 <code>start/docker</code>，复制 <code>.env.example</code> 为 <code>.env</code></li>
+    <li>修改 .env 中的数据库密码、GM 密码、玩家 JWT 密钥、RPC token 和 <code>EXTERNAL_ADDRESS</code></li>
+    <li>启动：<code>docker compose up -d --build</code>。镜像只复制已构建的 <code>start/jar/</code>，不会在容器内执行 Maven</li>
 </ol>
 
 <h3>Docker Compose 服务</h3>
@@ -87,6 +94,7 @@ sh start/linux/server_run_allone.sh</code></pre>
 <tr><td>gmback</td><td>8010:8010</td><td>mysql(healthy), center</td><td>GM 后台 API</td></tr>
 </tbody>
 </table>
+<p>Compose 只运行 MySQL 与服务端进程，不包含 <code>gmback-ui</code> 静态页面；浏览器前端需要另行执行 <code>npm run build</code> 并由 Nginx 托管。Docker 镜像当前复制 <code>tables/json</code>，未复制 <code>tables/mapjson</code>；使用地图导航时应扩展 Dockerfile 或挂载 nav 目录到 <code>/app/tables/mapjson</code>。</p>
 
 <h3>启动顺序</h3>
 <div class="flow-diagram">
@@ -237,11 +245,16 @@ registerPage('client-tools', '客户端工具', '消息发送工具、压测机�
 <h1>客户端工具</h1>
 <p class="page-desc">项目提供消息发送工具、压测机器人和压测统计工具三种客户端工具</p>
 
+<div class="callout callout-warn">
+    <p><strong>鉴权限制：</strong>仓库内三个 Java 工具都通过 <code>C2S_Login(uid)</code> 登录，不读取 Token，也不为 HTTP 请求附加 Authorization。它们只适用于 <code>player.auth.enabled=false</code> 的本地联调或压测；生产 Token 模式请使用独立游戏客户端或自行扩展工具的登录流程。</p>
+</div>
+
 <h2>消息发送工具</h2>
 <p>基于 Swing 的 GUI 工具，支持多标签页，每标签页一个玩家连接。自动读取 proto 信息构建发送 UI。</p>
 
 <h3>启动方式</h3>
-<pre><code class="language-bash">start\\windows\\client.bat</code></pre>
+<pre><code class="language-bash">cd start\\windows
+.\\client.bat</code></pre>
 
 <h3>核心类</h3>
 <table>
@@ -262,14 +275,15 @@ registerPage('client-tools', '客户端工具', '消息发送工具、压测机�
 <p>支持批量创建客户端、自动登录、定时 Ping，统计连接/登录状态。</p>
 
 <h3>启动方式</h3>
-<pre><code class="language-bash">start\\windows\\bot.bat</code></pre>
+<pre><code class="language-bash">cd start\\windows
+.\\bot.bat</code></pre>
 
 <h3>核心类</h3>
 <table>
 <thead><tr><th>类名</th><th>说明</th></tr></thead>
 <tbody>
 <tr><td>BotStartUp</td><td>启动入口</td></tr>
-<tr><td>BotManager</td><td>批量创建客户端、登录、定时 Ping（每10秒）</td></tr>
+<tr><td>BotManager</td><td>批量创建客户端、发送 UID 登录、定时 Ping（5 秒后首次，之后每 10 秒）</td></tr>
 <tr><td>BotFrame</td><td>压测 UI（显示统计信息）</td></tr>
 </tbody>
 </table>
@@ -278,13 +292,14 @@ registerPage('client-tools', '客户端工具', '消息发送工具、压测机�
 <table>
 <thead><tr><th>方法</th><th>说明</th></tr></thead>
 <tbody>
-<tr><td>addBots(count)</td><td>批量创建机器人（异步登录）</td></tr>
+<tr><td>addBots(count)</td><td>批量创建机器人，使用 10 线程执行登录流程</td></tr>
 <tr><td>removeBots(count)</td><td>批量移除</td></tr>
 <tr><td>removeBot(uid)</td><td>移除单个</td></tr>
 <tr><td>stopAll()</td><td>停止所有</td></tr>
 <tr><td>sendToAllBots(topic, packetId, data, interval, times)</td><td>向所有在线机器人发送消息</td></tr>
 </tbody>
 </table>
+<p>当前 <code>BotManager</code> 在 LoginManager 完成“地址获取并发送 C2S_Login”后即把机器人标记为登录成功，并不等待后续选角完成；需要精确登录成功率时优先使用压测统计工具。</p>
 
 <h3>BotManager.Stats 统计</h3>
 <table>
@@ -302,7 +317,8 @@ registerPage('client-tools', '客户端工具', '消息发送工具、压测机�
 <p>独立 GUI（<code>sunrise-stress.jar</code>）：分阶段统计「取地址 / 登录选角」耗时，并以<strong>服务器回包</strong>为准测量发包 TPS；内置客户端/服务端诊断日志对照。详见 <a href="#/stress-testing">压测统计文档</a>。</p>
 
 <h3>启动方式</h3>
-<pre><code class="language-bash">start\\windows\\stress.bat</code></pre>
+<pre><code class="language-bash">cd start\\windows
+.\\stress.bat</code></pre>
 
 <h3>核心类</h3>
 <table>
@@ -315,7 +331,7 @@ registerPage('client-tools', '客户端工具', '消息发送工具、压测机�
 </table>
 
 <h2>客户端连接流程</h2>
-<h3>开发模式（player.auth.enabled=false，默认）</h3>
+<h3>Java 工具模式（player.auth.enabled=false，默认）</h3>
 <ol class="step-list">
     <li>读取 <code>client-config.properties</code> 配置</li>
     <li>HTTP 请求 <code>/server_status?uid=xxx</code> 检查服务器状态</li>
@@ -327,7 +343,8 @@ registerPage('client-tools', '客户端工具', '消息发送工具、压测机�
     <li>登录完成，定时发送 C2S_ClientPing（每10秒）</li>
 </ol>
 
-<h3>生产模式（player.auth.enabled=true）</h3>
+<h3>生产 Token 模式（player.auth.enabled=true）</h3>
+<p>以下流程需要由正式客户端或自行扩展的客户端实现；仓库内置 Java 工具当前不会执行这些 Token 步骤。</p>
 <ol class="step-list">
     <li>调用 Http 服 <code>POST /send_code?email=...</code> 获取邮箱验证码</li>
     <li>注册：<code>POST /register?email=&password=&code=</code>；注册成功后进行登录：<code>POST /login?email=&password=</code> 获取 <code>token</code></li>
@@ -428,15 +445,17 @@ registerPage('api-reference', 'API 参考', 'RPC 服务 API、HTTP 接口、注�
 <tr><td>GlobalMailService_deleteMail</td><td>Global</td><td>删除邮件</td></tr>
 <tr><td>GlobalMailService_sendMail</td><td>Global</td><td>发送单人邮件</td></tr>
 <tr><td>GlobalMailService_readMail</td><td>Global</td><td>读取邮件</td></tr>
-<tr><td>GlobalMailService_receiveMailAttachment</td><td>Global</td><td>领取邮件附件</td></tr>
+<tr><td>GlobalMailService_getMailAttachmentInfo</td><td>Global</td><td>查询可领取附件，不改变状态</td></tr>
+<tr><td>GlobalMailService_confirmMailAttachment</td><td>Global</td><td>物品入包成功后确认领取</td></tr>
 <tr><td>GlobalMailService_getPlayerMails</td><td>Global</td><td>获取邮件列表</td></tr>
 <tr><td>GlobalMailService_sendMailToAll</td><td>Global</td><td>全服发送邮件</td></tr>
 <tr><td>GlobalMailService_sendMailToMultiple</td><td>Global</td><td>群发邮件</td></tr>
 <tr><td>GlobalPlayerInfoService_updatePlayerInfo</td><td>Global</td><td>更新玩家信息</td></tr>
 <tr><td>GlobalPlayerInfoService_getPlayerInfos</td><td>Global</td><td>批量获取玩家信息</td></tr>
 <tr><td>GlobalPlayerInfoService_getPlayerInfo</td><td>Global</td><td>获取单个玩家信息</td></tr>
-<tr><td>GlobalPlayerInfoService_getAllPlayerIds</td><td>Global</td><td>获取所有角色 ID</td></tr>
+<tr><td>GlobalPlayerInfoService_getAllPlayerIds</td><td>Global</td><td>按游标分页获取角色 ID</td></tr>
 <tr><td>GmBackRecvMessageService_recvMessage</td><td>GmBack</td><td>GM 后台消息接收</td></tr>
+<tr><td>HotswapControlService_command</td><td>所有 RPC 服务进程</td><td>统一热更控制入口，支持 reload、status、rollback</td></tr>
 <tr><td>HttpRecvMessageService_updateExternalRemoteData</td><td>Http</td><td>更新对外服地址数据</td></tr>
 <tr><td>HttpRecvMessageService_setExternalServerStatus</td><td>Http</td><td>设置服务器开关</td></tr>
 <tr><td>HttpRecvMessageService_setWhitelist</td><td>Http</td><td>设置白名单</td></tr>
@@ -447,6 +466,7 @@ registerPage('api-reference', 'API 参考', 'RPC 服务 API、HTTP 接口、注�
 <tr><td>GlobalRankService_removeFromRank</td><td>Global</td><td>从排行中移除</td></tr>
 </tbody>
 </table>
+<p>表中“所在进程”表示正常独立部署时提供该方法的节点；RunAllOne 会把全部业务服务注册在同一节点内。</p>
 
 <h2>HTTP 接口</h2>
 <h3>HttpServer（端口 8090）</h3>
@@ -476,6 +496,7 @@ registerPage('api-reference', 'API 参考', 'RPC 服务 API、HTTP 接口、注�
 <tr><td>/api/nodes</td><td>GET</td><td>节点监控</td></tr>
 <tr><td>/api/config/reload</td><td>POST</td><td>热更 Luban 配置</td></tr>
 <tr><td>/api/hotswap/jar</td><td>POST</td><td>代码热更 JAR</td></tr>
+<tr><td>/api/hotswap/upload</td><td>POST</td><td>上传全量业务补丁并等待所有节点返回热更结果</td></tr>
 <tr><td>/api/gm/send-mail</td><td>POST</td><td>发送邮件</td></tr>
 <tr><td>/api/gm/kick</td><td>POST</td><td>踢人下线</td></tr>
 <tr><td>/api/ban、/api/unban、/api/ban/list</td><td>POST/GET</td><td>封禁</td></tr>
@@ -483,10 +504,11 @@ registerPage('api-reference', 'API 参考', 'RPC 服务 API、HTTP 接口、注�
 <tr><td>/api/online-players</td><td>GET</td><td>在线玩家</td></tr>
 <tr><td>/api/server-status</td><td>GET/POST</td><td>服务器开关</td></tr>
 <tr><td>/api/whitelist、/api/whitelist/remove</td><td>GET/POST</td><td>白名单</td></tr>
+<tr><td>/api/cheat-users …</td><td>GET/POST</td><td>金手指用户与指令能力 CRUD</td></tr>
 <tr><td>/api/announcements …</td><td>多种</td><td>公告 CRUD</td></tr>
 <tr><td>/api/cdk …</td><td>多种</td><td>兑换码 CRUD</td></tr>
 <tr><td>/api/users …</td><td>多种</td><td>用户与权限（管理员）</td></tr>
-<tr><td>/api/logs</td><td>GET</td><td>操作日志</td></tr>
+<tr><td>/api/logs</td><td>GET</td><td>操作日志（管理员）</td></tr>
 </tbody>
 </table>
 
